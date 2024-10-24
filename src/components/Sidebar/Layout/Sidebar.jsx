@@ -1,13 +1,28 @@
 "use client";
-import { useContext, createContext, useState } from "react";
+import { useContext, createContext, useState, useEffect } from "react";
 import { TbLayoutSidebarLeftExpand } from "react-icons/tb";
 import Link from "next/link"; // Importando o Link do Next.js
-import { signOut } from "next-auth/react"; // Importando a função de logout
+import { signOut, useSession } from "next-auth/react"; // Importando a função de logout
+import { useRouter } from "next/navigation"; // Importando o hook de navegação
+import { FaSignOutAlt } from "react-icons/fa"; // Importa o ícone de logout
+import { FaUser } from "react-icons/fa";
 
 const SidebarContext = createContext();
 
 export default function Sidebar({ children, setExpanded }) {
   const [expanded, setExpandedInternal] = useState(true);
+  const { data: session, status } = useSession(); // Obtém a sessão
+  const router = useRouter(); // Obtém o router
+
+  useEffect(() => {
+    // Verifica se a sessão está carregando ou se está ativa
+    if (status === "loading") return;
+
+    // Se não houver sessão e o path não for "/auth", redireciona para "/auth"
+    if (!session && router.pathname !== "/auth") {
+      router.push("/auth");
+    }
+  }, [session, status, router.pathname]);
 
   const handleToggle = () => {
     setExpandedInternal((curr) => !curr);
@@ -46,32 +61,42 @@ export default function Sidebar({ children, setExpanded }) {
         </SidebarContext.Provider>
 
         <div className="border-t flex p-3">
-          <img
-            src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
-            alt=""
-            className="w-10 h-10 rounded-md"
-          />
+          <div className="w-10 h-10 rounded-md flex items-center justify-center bg-[#D4DDFF]">
+            <FaUser style={{ color: "#3730A3" }} />
+          </div>
+
           <div
             className={`flex justify-between items-center overflow-hidden transition-all ${
               expanded ? "w-52 ml-3" : "w-0"
             }`}
           >
             <div className="leading-4">
-              <h4 className="font-semibold">Henrique Gaspar</h4>
+              <h4 className="font-semibold">
+                {session
+                  ? `${session.user.firstName} ${session.user.secondName}`
+                  : "Usuário Desconhecido"}
+              </h4>
               <span className="text-xs text-gray-600">
-                henriquegaspar14@gmail.com
+                {session ? session.user.email : "Email Desconhecido"}
               </span>
             </div>
           </div>
         </div>
 
         {/* Botão de Logout */}
-        <button
+        <li
+          className={`flex items-center mx-3 py-[9px] mb-3 mt-1 rounded-md cursor-pointer transition-colors group hover:bg-red-600 ${
+            expanded ? "px-3" : "px-2"
+          } bg-red-500 text-white`} // Cor de fundo e texto
           onClick={handleLogout}
-          className="mt-4 mx-3 py-2 px-4 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
         >
-          Logout
-        </button>
+          <div className={`flex items-center justify-between w-full`}>
+            <div className={`flex items-center`}>
+              <FaSignOutAlt className="mr-2" /> {/* Ícone de logout */}
+              <span className={`${expanded ? "block" : "hidden"}`}>Logout</span>
+            </div>
+          </div>
+        </li>
       </nav>
     </aside>
   );

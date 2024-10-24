@@ -10,7 +10,7 @@ const ErrorPage = () => {
   useEffect(() => {
     // Redireciona após alguns segundos ou faz outra lógica
     const timeout = setTimeout(() => {
-      router.push("/auth/signin"); // Redireciona para a página de login
+      router.push("/auth"); // Redireciona para a página de login
     }, 3000); // Redireciona após 3 segundos
 
     return () => clearTimeout(timeout);
