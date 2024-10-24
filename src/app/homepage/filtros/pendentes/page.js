@@ -129,7 +129,7 @@ const PendentesPage = () => {
             );
           })
         ) : (
-          <p className="text-gray-500">Nenhuma reserva vista.</p>
+          <p className="text-gray-500">Nenhuma reserva pendente.</p>
         )}
       </div>
     </div>

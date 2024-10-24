@@ -14,7 +14,7 @@ const VistosPage = () => {
     if (status === "loading") return; // Esperar carregar a sessão
 
     if (!session) {
-      router.push("/auth/signin"); // Redirecionar para a página de login se não estiver autenticado
+      router.push("/auth"); // Redirecionar para a página de login se não estiver autenticado
     } else {
       setPropertyID(session.user.propertyID); // Pega o propertyID da sessão do usuário
     }

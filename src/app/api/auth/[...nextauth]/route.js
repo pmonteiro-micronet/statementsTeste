@@ -28,7 +28,10 @@ export const authOptions = {
           return {
             id: user.userID,
             email: user.email,
+            firstName: user.firstName,
+            secondName: user.secondName,
             propertyID: user.propertyID, // Adicione o propertyID ao objeto retornado
+            pin: user.pin,
           };
         } else {
           return null; // Retorne null se as credenciais não forem válidas
@@ -48,14 +51,20 @@ export const authOptions = {
       if (user) {
         token.id = user.id; // Adicione o ID ao token
         token.email = user.email; // Adicione o email ao token
+        token.firstName = user.firstName;
+        token.secondName = user.secondName;
         token.propertyID = user.propertyID; // Adicione o propertyID ao token
+        token.pin = user.pin;
       }
       return token;
     },
     async session({ session, token }) {
       session.user.id = token.id; // Adicione o ID do usuário à sessão
       session.user.email = token.email; // Adicione o email à sessão
+      session.user.firstName = token.firstName;
+      session.user.secondName = token.secondName;
       session.user.propertyID = token.propertyID; // Adicione o propertyID à sessão
+      session.user.pin = token.pin; // Adicione o propertyID à sessão
       return session;
     },
   },

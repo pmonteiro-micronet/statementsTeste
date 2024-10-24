@@ -36,6 +36,7 @@ model users {
   password        String            @db.VarChar(255)
   createdAt       DateTime?         @default(now()) @db.Timestamp(0)
   propertyID      Int?
+  pin             String?           @db.VarChar(255)
   usersProperties usersProperties[]
 }
 
