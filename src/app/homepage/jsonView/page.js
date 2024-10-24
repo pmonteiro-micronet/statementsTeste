@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import bcrypt from "bcryptjs"; // Importa bcryptjs
 
 const JsonViewPage = () => {
   const [reservationData, setReservationData] = useState(null);
@@ -10,8 +11,9 @@ const JsonViewPage = () => {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [password, setPassword] = useState("");
-  const [isPasswordError, setIsPasswordError] = useState(false);
+  const [pin, setPin] = useState(""); // Estado para o pin
+  const [isPinError, setIsPinError] = useState(false);
+  const [userPinHash, setUserPinHash] = useState(""); // Estado para o hash do pin do usuário logado
   const router = useRouter();
 
   const { data: session, status } = useSession();
@@ -19,14 +21,16 @@ const JsonViewPage = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      if (status === "loading") return; // Aguarde até que o status da sessão esteja definido
+      if (status === "loading") return;
 
       if (!session) {
-        router.push("/login"); // Redireciona para login se o usuário não estiver autenticado
+        router.push("/login");
       } else {
-        // Pega o propertyID da sessão
+        // Pega o propertyID e o pin do usuário da sessão
         const userPropertyID = session?.user?.propertyID;
+        const userPinHash = session?.user?.pin; // Supondo que o pin armazenado é o hash
         setPropertyID(userPropertyID);
+        setUserPinHash(userPinHash); // Armazena o hash do pin
       }
     };
 
@@ -53,36 +57,48 @@ const JsonViewPage = () => {
   }, [propertyID]);
 
   const handleOkClick = () => {
-    setShowModal(true); // Exibe o modal de senha quando o botão "Ok" é clicado
+    setShowModal(true);
   };
 
   const handleCancelClick = () => {
-    setShowCancelModal(true); // Exibe o modal de confirmação de cancelamento
+    setShowCancelModal(true);
   };
 
-  const handlePasswordSubmit = async (e) => {
+  const handlePinSubmit = async (e) => {
     e.preventDefault();
-    if (password === "1234") {
-      // Verifica a senha
-      const recordID = localStorage.getItem("recordID");
-      try {
+    const recordID = localStorage.getItem("recordID");
+
+    try {
+      // Verifica o pin do usuário logado com bcrypt
+      const isPinCorrect = await bcrypt.compare(pin, userPinHash); // Verifica o pin inserido com o hash armazenado
+
+      if (isPinCorrect) {
         await axios.patch(`/api/get_jsons/${recordID}`); // Atualiza o status
-        router.push("/"); // Redireciona após a atualização
-      } catch (error) {
-        console.error("Erro ao marcar como visto:", error);
+        router.push("/");
+      } else {
+        setIsPinError(true);
       }
-    } else {
-      setIsPasswordError(true); // Exibe mensagem de erro se a senha estiver incorreta
+    } catch (error) {
+      console.error("Erro ao marcar como visto:", error);
     }
   };
 
-  const handleCancelPasswordSubmit = (e) => {
+  const handleCancelPasswordSubmit = async (e) => {
     e.preventDefault();
-    if (password === "1234") {
-      // Verifica a senha para cancelamento
-      router.push("/"); // Redireciona após o cancelamento
-    } else {
-      setIsPasswordError(true); // Exibe mensagem de erro se a senha estiver incorreta
+    const recordID = localStorage.getItem("recordID");
+
+    try {
+      // Verifica o pin para cancelamento
+      const isPinCorrect = await bcrypt.compare(pin, userPinHash);
+
+      if (isPinCorrect) {
+        // Adicione aqui a lógica para cancelar
+        router.push("/"); // Redireciona após o cancelamento
+      } else {
+        setIsPinError(true);
+      }
+    } catch (error) {
+      console.error("Erro ao cancelar:", error);
     }
   };
 
@@ -284,25 +300,25 @@ const JsonViewPage = () => {
             </button>
           </div>
 
-          {/* Modal de Senha */}
+          {/* Modal de PIN */}
           {showModal && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
               <div className="bg-white p-8 rounded shadow-lg">
-                <h2 className="text-xl mb-4">Insira a Senha</h2>
-                <form onSubmit={handlePasswordSubmit}>
+                <h2 className="text-xl mb-4">Insira o PIN</h2>
+                <form onSubmit={handlePinSubmit}>
                   <input
                     type="password"
-                    value={password}
+                    value={pin}
                     onChange={(e) => {
-                      setPassword(e.target.value);
-                      setIsPasswordError(false); // Reseta a mensagem de erro ao digitar
+                      setPin(e.target.value);
+                      setIsPinError(false); // Reseta a mensagem de erro ao digitar
                     }}
                     className="border border-gray-300 p-2 mb-4 w-full"
-                    placeholder="Digite a senha"
+                    placeholder="Digite o PIN"
                   />
-                  {isPasswordError && (
+                  {isPinError && (
                     <p className="text-red-500">
-                      Senha incorreta. Tente novamente.
+                      PIN incorreto. Tente novamente.
                     </p>
                   )}
                   <div className="flex justify-end mt-4">
@@ -332,22 +348,22 @@ const JsonViewPage = () => {
                 <h2 className="text-xl mb-4">Cancelamento</h2>
                 <p className="mb-4">
                   Esta ação não irá guardar nenhuma informação.<br></br>Por
-                  favor, insira a senha para continuar.
+                  favor, insira o PIN para continuar.
                 </p>
-                <form onSubmit={handleCancelPasswordSubmit}>
+                <form onSubmit={handleCancelPinSubmit}>
                   <input
                     type="password"
-                    value={password}
+                    value={pin}
                     onChange={(e) => {
-                      setPassword(e.target.value);
-                      setIsPasswordError(false); // Reseta a mensagem de erro ao digitar
+                      setPin(e.target.value);
+                      setIsPinError(false); // Reseta a mensagem de erro ao digitar
                     }}
                     className="border border-gray-300 p-2 mb-4 w-full"
-                    placeholder="Digite a senha"
+                    placeholder="Digite o PIN"
                   />
-                  {isPasswordError && (
+                  {isPinError && (
                     <p className="text-red-500">
-                      Senha incorreta. Tente novamente.
+                      PIN incorreto. Tente novamente.
                     </p>
                   )}
                   <div className="flex justify-end mt-4">

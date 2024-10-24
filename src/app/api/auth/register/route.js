@@ -3,7 +3,7 @@ import prisma from "@/lib/db"; // ajuste o caminho conforme necessário
 import bcrypt from "bcryptjs";
 
 export async function POST(request) {
-  const { firstName, secondName, email, password } = await request.json();
+  const { firstName, secondName, email, password, pin } = await request.json();
 
   // Verifique se o email já está em uso
   const existingUser = await prisma.users.findUnique({
@@ -19,6 +19,10 @@ export async function POST(request) {
   // Hash da senha
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  // Se o pin é um número, você pode considerar convertê-lo para string.
+  // Também podemos optar por não encriptá-lo, se preferir, mas para fins de segurança, vamos fazer.
+  const hashedPin = await bcrypt.hash(pin.toString(), 10);
+
   // Crie o novo usuário
   const newUser = await prisma.users.create({
     data: {
@@ -26,6 +30,7 @@ export async function POST(request) {
       secondName,
       email,
       password: hashedPassword,
+      pin: hashedPin, // Adiciona o pin criptografado
     },
   });
 

@@ -31,6 +31,7 @@ export const authOptions = {
             firstName: user.firstName,
             secondName: user.secondName,
             propertyID: user.propertyID, // Adicione o propertyID ao objeto retornado
+            pin: user.pin,
           };
         } else {
           return null; // Retorne null se as credenciais não forem válidas
@@ -53,6 +54,7 @@ export const authOptions = {
         token.firstName = user.firstName;
         token.secondName = user.secondName;
         token.propertyID = user.propertyID; // Adicione o propertyID ao token
+        token.pin = user.pin;
       }
       return token;
     },
@@ -62,6 +64,7 @@ export const authOptions = {
       session.user.firstName = token.firstName;
       session.user.secondName = token.secondName;
       session.user.propertyID = token.propertyID; // Adicione o propertyID à sessão
+      session.user.pin = token.pin; // Adicione o propertyID à sessão
       return session;
     },
   },
