@@ -59,3 +59,25 @@ model requestRecordsReservations {
   responseBody    String?  @db.Text
   propertyID      Int
 }
+
+model Contadores {
+  id          Int    @id @default(autoincrement())
+  counterName String @db.VarChar(255)
+  count       Int?   @default(0)
+}
+
+model counter {
+  id          Int    @id @default(autoincrement())
+  counterName String @db.VarChar(255)
+  count       Int?   @default(0)
+}
+
+model requestRecordsReservationCI {
+  requestID       Int      @id @default(autoincrement())
+  requestBody     String   @db.Text
+  requestType     String   @db.VarChar(20)
+  requestDateTime DateTime @db.DateTime(0)
+  responseStatus  String?  @db.VarChar(20)
+  responseBody    String?  @db.Text
+  propertyID      Int
+}
