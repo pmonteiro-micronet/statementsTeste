@@ -27,6 +27,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/components/SessionChecker/page.tsx"
-  ],
+, "src/components/ClientComponentWrapper/page.js", "tailwind.config.js"  ],
   "exclude": ["node_modules"]
 }

@@ -1,12 +1,9 @@
-//app/api/reservations/info
-import { NextResponse } from "next/server"; // Importa o NextResponse
-import axios from "axios"; // Importa Axios para fazer requisições HTTP
+import { NextResponse } from "next/server"; 
+import axios from "axios"; 
 
 export async function POST(request) {
-  // Extrai os dados do corpo da requisição
   const { propertyID, data } = await request.json();
 
-  // Valida os dados recebidos
   if (!propertyID || !data) {
     return new NextResponse(
       JSON.stringify({ error: "Faltam parâmetros: propertyID ou data" }),
@@ -15,10 +12,10 @@ export async function POST(request) {
   }
 
   try {
-    // Enviar os dados para o Mock Server usando a URL do endpoint específico
-    const response = await axios.post('https://e66ef7df-5b4b-4133-9811-b17f6e9ab03c.mock.pstmn.io', {
+    // Enviar os dados para o Mock Server
+    const response = await axios.post('https://1f665a51-784d-4255-979e-660fb3c6a889.mock.pstmn.io/api/reservations/info', {
       propertyID,
-      data, // Use o valor enviado na requisição
+      data,
     });
 
     // Retorna a resposta do Mock Server para o cliente
@@ -26,7 +23,7 @@ export async function POST(request) {
   } catch (error) {
     console.error("Erro ao enviar dados para o Mock Server:", error.response ? error.response.data : error.message);
     return new NextResponse(
-      JSON.stringify({ error: "Erro ao buscar reservas no Mock Server" }),
+      JSON.stringify({ error: error.response ? error.response.data : "Erro ao enviar dados para o Mock Server" }),
       { status: 500 }
     );
   }
