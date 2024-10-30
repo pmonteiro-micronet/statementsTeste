@@ -155,11 +155,11 @@ export function SidebarItem({ icon, text, active, alert, children }) {
 }
 
 // Inside SubMenuItem component
-export function SubMenuItem({ text, filter }) {
+export function SubMenuItem({ text, href }) {
   const { expanded } = useContext(SidebarContext);
 
   return (
-    <Link href={`/homepage/filtros/${filter}`}>
+    <Link href={href}>
       <li
         className={`flex items-center py-2 pl-3 my-1 rounded-md hover:bg-indigo-50 text-gray-600 cursor-pointer`}
       >
