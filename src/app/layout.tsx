@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import ClientWrapper from "@/components/ClientComponentWrapper/page";
+import SidebarWrapper from "@/components/Layout/SidebarWrapper";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
@@ -35,7 +35,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionProviderWrapper>
-          <ClientWrapper>{children}</ClientWrapper>
+          <SidebarWrapper>{children}</SidebarWrapper>
         </SessionProviderWrapper>
       </body>
     </html>
