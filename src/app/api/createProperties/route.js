@@ -1,6 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/db"; // ajuste o caminho conforme necessário
 
-const prisma = new PrismaClient();
 const API_KEY =
   process.env.API_KEY || "vn2or398yvuh39fv9yf32faso987f987oihsao8789780hvw08f";
 

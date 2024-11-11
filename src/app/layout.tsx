@@ -17,8 +17,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Statements Online",
-  description: "Statements Online",
+  title: "Extensions myPMS",
+  description: "Extensions myPMS",
 };
 
 export default function RootLayout({
