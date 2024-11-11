@@ -3,124 +3,311 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
+import {
+  Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination,
+  Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem,
+  Input
+} from "@nextui-org/react";
+
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { FaGear } from "react-icons/fa6";
+import { MdOutlineRefresh } from "react-icons/md";
+import { IoIosArrowForward, IoIosArrowBack  } from "react-icons/io";
+
+import DepartureInfoForm from "@/components/modals/departures/info/page";
+import "../departures.css";
+import LoadingBackdrop from "@/components/Loader/page";
 
 export default function Page({ params }) {
-  const { id } = params; // Acessando o parâmetro id diretamente das props
+  const { id } = params;
+  const propertyID = id;
+  const today = new Date().toISOString().split("T")[0]; // Data de hoje
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1); // Calcula o amanhã
+  const tomorrowDate = tomorrow.toISOString().split("T")[0]; // Formata o amanhã
+
+  const [currentDate, setCurrentDate] = useState(today); // Estado para a data atual exibida
   const [reservas, setReservas] = useState([]);
   const [postSuccessful, setPostSuccessful] = useState(false);
-  const propertyID = id;
-  const today = new Date().toISOString().split("T")[0];
+  const [sendResSuccess, setSendResSuccess] = useState(false); //estado para envio get statement
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  console.log("ID", id);
-
-  const handleButtonClick = async () => {
+  // Função para enviar os dados para a API
+  const sendDataToAPI = async (date) => {
     try {
       await axios.post("/api/reservations/info", {
         propertyID,
-        data: today,
+        data: date, // Envia a data dinamicamente
       });
+      console.log(`Dados enviados para a data: ${date}`);
       setPostSuccessful(true);
     } catch (error) {
-      console.error("Erro ao enviar os dados:", error.response ? error.response.data : error.message);
+      console.error(
+        "Erro ao enviar os dados:",
+        error.response ? error.response.data : error.message
+      );
       setPostSuccessful(false);
     }
   };
 
+  // Função para enviar os dados para a API
+  const sendResToAPI = async (resNumber, roomNumber) => {
+    try {
+      // Envia todos os dados para a API
+      await axios.post("/api/reservations/info/specificReservation", {
+        propertyID,
+        resNumber,
+        roomNumber,
+        window: "A",
+      });
+      console.log(`Dados enviados com sucesso para a data: ${date}`);
+      setSendResSuccess(true);
+    } catch (error) {
+      console.error(
+        "Erro ao enviar os dados:",
+        error.response ? error.response.data : error.message
+      );
+      setSendResSuccess(false);
+    }
+  };
+
+  // UseEffect para enviar os dados quando a página for carregada
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true); // Inicia o carregamento
+
+      // Envia os dados para hoje e para o dia seguinte
+      await sendDataToAPI(today);
+      await sendDataToAPI(tomorrowDate);
+
+      setIsLoading(false); // Termina o carregamento
+    };
+
+    fetchData(); // Chama a função de envio assim que a página for carregada
+  }, [propertyID, today, tomorrowDate]); // Dependências para garantir que a requisição seja feita com os dados corretos
+
+  // Função para pegar as reservas
   useEffect(() => {
     const fetchReservas = async () => {
-      console.log("Buscando reservas...");
+      setIsLoading(true); // Inicia o carregamento
       try {
         const response = await axios.get("/api/reservations/checkouts");
-        console.log("Reservas retornadas:", response.data.response);
+        console.log("Resposta da API:", response.data); // Log da resposta da API
 
-        const reservasFiltradas = response.data.response.filter((reserva) => {
-          const requestDateTime = new Date(reserva.requestDateTime).toISOString().split("T")[0];
-          return requestDateTime === today;
+        let reservasFiltradas = [];
+
+        response.data.response.forEach((reserva) => {
+          try {
+            if (reserva.requestBody) {
+              const requestBody = JSON.parse(reserva.requestBody);
+              console.log("requestBody:", requestBody); // Log do requestBody
+
+              for (let key in requestBody) {
+                const reservas = requestBody[key];
+
+                if (Array.isArray(reservas)) {
+                  const reservasComDataAtual = reservas.filter(item => item.DateCO === currentDate);
+                  console.log("Reservas filtradas para a data atual:", reservasComDataAtual); // Log das reservas filtradas
+
+                  reservasFiltradas = [...reservasFiltradas, ...reservasComDataAtual];
+                } else {
+                  console.warn(`Reservas para a chave ${key} não são um array:`, reservas);
+                }
+              }
+            } else {
+              console.warn("requestBody está undefined para a reserva:", reserva);
+            }
+          } catch (e) {
+            console.error("Erro ao fazer o parsing do requestBody:", e);
+          }
         });
 
+        // Atualiza o estado com as reservas filtradas
         setReservas(reservasFiltradas);
       } catch (error) {
-        console.error("Erro ao buscar as reservas:", error.response ? error.response.data : error.message);
+        console.error(
+          "Erro ao buscar as reservas:",
+          error.response ? error.response.data : error.message
+        );
+      } finally {
+        setIsLoading(false); // Para o carregamento, independentemente do sucesso ou erro
       }
     };
 
     fetchReservas();
-  }, [postSuccessful]);
+  }, [currentDate, postSuccessful]); // Recarrega as reservas sempre que a data mudar
+
+  // UseEffect para monitorar mudanças em reservas
+  useEffect(() => {
+    console.log("Reservas atualizadas:", reservas);
+  }, [reservas]);
+
+  // UseMemo para preparar os dados filtrados de acordo com a paginação
+  const items = React.useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return reservas.slice(start, end); // Filtra as reservas com base na página atual e número de linhas por página
+  }, [page, rowsPerPage, reservas]); // A dependência inclui `reservas`, que é onde as reservas filtradas estão
+
+  const pages = Math.ceil(reservas.length / rowsPerPage); // Calcula o número total de páginas com base no total de reservas
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    setPage(1);
   };
 
-  const pages = Math.ceil(reservas.length / rowsPerPage);
-  const items = reservas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
   return (
-    <main className="flex flex-col flex-grow h-screen">
-      <div className="p-4">
-        <button className="bg-red-200 h-10 w-32 rounded-lg" onClick={handleButtonClick}>
-          See Departures
-        </button>
-        <h2 className="text-center font-semibold text-xl mt-5">Departure List for {today}</h2>
-        <div className="flex-grow overflow-y-auto">
+    <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-[#FAFAFA]">
+      <div className="flex-grow overflow-y-auto p-4">
+        <div className="flex justify-between items-center w-full">
+          <div className="header-container flex items-center justify-between w-full">
+            {/* Div para o conteúdo centralizado (setas e título dinâmico) */}
+            <div className="flex items-center space-x-4 mx-auto">
+              {/* Seta para voltar para o dia de hoje */}
+              {currentDate !== today && (
+                <button
+                  onClick={() => setCurrentDate(today)}
+                  className="p-2 text-gray-500"
+                >
+                  <IoIosArrowBack size={20} />
+                </button>
+              )}
+
+              {/* Título dinâmico com a data atual */}
+              <h2 className="text-xl">
+                {currentDate === today ? `Today: ${today}` : `Tomorrow: ${currentDate}`}
+              </h2>
+
+              {/* Seta para avançar para o próximo dia */}
+              {currentDate !== tomorrowDate && (
+                <button
+                  onClick={() => setCurrentDate(tomorrowDate)}
+                  className="p-2 text-gray-500"
+                >
+                  <IoIosArrowForward size={20} />
+                </button>
+              )}
+
+              {/* Título "Departure List" separado do título dinâmico */}
+              <h2 className="text-xl">Departure List</h2>
+            </div>
+
+            {/* Botão de refresh alinhado à direita */}
+            <div className="flex items-center">
+              <button
+                onClick={() => window.location.reload()}
+                className="text-black border border-black bg-white rounded-lg cursor-pointer p-2"
+              >
+                <MdOutlineRefresh size={20} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5">
           {reservas.length > 0 ? (
-            <table border="1" className="w-full text-left mt-5 mb-20">
-              <thead>
-                <tr className="bg-gray-200 h-10">
-                  <td>Departure</td>
-                  <td>Last Name</td>
-                  <td>First Name</td>
-                  <td>Booker</td>
-                  <td>Company</td>
-                  <td>Room</td>
-                  <td>Notes</td>
-                  <td>Res. No.</td>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((reserva, index) => {
-                  let requestBody;
-                  try {
-                    requestBody = JSON.parse(reserva.requestBody);
-                  } catch (error) {
-                    console.error("Erro ao parsear requestBody:", error.message);
-                    return null;
-                  }
+            <div className="overflow-auto md:overflow-visible">
+              <LoadingBackdrop open={isLoading} />
+              {!isLoading && (
+                <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
+                  <thead>
+                    <tr className="bg-[#e8e6e6] h-12">
+                      <td className="pl-2 w-10 border-r border-[#adacac]"><FaGear size={18} color="black" /></td>
+                      <td className="pl-2 border-r border-[#adacac]">ROOM</td>
+                      <td className="pl-2 border-r border-[#adacac]">LAST NAME</td>
+                      <td className="pl-2 border-r border-[#adacac]">FIRST NAME</td>
+                      <td className="pl-2 border-r border-[#adacac]">TRAVEL AGENCY</td>
+                      <td className="pl-2 border-r border-[#adacac]">COMPANY</td>
+                      <td className="pl-2 border-r border-[#adacac]">GROUP</td>
+                      <td className="pl-2 border-r border-[#adacac]">NOTES</td>
+                      <td className="pl-2 border-r border-[#adacac]">RES. NO.</td>
+                      <td className="text-right pr-2">DEPARTURE</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((reserva, index) => {
+                      // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
+                      return (
+                        <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left">
+                          <td className="pl-1 flex items-start border-r border-[#adacac]">
+                            <Dropdown>
+                              <DropdownTrigger>
+                                <Button
+                                  variant="light"
+                                  className="flex justify-center items-center w-auto min-w-0  p-0 m-0"
+                                >
+                                  <BsThreeDotsVertical size={20} className="text-black" />
+                                </Button>
 
-                  return Object.keys(requestBody).map((key) => {
-                    const reservasArray = requestBody[key];
 
-                    if (Array.isArray(reservasArray)) {
-                      return reservasArray.map((reservaItem, innerIndex) => (
-                        <tr key={`${index}-${innerIndex}`} className="h-10 border-2 border-b-gray text-left">
-                          <td>{reservaItem.DateCO}</td>
-                          <td>{reservaItem.LastName}</td>
-                          <td>{reservaItem.FirstName}</td>
-                          <td>{reservaItem.Booker}</td>
-                          <td>{reservaItem.Company}</td>
-                          <td>{reservaItem.RoomNumber}</td>
-                          <td>{reservaItem.Notes}</td>
-                          <td>{reservaItem.ReservationNumber}</td>
+                              </DropdownTrigger>
+                              <DropdownMenu
+                                aria-label="Static Actions"
+                                closeOnSelect={false}
+                                isOpen={true}
+                              >
+                                <DropdownItem key="edit">
+                                  <DepartureInfoForm
+                                    buttonName={"Ver info"}
+                                    buttonColor={"transparent"}
+                                    modalHeader={"Reservation"}
+                                    formTypeModal={11}
+                                    editor={"teste"}
+                                    roomNumber={reserva.RoomNumber}  // Passando o roomNumber
+                                    dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
+                                    booker={reserva.Booker}
+                                    salutation={reserva.Salutation}
+                                    lastName={reserva.LastName}
+                                    firstName={reserva.FirstName}
+                                    roomType={reserva.RoomType}
+                                    resStatus={reserva.ResStatus}
+                                    totalPax={reserva.TotalPax}
+                                    balance={reserva.Balance}
+                                    country={reserva.Country}
+                                  />
+                                </DropdownItem>
+                                <DropdownItem
+                                  key="show"
+                                  onClick={() => {
+                                    sendResToAPI(
+                                      reserva.ReservationNumber, // Assumindo que `ReservationNumber` está em `reserva`
+                                      reserva.RoomNumber
+                                    );
+                                  }}
+                                >
+                                  Get Statement
+                                </DropdownItem>
+                              </DropdownMenu>
+                            </Dropdown>
+                          </td>
+                          <td className="pl-2 border-r border-[#adacac]">{reserva.RoomNumber}</td>
+                          <td className="pl-2 border-r border-[#adacac]">{reserva.LastName}</td>
+                          <td className="pl-2 border-r border-[#adacac]">{reserva.FirstName}</td>
+                          <td className="pl-2 border-r border-[#adacac]">{reserva.Booker}</td>
+                          <td className="pl-2 border-r border-[#adacac]">{reserva.Company}</td>
+                          <td className="pl-2 border-r border-[#adacac]">{reserva.Group}</td>
+                          <td className="pl-2 border-r border-[#adacac]">{reserva.Notes}</td>
+                          <td className="pl-2 border-r border-[#adacac]">{reserva.ReservationNumber}</td>
+                          <td className="text-right pr-2">{reserva.DateCO}</td>
                         </tr>
-                      ));
-                    } else {
-                      console.error("reservasArray não é um array:", reservasArray);
-                      return null;
-                    }
-                  });
-                })}
-              </tbody>
-            </table>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
           ) : (
             <p>Nenhuma reserva encontrada.</p>
           )}
         </div>
+
       </div>
 
-      <div className="fixed bottom-0 right-0">
+      {/* Fixed Pagination Section */}
+      <div className="sticky bottom-0 w-full bg-white p-0 m-0">
         <PaginationTable
           page={page}
           pages={pages}

@@ -107,7 +107,7 @@ const JsonViewPage = () => {
   }
 
   return (
-    <div className="p-4 font-sans bg-white">
+    <main className="flex flex-col flex-grow h-full p-0 m-0 overflow-x-hidden">
       {loading ? (
         <p>Carregando dados...</p>
       ) : error ? (
@@ -129,7 +129,7 @@ const JsonViewPage = () => {
                 {JSON.parse(reservationData.requestBody).Reservation.map(
                   (reservation, index) => (
                     <div key={index}>
-                      <p className="font-bold text-3xl text-[#2E615C]">
+                      <p className="font-bold text-3xl text-primary">
                         Room:{" "}
                         <span className="font-bold">
                           {reservation.RoomNumber}
@@ -180,8 +180,7 @@ const JsonViewPage = () => {
             <table className="w-[80%] border-collapse border border-gray-300 mb-4 mx-auto">
               <thead>
                 <tr
-                  className="text-white"
-                  style={{ backgroundColor: "#2E615C" }}
+                  className="text-white bg-primary"
                 >
                   <th className="border border-gray-300 p-2 text-xl h-20">
                     DATE
@@ -201,10 +200,7 @@ const JsonViewPage = () => {
                   (item, index) => (
                     <tr
                       key={item.ID}
-                      style={{
-                        backgroundColor:
-                          index % 2 === 0 ? "#ffffff" : "#D4F1EE",
-                      }}
+                      className={index % 2 === 0 ? "bg-white" : "bg-primary-100"}
                     >
                       <td className="border border-gray-300 p-2 w-32 text-center text-lg">
                         {item.Date}
@@ -293,7 +289,7 @@ const JsonViewPage = () => {
               Cancel
             </button>
             <button
-              className="bg-[#2E615C] text-white font-semibold p-2 rounded-lg"
+              className="bg-primary text-white font-semibold p-2 rounded-lg"
               onClick={handleOkClick}
             >
               Ok
@@ -389,7 +385,7 @@ const JsonViewPage = () => {
       ) : (
         <p>Nenhum dado encontrado.</p>
       )}
-    </div>
+    </main>
   );
 };
 

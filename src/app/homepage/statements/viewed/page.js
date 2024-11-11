@@ -52,10 +52,8 @@ const VistosPage = () => {
   }
 
   return (
-    <div
-      className="min-h-screen flex flex-col p-8"
-      style={{ backgroundColor: "#EBEBEB" }}
-    >
+      <main 
+      className="flex flex-col flex-grow h-full overflow-hidden p-4 m-0 bg-background">
       <h2 className="font-semibold text-2xl mb-4">Vistos</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {filteredJsons.length > 0 ? (
@@ -77,7 +75,7 @@ const VistosPage = () => {
                   </div>
                   <div className="absolute top-0 right-0 mr-1 mt-1">
                     <p className="flex flex-col">
-                      <span className="text-5xl font-semibold text-center text-white bg-[#BAE9E4] rounded-lg">
+                      <span className="text-5xl font-semibold text-center text-white bg-primary rounded-lg">
                         <span className="text-4xl">#</span>
                         {reservation.RoomNumber}
                       </span>
@@ -112,7 +110,7 @@ const VistosPage = () => {
                   </div>
                   <div className="flex justify-center mt-5 pr-4 pb-4">
                     <button
-                      className="w-full pt-1 pb-1 text-sm rounded-lg border-2 flex items-center justify-center gap-2 border-gray-300 bg-[#BAE9E4] hover:bg-[#2E615C] hover:text-white transition-colors"
+                      className="w-full pt-1 pb-1 text-sm rounded-lg border-2 flex items-center justify-center gap-2 border-primary-50 bg-primary-100 hover:bg-primary hover:text-white transition-colors"
                       onClick={() => handleCardClick(json)}
                     >
                       View Statement
@@ -126,7 +124,7 @@ const VistosPage = () => {
           <p className="text-gray-500">Nenhuma reserva vista.</p>
         )}
       </div>
-    </div>
+    </main>
   );
 };
 
