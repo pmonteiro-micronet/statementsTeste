@@ -74,7 +74,7 @@ export default function SidebarWrapper({ children }) {
     setListItems((prevListItems) => {
       const updatedListItems = { ...prevListItems };
 
-      Object.entries(updatedListItems).forEach(([key, section]) => {
+      Object.entries(updatedListItems).forEach(([section]) => {
         let sectionActive = false;
 
         section.items = section.items.map((item) => {
