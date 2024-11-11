@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const API_KEY =
   process.env.API_KEY || "vn2or398yvuh39fv9yf32faso987f987oihsao8789780hvw08f";
 
-export async function POST(req, res) {
+export async function POST(req) {
   // Verificar a API Key
   const apiKey = req.headers.get("x-api-key"); // Use req.headers.get() with the new fetch API in Next.js 13
 
