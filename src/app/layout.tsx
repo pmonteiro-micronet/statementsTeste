@@ -1,3 +1,4 @@
+// RootLayout.js
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -31,11 +32,17 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SessionProviderWrapper>
-          <SidebarWrapper>{children}</SidebarWrapper>
+          <div className="flex h-screen">
+            {/* Sidebar */}
+            <SidebarWrapper />
+
+            {/* Main Content Area */}
+            <div className="flex-grow overflow-x-hidden">
+              {children}
+            </div>
+          </div>
         </SessionProviderWrapper>
       </body>
     </html>

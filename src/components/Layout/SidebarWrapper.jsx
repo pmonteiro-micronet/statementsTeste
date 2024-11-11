@@ -6,6 +6,8 @@ import NavBar from "./NavBar";
 import { useSession } from "next-auth/react";
 import { IoIosStats } from "react-icons/io";
 import axios from "axios";
+import { IoDocumentOutline } from "react-icons/io5";
+import { FaRegCalendarAlt } from "react-icons/fa";
 
 export default function SidebarWrapper({ children }) {
   const { data: session } = useSession();
@@ -14,16 +16,14 @@ export default function SidebarWrapper({ children }) {
   const [expanded, setExpanded] = useState(true);
   const [listItems, setListItems] = useState({
     Statements: {
-      icon: <IoIosStats size={20} />,
-      active: true,
+      icon: <IoDocumentOutline size={20} />,
       items: [
-        { ref: "/homepage/statements/pending", label: "Pendings", active: true },
-        { ref: "/homepage/statements/viewed", label: "Viewed", active: true },
+        { ref: "/homepage/statements/pending", label: "Pendings" },
+        { ref: "/homepage/statements/viewed", label: "Viewed" },
       ],
     },
     FrontOffice_View: {
-      icon: <IoIosStats size={20} />,
-      active: true,
+      icon: <FaRegCalendarAlt size={18} />,
       items: [],
     },
   });
@@ -41,18 +41,24 @@ export default function SidebarWrapper({ children }) {
         try {
           const response = await axios.get(`/api/properties?propertyID=${session.user.propertyID}`);
           const hotels = Array.isArray(response.data.response) ? response.data.response : [];
-          
+          const filteredHotels = hotels.filter(hotel => hotel.propertyID === session.user.propertyID);
+
           setListItems((prevListItems) => ({
             ...prevListItems,
             FrontOffice_View: {
               ...prevListItems.FrontOffice_View,
-              items: hotels.map((hotel) => ({
-                label: hotel.propertyName,
-                items: [
-                  { ref: `/homepage/frontOfficeView/departures/${hotel.propertyID}`, label: "Departures" },
-                  { ref: `/homepage/frontOfficeView/${hotel.propertyID}/arrivals`, label: "Arrivals" },
-                ],
-              })),
+              items: filteredHotels.length === 1
+                ? [
+                    { ref: `/homepage/frontOfficeView/departures/${filteredHotels[0].propertyID}`, label: "Departures" },
+                    { ref: `/homepage/frontOfficeView/arrivals/${filteredHotels[0].propertyID}`, label: "Arrivals" },
+                  ]
+                : filteredHotels.map((hotel) => ({
+                    label: hotel.propertyName,
+                    items: [
+                      { ref: `/homepage/frontOfficeView/departures/${hotel.propertyID}`, label: "Departures" },
+                      { ref: `/homepage/frontOfficeView/${hotel.propertyID}/arrivals/${hotel.propertyID}`, label: "Arrivals" },
+                    ],
+                  })),
             },
           }));
         } catch (error) {
@@ -64,12 +70,56 @@ export default function SidebarWrapper({ children }) {
     fetchHotels();
   }, [session]);
 
+  // Atualize o estado ativo com base na rota atual
+  useEffect(() => {
+    setListItems((prevListItems) => {
+      const updatedListItems = { ...prevListItems };
+
+      Object.entries(updatedListItems).forEach(([key, section]) => {
+        let sectionActive = false;
+
+        section.items = section.items.map((item) => {
+          // Se o item não tiver sub-itens
+          if (!item.items) {
+            const isActive = pathname === item.ref;
+            sectionActive = sectionActive || isActive; // Mantém ativo se algum sub-item estiver ativo
+            return {
+              ...item,
+              active: isActive,
+            };
+          }
+
+          // Se o item tiver sub-itens, verificamos se algum sub-item corresponde à rota
+          const subItems = item.items.map((subItem) => {
+            const isSubActive = pathname === subItem.ref;
+            sectionActive = sectionActive || isSubActive; // Se algum sub-item estiver ativo, ativamos o principal
+            return {
+              ...subItem,
+              active: isSubActive,
+            };
+          });
+
+          return {
+            ...item,
+            active: subItems.some((subItem) => subItem.active), // Define o item principal como ativo se algum sub-item for ativo
+            items: subItems,
+          };
+        });
+
+        // Define a seção principal como ativa se algum item ou sub-item estiver ativo
+        section.active = sectionActive;
+      });
+
+      return updatedListItems;
+    });
+  }, [pathname]);
+
   const showSidebar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth");
 
   return (
     <div className="min-h-screen flex flex-col">
       {isMobile ? (
-        <NavBar listItems={listItems}/>
+        <NavBar listItems={listItems} />
       ) : (
         showSidebar && (
           <Sidebar setExpanded={setExpanded}>
@@ -82,13 +132,13 @@ export default function SidebarWrapper({ children }) {
               >
                 {section.items.map((item, index) =>
                   item.items ? (
-                    <SidebarItem key={index} text={item.label} icon={section.icon} active={false}>
+                    <SidebarItem key={index} text={item.label} icon={section.icon} active={item.active}>
                       {item.items.map((subItem, subIndex) => (
-                        <SubMenuItem key={subIndex} text={subItem.label} href={subItem.ref} />
+                        <SubMenuItem key={subIndex} text={subItem.label} href={subItem.ref} active={subItem.active} />
                       ))}
                     </SidebarItem>
                   ) : (
-                    <SubMenuItem key={index} text={item.label} href={item.ref} />
+                    <SubMenuItem key={index} text={item.label} href={item.ref} active={item.active} />
                   )
                 )}
               </SidebarItem>
@@ -97,26 +147,16 @@ export default function SidebarWrapper({ children }) {
         )
       )}
 
-      {isMobile ? (
-        <main
-          className={`flex-1 overflow-y-auto transition-all duration-300`}
-          style={{
-            marginLeft: !isMobile && expanded ? "16rem" : "0", // Margem ajustada para largura total no mobile
-          }}
-        >
-          {children}
-        </main>
-      ) : (
-        <main
-          className={`flex-1 min-h-screen overflow-y-auto transition-all duration-300`}
-          style={{
-            marginLeft: !isMobile && expanded ? "16rem" : "4rem",
-            padding: "0",
-          }}
-        >
-          {children}
-        </main>
-      )}
+      <main
+        className={`flex-1 min-h-screen overflow-y-auto transition-all duration-300 ${
+          !showSidebar ? "p-0" : "ml-16"
+        }`}
+        style={{
+          marginLeft: isMobile || !showSidebar ? "0" : expanded ? "16rem" : "4rem",
+        }}
+      >
+        {children}
+      </main>
     </div>
   );
 }

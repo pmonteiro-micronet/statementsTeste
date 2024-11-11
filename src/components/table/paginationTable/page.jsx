@@ -20,50 +20,41 @@ export default function CustomPagination({
 
   return (
     <>
-    <div className="bg-tableFooter border border-tableFooterBorder flex justify-between items-center lg:pl-72 w-full py-3">
-      <div>
-        {dataCSVButton && dataCSVButton.length > 0 && (
-          <div className="ml-5 space-x-3 flex flex-row">
-            <Button><BsFiletypePdf size={17}/> PDF</Button>
-            <Button><BsFiletypeCsv size={17}/> CSV</Button>
+      <div className="bg-tableFooter border border-tableFooterBorder flex flex-col sm:flex-row justify-between items-start sm:items-center lg:pl-72 w-full py-3 px-2 sm:px-4">
+        <div className="flex flex-wrap items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-2 sm:mb-0">
+            <div className="flex space-x-3">
+              
+            </div>
+        </div>
+        <div className="flex flex-wrap items-center justify-start sm:justify-end space-y-2 sm:space-y-0">
+          <div className="flex items-center">
+            <span className="text-sm text-default-600">Items per Page</span>
+            <select
+              value={rowsPerPage}
+              onChange={handleChangeRowsPerPage}
+              className="ml-2 py-1 px-2 border rounded bg-transparent text-sm text-default-600"
+            >
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={150}>150</option>
+              <option value={250}>250</option>
+            </select>
           </div>
-        )}
-      </div>
-      <div className="flex flex-row items-center">
-        <Pagination
-          isCompact
-          showControls
-          color="primary"
-          variant="flat"
-          page={page}
-          total={pages}
-          onChange={(page) => setPage(page)}
-          className="mx-5"
-        />
-        <div>
-          <span className="text-sm text-black">Page Records</span>
-          <select
-            value={rowsPerPage}
-            onChange={handleChangeRowsPerPage}
-            className="ml-2 py-1 px-2 border rounded bg-transparent text-sm text-default-600 mx-5"
-          >
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-            <option value={150}>150</option>
-            <option value={250}>250</option>
-          </select>
-        </div>
-        <div className="ml-5 mr-10 text-black">
-          {items?.length > 0
-            ? `${(page - 1) * rowsPerPage + 1}-${Math.min(
-                page * rowsPerPage,
-                items.length
-              )} Pagination of ${items.length}`
-            : "No Records"}
+          <div className="ml-0 sm:ml-5 text-black">
+          <Pagination
+            isCompact
+            showControls
+            color="primary"
+            variant="flat"
+            page={page}
+            total={pages}
+            onChange={(page) => setPage(page)}
+            className="mx-0 xs:mx-2"
+          />
+          </div>
         </div>
       </div>
-    </div>
-    {children}
+      {children}
     </>
   );
 }

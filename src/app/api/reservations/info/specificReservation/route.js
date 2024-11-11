@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import axios from "axios"; 
 
 export async function POST(request) {
-  const { propertyID, data } = await request.json();
+  // Desestruture os quatro parâmetros necessários
+  const { propertyID, resNumber, roomNumber, window } = await request.json();
 
-  if (!propertyID || !data) {
+  // Verifique se todos os parâmetros estão presentes
+  if (!propertyID || !resNumber || !roomNumber || !window) {
     return new NextResponse(
-      JSON.stringify({ error: "Faltam parâmetros: propertyID ou data" }),
+      JSON.stringify({ error: "Faltam parâmetros" }),
       { status: 400 }
     );
   }
@@ -15,7 +17,9 @@ export async function POST(request) {
     // Enviar os dados para o Mock Server
     const response = await axios.post('https://734359c8-b9cd-4bd4-910c-7bf97feb9d45.mock.pstmn.io/api/reservations/info', {
       propertyID,
-      data,
+      resNumber,
+      roomNumber,
+      window
     });
 
     // Retorna a resposta do Mock Server para o cliente
