@@ -2,9 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar, { SidebarItem, SubMenuItem } from "./Sidebar";
-import NavBar from "./NavBar";
+import NavBar from "./Navbar";
 import { useSession } from "next-auth/react";
-import { IoIosStats } from "react-icons/io";
 import axios from "axios";
 import { IoDocumentOutline } from "react-icons/io5";
 import { FaRegCalendarAlt } from "react-icons/fa";
@@ -75,7 +74,7 @@ export default function SidebarWrapper({ children }) {
     setListItems((prevListItems) => {
       const updatedListItems = { ...prevListItems };
 
-      Object.entries(updatedListItems).forEach(([key, section]) => {
+      Object.entries(updatedListItems).forEach(([section]) => {
         let sectionActive = false;
 
         section.items = section.items.map((item) => {

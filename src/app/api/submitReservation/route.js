@@ -14,11 +14,11 @@ export async function POST(req) {
     // Desestruture os dados da requisição
     const {
       propertyID,
-      Reservation,
-      GuestInfo,
-      Items,
-      Taxes,
-      DocumentTotals,
+      // Reservation,
+      // GuestInfo,
+      // Items,
+      // Taxes,
+      // DocumentTotals,
     } = body;
 
     // Criar o objeto que vamos salvar
@@ -87,7 +87,7 @@ export async function POST(req) {
 }
 
 // Função para lidar com requisições GET
-export async function GET(req) {
+export async function GET() {
   try {
     const allRequests = await prisma.requestRecords.findMany();
     console.log("GET request: Retrieved all requests:", allRequests);

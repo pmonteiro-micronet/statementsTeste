@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { getSession, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import bcrypt from "bcryptjs"; // Importa bcryptjs
 
@@ -83,24 +83,24 @@ const JsonViewPage = () => {
     }
   };
 
-  const handleCancelPasswordSubmit = async (e) => {
-    e.preventDefault();
-    const recordID = localStorage.getItem("recordID");
+  // const handleCancelPasswordSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const recordID = localStorage.getItem("recordID");
 
-    try {
-      // Verifica o pin para cancelamento
-      const isPinCorrect = await bcrypt.compare(pin, userPinHash);
+  //   try {
+  //     // Verifica o pin para cancelamento
+  //     const isPinCorrect = await bcrypt.compare(pin, userPinHash);
 
-      if (isPinCorrect) {
-        // Adicione aqui a lógica para cancelar
-        router.push("/"); // Redireciona após o cancelamento
-      } else {
-        setIsPinError(true);
-      }
-    } catch (error) {
-      console.error("Erro ao cancelar:", error);
-    }
-  };
+  //     if (isPinCorrect) {
+  //       // Adicione aqui a lógica para cancelar
+  //       router.push("/"); // Redireciona após o cancelamento
+  //     } else {
+  //       setIsPinError(true);
+  //     }
+  //   } catch (error) {
+  //     console.error("Erro ao cancelar:", error);
+  //   }
+  // };
 
   if (status === "loading") {
     return <p>Carregando sessão...</p>;

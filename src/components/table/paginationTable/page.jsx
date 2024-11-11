@@ -1,22 +1,19 @@
 import React from "react";
-import { usePathname } from 'next/navigation';
-import { Pagination, Button } from "@nextui-org/react";
-import { BsFiletypePdf, BsFiletypeCsv } from "react-icons/bs";
+// import { usePathname } from 'next/navigation';
+import { Pagination } from "@nextui-org/react";
 
 export default function CustomPagination({
   page,
   pages,
   rowsPerPage,
   handleChangeRowsPerPage,
-  items,
   setPage,
   children,
-  dataCSVButton,
 }) {
-  const pathname = usePathname();
-  const segments = pathname.split('/');
-  const lastSegment = segments[segments.length - 1];
-  const filename = `${lastSegment}.csv`;
+  // const pathname = usePathname();
+  // const segments = pathname.split('/');
+  // const lastSegment = segments[segments.length - 1];
+  // const filename = `${lastSegment}.csv`;
 
   return (
     <>
