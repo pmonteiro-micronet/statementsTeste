@@ -2,57 +2,61 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 const API_KEY =
-  process.env.API_KEY || "vn2or398yvuh39fv9yf32faso987f987oihsao8789780hvw08f"; // Chave da API
+  process.env.API_KEY || "vn2or398yvuh39fv9yf32faso987f987oihsao8789780hvw08f";
 
-export default async function handler(req, res) {
-  if (req.method === "POST") {
-    // Verificar a API Key
-    const apiKey = req.headers["x-api-key"]; // Esperamos a chave no cabeçalho 'x-api-key'
+export async function POST(req) {
+  // Verificar a API Key
+  const apiKey = req.headers.get("x-api-key"); // Use req.headers.get() with the new fetch API in Next.js 13
 
-    if (!apiKey || apiKey !== API_KEY) {
-      return res.status(403).json({ message: "Invalid API key" });
+  if (!apiKey || apiKey !== API_KEY) {
+    return new Response(JSON.stringify({ message: "Invalid API key" }), {
+      status: 403,
+    });
+  }
+
+  try {
+    const {
+      propertyTag,
+      propertyName,
+      propertyServer,
+      propertyPort,
+      propertyConnectionString,
+    } = await req.json();
+
+    // Verificar se todos os campos obrigatórios estão presentes
+    if (!propertyTag || !propertyName || !propertyServer) {
+      return new Response(
+        JSON.stringify({
+          message: "Required fields: propertyTag, propertyName, propertyServer.",
+        }),
+        { status: 400 }
+      );
     }
 
-    try {
-      const {
-        propertyTag,
-        propertyName,
-        propertyServer,
-        propertyPort,
-        propertyConnectionString,
-      } = req.body;
+    // Inserir o novo registro na tabela 'properties'
+    const newProperty = await prisma.properties.create({
+      data: {
+        propertyTag: propertyTag,
+        propertyName: propertyName,
+        propertyServer: propertyServer,
+        propertyPort: propertyPort || null,
+        propertyConnectionString: propertyConnectionString || null,
+      },
+    });
 
-      // Verificar se todos os campos obrigatórios estão presentes
-      if (!propertyTag || !propertyName || !propertyServer) {
-        return res.status(400).json({
-          message:
-            "Required fields: propertyTag, propertyName, propertyServer.",
-        });
-      }
-
-      // Inserir o novo registro na tabela 'properties'
-      const newProperty = await prisma.properties.create({
-        data: {
-          propertyTag: propertyTag,
-          propertyName: propertyName,
-          propertyServer: propertyServer,
-          propertyPort: propertyPort || null, // Campo opcional
-          propertyConnectionString: propertyConnectionString || null, // Campo opcional
-        },
-      });
-
-      return res.status(201).json({
+    return new Response(
+      JSON.stringify({
         message: "Property added successfully.",
         property: newProperty,
-      });
-    } catch (error) {
-      console.error("Database error:", error);
-      return res
-        .status(500)
-        .json({ message: "Database error", error: error.message });
-    }
-  } else {
-    return res.status(405).json({ message: "Method not allowed." });
+      }),
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Database error:", error);
+    return new Response(
+      JSON.stringify({ message: "Database error", error: error.message }),
+      { status: 500 }
+    );
   }
 }
 

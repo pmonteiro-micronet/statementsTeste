@@ -1,18 +1,14 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import prisma from "@/lib/db"; // ajuste o caminho conforme necessário
+import prisma from "@/lib/db";
 import bcrypt from "bcryptjs";
 
-export const authOptions = {
+const handler = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: {
-          label: "Email",
-          type: "text",
-          placeholder: "email@example.com",
-        },
+        email: { label: "Email", type: "text", placeholder: "email@example.com" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
@@ -20,56 +16,50 @@ export const authOptions = {
           where: { email: credentials.email },
         });
 
-        if (
-          user &&
-          (await bcrypt.compare(credentials.password, user.password))
-        ) {
-          // Aqui retornamos o user com o propertyID
+        if (user && (await bcrypt.compare(credentials.password, user.password))) {
           return {
             id: user.userID,
             email: user.email,
             firstName: user.firstName,
             secondName: user.secondName,
-            propertyID: user.propertyID, // Adicione o propertyID ao objeto retornado
+            propertyID: user.propertyID,
             pin: user.pin,
           };
         } else {
-          return null; // Retorne null se as credenciais não forem válidas
+          return null;
         }
       },
     }),
   ],
   pages: {
-    signIn: "/auth", // Página personalizada de login
+    signIn: "/auth",
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 dias
+    maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id; // Adicione o ID ao token
-        token.email = user.email; // Adicione o email ao token
+        token.id = user.id;
+        token.email = user.email;
         token.firstName = user.firstName;
         token.secondName = user.secondName;
-        token.propertyID = user.propertyID; // Adicione o propertyID ao token
+        token.propertyID = user.propertyID;
         token.pin = user.pin;
       }
       return token;
     },
     async session({ session, token }) {
-      session.user.id = token.id; // Adicione o ID do usuário à sessão
-      session.user.email = token.email; // Adicione o email à sessão
+      session.user.id = token.id;
+      session.user.email = token.email;
       session.user.firstName = token.firstName;
       session.user.secondName = token.secondName;
-      session.user.propertyID = token.propertyID; // Adicione o propertyID à sessão
-      session.user.pin = token.pin; // Adicione o propertyID à sessão
+      session.user.propertyID = token.propertyID;
+      session.user.pin = token.pin;
       return session;
     },
   },
-};
-
-const handler = NextAuth(authOptions);
+});
 
 export { handler as GET, handler as POST };

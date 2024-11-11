@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useSession } from "next-auth/react"; // Importando a função de logout
+// import { useSession } from "next-auth/react"; // Importando a função de logout
 
 export default function Page() {
     const [reservas, setReservas] = useState([]); // Estado para armazenar as reservas
-    const [postSuccessful, setPostSuccessful] = useState(false); // Estado para rastrear o sucesso do POST
+    // const [postSuccessful, setPostSuccessful] = useState(false); // Estado para rastrear o sucesso do POST
     const today = new Date().toISOString().split("T")[0]; // Formata o dia atual como 'yyyy-mm-dd'
 
   
@@ -36,7 +36,7 @@ export default function Page() {
       };
   
       fetchReservas();
-    }, [postSuccessful]);
+    }, []);
 
   return (
     <div className="p-4">

@@ -1,11 +1,7 @@
-// RootLayout.js
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import SidebarWrapper from "@/components/Layout/SidebarWrapper";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper/page"; // Componente cliente para o SessionProvider
 
 const geistSans = localFont({
@@ -25,24 +21,22 @@ export const metadata: Metadata = {
   description: "Statements Online",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children?: React.ReactNode; // Torna `children` opcional
+}) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SessionProviderWrapper>
-          <div className="flex h-screen">
-            {/* Sidebar */}
-            <SidebarWrapper />
-
+          {/* SidebarWrapper agora envolve a sidebar e o conteúdo */}
+          <SidebarWrapper>
             {/* Main Content Area */}
-            <div className="flex-grow overflow-x-hidden">
+            <div className="flex-grow overflow-x-hidden h-full h-screen">
               {children}
             </div>
-          </div>
+          </SidebarWrapper>
         </SessionProviderWrapper>
       </body>
     </html>

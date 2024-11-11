@@ -1,13 +1,11 @@
 "use client";
 import React from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, Button, useDisclosure } from "@nextui-org/react";
 //imports de icons
-import { TfiSave } from "react-icons/tfi";
-import { LiaExpandSolid } from "react-icons/lia";
 import { MdClose } from "react-icons/md";
-import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
+import { Tabs, Tab } from "@nextui-org/react";
 
-const departureInfoForm = ({
+const DepartureInfoForm = ({
     buttonName,
     buttonIcon,
     modalHeader,
@@ -16,9 +14,6 @@ const departureInfoForm = ({
     modalEdit,
     formTypeModal,
     buttonColor,
-    criado,
-    editado,
-    editor,
     roomNumber,
     dateCO,
     booker,
@@ -124,4 +119,4 @@ const departureInfoForm = ({
     );
 };
 
-export default departureInfoForm;
+export default DepartureInfoForm;

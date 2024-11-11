@@ -3,11 +3,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
-import {
-  Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination,
-  Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem,
-  Input
-} from "@nextui-org/react";
+import {Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem,} from "@nextui-org/react";
 
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
@@ -72,7 +68,7 @@ export default function Page({ params }) {
       setSendResSuccess(false);
     }
   };
-
+console.log(sendResSuccess);
   // UseEffect para enviar os dados quando a página for carregada
   useEffect(() => {
     const fetchData = async () => {
