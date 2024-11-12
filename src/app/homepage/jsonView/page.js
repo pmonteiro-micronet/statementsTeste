@@ -261,39 +261,39 @@ const JsonViewPage = () => {
             </table>
 
             <div className="flex justify-end w-[80%] mx-auto">
-  {reservationData && reservationData.requestBody ? (
-    (() => {
-      const parsedData = JSON.parse(reservationData.requestBody);
-      const documentTotals = parsedData[0]?.DocumentTotals;
+              {reservationData && reservationData.requestBody ? (
+                (() => {
+                  const parsedData = JSON.parse(reservationData.requestBody);
+                  const documentTotals = parsedData[0]?.DocumentTotals;
 
-      if (Array.isArray(documentTotals) && documentTotals.length > 0) {
-        return documentTotals.map((total) => (
-          <div key={total.ID} className="w-full">
-            <p className="mt-4 text-5xl flex font-bold gap-20 justify-end">
-              <span>TOTAL</span>
-              <span>{total.Balance}€</span>
-            </p>
+                  if (Array.isArray(documentTotals) && documentTotals.length > 0) {
+                    return documentTotals.map((total) => (
+                      <div key={total.ID} className="w-full">
+                        <p className="mt-4 text-5xl flex font-bold gap-20 justify-end">
+                          <span>TOTAL</span>
+                          <span>{total.Balance}€</span>
+                        </p>
+                      </div>
+                    ));
+                  } else {
+                    return (
+                      <div className="w-full">
+                        <p className="mt-4 text-5xl flex font-bold gap-20 justify-end text-gray-500">
+                          Nenhum total disponível.
+                        </p>
+                      </div>
+                    );
+                  }
+                })()
+              ) : (
+                <div className="w-full">
+                  <p className="mt-4 text-5xl flex font-bold gap-20 justify-end text-gray-500">
+                    Nenhum total disponível.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        ));
-      } else {
-        return (
-          <div className="w-full">
-            <p className="mt-4 text-5xl flex font-bold gap-20 justify-end text-gray-500">
-              Nenhum total disponível.
-            </p>
-          </div>
-        );
-      }
-    })()
-  ) : (
-    <div className="w-full">
-      <p className="mt-4 text-5xl flex font-bold gap-20 justify-end text-gray-500">
-        Nenhum total disponível.
-      </p>
-    </div>
-  )}
-</div>
-</div>
 
           {/* </div> */}
 
@@ -350,8 +350,26 @@ const JsonViewPage = () => {
           </div>
 
           <div className="flex flex-col justify-center text-center">
-            <p>nome do hotel</p>
+            {reservationData && reservationData.requestBody ? (
+              (() => {
+                // Faz o parse do requestBody uma única vez para evitar parse múltiplo
+                const parsedRequestBody = JSON.parse(reservationData.requestBody);
+
+                // Verifica se parsedRequestBody é um array e se o primeiro item tem o array de HotelInfo
+                return Array.isArray(parsedRequestBody) &&
+                  Array.isArray(parsedRequestBody[0]?.HotelInfo) ? (
+                  parsedRequestBody[0].HotelInfo.map((hotelInfo, index) => (
+                    <p key={index}>{hotelInfo.HotelName}</p>
+                  ))
+                ) : (
+                  <p>Hotel information not available</p> // Exibe mensagem caso HotelInfo esteja ausente
+                );
+              })()
+            ) : (
+              <p>No reservation data available</p> // Exibe mensagem caso reservationData ou requestBody estejam ausentes
+            )}
           </div>
+
           {/* Botões de Ação */}
           <div className="flex gap-4 justify-end mt-4 mr-[17%]">
             <button
