@@ -126,62 +126,80 @@ const JsonViewPage = () => {
             <div className="flex justify-between w-full mb-10">
               {/* Detalhes da Reserva */}
               <div className="flex-1 text-left ml-[10%]">
-                {JSON.parse(reservationData.requestBody).Reservation.map(
-                  (reservation, index) => (
-                    <div key={index}>
-                      <p className="font-bold text-3xl text-primary">
-                        Room:{" "}
-                        <span className="font-bold">
-                          {reservation.RoomNumber}
-                        </span>
-                      </p>
-                      <p>
-                        Reservation Number:{" "}
-                        <span className="font-bold">
-                          {reservation.ReservationNumber}
-                        </span>
-                      </p>
-                      <p>
-                        Check-In:{" "}
-                        <span className="font-bold ml-6">
-                          {new Date(reservation.DateCI).toLocaleDateString()}
-                        </span>
-                      </p>
-                      <p>
-                        Check-Out:{" "}
-                        <span className="font-bold ml-3">
-                          {new Date(reservation.DateCO).toLocaleDateString()}
-                        </span>
-                      </p>
-                    </div>
+                {reservationData && reservationData.requestBody ? (
+                  Array.isArray(
+                    JSON.parse(reservationData.requestBody)[0]?.Reservation
+                  ) ? (
+                    JSON.parse(reservationData.requestBody)[0].Reservation.map(
+                      (reservation, index) => (
+                        <div key={index}>
+                          <p className="font-bold text-3xl text-primary">
+                            Room:{" "}
+                            <span className="font-bold">
+                              {reservation.RoomNumber}
+                            </span>
+                          </p>
+                          <p>
+                            Reservation Number:{" "}
+                            <span className="font-bold">
+                              {reservation.ReservationNumber}
+                            </span>
+                          </p>
+                          <p>
+                            Check-In:{" "}
+                            <span className="font-bold ml-6">
+                              {new Date(reservation.DateCI).toLocaleDateString()}
+                            </span>
+                          </p>
+                          <p>
+                            Check-Out:{" "}
+                            <span className="font-bold ml-3">
+                              {new Date(reservation.DateCO).toLocaleDateString()}
+                            </span>
+                          </p>
+                        </div>
+                      )
+                    )
+                  ) : (
+                    <p>No reservation details available</p>
                   )
+                ) : (
+                  <p>Loading reservation data...</p>
                 )}
               </div>
 
               {/* Detalhes do Hóspede */}
               <div className="flex-1 text-right mr-[10%] mt-4">
-                {JSON.parse(reservationData.requestBody).GuestInfo.map(
-                  (guest, index) => (
-                    <div key={index}>
-                      <p className="font-bold">
-                        {guest.Salutation}. {guest.FirstName} {guest.LastName}
-                      </p>
-                      <p>{guest.Street}</p>
-                      <p>
-                        {guest.PostalCode}, {guest.City}, {guest.Country}
-                      </p>
-                      <p>NIF: {guest.VatNo}</p>
-                    </div>
+                {reservationData && reservationData.requestBody ? (
+                  Array.isArray(
+                    JSON.parse(reservationData.requestBody)[0]?.GuestInfo
+                  ) ? (
+                    JSON.parse(reservationData.requestBody)[0].GuestInfo.map(
+                      (guest, index) => (
+                        <div key={index}>
+                          <p className="font-bold">
+                            {guest.Salution} {guest.FirstName} {guest.LastName}
+                          </p>
+                          <p>{guest.Street}</p>
+                          <p>
+                            {guest.PostalCode}, {guest.City}, {guest.Country}
+                          </p>
+                          <p>NIF: {guest.VatNo}</p>
+                        </div>
+                      )
+                    )
+                  ) : (
+                    <p>No guest information available</p>
                   )
+                ) : (
+                  <p>Loading guest information...</p>
                 )}
               </div>
             </div>
-            {/* <div className="mb-4 flex flex-col justify-center"> */}
+            {/* Tabela de Itens */}
             <table className="w-[80%] border-collapse border border-gray-300 mb-4 mx-auto">
               <thead>
-                <tr
-                  className="text-white bg-primary"
-                >
+                <tr className="text-white bg-primary">
                   <th className="border border-gray-300 p-2 text-xl h-20">
                     DATE
                   </th>
@@ -196,48 +214,87 @@ const JsonViewPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {JSON.parse(reservationData.requestBody).Items.map(
-                  (item, index) => (
-                    <tr
-                      key={item.ID}
-                      className={index % 2 === 0 ? "bg-white" : "bg-primary-100"}
-                    >
-                      <td className="border border-gray-300 p-2 w-32 text-center text-lg">
-                        {item.Date}
-                      </td>
-
-                      <td className="border border-gray-300 p-2 h-20 flex flex-col gap-2 text-lg ">
-                        <span>{item.Description}</span>
-                        <span>{item.Description2}</span>
-                      </td>
-                      <td className="border border-gray-300 p-2 text-right w-20 text-lg">
-                        {item.Qty}
-                      </td>
-                      <td className="border border-gray-300 p-2 text-right w-32 text-lg">
-                        €{item.UnitPrice.toFixed(2)}
-                      </td>
-                      <td className="border border-gray-300 p-2 text-right w-32 text-lg">
-                        €{item.Total.toFixed(2)}
+                {reservationData && reservationData.requestBody ? (
+                  Array.isArray(
+                    JSON.parse(reservationData.requestBody)[0]?.Items
+                  ) ? (
+                    JSON.parse(reservationData.requestBody)[0].Items.map(
+                      (item, index) => (
+                        <tr
+                          key={item.ID}
+                          className={index % 2 === 0 ? "bg-white" : "bg-primary-100"}
+                        >
+                          <td className="border border-gray-300 p-2 w-32 text-center text-lg">
+                            {item.Date}
+                          </td>
+                          <td className="border border-gray-300 p-2 h-20 flex flex-col gap-2 text-lg">
+                            <span>{item.Description}</span>
+                            <span>{item.Description2}</span>
+                          </td>
+                          <td className="border border-gray-300 p-2 text-right w-20 text-lg">
+                            {item.Qty}
+                          </td>
+                          <td className="border border-gray-300 p-2 text-right w-32 text-lg">
+                            €{item.UnitPrice.toFixed(2)}
+                          </td>
+                          <td className="border border-gray-300 p-2 text-right w-32 text-lg">
+                            €{item.Total.toFixed(2)}
+                          </td>
+                        </tr>
+                      )
+                    )
+                  ) : (
+                    <tr>
+                      <td colSpan="5" className="text-center p-2">
+                        No items found.
                       </td>
                     </tr>
                   )
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center p-2">
+                      Loading reservation data...
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
 
             <div className="flex justify-end w-[80%] mx-auto">
-              {JSON.parse(reservationData.requestBody).DocumentTotals.map(
-                (total) => (
-                  <div key={total.ID} className="w-full">
-                    <p className="mt-4 text-5xl flex font-bold gap-20 justify-end">
-                      <span>TOTAL</span>
-                      <span>{total.Balance}€</span>
-                    </p>
-                  </div>
-                )
-              )}
-            </div>
+  {reservationData && reservationData.requestBody ? (
+    (() => {
+      const parsedData = JSON.parse(reservationData.requestBody);
+      const documentTotals = parsedData[0]?.DocumentTotals;
+
+      if (Array.isArray(documentTotals) && documentTotals.length > 0) {
+        return documentTotals.map((total) => (
+          <div key={total.ID} className="w-full">
+            <p className="mt-4 text-5xl flex font-bold gap-20 justify-end">
+              <span>TOTAL</span>
+              <span>{total.Balance}€</span>
+            </p>
           </div>
+        ));
+      } else {
+        return (
+          <div className="w-full">
+            <p className="mt-4 text-5xl flex font-bold gap-20 justify-end text-gray-500">
+              Nenhum total disponível.
+            </p>
+          </div>
+        );
+      }
+    })()
+  ) : (
+    <div className="w-full">
+      <p className="mt-4 text-5xl flex font-bold gap-20 justify-end text-gray-500">
+        Nenhum total disponível.
+      </p>
+    </div>
+  )}
+</div>
+</div>
+
           {/* </div> */}
 
           <div className="mb-4 mt-20">
@@ -257,20 +314,37 @@ const JsonViewPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {JSON.parse(reservationData.requestBody).Taxes.map((tax) => (
-                  <tr key={tax.ID}>
-                    <td className="p-2">{tax.Taxes}%</td>
-                    <td className="p-2 text-right">
-                      {tax.TotalWithTaxes.toFixed(2)}€
-                    </td>
-                    <td className="p-2 text-right">
-                      {tax.TotalWithOutTaxes.toFixed(2)}€
-                    </td>
-                    <td className="p-2 text-right">
-                      {tax.TotalTaxes.toFixed(2)}€
+                {reservationData && reservationData.requestBody ? (
+                  (() => {
+                    const parsedData = JSON.parse(reservationData.requestBody);
+                    const taxes = parsedData[0]?.Taxes;
+
+                    if (Array.isArray(taxes) && taxes.length > 0) {
+                      return taxes.map((tax) => (
+                        <tr key={tax.ID}>
+                          <td className="p-2">{tax.Taxes}%</td>
+                          <td className="p-2 text-right">{tax.TotalWithTaxes.toFixed(2)}€</td>
+                          <td className="p-2 text-right">{tax.TotalWithOutTaxes.toFixed(2)}€</td>
+                          <td className="p-2 text-right">{tax.TotalTaxes.toFixed(2)}€</td>
+                        </tr>
+                      ));
+                    } else {
+                      return (
+                        <tr>
+                          <td colSpan={4} className="p-2 text-center text-gray-500">
+                            Nenhum imposto disponível.
+                          </td>
+                        </tr>
+                      );
+                    }
+                  })()
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="p-2 text-center text-gray-500">
+                      Carregando dados...
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

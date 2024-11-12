@@ -5,23 +5,30 @@ const prisma = new PrismaClient();
 
 // Função para lidar com requisições POST
 export async function POST(req) {
-  console.log("Received POST request"); // Log para verificar o método da requisição
+  console.log("Received POST request");
 
   let newRequest; // Definido para capturar o novo registro
   try {
     const body = await req.json(); // Ler o corpo da requisição
+    
+    // Extrair o campo Tag do JSON
+    const { HotelInfo } = body[0];
+    const tag = HotelInfo[0].Tag;
 
-    // Desestruture os dados da requisição
-    const {
-      propertyID,
-      // Reservation,
-      // GuestInfo,
-      // Items,
-      // Taxes,
-      // DocumentTotals,
-    } = body;
+    // Verificar se existe uma propriedade com o campo propertyTag igual ao valor de Tag
+    const property = await prisma.properties.findFirst({
+      where: { propertyTag: tag },
+    });
 
-    // Criar o objeto que vamos salvar
+    if (!property) {
+      // Se não encontrar a propriedade, retornar erro 404
+      return NextResponse.json(
+        { message: `Propriedade com Tag '${tag}' não encontrada.` },
+        { status: 404 }
+      );
+    }
+
+    // Criar o objeto que vamos salvar em requestRecords, usando o propertyID encontrado
     newRequest = await prisma.requestRecords.create({
       data: {
         requestBody: JSON.stringify(body), // Armazena o corpo completo como JSON
@@ -29,7 +36,7 @@ export async function POST(req) {
         requestDateTime: new Date(),
         responseStatus: "201",
         responseBody: "",
-        propertyID: propertyID,
+        propertyID: property.propertyID, // Usar o propertyID encontrado
         seen: false,
       },
     });
@@ -50,9 +57,7 @@ export async function POST(req) {
     // Se `newRequest` foi criado, atualize com erro
     if (newRequest) {
       await prisma.requestRecords.update({
-        where: {
-          id: newRequest.id, // Certifique-se de que 'id' é o campo correto
-        },
+        where: { id: newRequest.id },
         data: {
           responseStatus: "500",
           responseBody: JSON.stringify({
@@ -82,7 +87,10 @@ export async function POST(req) {
     }
 
     // Retorne o erro ao cliente
-    return NextResponse.json({ message: "Erro ao gravar os dados", error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: "Erro ao gravar os dados", error: error.message },
+      { status: 500 }
+    );
   }
 }
 
