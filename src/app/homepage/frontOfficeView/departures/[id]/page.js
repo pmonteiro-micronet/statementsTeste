@@ -55,7 +55,7 @@ export default function Page({ params }) {
   const sendResToAPI = async (resNumber) => {
     console.log("Enviando resNumber para a API:", resNumber); // Verifica o valor antes de enviar
     const windowValue = 0; // Usar uma variável temporária para armazenar o valor
-  
+
     try {
       await axios.post("/api/reservations/info/specificReservation", {
         resNumber,
@@ -255,34 +255,30 @@ export default function Page({ params }) {
                                   />
                                 </DropdownItem>
                                 <DropdownItem
-  key="show"
-  onClick={() => {
-    console.log("francisco e igor", reserva.ReservationNumber);
-
-    // Verificando se o ReservationNumber existe
-    if (reserva.ReservationNumber) {
-      // Passando o ReservationNumber para a função sendResToAPI
-      sendResToAPI(reserva.ReservationNumber);
-    } else {
-      console.warn("ReservationNumber não encontrado.");
-    }
-  }}
->
-  Get Statement
-</DropdownItem>
-
-
+                                  key="show"
+                                  onClick={() => {
+                                    // Verificando se o ReservationNumber existe
+                                    if (reserva.ReservationNumber) {
+                                      // Passando o ReservationNumber para a função sendResToAPI
+                                      sendResToAPI(reserva.ReservationNumber);
+                                    } else {
+                                      console.warn("ReservationNumber não encontrado.");
+                                    }
+                                  }}
+                                >
+                                  Get Statement
+                                </DropdownItem>
                               </DropdownMenu>
                             </Dropdown>
                           </td>
-                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.RoomNumber}</td>
+                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.RoomNumber}</td>
                           <td className="pl-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
                           <td className="pl-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
                           <td className="pl-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
-                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.Company}</td>
-                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.Group}</td>
-                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.Notes}</td>
-                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.ReservationNumber}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6] w-64">{reserva.Notes}</td>
+                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.ReservationNumber}</td>
                           <td className="text-right pr-2">{reserva.DateCO}</td>
                         </tr>
                       );

@@ -13,7 +13,7 @@ export async function POST(request) {
 
   try {
     // Enviar os dados para o Mock Server
-    const response = await axios.post('http://192.168.10.201:91/pp_xml_ckit_statementcheckins', {
+    const response = await axios.post('http://192.168.10.201:91/pp_xml_ckit_statementcheckouts', {
       propertyID,
       data,
     });
