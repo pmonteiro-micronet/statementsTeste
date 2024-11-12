@@ -25,7 +25,7 @@ export async function POST(request) {
     );
     return new NextResponse(
       JSON.stringify({
-        error: error.response ? error.response.data : "Erro ao enviar dados para o Mock Server",
+        error: error.response ? error.response.data : "Erro ao enviar dados para a API" + error,
       }),
       { status: 500 }
     );

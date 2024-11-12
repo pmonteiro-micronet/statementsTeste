@@ -257,8 +257,6 @@ export default function Page({ params }) {
                                 <DropdownItem
                                   key="show"
                                   onClick={() => {
-                                    console.log("francisco e igor", reserva.ReservationNumber);
-
                                     // Verificando se o ReservationNumber existe
                                     if (reserva.ReservationNumber) {
                                       // Passando o ReservationNumber para a função sendResToAPI
