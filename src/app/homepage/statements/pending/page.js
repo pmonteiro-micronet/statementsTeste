@@ -32,6 +32,7 @@ const PendentesPage = () => {
             const parsedItem = JSON.parse(item.requestBody);
             return Array.isArray(parsedItem) && parsedItem[0]?.HotelInfo;
           } catch (error) {
+            console.log(error);
             return false; // Skip if parsing fails
           }
         })
