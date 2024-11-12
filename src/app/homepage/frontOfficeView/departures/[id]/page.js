@@ -3,12 +3,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
-import {Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem,} from "@nextui-org/react";
+import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "@nextui-org/react";
 
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
-import { IoIosArrowForward, IoIosArrowBack  } from "react-icons/io";
+import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 import DepartureInfoForm from "@/components/modals/departures/info/page";
 import "../departures.css";
@@ -17,27 +17,28 @@ import LoadingBackdrop from "@/components/Loader/page";
 export default function Page({ params }) {
   const { id } = params;
   const propertyID = id;
-  const today = new Date().toISOString().split("T")[0]; // Data de hoje
+  const today = new Date().toISOString().split("T")[0];
   const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1); // Calcula o amanhã
-  const tomorrowDate = tomorrow.toISOString().split("T")[0]; // Formata o amanhã
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowDate = tomorrow.toISOString().split("T")[0];
 
-  const [currentDate, setCurrentDate] = useState(today); // Estado para a data atual exibida
+  const [currentDate, setCurrentDate] = useState(today);
   const [reservas, setReservas] = useState([]);
   const [postSuccessful, setPostSuccessful] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [sendResSuccess, setSendResSuccess] = useState(false); //estado para envio get statement
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Função para enviar os dados para a API
-  const sendDataToAPI = async (date) => {
+  const sendDataToAPI = async (dates) => {
     try {
+      setIsLoading(true); // Inicia o carregamento
       await axios.post("/api/reservations/info", {
         propertyID,
-        data: date, // Envia a data dinamicamente
+        data: dates,
       });
-      console.log(`Dados enviados para a data: ${date}`);
+      console.log(`Dados enviados para as datas: ${dates.join(", ")}`);
       setPostSuccessful(true);
     } catch (error) {
       console.error(
@@ -45,20 +46,22 @@ export default function Page({ params }) {
         error.response ? error.response.data : error.message
       );
       setPostSuccessful(false);
+    } finally {
+      setIsLoading(false); // Termina o carregamento
     }
   };
 
   // Função para enviar os dados para a API
-  const sendResToAPI = async (resNumber, roomNumber) => {
+  const sendResToAPI = async (resNumber) => {
+    console.log("Enviando resNumber para a API:", resNumber); // Verifica o valor antes de enviar
+    const windowValue = 0; // Usar uma variável temporária para armazenar o valor
+  
     try {
-      // Envia todos os dados para a API
       await axios.post("/api/reservations/info/specificReservation", {
-        propertyID,
         resNumber,
-        roomNumber,
-        window: "A",
+        window: windowValue,  // Enviando como "window"
       });
-      console.log(`Dados enviados com sucesso para a data: ${date}`);
+      console.log(`Dados enviados com sucesso para a reserva ${resNumber} com window: ${windowValue}`);
       setSendResSuccess(true);
     } catch (error) {
       console.error(
@@ -68,21 +71,7 @@ export default function Page({ params }) {
       setSendResSuccess(false);
     }
   };
-console.log(sendResSuccess);
-  // UseEffect para enviar os dados quando a página for carregada
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true); // Inicia o carregamento
-
-      // Envia os dados para hoje e para o dia seguinte
-      await sendDataToAPI(today);
-      await sendDataToAPI(tomorrowDate);
-
-      setIsLoading(false); // Termina o carregamento
-    };
-
-    fetchData(); // Chama a função de envio assim que a página for carregada
-  }, [propertyID, today, tomorrowDate]); // Dependências para garantir que a requisição seja feita com os dados corretos
+  console.log(sendResSuccess);
 
   // Função para pegar as reservas
   useEffect(() => {
@@ -135,11 +124,6 @@ console.log(sendResSuccess);
     fetchReservas();
   }, [currentDate, postSuccessful]); // Recarrega as reservas sempre que a data mudar
 
-  // UseEffect para monitorar mudanças em reservas
-  useEffect(() => {
-    console.log("Reservas atualizadas:", reservas);
-  }, [reservas]);
-
   // UseMemo para preparar os dados filtrados de acordo com a paginação
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -153,6 +137,11 @@ console.log(sendResSuccess);
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(1);
+  };
+
+  // Função chamada quando o botão de refresh é clicado
+  const handleRefreshClick = () => {
+    sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
   };
 
   return (
@@ -194,7 +183,7 @@ console.log(sendResSuccess);
             {/* Botão de refresh alinhado à direita */}
             <div className="flex items-center">
               <button
-                onClick={() => window.location.reload()}
+                onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
                 className="text-black border border-black bg-white rounded-lg cursor-pointer p-2"
               >
                 <MdOutlineRefresh size={20} />
@@ -211,15 +200,15 @@ console.log(sendResSuccess);
                 <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
                   <thead>
                     <tr className="bg-[#e8e6e6] h-12">
-                      <td className="pl-2 w-10 border-r border-[#adacac]"><FaGear size={18} color="black" /></td>
-                      <td className="pl-2 border-r border-[#adacac]">ROOM</td>
-                      <td className="pl-2 border-r border-[#adacac]">LAST NAME</td>
-                      <td className="pl-2 border-r border-[#adacac]">FIRST NAME</td>
-                      <td className="pl-2 border-r border-[#adacac]">TRAVEL AGENCY</td>
-                      <td className="pl-2 border-r border-[#adacac]">COMPANY</td>
-                      <td className="pl-2 border-r border-[#adacac]">GROUP</td>
-                      <td className="pl-2 border-r border-[#adacac]">NOTES</td>
-                      <td className="pl-2 border-r border-[#adacac]">RES. NO.</td>
+                      <td className="pl-2 w-10 border-r border-[#e6e6e6]"><FaGear size={18} color="black" /></td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">ROOM</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">LAST NAME</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">FIRST NAME</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">TRAVEL AGENCY</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">COMPANY</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">GROUP</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">NOTES</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">RES. NO.</td>
                       <td className="text-right pr-2">DEPARTURE</td>
                     </tr>
                   </thead>
@@ -228,7 +217,7 @@ console.log(sendResSuccess);
                       // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                       return (
                         <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left">
-                          <td className="pl-1 flex items-start border-r border-[#adacac]">
+                          <td className="pl-1 flex items-start border-r border-[#e6e6e6]">
                             <Dropdown>
                               <DropdownTrigger>
                                 <Button
@@ -266,27 +255,34 @@ console.log(sendResSuccess);
                                   />
                                 </DropdownItem>
                                 <DropdownItem
-                                  key="show"
-                                  onClick={() => {
-                                    sendResToAPI(
-                                      reserva.ReservationNumber, // Assumindo que `ReservationNumber` está em `reserva`
-                                      reserva.RoomNumber
-                                    );
-                                  }}
-                                >
-                                  Get Statement
-                                </DropdownItem>
+  key="show"
+  onClick={() => {
+    console.log("francisco e igor", reserva.ReservationNumber);
+
+    // Verificando se o ReservationNumber existe
+    if (reserva.ReservationNumber) {
+      // Passando o ReservationNumber para a função sendResToAPI
+      sendResToAPI(reserva.ReservationNumber);
+    } else {
+      console.warn("ReservationNumber não encontrado.");
+    }
+  }}
+>
+  Get Statement
+</DropdownItem>
+
+
                               </DropdownMenu>
                             </Dropdown>
                           </td>
-                          <td className="pl-2 border-r border-[#adacac]">{reserva.RoomNumber}</td>
-                          <td className="pl-2 border-r border-[#adacac]">{reserva.LastName}</td>
-                          <td className="pl-2 border-r border-[#adacac]">{reserva.FirstName}</td>
-                          <td className="pl-2 border-r border-[#adacac]">{reserva.Booker}</td>
-                          <td className="pl-2 border-r border-[#adacac]">{reserva.Company}</td>
-                          <td className="pl-2 border-r border-[#adacac]">{reserva.Group}</td>
-                          <td className="pl-2 border-r border-[#adacac]">{reserva.Notes}</td>
-                          <td className="pl-2 border-r border-[#adacac]">{reserva.ReservationNumber}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.RoomNumber}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.Company}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.Group}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.Notes}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.ReservationNumber}</td>
                           <td className="text-right pr-2">{reserva.DateCO}</td>
                         </tr>
                       );

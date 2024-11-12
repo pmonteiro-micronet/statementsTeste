@@ -43,10 +43,10 @@ export default function Sidebar({ children, setExpanded }) {
         <div className="p-4 pb-2 flex justify-between items-center">
           <p
             className={`font-semibold text-sm overflow-hidden transition-all ${
-              expanded ? "w-32" : "w-0"
+              expanded ? "w-64" : "w-0"
             }`}
           >
-            PMS Extensions
+            Extensions myPMS
           </p>
           <button
             onClick={handleToggle}
