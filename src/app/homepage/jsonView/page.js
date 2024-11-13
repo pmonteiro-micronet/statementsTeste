@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import bcrypt from "bcryptjs"; // Importa bcryptjs
 import OkPIN from "@/components/modals/pin/ok/page";
 import CancelPIN from "@/components/modals/pin/cancel/page";
 
@@ -12,13 +11,9 @@ const JsonViewPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const [pin, setPin] = useState(""); // Estado para o pin
-  const [isPinError, setIsPinError] = useState(false);
   const [userPinHash, setUserPinHash] = useState(""); // Estado para o hash do pin do usuário logado
   const router = useRouter();
-
-  console.log(showModal, showCancelModal, setPin, isPinError);
+  console.log(userPinHash, showModal);
 
   const { data: session, status } = useSession();
   const [propertyID, setPropertyID] = useState("");
