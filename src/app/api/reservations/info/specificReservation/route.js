@@ -1,11 +1,14 @@
-import { NextResponse } from "next/server"; 
-import axios from "axios"; 
+import { NextResponse } from "next/server";
+import axios from "axios";
 
-export async function POST(request) {
-  const { resNumber, window } = await request.json();  // Mantendo o nome "window"
-  console.log("Dados recebidos no backend:", { resNumber, window }); // Confirmação dos dados recebidos
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const ResNumber = searchParams.get("ResNumber");
+  const window = searchParams.get("window");
 
-  if (!resNumber || window === undefined) {
+  console.log("Dados recebidos no backend:", { ResNumber, window }); // Confirmação dos dados recebidos
+
+  if (!ResNumber || window === null) {
     return new NextResponse(
       JSON.stringify({ error: "Faltam parâmetros" }),
       { status: 400 }
@@ -13,9 +16,12 @@ export async function POST(request) {
   }
 
   try {
-    const response = await axios.post(
-      "http://192.168.10.201:91/pp_xml_ckit_extratoconta",
-      { resNumber, window }
+    // Monta a URL com os parâmetros na query string
+    const response = await axios.get(
+      `http://192.168.10.201:91/pp_xml_ckit_extratoconta`,
+      {
+        params: { ResNumber, window },
+      }
     );
     return new NextResponse(JSON.stringify(response.data), { status: 200 });
   } catch (error) {
