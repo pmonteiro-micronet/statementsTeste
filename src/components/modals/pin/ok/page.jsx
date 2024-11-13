@@ -45,6 +45,7 @@ const OkPIN = ({
     const handlePinSubmit = async (e) => {
         if (e) e.preventDefault();
         const recordID = localStorage.getItem("recordID");
+        console.log(recordID);
 
         try {
             const isPinCorrect = await bcrypt.compare(pin, userPinHash);
