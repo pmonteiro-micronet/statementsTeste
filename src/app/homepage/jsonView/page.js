@@ -4,6 +4,8 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import bcrypt from "bcryptjs"; // Importa bcryptjs
+import OkPIN from "@/components/modals/pin/ok/page";
+import CancelPIN from "@/components/modals/pin/cancel/page";
 
 const JsonViewPage = () => {
   const [reservationData, setReservationData] = useState(null);
@@ -371,108 +373,29 @@ const JsonViewPage = () => {
           </div>
 
           {/* Botões de Ação */}
-          <div className="flex gap-4 justify-end mt-4 mr-[17%]">
+          <div className="flex gap-4 justify-end mt-4 mr-[17%] mb-3 ">
+          <CancelPIN
+            buttonName={"Cancel"}
+            buttonColor={"transparent"}
+            modalHeader={"Insira o PIN"}
+            formTypeModal={11}
+            editor={"teste"}
+          />
             <button
-              className="bg-gray-300 font-semibold p-2 rounded-lg"
-              onClick={handleCancelClick}
-            >
-              {" "}
-              {/* Modificado para chamar o novo método */}
-              Cancel
-            </button>
-            <button
-              className="bg-primary text-white font-semibold p-2 rounded-lg"
+              className="bg-primary text-white font-semibold rounded-lg mb-3"
               onClick={handleOkClick}
             >
-              Ok
+              <OkPIN
+            buttonName={"Ok"}
+            buttonColor={"transparent"}
+            modalHeader={"Insira o PIN"}
+            formTypeModal={11}
+            editor={"teste"}
+          />
             </button>
           </div>
 
-          {/* Modal de PIN */}
-          {showModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div className="bg-white p-8 rounded shadow-lg">
-                <h2 className="text-xl mb-4">Insira o PIN</h2>
-                <form onSubmit={handlePinSubmit}>
-                  <input
-                    type="password"
-                    value={pin}
-                    onChange={(e) => {
-                      setPin(e.target.value);
-                      setIsPinError(false); // Reseta a mensagem de erro ao digitar
-                    }}
-                    className="border border-gray-300 p-2 mb-4 w-full"
-                    placeholder="Digite o PIN"
-                  />
-                  {isPinError && (
-                    <p className="text-red-500">
-                      PIN incorreto. Tente novamente.
-                    </p>
-                  )}
-                  <div className="flex justify-end mt-4">
-                    <button
-                      type="button"
-                      onClick={() => setShowModal(false)}
-                      className="mr-2 bg-gray-300 p-2 rounded"
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      type="submit"
-                      className="bg-[#2E615C] text-white p-2 rounded"
-                    >
-                      Confirmar
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Modal de Cancelamento */}
-          {showCancelModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div className="bg-white p-8 rounded shadow-lg">
-                <h2 className="text-xl mb-4">Cancelamento</h2>
-                <p className="mb-4">
-                  Esta ação não irá guardar nenhuma informação.<br></br>Por
-                  favor, insira o PIN para continuar.
-                </p>
-                <form onSubmit={handleCancelPinSubmit}>
-                  <input
-                    type="password"
-                    value={pin}
-                    onChange={(e) => {
-                      setPin(e.target.value);
-                      setIsPinError(false); // Reseta a mensagem de erro ao digitar
-                    }}
-                    className="border border-gray-300 p-2 mb-4 w-full"
-                    placeholder="Digite o PIN"
-                  />
-                  {isPinError && (
-                    <p className="text-red-500">
-                      PIN incorreto. Tente novamente.
-                    </p>
-                  )}
-                  <div className="flex justify-end mt-4">
-                    <button
-                      type="button"
-                      onClick={() => setShowCancelModal(false)}
-                      className="mr-2 bg-gray-300 p-2 rounded"
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      type="submit"
-                      className="bg-[#2E615C] text-white p-2 rounded"
-                    >
-                      Confirmar
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
+          
         </>
       ) : (
         <p>Nenhum dado encontrado.</p>
