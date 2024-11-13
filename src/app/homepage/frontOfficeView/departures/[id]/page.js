@@ -219,7 +219,7 @@ export default function Page({ params }) {
                     {items.map((reserva, index) => {
                       // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                       return (
-                        <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left">
+                        <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left hover:bg-primary-50">
                           <td className="pl-1 flex items-start border-r border-[#e6e6e6]">
                             <Dropdown>
                               <DropdownTrigger>
