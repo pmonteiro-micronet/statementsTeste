@@ -18,7 +18,7 @@ export async function GET(request) {
   try {
     // Monta a URL com os parâmetros na query string
     const response = await axios.get(
-      `http://192.168.10.201:91/pp_xml_ckit_extratoconta`,
+      `http://192.168.145.22/pp_xml_ckit_extratoconta`,
       {
         params: { ResNumber, window },
       }

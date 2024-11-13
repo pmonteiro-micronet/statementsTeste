@@ -17,7 +17,7 @@ export default function CustomPagination({
 
   return (
     <>
-      <div className="bg-tableFooter border border-tableFooterBorder flex flex-col sm:flex-row justify-between items-start sm:items-center lg:pl-72 w-full py-3 px-2 sm:px-4">
+      <div className="bg-tableFooter border border-tableFooterBorder flex flex-col sm:flex-row justify-between items-start sm:items-center lg:pl-72 w-full py-3 px-2">
         <div className="flex flex-wrap items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-2 sm:mb-0">
             <div className="flex space-x-3">
               

@@ -2,108 +2,323 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-// import { useSession } from "next-auth/react"; // Importando a função de logout
+import PaginationTable from "@/components/table/paginationTable/page";
+import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "@nextui-org/react";
 
-export default function Page() {
-    const [reservas, setReservas] = useState([]); // Estado para armazenar as reservas
-    // const [postSuccessful, setPostSuccessful] = useState(false); // Estado para rastrear o sucesso do POST
-    const today = new Date().toISOString().split("T")[0]; // Formata o dia atual como 'yyyy-mm-dd'
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { FaGear } from "react-icons/fa6";
+import { MdOutlineRefresh } from "react-icons/md";
+import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
+import DepartureInfoForm from "@/components/modals/departures/info/page";
+import "../departures.css";
+import LoadingBackdrop from "@/components/Loader/page";
+
+export default function Page({ params }) {
+  const { id } = params;
+  const propertyID = id;
+  const today = new Date().toISOString().split("T")[0];
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowDate = tomorrow.toISOString().split("T")[0];
+
+  const [currentDate, setCurrentDate] = useState(today);
+  const [reservas, setReservas] = useState([]);
+  const [postSuccessful, setPostSuccessful] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [sendResSuccess, setSendResSuccess] = useState(false); //estado para envio get statement
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+
+  // Função para enviar os dados para a API
+  const sendDataToAPI = async (dates) => {
+    try {
+      setIsLoading(true); // Inicia o carregamento
+      await axios.post("/api/reservations/info", {
+        propertyID,
+        data: dates,
+      });
+      console.log(`Dados enviados para as datas: ${dates.join(", ")}`);
+      setPostSuccessful(true);
+    } catch (error) {
+      console.error(
+        "Erro ao enviar os dados:",
+        error.response ? error.response.data : error.message
+      );
+      setPostSuccessful(false);
+    } finally {
+      setIsLoading(false); // Termina o carregamento
+    }
+  };
+
+  // Função para enviar os dados para a API
+  const sendResToAPI = async (ResNumber) => {
+    console.log("Enviando resNumber para a API:", ResNumber); // Verifica o valor antes de enviar
+    const windowValue = 0; // Usar uma variável temporária para armazenar o valor
   
-    // Efeito colateral que busca as reservas após um POST bem-sucedido
-    useEffect(() => {
-      const fetchReservas = async () => {
-        console.log("Buscando reservas..."); // Log antes da chamada GET
-        try {
-          const response = await axios.get("/api/reservations/CI"); // Chama a API GET
-          console.log("Reservas retornadas:", response.data.response);
-          // Filtra as reservas para incluir apenas aquelas com requestDateTime igual ao dia atual
-          const reservasFiltradas = response.data.response.filter((reserva) => {
-            // Converte requestDateTime para o formato YYYY-MM-DD
-            const requestDateTime = new Date(reserva.requestDateTime)
-              .toISOString()
-              .split("T")[0]; // Formata a data da reserva
-            return requestDateTime === today; // Verifica se é igual ao dia atual
-          });
+    try {
+      await axios.get("/api/reservations/info/specificReservation", {
+        params: {  
+          ResNumber,
+          window: windowValue,
+        },
+      });
+      console.log(`Dados enviados com sucesso para a reserva ${ResNumber} com window: ${windowValue}`);
+      setSendResSuccess(true);
+    } catch (error) {
+      console.error(
+        "Erro ao enviar os dados:",
+        error.response ? error.response.data : error.message
+      );
+      setSendResSuccess(false);
+    }
+  };
   
-          setReservas(reservasFiltradas); // Atualiza o estado com as reservas filtradas
-        } catch (error) {
-          console.error(
-            "Erro ao buscar as reservas:",
-            error.response ? error.response.data : error.message
-          );
-        }
-      };
-  
-      fetchReservas();
-    }, []);
+  console.log(sendResSuccess);
+
+  // Função para pegar as reservas
+  useEffect(() => {
+    const fetchReservas = async () => {
+      setIsLoading(true); // Inicia o carregamento
+      try {
+        const response = await axios.get("/api/reservations/checkins");
+        console.log("Resposta da API:", response.data); // Log da resposta da API
+
+        let reservasFiltradas = [];
+
+        response.data.response.forEach((reserva) => {
+          try {
+            if (reserva.requestBody) {
+              const requestBody = JSON.parse(reserva.requestBody);
+              console.log("requestBody:", requestBody); // Log do requestBody
+
+              for (let key in requestBody) {
+                const reservas = requestBody[key];
+
+                if (Array.isArray(reservas)) {
+                  const reservasComDataAtual = reservas.filter(item => item.DateCO === currentDate);
+                  console.log("Reservas filtradas para a data atual:", reservasComDataAtual); // Log das reservas filtradas
+
+                  reservasFiltradas = [...reservasFiltradas, ...reservasComDataAtual];
+                } else {
+                  console.warn(`Reservas para a chave ${key} não são um array:`, reservas);
+                }
+              }
+            } else {
+              console.warn("requestBody está undefined para a reserva:", reserva);
+            }
+          } catch (e) {
+            console.error("Erro ao fazer o parsing do requestBody:", e);
+          }
+        });
+
+        // Atualiza o estado com as reservas filtradas
+        setReservas(reservasFiltradas);
+      } catch (error) {
+        console.error(
+          "Erro ao buscar as reservas:",
+          error.response ? error.response.data : error.message
+        );
+      } finally {
+        setIsLoading(false); // Para o carregamento, independentemente do sucesso ou erro
+      }
+    };
+
+    fetchReservas();
+  }, [currentDate, postSuccessful]); // Recarrega as reservas sempre que a data mudar
+
+  // UseMemo para preparar os dados filtrados de acordo com a paginação
+  const items = React.useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return reservas.slice(start, end); // Filtra as reservas com base na página atual e número de linhas por página
+  }, [page, rowsPerPage, reservas]); // A dependência inclui `reservas`, que é onde as reservas filtradas estão
+
+  const pages = Math.ceil(reservas.length / rowsPerPage); // Calcula o número total de páginas com base no total de reservas
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(1);
+  };
+
+  // Função chamada quando o botão de refresh é clicado
+  const handleRefreshClick = () => {
+    sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
+  };
 
   return (
-    <div className="p-4">
-      {/* <button className="bg-red-200 h-10 w-32 rounded-lg">
-        See Departures
-      </button> */}
+    <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-[#FAFAFA]">
+      <div className="flex-grow overflow-y-auto p-4">
+        <div className="flex justify-between items-center w-full">
+          <div className="header-container flex items-center justify-between w-full">
+            {/* Div para o conteúdo centralizado (setas e título dinâmico) */}
+            <div className="flex items-center space-x-4 mx-auto">
+              {/* Seta para voltar para o dia de hoje */}
+              {currentDate !== today && (
+                <button
+                  onClick={() => setCurrentDate(today)}
+                  className="p-2 text-gray-500"
+                >
+                  <IoIosArrowBack size={20} />
+                </button>
+              )}
 
-      {/* Exibe as reservas */}
-      <div>
-        <h2 className="text-center font-semibold text-xl">Arrivals list</h2>
-        {reservas.length > 0 ? (
-          <table border="1" className="w-full text-left mt-5">
-            <thead>
-              <tr className="bg-gray-200 h-10">
-                <th>Arrival</th>
-                <th>Last Name</th>
-                <th>First Name</th>
-                <th>Booker</th>
-                <th>Company</th>
-                <th>Room</th>
-                <th>Room status</th>
-                <th>Notes</th>
-                <th>Res. No.</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reservas.map((reserva, index) => {
-                // Parseia o requestBody para garantir que é um objeto
-                let requestBody;
-                try {
-                  requestBody = JSON.parse(reserva.requestBody); // Tenta converter para objeto
-                } catch (error) {
-                  console.error("Erro ao parsear requestBody:", error.message);
-                  return null;
-                }
+              {/* Título dinâmico com a data atual */}
+              <h2 className="text-xl">
+                {currentDate === today ? `Today: ${today}` : `Tomorrow: ${currentDate}`}
+              </h2>
 
-                // Itera sobre as chaves numéricas (1, 2, 3, etc.) no objeto parsed
-                return Object.keys(requestBody).map((key) => {
-                  const reservasArray = requestBody[key]; // Valor que deve ser um array
+              {/* Seta para avançar para o próximo dia */}
+              {currentDate !== tomorrowDate && (
+                <button
+                  onClick={() => setCurrentDate(tomorrowDate)}
+                  className="p-2 text-gray-500"
+                >
+                  <IoIosArrowForward size={20} />
+                </button>
+              )}
 
-                  // Verifica se reservasArray é um array e itera
-                  if (Array.isArray(reservasArray)) {
-                    return reservasArray.map((reservaItem, innerIndex) => (
-                      <tr key={`${index}-${innerIndex}`} className="h-10 border-2 border-b-gray text-left">
-                        <td>{reservaItem.DateCI}</td>
-                        <td>{reservaItem.LastName}</td>
-                        <td>{reservaItem.FirstName}</td>
-                        <td>{reservaItem.Booker}</td>
-                        <td>{reservaItem.Company}</td>
-                        <td>{reservaItem.RoomNumber}</td>
-                        <td>{reservaItem.RoomStatus}</td>
-                        <td>{reservaItem.Notes}</td>
-                        <td>{reservaItem.ReservationNumber}</td>
-                      </tr>
-                    ));
-                  } else {
-                    console.error("reservasArray não é um array:", reservasArray);
-                    return null;
-                  }
-                });
-              })}
-            </tbody>
-          </table>
-        ) : (
-          <p>Nenhuma reserva encontrada.</p>
-        )}
+              {/* Título "Departure List" separado do título dinâmico */}
+              <h2 className="text-xl">Arrivals List</h2>
+            </div>
+
+            {/* Botão de refresh alinhado à direita */}
+            <div className="flex items-center">
+              <button
+                onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
+                className="text-white bg-primary rounded-lg cursor-pointer p-2"
+              >
+                <MdOutlineRefresh size={20}/>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5">
+          {reservas.length > 0 ? (
+            <div className="overflow-auto md:overflow-visible">
+              <LoadingBackdrop open={isLoading} />
+              {!isLoading && (
+                <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
+                  <thead>
+                    <tr className="bg-primary text-white h-12">
+                      <td className="pl-2 w-10 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">ROOM</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">ROOM STATUS</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">LAST NAME</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">FIRST NAME</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">TRAVEL AGENCY</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">COMPANY</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">GROUP</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">NOTES</td>
+                      <td className="pl-2 border-r border-[#e6e6e6]">RES. NO.</td>
+                      <td className="text-right pr-2">ARRIVAL</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((reserva, index) => {
+                      // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
+                      return (
+                        <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left hover:bg-primary-50">
+                          <td className="pl-1 flex items-start border-r border-[#e6e6e6]">
+                            <Dropdown>
+                              <DropdownTrigger>
+                                <Button
+                                  variant="light"
+                                  className="flex justify-center items-center w-auto min-w-0  p-0 m-0"
+                                >
+                                  <BsThreeDotsVertical size={20} className="text-black" />
+                                </Button>
+
+
+                              </DropdownTrigger>
+                              <DropdownMenu
+                                aria-label="Static Actions"
+                                closeOnSelect={false}
+                                isOpen={true}
+                              >
+                                <DropdownItem key="edit">
+                                  <DepartureInfoForm
+                                    buttonName={"Ver info"}
+                                    buttonColor={"transparent"}
+                                    modalHeader={"Reservation"}
+                                    formTypeModal={11}
+                                    editor={"teste"}
+                                    roomNumber={reserva.RoomNumber}  // Passando o roomNumber
+                                    dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
+                                    booker={reserva.Booker}
+                                    salutation={reserva.Salutation}
+                                    lastName={reserva.LastName}
+                                    firstName={reserva.FirstName}
+                                    roomType={reserva.RoomType}
+                                    resStatus={reserva.ResStatus}
+                                    totalPax={reserva.TotalPax}
+                                    balance={reserva.Balance}
+                                    country={reserva.Country}
+                                  />
+                                </DropdownItem>
+                                <DropdownItem
+                                  key="show"
+                                  onClick={() => {
+                                    // Verificando se o ReservationNumber existe
+                                    if (reserva.ReservationNumber) {
+                                      // Passando o ReservationNumber para a função sendResToAPI
+                                      sendResToAPI(reserva.ReservationNumber);
+                                    } else {
+                                      console.warn("ReservationNumber não encontrado.");
+                                    }
+                                  }}
+                                >
+                                  Get Statement
+                                </DropdownItem>
+                              </DropdownMenu>
+                            </Dropdown>
+                          </td>
+                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.RoomNumber}</td>
+                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.RoomStatus}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6] ">{reserva.Group}</td>
+                          <td className="pl-2 border-r border-[#e6e6e6] w-64">{reserva.Notes}</td>
+                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.ReservationNumber}</td>
+                          <td className="text-right pr-2">{reserva.DateCO}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          ) : (
+            <p>Nenhuma reserva encontrada.</p>
+          )}
+        </div>
+
       </div>
-    </div>
+
+      {/* Fixed Pagination Section */}
+      <div className="sticky bottom-0 w-full bg-white p-0 m-0">
+        <PaginationTable
+          page={page}
+          pages={pages}
+          rowsPerPage={rowsPerPage}
+          handleChangeRowsPerPage={handleChangeRowsPerPage}
+          items={items}
+          setPage={setPage}
+          dataCSVButton={items.map((item) => ({
+            ID: item.roomTypeID,
+            Cod: item.active,
+            Abreviatura: item.name,
+            Descrição: item.desc,
+            Detalhe: item.roomFeaturesDesc,
+            Função: item.roomTypePlan,
+            GrupoTipologia: item.groupID,
+          }))}
+        />
+      </div>
+    </main>
   );
 }
