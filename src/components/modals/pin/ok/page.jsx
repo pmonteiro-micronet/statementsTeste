@@ -23,6 +23,7 @@ const OkPIN = ({
     const router = useRouter();
     const { data: session, status } = useSession();
     const [propertyID, setPropertyID] = useState("");
+    console.log(propertyID);
 
     useEffect(() => {
         const checkSession = async () => {
@@ -58,21 +59,21 @@ const OkPIN = ({
         }
     };
 
-    const handleCancelPinSubmit = async (e) => {
-        if (e) e.preventDefault();
-        const recordID = localStorage.getItem("recordID");
+    // const handleCancelPinSubmit = async (e) => {
+    //     if (e) e.preventDefault();
+    //     const recordID = localStorage.getItem("recordID");
 
-        try {
-            const isPinCorrect = await bcrypt.compare(pin, userPinHash);
-            if (isPinCorrect) {
-                router.push("/");
-            } else {
-                setIsPinError(true);
-            }
-        } catch (error) {
-            console.error("Erro ao cancelar:", error);
-        }
-    };
+    //     try {
+    //         const isPinCorrect = await bcrypt.compare(pin, userPinHash);
+    //         if (isPinCorrect) {
+    //             router.push("/");
+    //         } else {
+    //             setIsPinError(true);
+    //         }
+    //     } catch (error) {
+    //         console.error("Erro ao cancelar:", error);
+    //     }
+    // };
 
     const handleModalOpenChange = (isOpen) => {
         onOpenChange(isOpen);

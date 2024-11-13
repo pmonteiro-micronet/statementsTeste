@@ -18,6 +18,8 @@ const JsonViewPage = () => {
   const [userPinHash, setUserPinHash] = useState(""); // Estado para o hash do pin do usuário logado
   const router = useRouter();
 
+  console.log(showModal, showCancelModal, setPin, isPinError);
+
   const { data: session, status } = useSession();
   const [propertyID, setPropertyID] = useState("");
 
@@ -26,7 +28,7 @@ const JsonViewPage = () => {
       if (status === "loading") return;
 
       if (!session) {
-        router.push("/login");
+        router.push("/auth");
       } else {
         // Pega o propertyID e o pin do usuário da sessão
         const userPropertyID = session?.user?.propertyID;
@@ -62,28 +64,28 @@ const JsonViewPage = () => {
     setShowModal(true);
   };
 
-  const handleCancelClick = () => {
-    setShowCancelModal(true);
-  };
+  // const handleCancelClick = () => {
+  //   setShowCancelModal(true);
+  // };
 
-  const handlePinSubmit = async (e) => {
-    e.preventDefault();
-    const recordID = localStorage.getItem("recordID");
+  // const handlePinSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const recordID = localStorage.getItem("recordID");
 
-    try {
-      // Verifica o pin do usuário logado com bcrypt
-      const isPinCorrect = await bcrypt.compare(pin, userPinHash); // Verifica o pin inserido com o hash armazenado
+  //   try {
+  //     // Verifica o pin do usuário logado com bcrypt
+  //     const isPinCorrect = await bcrypt.compare(pin, userPinHash); // Verifica o pin inserido com o hash armazenado
 
-      if (isPinCorrect) {
-        await axios.patch(`/api/get_jsons/${recordID}`); // Atualiza o status
-        router.push("/");
-      } else {
-        setIsPinError(true);
-      }
-    } catch (error) {
-      console.error("Erro ao marcar como visto:", error);
-    }
-  };
+  //     if (isPinCorrect) {
+  //       await axios.patch(`/api/get_jsons/${recordID}`); // Atualiza o status
+  //       router.push("/");
+  //     } else {
+  //       setIsPinError(true);
+  //     }
+  //   } catch (error) {
+  //     console.error("Erro ao marcar como visto:", error);
+  //   }
+  // };
 
   // const handleCancelPasswordSubmit = async (e) => {
   //   e.preventDefault();

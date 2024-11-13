@@ -23,6 +23,7 @@ const CancelPIN = ({
     const router = useRouter();
     const { data: session, status } = useSession();
     const [propertyID, setPropertyID] = useState("");
+    console.log(propertyID)
 
     useEffect(() => {
         const checkSession = async () => {
@@ -41,22 +42,22 @@ const CancelPIN = ({
         checkSession();
     }, [session, status, router]);
 
-    const handlePinSubmit = async (e) => {
-        if (e) e.preventDefault();
-        const recordID = localStorage.getItem("recordID");
+    // const handlePinSubmit = async (e) => {
+    //     if (e) e.preventDefault();
+    //     const recordID = localStorage.getItem("recordID");
 
-        try {
-            const isPinCorrect = await bcrypt.compare(pin, userPinHash);
-            if (isPinCorrect) {
-                await axios.patch(`/api/get_jsons/${recordID}`);
-                router.push("/");
-            } else {
-                setIsPinError(true);
-            }
-        } catch (error) {
-            console.error("Erro ao marcar como visto:", error);
-        }
-    };
+    //     try {
+    //         const isPinCorrect = await bcrypt.compare(pin, userPinHash);
+    //         if (isPinCorrect) {
+    //             await axios.patch(`/api/get_jsons/${recordID}`);
+    //             router.push("/");
+    //         } else {
+    //             setIsPinError(true);
+    //         }
+    //     } catch (error) {
+    //         console.error("Erro ao marcar como visto:", error);
+    //     }
+    // };
 
     const handleCancelPinSubmit = async (e) => {
         if (e) e.preventDefault();
