@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server"; 
-import axios from "axios"; 
+import { NextResponse } from "next/server";
+import axios from "axios";
 
-export async function POST(request) {
-  const { propertyID, data } = await request.json();
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const propertyID = searchParams.get("propertyID");
+  const data = searchParams.get("data");
 
   if (!propertyID || !data) {
     return new NextResponse(
@@ -12,11 +14,13 @@ export async function POST(request) {
   }
 
   try {
-    // Enviar os dados para o Mock Server
-    const response = await axios.post('http://192.168.10.201:91/pp_xml_ckit_statementcheckouts', {
-      propertyID,
-      data,
-    });
+    // Enviar os dados como parâmetros na query string
+    const response = await axios.get(
+      'http://192.168.10.201:91/pp_xml_ckit_statementcheckouts',
+      {
+        params: { propertyID, data },
+      }
+    );
 
     // Retorna a resposta do Mock Server para o cliente
     return new NextResponse(JSON.stringify(response.data), { status: 200 });

@@ -52,16 +52,18 @@ export default function Page({ params }) {
   };
 
   // Função para enviar os dados para a API
-  const sendResToAPI = async (resNumber) => {
-    console.log("Enviando resNumber para a API:", resNumber); // Verifica o valor antes de enviar
+  const sendResToAPI = async (ResNumber) => {
+    console.log("Enviando resNumber para a API:", ResNumber); // Verifica o valor antes de enviar
     const windowValue = 0; // Usar uma variável temporária para armazenar o valor
-
+  
     try {
-      await axios.post("/api/reservations/info/specificReservation", {
-        resNumber,
-        window: windowValue,  // Enviando como "window"
+      await axios.get("/api/reservations/info/specificReservation", {
+        params: {  
+          ResNumber,
+          window: windowValue,
+        },
       });
-      console.log(`Dados enviados com sucesso para a reserva ${resNumber} com window: ${windowValue}`);
+      console.log(`Dados enviados com sucesso para a reserva ${ResNumber} com window: ${windowValue}`);
       setSendResSuccess(true);
     } catch (error) {
       console.error(
@@ -71,6 +73,7 @@ export default function Page({ params }) {
       setSendResSuccess(false);
     }
   };
+  
   console.log(sendResSuccess);
 
   // Função para pegar as reservas
@@ -184,9 +187,9 @@ export default function Page({ params }) {
             <div className="flex items-center">
               <button
                 onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
-                className="text-black border border-black bg-white rounded-lg cursor-pointer p-2"
+                className="text-white bg-primary rounded-lg cursor-pointer p-2"
               >
-                <MdOutlineRefresh size={20} />
+                <MdOutlineRefresh size={20}/>
               </button>
             </div>
           </div>
@@ -199,8 +202,8 @@ export default function Page({ params }) {
               {!isLoading && (
                 <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
                   <thead>
-                    <tr className="bg-[#e8e6e6] h-12">
-                      <td className="pl-2 w-10 border-r border-[#e6e6e6]"><FaGear size={18} color="black" /></td>
+                    <tr className="bg-primary text-white h-12">
+                      <td className="pl-2 w-10 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
                       <td className="pl-2 border-r border-[#e6e6e6]">ROOM</td>
                       <td className="pl-2 border-r border-[#e6e6e6]">LAST NAME</td>
                       <td className="pl-2 border-r border-[#e6e6e6]">FIRST NAME</td>
