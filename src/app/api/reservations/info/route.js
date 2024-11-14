@@ -4,11 +4,10 @@ import axios from "axios";
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const propertyID = searchParams.get("propertyID");
-  const data = searchParams.get("data");
 
-  if (!propertyID || !data) {
+  if (!propertyID ) {
     return new NextResponse(
-      JSON.stringify({ error: "Faltam parâmetros: propertyID ou data" }),
+      JSON.stringify({ error: "Faltam parâmetros: propertyID" }),
       { status: 400 }
     );
   }
@@ -18,7 +17,7 @@ export async function GET(request) {
     const response = await axios.get(
       'http://192.168.145.22:91/pp_xml_ckit_statementcheckouts',
       {
-        params: { propertyID, data },
+        params: { propertyID },
       }
     );
 

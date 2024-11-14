@@ -1,3 +1,4 @@
+// SidebarWrapper.js
 "use client";
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -17,7 +18,7 @@ export default function SidebarWrapper({ children }) {
     Statements: {
       icon: <IoDocumentOutline size={20} />,
       items: [
-        { ref: "/homepage/statements/pending", label: "Pendings" },
+        { ref: "/homepage/statements/pending", label: "Pendings", count: 0 },
         { ref: "/homepage/statements/viewed", label: "Viewed" },
       ],
     },
@@ -79,20 +80,18 @@ export default function SidebarWrapper({ children }) {
         let sectionActive = false;
 
         section.items = section.items.map((item) => {
-          // Se o item não tiver sub-itens
           if (!item.items) {
             const isActive = pathname === item.ref;
-            sectionActive = sectionActive || isActive; // Mantém ativo se algum sub-item estiver ativo
+            sectionActive = sectionActive || isActive;
             return {
               ...item,
               active: isActive,
             };
           }
 
-          // Se o item tiver sub-itens, verificamos se algum sub-item corresponde à rota
           const subItems = item.items.map((subItem) => {
             const isSubActive = pathname === subItem.ref;
-            sectionActive = sectionActive || isSubActive; // Se algum sub-item estiver ativo, ativamos o principal
+            sectionActive = sectionActive || isSubActive;
             return {
               ...subItem,
               active: isSubActive,
@@ -101,12 +100,11 @@ export default function SidebarWrapper({ children }) {
 
           return {
             ...item,
-            active: subItems.some((subItem) => subItem.active), // Define o item principal como ativo se algum sub-item for ativo
+            active: subItems.some((subItem) => subItem.active),
             items: subItems,
           };
         });
 
-        // Define a seção principal como ativa se algum item ou sub-item estiver ativo
         section.active = sectionActive;
       });
 
@@ -138,7 +136,7 @@ export default function SidebarWrapper({ children }) {
                       ))}
                     </SidebarItem>
                   ) : (
-                    <SubMenuItem key={index} text={item.label} href={item.ref} active={item.active} />
+                    <SubMenuItem key={index} text={item.label} href={item.ref} active={item.active} count={item.count} />
                   )
                 )}
               </SidebarItem>

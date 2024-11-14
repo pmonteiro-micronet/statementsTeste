@@ -11,7 +11,7 @@ import { MdOutlineRefresh } from "react-icons/md";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 import DepartureInfoForm from "@/components/modals/departures/info/page";
-import "../departures.css";
+import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 
 export default function Page({ params }) {
@@ -31,22 +31,17 @@ export default function Page({ params }) {
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
 // Função para enviar os dados para a API
-const sendDataToAPI = async (dates) => {
+const sendDataToAPI = async () => {
   try {
     setIsLoading(true); // Inicia o carregamento
-    
-    // Converte o array de datas em uma string separada por vírgulas
-    const datesString = dates.join(",");
 
     // Faz a requisição GET com os parâmetros na URL
     await axios.get("/api/reservations/info", {
       params: {
         propertyID,
-        data: datesString,
       },
     });
 
-    console.log(`Dados enviados para as datas: ${datesString}`);
     setPostSuccessful(true);
   } catch (error) {
     console.error(
@@ -55,7 +50,7 @@ const sendDataToAPI = async (dates) => {
     );
     setPostSuccessful(false);
   } finally {
-    setIsLoading(false); // Termina o carregamento
+    setIsLoading(false); 
   }
 };
 
