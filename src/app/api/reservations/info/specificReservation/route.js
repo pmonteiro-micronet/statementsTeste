@@ -16,14 +16,21 @@ export async function GET(request) {
   }
 
   try {
-    // Monta a URL com os parâmetros na query string
+    // Monta a URL com os parâmetros na query string e inclui headers na requisição
     const response = await axios.get(
       `http://192.168.145.22:91/pp_xml_ckit_extratoconta`,
       {
         params: { ResNumber, window },
+        headers: {
+          Accept: "*/*",
+          "Accept-Encoding": "gzip, deflate, br",
+          Connection: "keep-alive",
+        },
       }
     );
+    
     return new NextResponse(JSON.stringify(response.data), { status: 200 });
+    
   } catch (error) {
     console.error(
       "Erro ao enviar dados para o Mock Server:",

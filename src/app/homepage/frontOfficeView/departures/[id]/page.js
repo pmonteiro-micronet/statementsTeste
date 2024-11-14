@@ -30,26 +30,35 @@ export default function Page({ params }) {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
-  // Função para enviar os dados para a API
-  const sendDataToAPI = async (dates) => {
-    try {
-      setIsLoading(true); // Inicia o carregamento
-      await axios.post("/api/reservations/info", {
+// Função para enviar os dados para a API
+const sendDataToAPI = async (dates) => {
+  try {
+    setIsLoading(true); // Inicia o carregamento
+    
+    // Converte o array de datas em uma string separada por vírgulas
+    const datesString = dates.join(",");
+
+    // Faz a requisição GET com os parâmetros na URL
+    await axios.get("/api/reservations/info", {
+      params: {
         propertyID,
-        data: dates,
-      });
-      console.log(`Dados enviados para as datas: ${dates.join(", ")}`);
-      setPostSuccessful(true);
-    } catch (error) {
-      console.error(
-        "Erro ao enviar os dados:",
-        error.response ? error.response.data : error.message
-      );
-      setPostSuccessful(false);
-    } finally {
-      setIsLoading(false); // Termina o carregamento
-    }
-  };
+        data: datesString,
+      },
+    });
+
+    console.log(`Dados enviados para as datas: ${datesString}`);
+    setPostSuccessful(true);
+  } catch (error) {
+    console.error(
+      "Erro ao enviar os dados:",
+      error.response ? error.response.data : error.message
+    );
+    setPostSuccessful(false);
+  } finally {
+    setIsLoading(false); // Termina o carregamento
+  }
+};
+
 
   // Função para enviar os dados para a API
   const sendResToAPI = async (ResNumber) => {
