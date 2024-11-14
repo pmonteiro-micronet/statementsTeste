@@ -16,7 +16,7 @@ export async function GET(request) {
   try {
     // Enviar os dados como parâmetros na query string
     const response = await axios.get(
-      'http://192.168.145.22/pp_xml_ckit_statementcheckouts',
+      'http://192.168.145.22:91/pp_xml_ckit_statementcheckouts',
       {
         params: { propertyID, data },
       }
