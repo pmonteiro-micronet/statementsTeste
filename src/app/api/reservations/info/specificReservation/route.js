@@ -6,7 +6,7 @@ export async function GET(request) {
   const ResNumber = searchParams.get("ResNumber");
   const window = searchParams.get("window");
 
-  console.log("Dados recebidos no backend:", { ResNumber, window }); // Confirmação dos dados recebidos
+  console.log("Dados recebidos no backend:", { ResNumber, window });
 
   if (!ResNumber || window === null) {
     return new NextResponse(
@@ -16,19 +16,15 @@ export async function GET(request) {
   }
 
   try {
-    // Monta a URL com os parâmetros na query string e inclui headers na requisição
+    // Fazer a requisição GET para o endpoint de destino
     const response = await axios.get(
       `http://192.168.145.22:91/pp_xml_ckit_extratoconta`,
       {
-        params: { ResNumber, window },
-        headers: {
-          Accept: "*/*",
-          "Accept-Encoding": "gzip, deflate, br",
-          Connection: "keep-alive",
-        },
+        params: { ResNumber, window },  // Passando os parâmetros como query string
       }
     );
     
+    // Retornar a resposta do serviço de destino
     return new NextResponse(JSON.stringify(response.data), { status: 200 });
     
   } catch (error) {
