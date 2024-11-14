@@ -6,7 +6,7 @@ export async function GET(request) {
   const ResNumber = searchParams.get("ResNumber");
   const window = searchParams.get("window");
 
-  console.log("Dados recebidos no backend:", { ResNumber, window });
+  console.log("Dados recebidos no backend:", { ResNumber, window }); // Confirmação dos dados recebidos
 
   if (!ResNumber || window === null) {
     return new NextResponse(
@@ -16,20 +16,22 @@ export async function GET(request) {
   }
 
   try {
-    // Fazer a requisição GET para o endpoint de destino
+    // Realiza a requisição GET para o endpoint de destino
+    console.log("Enviando requisição para:", `http://192.168.145.22:91/pp_xml_ckit_extratoconta?ResNumber=${ResNumber}&window=${window}`);
     const response = await axios.get(
       `http://192.168.145.22:91/pp_xml_ckit_extratoconta`,
       {
-        params: { ResNumber, window },  // Passando os parâmetros como query string
+        params: { ResNumber, window },
       }
     );
+
+    console.log("Resposta recebida do endpoint:", response.data);  // Exibe a resposta completa
     
-    // Retornar a resposta do serviço de destino
     return new NextResponse(JSON.stringify(response.data), { status: 200 });
-    
+
   } catch (error) {
     console.error(
-      "Erro ao enviar dados para o Mock Server:",
+      "Erro ao enviar dados para o servidor:",
       error.response ? error.response.data : error.message
     );
     return new NextResponse(
