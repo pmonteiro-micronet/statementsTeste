@@ -10,8 +10,8 @@ import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
-import DepartureInfoForm from "@/components/modals/departures/info/page";
-import "../departures.css";
+import ArrivalInfoForm from "@/components/modals/arrivals/info/page";
+import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 
 export default function Page({ params }) {
@@ -96,7 +96,7 @@ export default function Page({ params }) {
                 const reservas = requestBody[key];
 
                 if (Array.isArray(reservas)) {
-                  const reservasComDataAtual = reservas.filter(item => item.DateCO === currentDate);
+                  const reservasComDataAtual = reservas.filter(item => item.DateCI === currentDate);
                   console.log("Reservas filtradas para a data atual:", reservasComDataAtual); // Log das reservas filtradas
 
                   reservasFiltradas = [...reservasFiltradas, ...reservasComDataAtual];
@@ -239,14 +239,14 @@ export default function Page({ params }) {
                                 isOpen={true}
                               >
                                 <DropdownItem key="edit">
-                                  <DepartureInfoForm
+                                  <ArrivalInfoForm
                                     buttonName={"Ver info"}
                                     buttonColor={"transparent"}
                                     modalHeader={"Reservation"}
                                     formTypeModal={11}
                                     editor={"teste"}
                                     roomNumber={reserva.RoomNumber}  // Passando o roomNumber
-                                    dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
+                                    DateCI={reserva.DateCI}  // Passando a data de check-out (DateCI)
                                     booker={reserva.Booker}
                                     salutation={reserva.Salutation}
                                     lastName={reserva.LastName}
@@ -284,7 +284,7 @@ export default function Page({ params }) {
                           <td className="pl-2 border-r border-[#e6e6e6] ">{reserva.Group}</td>
                           <td className="pl-2 border-r border-[#e6e6e6] w-64">{reserva.Notes}</td>
                           <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.ReservationNumber}</td>
-                          <td className="text-right pr-2">{reserva.DateCO}</td>
+                          <td className="text-right pr-2">{reserva.DateCI}</td>
                         </tr>
                       );
                     })}

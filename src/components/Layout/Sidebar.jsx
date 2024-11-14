@@ -155,21 +155,27 @@ export function SidebarItem({ icon, text, active, alert, children }) {
 }
 
 // Inside SubMenuItem component
-export function SubMenuItem({ text, href }) {
+export function SubMenuItem({ text, href, count }) {
   const { expanded } = useContext(SidebarContext);
 
   return (
     <Link href={href}>
       <li
-        className={`flex items-center py-2 pl-3 my-1 rounded-md hover:bg-[#FAE7D6] text-gray-600 cursor-pointer`}
+        className="flex items-center py-2 pl-3 my-1 rounded-md hover:bg-[#FAE7D6] text-gray-600 cursor-pointer"
       >
         <span
-          className={`overflow-hidden transition-all ${
-            expanded ? "w-40" : "w-0"
-          }`}
+          className={`overflow-hidden transition-all ${expanded ? "w-40" : "w-0"}`}
         >
           {text}
         </span>
+        {/* Badge count */}
+        {count !== undefined && (
+          <span
+            className="ml-auto mr-3 flex items-center justify-center w-5 h-5 rounded-full bg-primary text-white text-xs font-semibold"
+          >
+            {count}
+          </span>
+        )}
       </li>
     </Link>
   );
