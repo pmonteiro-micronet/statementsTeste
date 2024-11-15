@@ -72,7 +72,8 @@ export default function Page({ params }) {
 
       // Após o envio, busca o recordID do último registro
       const response = await axios.get("/api/get_jsons");
-      const lastRecordID = response.data.lastRecordID;
+      console.log("resposta api get json:", response);
+      const lastRecordID = response.data.requestID;
 
       if (lastRecordID) {
         // Salva o recordID no localStorage
