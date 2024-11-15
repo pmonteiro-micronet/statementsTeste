@@ -59,7 +59,7 @@ export default function Page({ params }) {
   const sendResToAPI = async (ResNumber) => {
     console.log("Enviando ResNumber para a API:", ResNumber);
     const windowValue = 0;
-
+  
     try {
       // Faz a requisição para enviar os dados do statement
       await axios.get("/api/reservations/info/specificReservation", {
@@ -69,15 +69,19 @@ export default function Page({ params }) {
         },
       });
       console.log(`Dados enviados com sucesso para a reserva ${ResNumber} com window: ${windowValue}`);
-
+  
       // Após o envio, busca o recordID do último registro
       const response = await axios.get("/api/get_jsons");
       console.log("resposta api get json:", response);
-      const lastRecordID = response.data.requestID;
-
-      if (lastRecordID) {
+  
+      // Buscar o último `requestID` na lista de respostas
+      const lastRecord = response.data.response.find((item) => item.requestID);
+      if (lastRecord) {
+        const lastRecordID = lastRecord.requestID;
+  
         // Salva o recordID no localStorage
         localStorage.setItem("recordID", lastRecordID);
+  
         // Redireciona para a página jsonView
         router.push("/homepage/jsonView");
       } else {
@@ -90,8 +94,7 @@ export default function Page({ params }) {
       );
     }
   };
-
-
+  
   // Função para pegar as reservas
   useEffect(() => {
     const fetchReservas = async () => {
