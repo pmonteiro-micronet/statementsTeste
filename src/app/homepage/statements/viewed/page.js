@@ -54,7 +54,7 @@ const VistosPage = () => {
   }, []);
 
   const filteredJsons = getJsons.filter(
-    (json) => json.propertyID === propertyID && json.seen===1
+    (json) => json.propertyID === propertyID && json.seen
   );
 
   const uniqueJsons = filteredJsons.filter((item, index, self) => {
