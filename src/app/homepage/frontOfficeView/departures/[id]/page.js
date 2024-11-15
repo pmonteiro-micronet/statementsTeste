@@ -14,6 +14,8 @@ import DepartureInfoForm from "@/components/modals/departures/info/page";
 import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 
+import { useRouter } from "next/navigation";
+
 export default function Page({ params }) {
   const { id } = params;
   const propertyID = id;
@@ -30,6 +32,8 @@ export default function Page({ params }) {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
+  const router = useRouter();
+  
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
     try {
