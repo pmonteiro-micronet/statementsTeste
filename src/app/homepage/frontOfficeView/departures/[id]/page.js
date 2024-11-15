@@ -33,7 +33,7 @@ export default function Page({ params }) {
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const router = useRouter();
-  
+
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
     try {
@@ -60,44 +60,44 @@ export default function Page({ params }) {
 
 
   // Função para enviar os dados para a API
-  const sendResToAPI = async (ResNumber) => {
-    console.log("Enviando ResNumber para a API:", ResNumber);
-    const windowValue = 0;
-  
-    try {
-      // Faz a requisição para enviar os dados do statement
-      await axios.get("/api/reservations/info/specificReservation", {
-        params: {
-          ResNumber,
-          window: windowValue,
-        },
-      });
-      console.log(`Dados enviados com sucesso para a reserva ${ResNumber} com window: ${windowValue}`);
-  
-      // Após o envio, busca o recordID do último registro
-      const response = await axios.get("/api/get_jsons");
-      console.log("resposta api get json:", response);
-  
-      // Buscar o último `requestID` na lista de respostas
-      const lastRecord = response.data.response.find((item) => item.requestID);
-      if (lastRecord) {
-        const lastRecordID = lastRecord.requestID;
-  
-        // Salva o recordID no localStorage
-        localStorage.setItem("recordID", lastRecordID);
-  
-        // Redireciona para a página jsonView
-        router.push("/homepage/jsonView");
-      } else {
-        console.warn("RecordID não encontrado na resposta da API.");
-      }
-    } catch (error) {
-      console.error(
-        "Erro ao enviar os dados ou buscar o recordID:",
-        error.response ? error.response.data : error.message
-      );
+ const sendResToAPI = async (ResNumber) => {
+  console.log("Enviando ResNumber para a API:", ResNumber);
+  const windowValue = 0;
+
+  try {
+    // Faz a requisição para enviar os dados do statement
+    await axios.get("/api/reservations/info/specificReservation", {
+      params: {
+        ResNumber,
+        window: windowValue,
+      },
+    });
+    console.log(`Dados enviados com sucesso para a reserva ${ResNumber} com window: ${windowValue}`);
+
+    // Após o envio, busca o recordID do último registro
+    const response = await axios.get("/api/get_jsons");
+    console.log("resposta api get json:", response);
+
+    // Buscar o último `requestID` na lista de respostas
+    const lastRecord = response.data.response[response.data.response.length - 1];
+    if (lastRecord && lastRecord.requestID) {
+      const lastRecordID = lastRecord.requestID;
+
+      // Salva o recordID no localStorage
+      localStorage.setItem("recordID", lastRecordID);
+
+      // Redireciona para a página jsonView
+      router.push("/homepage/jsonView");
+    } else {
+      console.warn("RecordID não encontrado na resposta da API.");
     }
-  };
+  } catch (error) {
+    console.error(
+      "Erro ao enviar os dados ou buscar o recordID:",
+      error.response ? error.response.data : error.message
+    );
+  }
+};
   
   // Função para pegar as reservas
   useEffect(() => {
