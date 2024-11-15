@@ -27,7 +27,7 @@ export default function SidebarWrapper({ children }) {
       items: [],
     },
   });
-
+console.log(pendingCount);
   // Atualizar o tamanho da tela
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -104,6 +104,7 @@ export default function SidebarWrapper({ children }) {
       const updatedListItems = { ...prevListItems };
 
       Object.entries(updatedListItems).forEach(([key, section]) => {
+        console.log(key);
         let sectionActive = false;
 
         section.items = section.items.map((item) => {
