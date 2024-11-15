@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import "./styles.css";
+import "../styles.css";
 
 const VistosPage = () => {
   const [getJsons, setGetJsons] = useState([]);
@@ -54,7 +54,7 @@ const VistosPage = () => {
   }, []);
 
   const filteredJsons = getJsons.filter(
-    (json) => json.propertyID === propertyID && !json.seen
+    (json) => json.propertyID === propertyID && json.seen===1
   );
 
   const uniqueJsons = filteredJsons.filter((item, index, self) => {
@@ -108,7 +108,7 @@ const VistosPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col p-8 bg-background">
-      <h2 className="font-semibold text-2xl mb-4">Pendentes</h2>
+      <h2 className="font-semibold text-2xl mb-4">View</h2>
       <div className="grid-container">
         {uniqueJsons.length > 0 ? (
           uniqueJsons.map((json, index) => {
