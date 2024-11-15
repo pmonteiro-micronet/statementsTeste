@@ -26,59 +26,70 @@ export default function Page({ params }) {
   const [reservas, setReservas] = useState([]);
   const [postSuccessful, setPostSuccessful] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [sendResSuccess, setSendResSuccess] = useState(false); //estado para envio get statement
+  // const [sendResSuccess, setSendResSuccess] = useState(false); //estado para envio get statement
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
-// Função para enviar os dados para a API
-const sendDataToAPI = async () => {
-  try {
-    setIsLoading(true); // Inicia o carregamento
-
-    // Faz a requisição GET com os parâmetros na URL
-    await axios.get("/api/reservations/info", {
-      params: {
-        propertyID,
-      },
-    });
-
-    setPostSuccessful(true);
-  } catch (error) {
-    console.error(
-      "Erro ao enviar os dados:",
-      error.response ? error.response.data : error.message
-    );
-    setPostSuccessful(false);
-  } finally {
-    setIsLoading(false); 
-  }
-};
-
-
   // Função para enviar os dados para a API
-  const sendResToAPI = async (ResNumber) => {
-    console.log("Enviando resNumber para a API:", ResNumber); // Verifica o valor antes de enviar
-    const windowValue = 0; // Usar uma variável temporária para armazenar o valor
-  
+  const sendDataToAPI = async () => {
     try {
-      await axios.get("/api/reservations/info/specificReservation", {
-        params: {  
-          ResNumber,
-          window: windowValue,
+      setIsLoading(true); // Inicia o carregamento
+
+      // Faz a requisição GET com os parâmetros na URL
+      await axios.get("/api/reservations/info", {
+        params: {
+          propertyID,
         },
       });
-      console.log(`Dados enviados com sucesso para a reserva ${ResNumber} com window: ${windowValue}`);
-      setSendResSuccess(true);
+
+      setPostSuccessful(true);
     } catch (error) {
       console.error(
         "Erro ao enviar os dados:",
         error.response ? error.response.data : error.message
       );
-      setSendResSuccess(false);
+      setPostSuccessful(false);
+    } finally {
+      setIsLoading(false);
     }
   };
-  
-  console.log(sendResSuccess);
+
+
+  // Função para enviar os dados para a API
+  const sendResToAPI = async (ResNumber) => {
+    console.log("Enviando ResNumber para a API:", ResNumber);
+    const windowValue = 0;
+
+    try {
+      // Faz a requisição para enviar os dados do statement
+      await axios.get("/api/reservations/info/specificReservation", {
+        params: {
+          ResNumber,
+          window: windowValue,
+        },
+      });
+      console.log(`Dados enviados com sucesso para a reserva ${ResNumber} com window: ${windowValue}`);
+
+      // Após o envio, busca o recordID do último registro
+      const response = await axios.get("/api/reservations/get_json");
+      const lastRecordID = response.data.lastRecordID;
+
+      if (lastRecordID) {
+        // Salva o recordID no localStorage
+        localStorage.setItem("recordID", lastRecordID);
+        // Redireciona para a página jsonView
+        router.push("/homepage/jsonView");
+      } else {
+        console.warn("RecordID não encontrado na resposta da API.");
+      }
+    } catch (error) {
+      console.error(
+        "Erro ao enviar os dados ou buscar o recordID:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
+
 
   // Função para pegar as reservas
   useEffect(() => {
@@ -193,7 +204,7 @@ const sendDataToAPI = async () => {
                 onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
                 className="text-white bg-primary rounded-lg cursor-pointer p-2"
               >
-                <MdOutlineRefresh size={20}/>
+                <MdOutlineRefresh size={20} />
               </button>
             </div>
           </div>
@@ -216,7 +227,7 @@ const sendDataToAPI = async () => {
                       <td className="pl-2 border-r border-[#e6e6e6]">GROUP</td>
                       <td className="pl-2 border-r border-[#e6e6e6]">NOTES</td>
                       <td className="pl-2 border-r border-[#e6e6e6]">RES. NO.</td>
-                      <td className="text-right pr-2">DEPARTURE</td>
+                      <td className="pl-2">DEPARTURE</td>
                     </tr>
                   </thead>
                   <tbody>
@@ -264,17 +275,16 @@ const sendDataToAPI = async () => {
                                 <DropdownItem
                                   key="show"
                                   onClick={() => {
-                                    // Verificando se o ReservationNumber existe
                                     if (reserva.ReservationNumber) {
-                                      // Passando o ReservationNumber para a função sendResToAPI
                                       sendResToAPI(reserva.ReservationNumber);
                                     } else {
                                       console.warn("ReservationNumber não encontrado.");
                                     }
                                   }}
                                 >
-                                  Get Statement
+                                  View Statement
                                 </DropdownItem>
+
                               </DropdownMenu>
                             </Dropdown>
                           </td>

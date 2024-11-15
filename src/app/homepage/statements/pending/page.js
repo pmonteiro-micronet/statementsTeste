@@ -38,8 +38,8 @@ const PendentesPage = () => {
         })
         .sort((a, b) => {
           // Convert requestID to number if it's a string
-          const requestID_A = typeof a.requestID === 'string' ? parseInt(a.requestID, 10) : a.requestID;
-          const requestID_B = typeof b.requestID === 'string' ? parseInt(b.requestID, 10) : b.requestID;
+          const requestID_A = typeof a.requestID === "string" ? parseInt(a.requestID, 10) : a.requestID;
+          const requestID_B = typeof b.requestID === "string" ? parseInt(b.requestID, 10) : b.requestID;
 
           // Sort in descending order
           return requestID_B - requestID_A; // Higher requestID first
@@ -62,6 +62,43 @@ const PendentesPage = () => {
     (json) => json.propertyID === propertyID && !json.seen
   );
 
+  // Remover duplicados com base em RoomNumber, FirstName, LastName, DateCI, DateCO, Description do hotel e ReservationNumber
+  const uniqueJsons = filteredJsons.filter((item, index, self) => {
+    const parsedData = JSON.parse(item.requestBody);
+    const hotelInfo = parsedData[0]?.HotelInfo?.[0];
+    const reservation = parsedData[0]?.Reservation?.[0];
+    const guestInfo = parsedData[0]?.GuestInfo?.[0];
+
+    const description = hotelInfo?.Description;
+    const roomNumber = reservation?.RoomNumber;
+    const firstName = guestInfo?.FirstName;
+    const lastName = guestInfo?.LastName;
+    const dateCI = reservation?.DateCI;
+    const dateCO = reservation?.DateCO;
+    const reservationNumber = reservation?.ReservationNumber;
+
+    // Encontrar a primeira ocorrência com os mesmos atributos
+    return (
+      index ===
+      self.findIndex((json) => {
+        const comparisonData = JSON.parse(json.requestBody);
+        const comparisonHotelInfo = comparisonData[0]?.HotelInfo?.[0];
+        const comparisonReservation = comparisonData[0]?.Reservation?.[0];
+        const comparisonGuestInfo = comparisonData[0]?.GuestInfo?.[0];
+
+        return (
+          comparisonHotelInfo?.Description === description &&
+          comparisonReservation?.RoomNumber === roomNumber &&
+          comparisonGuestInfo?.FirstName === firstName &&
+          comparisonGuestInfo?.LastName === lastName &&
+          comparisonReservation?.DateCI === dateCI &&
+          comparisonReservation?.DateCO === dateCO &&
+          comparisonReservation?.ReservationNumber === reservationNumber
+        );
+      })
+    );
+  });
+
   // Handle card click to view details
   const handleCardClick = (json) => {
     localStorage.setItem("recordID", json.requestID);
@@ -76,9 +113,8 @@ const PendentesPage = () => {
     <div className="min-h-screen flex flex-col p-8 bg-background">
       <h2 className="font-semibold text-2xl mb-4">Pendentes</h2>
       <div className="grid-container">
-        {filteredJsons.length > 0 ? (
-          // Exibir itens na ordem mais recente para mais antigo
-          filteredJsons.map((json, index) => {
+        {uniqueJsons.length > 0 ? (
+          uniqueJsons.map((json, index) => {
             let parsedData;
             try {
               parsedData = JSON.parse(json.requestBody);

@@ -113,7 +113,7 @@ export function SidebarItem({ icon, text, active, alert, children }) {
         className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors group ${
           active
             ? "bg-[#FC9D25] text-white"
-            : "hover:bg-[#FAE7D6] text-gray-600"
+            : "hover:bg-primary-50 text-gray-600"
         }`}
         onClick={() => {
           if (children) setIsOpen((prev) => !prev); // Alterna o submenu se houver filhos
@@ -129,7 +129,7 @@ export function SidebarItem({ icon, text, active, alert, children }) {
         </span>
         {alert && (
           <div
-            className={`absolute right-2 w-2 h-2 rounded bg-[#FAE7D6] ${
+            className={`absolute right-2 w-2 h-2 rounded bg-primary ${
               expanded ? "" : "top-2"
             }`}
           />
@@ -137,7 +137,7 @@ export function SidebarItem({ icon, text, active, alert, children }) {
 
         {!expanded && (
           <div
-            className={`absolute left-full rounded-md px-2 py-1 ml-6 bg-[#FAE7D6] text-[#BF6415] text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}
+            className={`absolute left-full rounded-md px-2 py-1 ml-6 bg-primary text-[#BF6415] text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}
           >
             {text}
           </div>
