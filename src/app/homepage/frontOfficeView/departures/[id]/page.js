@@ -71,7 +71,7 @@ export default function Page({ params }) {
       console.log(`Dados enviados com sucesso para a reserva ${ResNumber} com window: ${windowValue}`);
 
       // Após o envio, busca o recordID do último registro
-      const response = await axios.get("/api/reservations/get_json");
+      const response = await axios.get("/api/get_jsons");
       const lastRecordID = response.data.lastRecordID;
 
       if (lastRecordID) {
