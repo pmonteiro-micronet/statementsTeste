@@ -92,11 +92,6 @@ const VistosPage = () => {
     );
   });
 
-  // Store the count of unique JSONs in localStorage
-  useEffect(() => {
-    localStorage.setItem("pendingCount", uniqueJsons.length.toString());
-  }, [uniqueJsons]);
-
   const handleCardClick = (json) => {
     localStorage.setItem("recordID", json.requestID);
     router.push("/homepage/jsonView");
