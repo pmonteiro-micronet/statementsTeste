@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import "./styles.css";
+import "../styles.css";
 
 const PendentesPage = () => {
   const [getJsons, setGetJsons] = useState([]);
