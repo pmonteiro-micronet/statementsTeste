@@ -57,13 +57,14 @@ const VistosPage = () => {
       <h2 className="font-semibold text-2xl mb-4">Vistos</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {filteredJsons.length > 0 ? (
+          // Exibir itens na ordem mais recente para mais antigo
           filteredJsons.map((json, index) => {
             let parsedData;
             try {
               parsedData = JSON.parse(json.requestBody);
             } catch (error) {
               console.error("Error parsing JSON:", error);
-              return null;
+              return null; // Skip this item if parsing fails
             }
 
             const hotelInfo = parsedData[0]?.HotelInfo?.[0];
@@ -72,7 +73,7 @@ const VistosPage = () => {
             const hotelName = hotelInfo?.Description || "Nome do Hotel";
 
             if (!reservation || !guestInfo) {
-              return null;
+              return null; // Skip if reservation or guest info is missing
             }
 
             return (
