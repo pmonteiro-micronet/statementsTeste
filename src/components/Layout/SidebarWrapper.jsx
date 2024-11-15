@@ -1,4 +1,3 @@
-// SidebarWrapper.js
 "use client";
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -14,6 +13,7 @@ export default function SidebarWrapper({ children }) {
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [expanded, setExpanded] = useState(true);
+  const [pendingCount, setPendingCount] = useState(0); // Estado para armazenar o contador de pendências
   const [listItems, setListItems] = useState({
     Statements: {
       icon: <IoDocumentOutline size={20} />,
@@ -27,7 +27,8 @@ export default function SidebarWrapper({ children }) {
       items: [],
     },
   });
-
+console.log(pendingCount);
+  // Atualizar o tamanho da tela
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
@@ -35,6 +36,7 @@ export default function SidebarWrapper({ children }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Buscar hotéis e configurar items da sidebar
   useEffect(() => {
     const fetchHotels = async () => {
       if (session?.user?.propertyID) {
@@ -69,6 +71,32 @@ export default function SidebarWrapper({ children }) {
 
     fetchHotels();
   }, [session]);
+
+  // Atualizar pendências do localStorage
+  useEffect(() => {
+    const updatePendingCount = () => {
+      const count = parseInt(localStorage.getItem("pendingCount"), 10) || 0;
+      setPendingCount(count);
+
+      // Atualizar o listItems com a contagem mais recente
+      setListItems((prevListItems) => ({
+        ...prevListItems,
+        Statements: {
+          ...prevListItems.Statements,
+          items: prevListItems.Statements.items.map((item) =>
+            item.ref === "/homepage/statements/pending"
+              ? { ...item, count }
+              : item
+          ),
+        },
+      }));
+    };
+
+    updatePendingCount(); // Atualizar ao montar
+    const interval = setInterval(updatePendingCount, 1000); // Atualizar periodicamente
+
+    return () => clearInterval(interval); // Limpar intervalo ao desmontar
+  }, []);
 
   // Atualize o estado ativo com base na rota atual
   useEffect(() => {

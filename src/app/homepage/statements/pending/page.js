@@ -33,16 +33,13 @@ const PendentesPage = () => {
             return Array.isArray(parsedItem) && parsedItem[0]?.HotelInfo;
           } catch (error) {
             console.log(error);
-            return false; // Skip if parsing fails
+            return false;
           }
         })
         .sort((a, b) => {
-          // Convert requestID to number if it's a string
           const requestID_A = typeof a.requestID === "string" ? parseInt(a.requestID, 10) : a.requestID;
           const requestID_B = typeof b.requestID === "string" ? parseInt(b.requestID, 10) : b.requestID;
-
-          // Sort in descending order
-          return requestID_B - requestID_A; // Higher requestID first
+          return requestID_B - requestID_A;
         });
       setGetJsons(filteredData);
     } catch (error) {
@@ -50,19 +47,16 @@ const PendentesPage = () => {
     }
   };
 
-  // Fetch data periodically
   useEffect(() => {
     getDataJsons();
     const interval = setInterval(getDataJsons, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // Filter pending JSONs based on propertyID and unseen status
   const filteredJsons = getJsons.filter(
     (json) => json.propertyID === propertyID && !json.seen
   );
 
-  // Remover duplicados com base em RoomNumber, FirstName, LastName, DateCI, DateCO, Description do hotel e ReservationNumber
   const uniqueJsons = filteredJsons.filter((item, index, self) => {
     const parsedData = JSON.parse(item.requestBody);
     const hotelInfo = parsedData[0]?.HotelInfo?.[0];
@@ -77,7 +71,6 @@ const PendentesPage = () => {
     const dateCO = reservation?.DateCO;
     const reservationNumber = reservation?.ReservationNumber;
 
-    // Encontrar a primeira ocorrência com os mesmos atributos
     return (
       index ===
       self.findIndex((json) => {
@@ -99,7 +92,11 @@ const PendentesPage = () => {
     );
   });
 
-  // Handle card click to view details
+  // Store the count of unique JSONs in localStorage
+  useEffect(() => {
+    localStorage.setItem("pendingCount", uniqueJsons.length.toString());
+  }, [uniqueJsons]);
+
   const handleCardClick = (json) => {
     localStorage.setItem("recordID", json.requestID);
     router.push("/homepage/jsonView");
@@ -120,7 +117,7 @@ const PendentesPage = () => {
               parsedData = JSON.parse(json.requestBody);
             } catch (error) {
               console.error("Error parsing JSON:", error);
-              return null; // Skip this item if parsing fails
+              return null;
             }
 
             const hotelInfo = parsedData[0]?.HotelInfo?.[0];
@@ -129,7 +126,7 @@ const PendentesPage = () => {
             const hotelName = hotelInfo?.Description || "Nome do Hotel";
 
             if (!reservation || !guestInfo) {
-              return null; // Skip if reservation or guest info is missing
+              return null;
             }
 
             return (

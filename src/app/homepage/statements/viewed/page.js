@@ -56,22 +56,30 @@ const VistosPage = () => {
       className="flex flex-col flex-grow h-full overflow-hidden p-4 m-0 bg-background">
       <h2 className="font-semibold text-2xl mb-4">Vistos</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {filteredJsons.length > 0 ? (
+      {filteredJsons.length > 0 ? (
           filteredJsons.map((json, index) => {
-            const reservation = JSON.parse(json.requestBody).Reservation[0];
-            const guestInfo = JSON.parse(json.requestBody).GuestInfo[0];
+            let parsedData;
+            try {
+              parsedData = JSON.parse(json.requestBody);
+            } catch (error) {
+              console.error("Error parsing JSON:", error);
+              return null;
+            }
+
+            const hotelInfo = parsedData[0]?.HotelInfo?.[0];
+            const reservation = parsedData[0]?.Reservation?.[0];
+            const guestInfo = parsedData[0]?.GuestInfo?.[0];
+            const hotelName = hotelInfo?.Description || "Nome do Hotel";
+
+            if (!reservation || !guestInfo) {
+              return null;
+            }
 
             return (
-              <div
-                key={index}
-                className="relative bg-white p-4 rounded-lg shadow-md flex items-center justify-center h-64"
-              >
-                {/* Conteúdo do cartão */}
+              <div key={index} className="card" onClick={() => handleCardClick(json)}>
                 <div className="flex flex-row">
                   <div className="absolute top-0 left-0 p-2 rounded-lg mt-2 ml-2">
-                    <p className="text-sm font-bold text-gray-700">
-                      Nome do Hotel
-                    </p>
+                    <p className="text-sm font-bold text-gray-700">{hotelName}</p>
                   </div>
                   <div className="absolute top-0 right-0 mr-1 mt-1">
                     <p className="flex flex-col">
@@ -82,17 +90,14 @@ const VistosPage = () => {
                     </p>
                   </div>
                 </div>
-
                 <div className="flex flex-col absolute top-12 left-4">
                   <p className="text-sm text-gray-500">
                     <span className="text-lg text-gray-900 font-semibold">
-                      {guestInfo.Salutation}. {guestInfo.LastName}
+                      {guestInfo.Salution || ""} {guestInfo.LastName || ""}
                     </span>
                   </p>
                 </div>
-
                 <div className="bg-gray-200 h-[1%] w-full -mt-[20%]"></div>
-
                 <div className="absolute left-4 mt-20 w-full pr-4">
                   <div className="flex flex-col space-y-2 pr-4">
                     <div className="flex justify-between mt-10">
