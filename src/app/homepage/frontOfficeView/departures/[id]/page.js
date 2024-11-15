@@ -34,29 +34,40 @@ export default function Page({ params }) {
 
   const router = useRouter();
 
-  // Função para enviar os dados para a API
-  const sendDataToAPI = async () => {
-    try {
-      setIsLoading(true); // Inicia o carregamento
+ // Função para enviar os dados para a API
+const sendDataToAPI = async () => {
+  try {
+    setIsLoading(true); // Inicia o carregamento
 
-      // Faz a requisição GET com os parâmetros na URL
+    // Faz a requisição GET à API de properties com o propertyID passado
+    const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
+
+    // Verifica se a resposta contém o 'mpehotel' e executa o que for necessário
+    if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
+      const mpehotel = propertyResponse.data.response[0].mpehotel;
+      console.log('Mpehotel encontrado:', mpehotel);
+
       await axios.get("/api/reservations/info", {
         params: {
-          propertyID,
+          mpehotel,
         },
       });
 
       setPostSuccessful(true);
-    } catch (error) {
-      console.error(
-        "Erro ao enviar os dados:",
-        error.response ? error.response.data : error.message
-      );
+    } else {
+      console.error('Mpehotel não encontrado para o propertyID:', propertyID);
       setPostSuccessful(false);
-    } finally {
-      setIsLoading(false);
     }
-  };
+  } catch (error) {
+    console.error(
+      "Erro ao enviar os dados:",
+      error.response ? error.response.data : error.message
+    );
+    setPostSuccessful(false);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
 
   // Função para enviar os dados para a API

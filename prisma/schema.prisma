@@ -28,6 +28,7 @@ model requestRecords {
   responseBody    String?  @db.Text
   propertyID      Int
   seen            Boolean?
+  uniqueKey       String?  @db.VarChar(255)
 }
 
 model users {
