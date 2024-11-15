@@ -52,10 +52,9 @@ const VistosPage = () => {
   }
 
   return (
-      <main 
-      className="flex flex-col flex-grow h-full overflow-hidden p-4 m-0 bg-background">
-      <h2 className="font-semibold text-2xl mb-4">Vistos</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="min-h-screen flex flex-col p-8 bg-background">
+      <h2 className="font-semibold text-2xl mb-4">Viewed</h2>
+      <div className="grid-container">
       {filteredJsons.length > 0 ? (
           // Exibir itens na ordem mais recente para mais antigo
           filteredJsons.map((json, index) => {
@@ -130,7 +129,7 @@ const VistosPage = () => {
           <p className="text-gray-500">Nenhuma reserva vista.</p>
         )}
       </div>
-    </main>
+    </div>
   );
 };
 
