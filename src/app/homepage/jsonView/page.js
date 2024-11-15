@@ -121,7 +121,7 @@ const JsonViewPage = () => {
             />
           </div>
 
-          <div className="flex flex-col justify-center items-center w-[80%] mx-auto mt-4">
+          <div className="flex flex-col justify-between items-center w-[80%] mx-auto mt-4">
             <div className="flex justify-between w-full mb-10">
               {/* Detalhes da Reserva */}
               <div className="flex-1 text-left ml-[10%]">
@@ -168,7 +168,7 @@ const JsonViewPage = () => {
               </div>
 
               {/* Detalhes do Hóspede */}
-              <div className="flex-1 text-right mr-[10%] mt-4">
+              <div className="flex-1 text-left ml-[40%] mt-4">
                 {reservationData && reservationData.requestBody ? (
                   Array.isArray(
                     JSON.parse(reservationData.requestBody)[0]?.GuestInfo
@@ -195,6 +195,7 @@ const JsonViewPage = () => {
                 )}
               </div>
             </div>
+
             {/* Tabela de Itens */}
             <table className="w-[80%] border-collapse border border-gray-300 mb-4 mx-auto">
               <thead>
@@ -217,31 +218,32 @@ const JsonViewPage = () => {
                   Array.isArray(
                     JSON.parse(reservationData.requestBody)[0]?.Items
                   ) ? (
-                    JSON.parse(reservationData.requestBody)[0].Items.map(
-                      (item, index) => (
-                        <tr
-                          key={item.ID}
-                          className={index % 2 === 0 ? "bg-white" : "bg-primary-100"}
+                    JSON.parse(reservationData.requestBody)[0].Items.map((item, index) => (
+                      <tr
+                        key={item.ID}
+                        className={index % 2 === 0 ? "bg-white" : "bg-primary-100"}
+                      >
+                        <td className="border border-gray-300 p-2 w-32 text-center text-lg">
+                          {item.Date}
+                        </td>
+                        <td
+                          className={`border border-gray-300 p-2 h-20 flex flex-col gap-2 text-lg ${!item.Description2 ? "justify-center text-left" : "text-left"
+                            }`}
                         >
-                          <td className="border border-gray-300 p-2 w-32 text-center text-lg">
-                            {item.Date}
-                          </td>
-                          <td className="border border-gray-300 p-2 h-20 flex flex-col gap-2 text-lg">
-                            <span>{item.Description}</span>
-                            <span>{item.Description2}</span>
-                          </td>
-                          <td className="border border-gray-300 p-2 text-right w-20 text-lg">
-                            {item.Qty}
-                          </td>
-                          <td className="border border-gray-300 p-2 text-right w-32 text-lg">
-                            €{item.UnitPrice.toFixed(2)}
-                          </td>
-                          <td className="border border-gray-300 p-2 text-right w-32 text-lg">
-                            €{item.Total.toFixed(2)}
-                          </td>
-                        </tr>
-                      )
-                    )
+                          <span>{item.Description}</span>
+                          {item.Description2 && <span>{item.Description2}</span>}
+                        </td>
+                        <td className="border border-gray-300 p-2 text-right w-20 text-lg">
+                          {item.Qty}
+                        </td>
+                        <td className="border border-gray-300 p-2 text-right w-32 text-lg">
+                          {item.UnitPrice.toFixed(2)}€
+                        </td>
+                        <td className="border border-gray-300 p-2 text-right w-32 text-lg">
+                          {item.Total.toFixed(2)}€
+                        </td>
+                      </tr>
+                    ))
                   ) : (
                     <tr>
                       <td colSpan="5" className="text-center p-2">
@@ -257,6 +259,7 @@ const JsonViewPage = () => {
                   </tr>
                 )}
               </tbody>
+
             </table>
 
             <div className="flex justify-end w-[80%] mx-auto">
@@ -269,8 +272,8 @@ const JsonViewPage = () => {
                     return documentTotals.map((total) => (
                       <div key={total.ID} className="w-full">
                         <p className="mt-4 text-5xl flex font-bold gap-20 justify-end">
-                          <span>TOTAL</span>
-                          <span>{total.Balance}€</span>
+                          <span>TOTAL BALANCE</span>
+                          <span>{total.Balance.toFixed(2)}€</span>
                         </p>
                       </div>
                     ));
@@ -371,28 +374,28 @@ const JsonViewPage = () => {
 
           {/* Botões de Ação */}
           <div className="flex gap-4 justify-end mt-4 mr-[17%] mb-3 ">
-          <CancelPIN
-            buttonName={"Cancel"}
-            buttonColor={"transparent"}
-            modalHeader={"Insira o PIN"}
-            formTypeModal={11}
-            editor={"teste"}
-          />
+            <CancelPIN
+              buttonName={"Cancel"}
+              buttonColor={"transparent"}
+              modalHeader={"Insira o PIN"}
+              formTypeModal={11}
+              editor={"teste"}
+            />
             <button
               className="bg-primary text-white font-semibold rounded-lg mb-3"
               onClick={handleOkClick}
             >
               <OkPIN
-            buttonName={"Ok"}
-            buttonColor={"transparent"}
-            modalHeader={"Insira o PIN"}
-            formTypeModal={11}
-            editor={"teste"}
-          />
+                buttonName={"Ok"}
+                buttonColor={"transparent"}
+                modalHeader={"Insira o PIN"}
+                formTypeModal={11}
+                editor={"teste"}
+              />
             </button>
           </div>
 
-          
+
         </>
       ) : (
         <p>Nenhum dado encontrado.</p>

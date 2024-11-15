@@ -10,11 +10,12 @@ datasource db {
 
 model properties {
   propertyID               Int               @id @default(autoincrement())
-  propertyTag              String            @db.VarChar(100)
+  propertyTag              String            @unique(map: "propertyTag_UNIQUE") @db.VarChar(100)
   propertyName             String            @db.VarChar(100)
   propertyServer           String            @db.VarChar(2048)
   propertyPort             Int?
   propertyConnectionString String?           @db.VarChar(2048)
+  mpehotel                 Int?
   usersProperties          usersProperties[]
 }
 
@@ -42,12 +43,13 @@ model users {
 }
 
 model usersProperties {
-  userID     Int
-  propertyID Int
-  properties properties @relation(fields: [propertyID], references: [propertyID], onDelete: Cascade)
-  users      users      @relation(fields: [userID], references: [userID], onDelete: Cascade)
+  userID      Int
+  propertyID  Int
+  propertyTag String     @db.VarChar(10)
+  properties  properties @relation(fields: [propertyID], references: [propertyID], onDelete: Cascade)
+  users       users      @relation(fields: [userID], references: [userID], onDelete: Cascade)
 
-  @@id([userID, propertyID])
+  @@id([userID, propertyID, propertyTag])
   @@index([propertyID], map: "usersProperties_propertyID_fkey")
 }
 
@@ -59,12 +61,6 @@ model requestRecordsReservations {
   responseStatus  String?  @db.VarChar(20)
   responseBody    String?  @db.Text
   propertyID      Int
-}
-
-model Contadores {
-  id          Int    @id @default(autoincrement())
-  counterName String @db.VarChar(255)
-  count       Int?   @default(0)
 }
 
 model counter {

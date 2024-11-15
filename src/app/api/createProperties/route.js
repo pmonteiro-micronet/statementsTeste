@@ -20,6 +20,7 @@ export async function POST(req) {
       propertyServer,
       propertyPort,
       propertyConnectionString,
+      mpehotel, 
     } = await req.json();
 
     // Verificar se todos os campos obrigatórios estão presentes
@@ -40,6 +41,7 @@ export async function POST(req) {
         propertyServer: propertyServer,
         propertyPort: propertyPort || null,
         propertyConnectionString: propertyConnectionString || null,
+        mpehotel: mpehotel
       },
     });
 

@@ -56,10 +56,25 @@ const VistosPage = () => {
       className="flex flex-col flex-grow h-full overflow-hidden p-4 m-0 bg-background">
       <h2 className="font-semibold text-2xl mb-4">Vistos</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {filteredJsons.length > 0 ? (
+      {filteredJsons.length > 0 ? (
+          // Exibir itens na ordem mais recente para mais antigo
           filteredJsons.map((json, index) => {
-            const reservation = JSON.parse(json.requestBody).Reservation[0];
-            const guestInfo = JSON.parse(json.requestBody).GuestInfo[0];
+            let parsedData;
+            try {
+              parsedData = JSON.parse(json.requestBody);
+            } catch (error) {
+              console.error("Error parsing JSON:", error);
+              return null; // Skip this item if parsing fails
+            }
+
+            const hotelInfo = parsedData[0]?.HotelInfo?.[0];
+            const reservation = parsedData[0]?.Reservation?.[0];
+            const guestInfo = parsedData[0]?.GuestInfo?.[0];
+            const hotelName = hotelInfo?.Description || "Nome do Hotel";
+
+            if (!reservation || !guestInfo) {
+              return null; // Skip if reservation or guest info is missing
+            }
 
             return (
               <div
