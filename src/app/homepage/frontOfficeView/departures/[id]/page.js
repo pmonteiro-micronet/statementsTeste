@@ -273,7 +273,7 @@ const sendDataToAPI = async () => {
                               >
                                 <DropdownItem key="edit">
                                   <DepartureInfoForm
-                                    buttonName={"Ver info"}
+                                    buttonName={"Info"}
                                     buttonColor={"transparent"}
                                     modalHeader={"Reservation"}
                                     formTypeModal={11}
@@ -301,7 +301,7 @@ const sendDataToAPI = async () => {
                                     }
                                   }}
                                 >
-                                  View Statement
+                                  Statement
                                 </DropdownItem>
 
                               </DropdownMenu>
@@ -324,7 +324,7 @@ const sendDataToAPI = async () => {
               )}
             </div>
           ) : (
-            <p>Nenhuma reserva encontrada.</p>
+            <p>No reservations found.</p>
           )}
         </div>
 

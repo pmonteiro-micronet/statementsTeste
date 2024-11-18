@@ -103,7 +103,7 @@ const VistosPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col p-8 bg-background">
-      <h2 className="font-semibold text-2xl mb-4">View</h2>
+      <h2 className="font-semibold text-2xl mb-4">Viewed</h2>
       <div className="grid-container">
         {uniqueJsons.length > 0 ? (
           uniqueJsons.map((json, index) => {
@@ -167,7 +167,7 @@ const VistosPage = () => {
                       className="w-full pt-1 pb-1 text-sm rounded-lg border-2 flex items-center justify-center gap-2 border-primary-50 bg-primary-100 hover:bg-primary hover:text-white transition-colors"
                       onClick={() => handleCardClick(json)}
                     >
-                      View Statement
+                      Checked Statement
                     </button>
                   </div>
                 </div>
@@ -175,7 +175,7 @@ const VistosPage = () => {
             );
           })
         ) : (
-          <p className="text-gray-500">Nenhuma reserva pendente.</p>
+          <p className="text-gray-500">No statements seen.</p>
         )}
       </div>
     </div>
