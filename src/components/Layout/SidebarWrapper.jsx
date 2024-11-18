@@ -52,13 +52,13 @@ console.log(pendingCount);
               items: filteredHotels.length === 1
                 ? [
                     { ref: `/homepage/frontOfficeView/departures/${filteredHotels[0].propertyID}`, label: "Departures" },
-                    { ref: `/homepage/frontOfficeView/arrivals/${filteredHotels[0].propertyID}`, label: "Arrivals" },
+                    // { ref: `/homepage/frontOfficeView/arrivals/${filteredHotels[0].propertyID}`, label: "Arrivals" },
                   ]
                 : filteredHotels.map((hotel) => ({
                     label: hotel.propertyName,
                     items: [
                       { ref: `/homepage/frontOfficeView/departures/${hotel.propertyID}`, label: "Departures" },
-                      { ref: `/homepage/frontOfficeView/${hotel.propertyID}/arrivals/${hotel.propertyID}`, label: "Arrivals" },
+                      // { ref: `/homepage/frontOfficeView/${hotel.propertyID}/arrivals/${hotel.propertyID}`, label: "Arrivals" },
                     ],
                   })),
             },
