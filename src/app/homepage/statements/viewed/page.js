@@ -14,7 +14,8 @@ const VistosPage = () => {
   const [propertyID, setPropertyID] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(true); // Controle de carregamento inicial
-
+  console.log(isFirstLoad);
+  
   // Redirect to login if no active session
   useEffect(() => {
     if (status === "loading") return;
