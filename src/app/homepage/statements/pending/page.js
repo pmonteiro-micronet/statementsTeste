@@ -10,19 +10,19 @@ const PendentesPage = () => {
   const [getJsons, setGetJsons] = useState([]);
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [propertyID, setPropertyID] = useState("");
+  const [propertyIDs, setPropertyIDs] = useState([]);
 
-  // Redirect to login if no active session
+  // Redirecionar para login caso não haja sessão ativa
   useEffect(() => {
     if (status === "loading") return;
-    if (!session || !session.user.propertyID) {
+    if (!session) {
       router.push("/auth");
     } else {
-      setPropertyID(session.user.propertyID);
+      setPropertyIDs(session.user.propertyIDs || []); // Define múltiplos propertyIDs
     }
   }, [session, status, router]);
 
-  // Fetch data from the API
+  // Busca os dados da API
   const getDataJsons = async () => {
     try {
       const response = await axios.get("/api/get_jsons");
@@ -43,7 +43,7 @@ const PendentesPage = () => {
         });
       setGetJsons(filteredData);
     } catch (error) {
-      console.error("Error fetching data from API", error);
+      console.error("Erro ao buscar dados da API", error);
     }
   };
 
@@ -53,10 +53,12 @@ const PendentesPage = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Filtra os dados com base nos múltiplos propertyIDs
   const filteredJsons = getJsons.filter(
-    (json) => json.propertyID === propertyID && !json.seen
+    (json) => propertyIDs.includes(json.propertyID) && !json.seen
   );
 
+  // Remove duplicados com base nas informações da reserva
   const uniqueJsons = filteredJsons.filter((item, index, self) => {
     const parsedData = JSON.parse(item.requestBody);
     const hotelInfo = parsedData[0]?.HotelInfo?.[0];
@@ -92,13 +94,14 @@ const PendentesPage = () => {
     );
   });
 
-  // Store the count of unique JSONs in localStorage
+  // Armazena o número de JSONs únicos no localStorage
   useEffect(() => {
     localStorage.setItem("pendingCount", uniqueJsons.length.toString());
   }, [uniqueJsons]);
 
   const handleCardClick = (json) => {
     localStorage.setItem("recordID", json.requestID);
+    localStorage.setItem("recordPropertyID", json.propertyID);
     router.push("/homepage/jsonView");
   };
 
@@ -108,7 +111,7 @@ const PendentesPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col p-8 bg-background">
-      <h2 className="font-semibold text-2xl mb-4">Pendings</h2>
+      <h2 className="font-semibold text-2xl mb-4">Pendentes</h2>
       <div className="grid-container">
         {uniqueJsons.length > 0 ? (
           uniqueJsons.map((json, index) => {
@@ -116,7 +119,7 @@ const PendentesPage = () => {
             try {
               parsedData = JSON.parse(json.requestBody);
             } catch (error) {
-              console.error("Error parsing JSON:", error);
+              console.error("Erro ao analisar JSON:", error);
               return null;
             }
 
@@ -180,7 +183,7 @@ const PendentesPage = () => {
             );
           })
         ) : (
-          <p className="text-gray-500">No pending statements.</p>
+          <p className="text-gray-500">Nenhuma reserva pendente.</p>
         )}
       </div>
     </div>

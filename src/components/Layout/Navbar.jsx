@@ -10,6 +10,7 @@ import { signOut, useSession } from "next-auth/react";
 export default function NavBar({ listItems }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: session } = useSession();
+  let inactivityTimeout;
 
   const toggleMenu = () => {
     setMenuOpen((prev) => !prev);
@@ -18,6 +19,37 @@ export default function NavBar({ listItems }) {
   const handleLogout = () => {
     signOut({ callbackUrl: "/auth" });
   };
+
+  const resetInactivityTimer = () => {
+    // Limpa o timeout anterior
+    clearTimeout(inactivityTimeout);
+
+    // Define um novo timeout de 15 minutos
+    inactivityTimeout = setTimeout(() => {
+      handleSignOut();
+    }, 15 * 60 * 1000); // 15 minutos em milissegundos
+  };
+
+  const handleSignOut = () => {
+    // Faz logout do usuário
+    signOut();
+  };
+
+  useEffect(() => {
+    // Adiciona listeners para eventos de atividade do usuário
+    window.addEventListener("mousemove", resetInactivityTimer);
+    window.addEventListener("keydown", resetInactivityTimer);
+
+    // Define o timeout inicial
+    resetInactivityTimer();
+
+    // Remove listeners ao desmontar o componente
+    return () => {
+      window.removeEventListener("mousemove", resetInactivityTimer);
+      window.removeEventListener("keydown", resetInactivityTimer);
+      clearTimeout(inactivityTimeout);
+    };
+  }, []);
 
   return (
     <nav className="w-full fixed top-0 z-10 flex items-center justify-between p-4 bg-white shadow-md">
