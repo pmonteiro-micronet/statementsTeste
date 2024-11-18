@@ -13,7 +13,8 @@ export default function SidebarWrapper({ children }) {
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [expanded, setExpanded] = useState(true);
-  const [pendingCount, setPendingCount] = useState(0); // Estado para armazenar o contador de pendências
+  const [pendingCount, setPendingCount] = useState(0);
+  console.log(pendingCount);
   const [listItems, setListItems] = useState({
     Statements: {
       icon: <IoDocumentOutline size={20} />,
@@ -27,7 +28,7 @@ export default function SidebarWrapper({ children }) {
       items: [],
     },
   });
-console.log(pendingCount);
+
   // Atualizar o tamanho da tela
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -39,28 +40,31 @@ console.log(pendingCount);
   // Buscar hotéis e configurar items da sidebar
   useEffect(() => {
     const fetchHotels = async () => {
-      if (session?.user?.propertyID) {
+      if (session?.user?.propertyIDs && Array.isArray(session.user.propertyIDs)) {
         try {
-          const response = await axios.get(`/api/properties?propertyID=${session.user.propertyID}`);
+          // Realiza a busca para múltiplos propertyIDs
+          const response = await axios.get(
+            `/api/properties?propertyIDs=${session.user.propertyIDs.join(",")}`
+          );
           const hotels = Array.isArray(response.data.response) ? response.data.response : [];
-          const filteredHotels = hotels.filter(hotel => hotel.propertyID === session.user.propertyID);
+          const filteredHotels = hotels.filter(hotel =>
+            session.user.propertyIDs.includes(hotel.propertyID)
+          );
 
           setListItems((prevListItems) => ({
             ...prevListItems,
             Front_Office: {
               ...prevListItems.Front_Office,
-              items: filteredHotels.length === 1
-                ? [
-                    { ref: `/homepage/frontOfficeView/departures/${filteredHotels[0].propertyID}`, label: "Departures" },
-                    // { ref: `/homepage/frontOfficeView/arrivals/${filteredHotels[0].propertyID}`, label: "Arrivals" },
-                  ]
-                : filteredHotels.map((hotel) => ({
-                    label: hotel.propertyName,
-                    items: [
-                      { ref: `/homepage/frontOfficeView/departures/${hotel.propertyID}`, label: "Departures" },
-                      // { ref: `/homepage/frontOfficeView/${hotel.propertyID}/arrivals/${hotel.propertyID}`, label: "Arrivals" },
-                    ],
-                  })),
+              items: filteredHotels.map((hotel) => ({
+                label: hotel.propertyName,
+                items: [
+                  {
+                    ref: `/homepage/frontOfficeView/departures/${hotel.propertyID}`,
+                    label: "Departures",
+                  },
+                  // Outros subitens podem ser adicionados aqui
+                ],
+              })),
             },
           }));
         } catch (error) {
@@ -104,8 +108,8 @@ console.log(pendingCount);
       const updatedListItems = { ...prevListItems };
 
       Object.entries(updatedListItems).forEach(([key, section]) => {
-        console.log(key);
         let sectionActive = false;
+        console.log(key);
 
         section.items = section.items.map((item) => {
           if (!item.items) {

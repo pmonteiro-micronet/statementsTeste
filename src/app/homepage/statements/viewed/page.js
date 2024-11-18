@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -11,18 +10,20 @@ const VistosPage = () => {
   const [getJsons, setGetJsons] = useState([]);
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [propertyID, setPropertyID] = useState("");
+  const [propertyIDs, setPropertyIDs] = useState([]); // Suporte a múltiplos propertyIDs
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(true); // Controle de carregamento inicial
   console.log(isFirstLoad);
   
   // Redirect to login if no active session
+
   useEffect(() => {
     if (status === "loading") return;
-    if (!session || !session.user.propertyIDs) {
+
+    if (!session) {
       router.push("/auth");
     } else {
-      setPropertyID(session.user.propertyID);
+      setPropertyIDs(session.user.propertyIDs || []); // Pega os propertyIDs da sessão
     }
   }, [session, status, router]);
 
@@ -31,22 +32,7 @@ const VistosPage = () => {
     if (isInitialLoad) setIsLoading(true); // Exibe carregamento apenas na primeira carga
     try {
       const response = await axios.get("/api/get_jsons");
-      const filteredData = response.data.response
-        .filter(item => {
-          try {
-            const parsedItem = JSON.parse(item.requestBody);
-            return Array.isArray(parsedItem) && parsedItem[0]?.HotelInfo;
-          } catch (error) {
-            console.log(error);
-            return false;
-          }
-        })
-        .sort((a, b) => {
-          const requestID_A = typeof a.requestID === "string" ? parseInt(a.requestID, 10) : a.requestID;
-          const requestID_B = typeof b.requestID === "string" ? parseInt(b.requestID, 10) : b.requestID;
-          return requestID_B - requestID_A;
-        });
-      setGetJsons(filteredData);
+      setGetJsons(response.data.response);
     } catch (error) {
       console.error("Error fetching data from API", error);
     } finally {
@@ -58,49 +44,17 @@ const VistosPage = () => {
   };
 
   useEffect(() => {
-    getDataJsons(true); // Primeira carga com carregamento visível
-    const interval = setInterval(() => getDataJsons(false), 5000); // Atualizações automáticas sem exibir carregamento
-    return () => clearInterval(interval);
-  }, []);
+    if (propertyIDs.length > 0) {
+      getDataJsons(true);
+      const interval = setInterval(getDataJsons(false), 5000);
+      return () => clearInterval(interval);
+    }
+  }, [propertyIDs]);
 
   const filteredJsons = getJsons.filter(
-    (json) => json.propertyID === propertyID && json.seen
+    (json) => propertyIDs.includes(json.propertyID) && json.seen // Filtrar pelos propertyIDs e vistos
   );
-
-  const uniqueJsons = filteredJsons.filter((item, index, self) => {
-    const parsedData = JSON.parse(item.requestBody);
-    const hotelInfo = parsedData[0]?.HotelInfo?.[0];
-    const reservation = parsedData[0]?.Reservation?.[0];
-    const guestInfo = parsedData[0]?.GuestInfo?.[0];
-
-    const description = hotelInfo?.Description;
-    const roomNumber = reservation?.RoomNumber;
-    const firstName = guestInfo?.FirstName;
-    const lastName = guestInfo?.LastName;
-    const dateCI = reservation?.DateCI;
-    const dateCO = reservation?.DateCO;
-    const reservationNumber = reservation?.ReservationNumber;
-
-    return (
-      index ===
-      self.findIndex((json) => {
-        const comparisonData = JSON.parse(json.requestBody);
-        const comparisonHotelInfo = comparisonData[0]?.HotelInfo?.[0];
-        const comparisonReservation = comparisonData[0]?.Reservation?.[0];
-        const comparisonGuestInfo = comparisonData[0]?.GuestInfo?.[0];
-
-        return (
-          comparisonHotelInfo?.Description === description &&
-          comparisonReservation?.RoomNumber === roomNumber &&
-          comparisonGuestInfo?.FirstName === firstName &&
-          comparisonGuestInfo?.LastName === lastName &&
-          comparisonReservation?.DateCI === dateCI &&
-          comparisonReservation?.DateCO === dateCO &&
-          comparisonReservation?.ReservationNumber === reservationNumber
-        );
-      })
-    );
-  });
+  console.log(filteredJsons);
 
   const handleCardClick = (json) => {
     localStorage.setItem("recordID", json.requestID);
@@ -108,7 +62,7 @@ const VistosPage = () => {
   };
 
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return <p>Carregando...</p>;
   }
 
   return (
