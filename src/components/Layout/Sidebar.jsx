@@ -102,7 +102,12 @@ export default function Sidebar({ children, setExpanded }) {
   );
 }
 
-// src/components/Sidebar/Layout/Sidebar.tsx
+// Função utilitária para substituir underscores por espaços
+function replaceUnderscores(text) {
+  return text.replace(/_/g, " ");
+}
+
+// SidebarItem Component
 export function SidebarItem({ icon, text, active, alert, children }) {
   const { expanded } = useContext(SidebarContext);
   const [isOpen, setIsOpen] = useState(false); // Estado para controle do submenu
@@ -125,7 +130,7 @@ export function SidebarItem({ icon, text, active, alert, children }) {
             expanded ? "w-52 ml-3" : "w-0"
           }`}
         >
-          {text}
+          {replaceUnderscores(text)} {/* Aplica a função aqui */}
         </span>
         {alert && (
           <div
@@ -139,7 +144,7 @@ export function SidebarItem({ icon, text, active, alert, children }) {
           <div
             className={`absolute left-full rounded-md px-2 py-1 ml-6 bg-primary text-[#BF6415] text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}
           >
-            {text}
+            {replaceUnderscores(text)} {/* Aplica a função aqui */}
           </div>
         )}
       </li>
@@ -154,7 +159,7 @@ export function SidebarItem({ icon, text, active, alert, children }) {
   );
 }
 
-// Inside SubMenuItem component
+// SubMenuItem Component
 export function SubMenuItem({ text, href, count }) {
   const { expanded } = useContext(SidebarContext);
 
@@ -166,7 +171,7 @@ export function SubMenuItem({ text, href, count }) {
         <span
           className={`overflow-hidden transition-all ${expanded ? "w-40" : "w-0"}`}
         >
-          {text}
+          {replaceUnderscores(text)} {/* Aplica a função aqui */}
         </span>
         {/* Badge count */}
         {count !== undefined && (
@@ -180,3 +185,4 @@ export function SubMenuItem({ text, href, count }) {
     </Link>
   );
 }
+

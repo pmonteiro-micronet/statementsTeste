@@ -197,20 +197,20 @@ const JsonViewPage = () => {
             </div>
 
             {/* Tabela de Itens */}
-            <table className="w-[80%] border-collapse border border-gray-300 mb-4 mx-auto">
+            <table className="w-[80%] border-collapse border border-[#e6e6e6] mb-4 mx-auto">
               <thead>
                 <tr className="text-white bg-primary">
-                  <th className="border border-gray-300 p-2 text-xl h-20">
+                  <th className="border border-[#e6e6e6] p-2 text-xl h-20">
                     DATE
                   </th>
-                  <th className="border border-gray-300 p-2  text-xl">
+                  <th className="border border-[#e6e6e6] p-2 text-xl">
                     DESCRIPTION
                   </th>
-                  <th className="border border-gray-300 p-2 text-xl">QTY</th>
-                  <th className="border border-gray-300 p-2 text-xl">
+                  <th className="border border-[#e6e6e6] p-2 text-xl">QTY</th>
+                  <th className="border border-[#e6e6e6] p-2 text-xl">
                     UNIT PRICE
                   </th>
-                  <th className="border border-gray-300 p-2 text-xl">TOTAL</th>
+                  <th className="border border-[#e6e6e6] p-2 text-xl">TOTAL</th>
                 </tr>
               </thead>
               <tbody>
@@ -223,23 +223,23 @@ const JsonViewPage = () => {
                         key={item.ID}
                         className={index % 2 === 0 ? "bg-white" : "bg-primary-100"}
                       >
-                        <td className="border border-gray-300 p-2 w-32 text-center text-lg">
+                        <td className="border border-[#e6e6e6] p-2 w-32 text-center text-lg">
                           {item.Date}
                         </td>
                         <td
-                          className={`border border-gray-300 p-2 h-20 flex flex-col gap-2 text-lg ${!item.Description2 ? "justify-center text-left" : "text-left"
+                          className={`border border-[#e6e6e6] p-2 h-20 flex flex-col gap-2 text-lg ${!item.Description2 ? "justify-center text-left" : "text-left"
                             }`}
                         >
                           <span>{item.Description}</span>
                           {item.Description2 && <span>{item.Description2}</span>}
                         </td>
-                        <td className="border border-gray-300 p-2 text-right w-20 text-lg">
+                        <td className="border border-[#e6e6e6] p-2 text-right w-20 text-lg">
                           {item.Qty}
                         </td>
-                        <td className="border border-gray-300 p-2 text-right w-32 text-lg">
+                        <td className="border border-[#e6e6e6] p-2 text-right w-32 text-lg">
                           {item.UnitPrice.toFixed(2)}€
                         </td>
-                        <td className="border border-gray-300 p-2 text-right w-32 text-lg">
+                        <td className="border border-[#e6e6e6] p-2 text-right w-32 text-lg">
                           {item.Total.toFixed(2)}€
                         </td>
                       </tr>

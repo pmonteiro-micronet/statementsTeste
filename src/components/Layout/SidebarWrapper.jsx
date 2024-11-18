@@ -22,7 +22,7 @@ export default function SidebarWrapper({ children }) {
         { ref: "/homepage/statements/viewed", label: "Viewed" },
       ],
     },
-    FrontOffice_View: {
+    Front_Office: {
       icon: <FaRegCalendarAlt size={18} />,
       items: [],
     },
@@ -47,8 +47,8 @@ console.log(pendingCount);
 
           setListItems((prevListItems) => ({
             ...prevListItems,
-            FrontOffice_View: {
-              ...prevListItems.FrontOffice_View,
+            Front_Office: {
+              ...prevListItems.Front_Office,
               items: filteredHotels.length === 1
                 ? [
                     { ref: `/homepage/frontOfficeView/departures/${filteredHotels[0].propertyID}`, label: "Departures" },

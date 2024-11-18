@@ -108,7 +108,7 @@ const PendentesPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col p-8 bg-background">
-      <h2 className="font-semibold text-2xl mb-4">Pendentes</h2>
+      <h2 className="font-semibold text-2xl mb-4">Pendings</h2>
       <div className="grid-container">
         {uniqueJsons.length > 0 ? (
           uniqueJsons.map((json, index) => {
@@ -180,7 +180,7 @@ const PendentesPage = () => {
             );
           })
         ) : (
-          <p className="text-gray-500">Nenhuma reserva pendente.</p>
+          <p className="text-gray-500">No pending statements.</p>
         )}
       </div>
     </div>
