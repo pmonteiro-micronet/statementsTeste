@@ -54,6 +54,7 @@ const VistosPage = () => {
   const filteredJsons = getJsons.filter(
     (json) => propertyIDs.includes(json.propertyID) && json.seen // Filtrar pelos propertyIDs e vistos
   );
+  console.log(filteredJsons);
 
   const handleCardClick = (json) => {
     localStorage.setItem("recordID", json.requestID);
