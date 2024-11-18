@@ -8,6 +8,7 @@ import { FaSignOutAlt } from "react-icons/fa"; // Importa o ícone de logout
 import { FaUser } from "react-icons/fa";
 
 const SidebarContext = createContext();
+let inactivityTimeout;
 
 export default function Sidebar({ children, setExpanded }) {
   const [expanded, setExpandedInternal] = useState(true);
@@ -32,6 +33,36 @@ export default function Sidebar({ children, setExpanded }) {
   const handleLogout = () => {
     signOut({ callbackUrl: "/auth" }); // Redireciona para a página de login após logout
   };
+  const resetInactivityTimer = () => {
+    // Limpa o timeout anterior
+    clearTimeout(inactivityTimeout);
+
+    // Define um novo timeout de 15 minutos
+    inactivityTimeout = setTimeout(() => {
+      handleSignOut();
+    }, 15 * 60 * 1000); // 15 minutos em milissegundos
+  };
+
+  const handleSignOut = () => {
+    // Faz logout do usuário
+    signOut();
+  };
+
+  useEffect(() => {
+    // Adiciona listeners para eventos de atividade do usuário
+    window.addEventListener("mousemove", resetInactivityTimer);
+    window.addEventListener("keydown", resetInactivityTimer);
+
+    // Define o timeout inicial
+    resetInactivityTimer();
+
+    // Remove listeners ao desmontar o componente
+    return () => {
+      window.removeEventListener("mousemove", resetInactivityTimer);
+      window.removeEventListener("keydown", resetInactivityTimer);
+      clearTimeout(inactivityTimeout);
+    };
+  }, []);
 
   return (
     <aside

@@ -11,18 +11,18 @@ const PendentesPage = () => {
   const [getJsons, setGetJsons] = useState([]);
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [propertyID, setPropertyID] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(true); // Novo estado para controlar carregamento inicial
   console.log(isFirstLoad);
-  
-  // Redirect to login if no active session
+  const [propertyIDs, setPropertyIDs] = useState([]);
+
+  // Redirecionar para login caso não haja sessão ativa
   useEffect(() => {
     if (status === "loading") return;
-    if (!session || !session.user.propertyID) {
+    if (!session) {
       router.push("/auth");
     } else {
-      setPropertyID(session.user.propertyID);
+      setPropertyIDs(session.user.propertyIDs || []); // Define múltiplos propertyIDs
     }
   }, [session, status, router]);
 
@@ -63,10 +63,12 @@ const PendentesPage = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Filtra os dados com base nos múltiplos propertyIDs
   const filteredJsons = getJsons.filter(
-    (json) => json.propertyID === propertyID && !json.seen
+    (json) => propertyIDs.includes(json.propertyID) && !json.seen
   );
 
+  // Remove duplicados com base nas informações da reserva
   const uniqueJsons = filteredJsons.filter((item, index, self) => {
     const parsedData = JSON.parse(item.requestBody);
     const hotelInfo = parsedData[0]?.HotelInfo?.[0];
@@ -102,13 +104,14 @@ const PendentesPage = () => {
     );
   });
 
-  // Store the count of unique JSONs in localStorage
+  // Armazena o número de JSONs únicos no localStorage
   useEffect(() => {
     localStorage.setItem("pendingCount", uniqueJsons.length.toString());
   }, [uniqueJsons]);
 
   const handleCardClick = (json) => {
     localStorage.setItem("recordID", json.requestID);
+    localStorage.setItem("recordPropertyID", json.propertyID);
     router.push("/homepage/jsonView");
   };
 

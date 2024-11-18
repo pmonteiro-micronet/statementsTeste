@@ -19,7 +19,7 @@ const VistosPage = () => {
   // Redirect to login if no active session
   useEffect(() => {
     if (status === "loading") return;
-    if (!session || !session.user.propertyID) {
+    if (!session || !session.user.propertyIDs) {
       router.push("/auth");
     } else {
       setPropertyID(session.user.propertyID);

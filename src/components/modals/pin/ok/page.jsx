@@ -32,7 +32,8 @@ const OkPIN = ({
             if (!session) {
                 router.push("/auth");
             } else {
-                const userPropertyID = session?.user?.propertyID;
+                const userPropertyID = localStorage.getItem("recordPropertyID");
+                console.log(session.user);
                 const userPinHash = session?.user?.pin; // Supondo que o pin armazenado é o hash
                 setPropertyID(userPropertyID);
                 setUserPinHash(userPinHash); // Armazena o hash do pin
@@ -53,6 +54,7 @@ const OkPIN = ({
                 await axios.patch(`/api/get_jsons/${recordID}`);
                 router.push("/");
             } else {
+                setPin("");
                 setIsPinError(true);
             }
         } catch (error) {
