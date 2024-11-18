@@ -29,6 +29,7 @@ model requestRecords {
   propertyID      Int
   seen            Boolean?
   uniqueKey       String?  @db.VarChar(255)
+  seenAt          DateTime @default(dbgenerated("(_utf8mb4\\'1900-01-01 00:00:00\\')")) @db.DateTime(0)
 }
 
 model users {
