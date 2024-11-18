@@ -59,48 +59,6 @@ const JsonViewPage = () => {
     setShowModal(true);
   };
 
-  // const handleCancelClick = () => {
-  //   setShowCancelModal(true);
-  // };
-
-  // const handlePinSubmit = async (e) => {
-  //   e.preventDefault();
-  //   const recordID = localStorage.getItem("recordID");
-
-  //   try {
-  //     // Verifica o pin do usuário logado com bcrypt
-  //     const isPinCorrect = await bcrypt.compare(pin, userPinHash); // Verifica o pin inserido com o hash armazenado
-
-  //     if (isPinCorrect) {
-  //       await axios.patch(`/api/get_jsons/${recordID}`); // Atualiza o status
-  //       router.push("/");
-  //     } else {
-  //       setIsPinError(true);
-  //     }
-  //   } catch (error) {
-  //     console.error("Erro ao marcar como visto:", error);
-  //   }
-  // };
-
-  // const handleCancelPasswordSubmit = async (e) => {
-  //   e.preventDefault();
-  //   const recordID = localStorage.getItem("recordID");
-
-  //   try {
-  //     // Verifica o pin para cancelamento
-  //     const isPinCorrect = await bcrypt.compare(pin, userPinHash);
-
-  //     if (isPinCorrect) {
-  //       // Adicione aqui a lógica para cancelar
-  //       router.push("/"); // Redireciona após o cancelamento
-  //     } else {
-  //       setIsPinError(true);
-  //     }
-  //   } catch (error) {
-  //     console.error("Erro ao cancelar:", error);
-  //   }
-  // };
-
   if (status === "loading") {
     return <p>Carregando sessão...</p>;
   }
