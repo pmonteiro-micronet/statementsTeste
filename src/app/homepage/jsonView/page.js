@@ -14,9 +14,28 @@ const JsonViewPage = () => {
   const [userPinHash, setUserPinHash] = useState(""); // Estado para o hash do pin do usuário logado
   const router = useRouter();
   console.log(userPinHash, showModal);
+  const [imageExists, setImageExists] = useState(false);
 
   const { data: session, status } = useSession();
   const [propertyID, setPropertyID] = useState("");
+
+  useEffect(() => {
+    const preventBackNavigation = () => {
+      window.history.pushState(null, null, window.location.href);
+    };
+  
+    // Adiciona evento para prevenir retrocesso
+    window.addEventListener('popstate', preventBackNavigation);
+  
+    // Configura o estado inicial do histórico
+    window.history.pushState(null, null, window.location.href);
+  
+    return () => {
+      // Remove o evento quando o componente é desmontado
+      window.removeEventListener('popstate', preventBackNavigation);
+    };
+  }, []);
+  
 
   useEffect(() => {
     const checkSession = async () => {
@@ -26,7 +45,7 @@ const JsonViewPage = () => {
         router.push("/auth");
       } else {
         // Pega o propertyID e o pin do usuário da sessão
-        const userPropertyID = session?.user?.propertyID;
+        const userPropertyID = localStorage.getItem("recordPropertyID");
         const userPinHash = session?.user?.pin; // Supondo que o pin armazenado é o hash
         setPropertyID(userPropertyID);
         setUserPinHash(userPinHash); // Armazena o hash do pin
@@ -53,6 +72,25 @@ const JsonViewPage = () => {
       };
       fetchReservation();
     }
+  }, [propertyID]);
+
+  useEffect(() => {
+    // Verifica se a imagem existe
+    const checkImage = async () => {
+      try {
+        const res = await fetch(`/logos/${propertyID}.png`);
+        if (res.ok) {
+          setImageExists(true);
+        } else {
+          setImageExists(false);
+        }
+      } catch (error) {
+        setImageExists(false);
+        console.log(error);
+      }
+    };
+
+    checkImage();
   }, [propertyID]);
 
   const handleOkClick = () => {
@@ -113,13 +151,15 @@ const JsonViewPage = () => {
         <p className="text-red-500">{error}</p>
       ) : reservationData ? (
         <>
-          <div className="mb-4 w-screen">
-            <img
-              src={`/logos/${propertyID}.png`}
-              alt="Property Image"
-              className="mx-auto"
-            />
-          </div>
+          {imageExists && (
+  <div className="mb-4 w-screen">
+    <img
+      src={`/logos/${propertyID}.png`}
+      alt="Property Image"
+      className="mx-auto"
+    />
+  </div>
+)}  
 
           <div className="flex flex-col justify-between items-center w-[80%] mx-auto mt-4">
             <div className="flex justify-between w-full mb-10">
@@ -197,20 +237,20 @@ const JsonViewPage = () => {
             </div>
 
             {/* Tabela de Itens */}
-            <table className="w-[80%] border-collapse border border-[#e6e6e6] mb-4 mx-auto">
+            <table className="w-[80%] border-collapse border border-gray-300 mb-4 mx-auto">
               <thead>
                 <tr className="text-white bg-primary">
-                  <th className="border border-[#e6e6e6] p-2 text-xl h-20">
+                  <th className="border border-gray-300 p-2 text-xl h-20">
                     DATE
                   </th>
-                  <th className="border border-[#e6e6e6] p-2 text-xl">
+                  <th className="border border-gray-300 p-2  text-xl">
                     DESCRIPTION
                   </th>
-                  <th className="border border-[#e6e6e6] p-2 text-xl">QTY</th>
-                  <th className="border border-[#e6e6e6] p-2 text-xl">
+                  <th className="border border-gray-300 p-2 text-xl">QTY</th>
+                  <th className="border border-gray-300 p-2 text-xl">
                     UNIT PRICE
                   </th>
-                  <th className="border border-[#e6e6e6] p-2 text-xl">TOTAL</th>
+                  <th className="border border-gray-300 p-2 text-xl">TOTAL</th>
                 </tr>
               </thead>
               <tbody>
@@ -223,23 +263,23 @@ const JsonViewPage = () => {
                         key={item.ID}
                         className={index % 2 === 0 ? "bg-white" : "bg-primary-100"}
                       >
-                        <td className="border border-[#e6e6e6] p-2 w-32 text-center text-lg">
+                        <td className="border border-gray-300 p-2 w-32 text-center text-lg">
                           {item.Date}
                         </td>
                         <td
-                          className={`border border-[#e6e6e6] p-2 h-20 flex flex-col gap-2 text-lg ${!item.Description2 ? "justify-center text-left" : "text-left"
+                          className={`border border-gray-300 p-2 h-20 flex flex-col gap-2 text-lg ${!item.Description2 ? "justify-center text-left" : "text-left"
                             }`}
                         >
                           <span>{item.Description}</span>
                           {item.Description2 && <span>{item.Description2}</span>}
                         </td>
-                        <td className="border border-[#e6e6e6] p-2 text-right w-20 text-lg">
+                        <td className="border border-gray-300 p-2 text-right w-20 text-lg">
                           {item.Qty}
                         </td>
-                        <td className="border border-[#e6e6e6] p-2 text-right w-32 text-lg">
+                        <td className="border border-gray-300 p-2 text-right w-32 text-lg">
                           {item.UnitPrice.toFixed(2)}€
                         </td>
-                        <td className="border border-[#e6e6e6] p-2 text-right w-32 text-lg">
+                        <td className="border border-gray-300 p-2 text-right w-32 text-lg">
                           {item.Total.toFixed(2)}€
                         </td>
                       </tr>

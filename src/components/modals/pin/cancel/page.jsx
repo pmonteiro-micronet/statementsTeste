@@ -31,7 +31,7 @@ const CancelPIN = ({
             if (!session) {
                 router.push("/auth");
             } else {
-                const userPropertyID = session?.user?.propertyID;
+                const userPropertyID = localStorage.getItem("recordPropertyID");
                 const userPinHash = session?.user?.pin; // Supondo que o pin armazenado é o hash
                 setPropertyID(userPropertyID);
                 setUserPinHash(userPinHash); // Armazena o hash do pin
@@ -68,6 +68,7 @@ const CancelPIN = ({
             if (isPinCorrect) {
                 router.push("/");
             } else {
+                setPin("");
                 setIsPinError(true);
             }
         } catch (error) {
