@@ -109,6 +109,7 @@ export default function SidebarWrapper({ children }) {
 
       Object.entries(updatedListItems).forEach(([key, section]) => {
         let sectionActive = false;
+        console.log(key);
 
         section.items = section.items.map((item) => {
           if (!item.items) {
