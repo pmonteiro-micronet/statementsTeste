@@ -86,6 +86,7 @@ const JsonViewPage = () => {
         }
       } catch (error) {
         setImageExists(false);
+        console.log(error);
       }
     };
 
