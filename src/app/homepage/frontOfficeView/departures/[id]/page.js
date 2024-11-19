@@ -34,81 +34,84 @@ export default function Page({ params }) {
 
   const router = useRouter();
 
- // Função para enviar os dados para a API
-const sendDataToAPI = async () => {
-  try {
-    setIsLoading(true); // Inicia o carregamento
+  const [propertyName, setPropertyName]=useState([]);
 
-    // Faz a requisição GET à API de properties com o propertyID passado
-    const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
+  // Função para enviar os dados para a API
+  const sendDataToAPI = async () => {
+    try {
+      setIsLoading(true); // Inicia o carregamento
 
-    // Verifica se a resposta contém o 'mpehotel' e executa o que for necessário
-    if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
-      const mpehotel = propertyResponse.data.response[0].mpehotel;
-      console.log('Mpehotel encontrado:', mpehotel);
+      // Faz a requisição GET à API de properties com o propertyID passado
+      const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
 
-      await axios.get("/api/reservations/info", {
-        params: {
-          mpehotel,
-        },
-      });
+      // Verifica se a resposta contém o 'mpehotel' e executa o que for necessário
+      if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
+        const mpehotel = propertyResponse.data.response[0].mpehotel;
+        console.log('Mpehotel encontrado:', mpehotel);
 
-      setPostSuccessful(true);
-    } else {
-      console.error('Mpehotel não encontrado para o propertyID:', propertyID);
+        await axios.get("/api/reservations/info", {
+          params: {
+            mpehotel,
+          },
+        });
+
+        setPostSuccessful(true);
+      } else {
+        console.error('Mpehotel não encontrado para o propertyID:', propertyID);
+        setPostSuccessful(false);
+      }
+    } catch (error) {
+      console.error(
+        "Erro ao enviar os dados:",
+        error.response ? error.response.data : error.message
+      );
       setPostSuccessful(false);
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error(
-      "Erro ao enviar os dados:",
-      error.response ? error.response.data : error.message
-    );
-    setPostSuccessful(false);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
 
   // Função para enviar os dados para a API
- const sendResToAPI = async (ResNumber) => {
-  console.log("Enviando ResNumber para a API:", ResNumber);
-  const windowValue = 0;
+  const sendResToAPI = async (ResNumber) => {
+    console.log("Enviando ResNumber para a API:", ResNumber);
+    const windowValue = 0;
 
-  try {
-    // Faz a requisição para enviar os dados do statement
-    await axios.get("/api/reservations/info/specificReservation", {
-      params: {
-        ResNumber,
-        window: windowValue,
-      },
-    });
-    console.log(`Dados enviados com sucesso para a reserva ${ResNumber} com window: ${windowValue}`);
+    try {
+      // Faz a requisição para enviar os dados do statement
+      await axios.get("/api/reservations/info/specificReservation", {
+        params: {
+          ResNumber,
+          window: windowValue,
+        },
+      });
+      console.log(`Dados enviados com sucesso para a reserva ${ResNumber} com window: ${windowValue}`);
 
-    // Após o envio, busca o recordID do último registro
-    const response = await axios.get("/api/get_jsons");
-    console.log("resposta api get json:", response);
+      // Após o envio, busca o recordID do último registro
+      const response = await axios.get("/api/get_jsons");
+      console.log("resposta api get json:", response);
 
-    // Buscar o último `requestID` na lista de respostas
-    const lastRecord = response.data.response[response.data.response.length - 1];
-    if (lastRecord && lastRecord.requestID) {
-      const lastRecordID = lastRecord.requestID;
+      // Buscar o último `requestID` na lista de respostas
+      const lastRecord = response.data.response[response.data.response.length - 1];
+      if (lastRecord && lastRecord.requestID) {
+        const lastRecordID = lastRecord.requestID;
 
-      // Salva o recordID no localStorage
-      localStorage.setItem("recordID", lastRecordID);
+        // Salva o recordID no localStorage
+        localStorage.setItem("recordID", lastRecordID);
 
-      // Redireciona para a página jsonView
-      router.push("/homepage/jsonView");
-    } else {
-      console.warn("RecordID não encontrado na resposta da API.");
+        // Redireciona para a página jsonView
+        router.push("/homepage/jsonView");
+      } else {
+        console.warn("RecordID não encontrado na resposta da API.");
+      }
+    } catch (error) {
+      console.error(
+        "Erro ao enviar os dados ou buscar o recordID:",
+        error.response ? error.response.data : error.message
+      );
     }
-  } catch (error) {
-    console.error(
-      "Erro ao enviar os dados ou buscar o recordID:",
-      error.response ? error.response.data : error.message
-    );
-  }
-};
+  };
+
   
   // Função para pegar as reservas
   useEffect(() => {
@@ -160,6 +163,31 @@ const sendDataToAPI = async () => {
 
     fetchReservas();
   }, [currentDate, postSuccessful]); // Recarrega as reservas sempre que a data mudar
+
+  useEffect(() => {
+    const fetchHotelName = async () => {
+      try {
+        const response = await axios.get(`/api/properties/${propertyID}`);
+        
+        // Verifique se a resposta contém os dados esperados
+        if (response.data?.response?.length > 0) {
+          const propertyName = response.data.response[0].propertyName; // Obtém o propertyName
+          console.log("Property Name:", propertyName); // Exibe o propertyName no console
+          setPropertyName(propertyName);
+        } else {
+          console.warn("Nenhum dado encontrado para o propertyID:", propertyID);
+        }
+      } catch (error) {
+        console.error(
+          "Erro ao buscar o nome do hotel:",
+          error.response ? error.response.data : error.message
+        );
+      }
+    };
+  
+    fetchHotelName();
+  }, [propertyID]);
+  
 
   // UseMemo para preparar os dados filtrados de acordo com a paginação
   const items = React.useMemo(() => {
@@ -214,7 +242,7 @@ const sendDataToAPI = async () => {
               )}
 
               {/* Título "Departure List" separado do título dinâmico */}
-              <h2 className="text-xl">Departure List</h2>
+              <h2 className="text-xl">{propertyName} Departure List</h2>
             </div>
 
             {/* Botão de refresh alinhado à direita */}
@@ -254,22 +282,21 @@ const sendDataToAPI = async () => {
                       // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                       return (
                         <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left hover:bg-primary-50">
-                          <td className="pl-1 flex items-start border-r border-[#e6e6e6]">
+                          <td className="pl-1 flex items-start border-r border-[#e6e6e6] relative z-10">
                             <Dropdown>
                               <DropdownTrigger>
                                 <Button
                                   variant="light"
-                                  className="flex justify-center items-center w-auto min-w-0  p-0 m-0"
+                                  className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
                                 >
                                   <BsThreeDotsVertical size={20} className="text-black" />
                                 </Button>
-
-
                               </DropdownTrigger>
                               <DropdownMenu
                                 aria-label="Static Actions"
                                 closeOnSelect={false}
                                 isOpen={true}
+                                className="relative z-10"
                               >
                                 <DropdownItem key="edit">
                                   <DepartureInfoForm
@@ -303,7 +330,6 @@ const sendDataToAPI = async () => {
                                 >
                                   Statement
                                 </DropdownItem>
-
                               </DropdownMenu>
                             </Dropdown>
                           </td>

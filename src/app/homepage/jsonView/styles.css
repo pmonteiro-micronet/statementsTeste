@@ -1,0 +1,28 @@
+@media (max-width: 768px) {
+    body{
+        padding-top: 5rem;
+        overflow-x: auto;
+    }
+    .bodyContainer{
+        padding-bottom: 5rem;
+    }
+    .infoContainer{
+        display: flex;
+        flex-direction: column;
+        margin-left: -3rem;
+    }
+    .footerContainer{
+        display: flex;
+        flex-direction: column;
+        font-size: 10px;
+        gap: 4px;
+    }
+    .lineContainer{
+        width: 100%;
+    }
+    .tableTotal p{
+        font-size: 25px;
+        display: flex;
+        justify-content: center;
+    }
+  }

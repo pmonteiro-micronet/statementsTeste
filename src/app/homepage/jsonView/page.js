@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import OkPIN from "@/components/modals/pin/ok/page";
 import CancelPIN from "@/components/modals/pin/cancel/page";
+import "./styles.css";
 
 const JsonViewPage = () => {
   const [reservationData, setReservationData] = useState(null);
@@ -23,19 +24,19 @@ const JsonViewPage = () => {
     const preventBackNavigation = () => {
       window.history.pushState(null, null, window.location.href);
     };
-  
+
     // Adiciona evento para prevenir retrocesso
     window.addEventListener('popstate', preventBackNavigation);
-  
+
     // Configura o estado inicial do histórico
     window.history.pushState(null, null, window.location.href);
-  
+
     return () => {
       // Remove o evento quando o componente é desmontado
       window.removeEventListener('popstate', preventBackNavigation);
     };
   }, []);
-  
+
 
   useEffect(() => {
     const checkSession = async () => {
@@ -100,9 +101,9 @@ const JsonViewPage = () => {
   if (status === "loading") {
     return <p>Carregando sessão...</p>;
   }
-
+  
   return (
-    <main className="flex flex-col flex-grow h-full p-0 m-0 overflow-x-hidden">
+    <div className="overflow-y-auto pb-10 bodyContainer">
       {loading ? (
         <p>Carregando dados...</p>
       ) : error ? (
@@ -110,19 +111,19 @@ const JsonViewPage = () => {
       ) : reservationData ? (
         <>
           {imageExists && (
-  <div className="mb-4 w-screen">
-    <img
-      src={`/logos/${propertyID}.png`}
-      alt="Property Image"
-      className="mx-auto"
-    />
-  </div>
-)}  
+            <div className="mb-4 w-screen">
+              <img
+                src={`/logos/${propertyID}.png`}
+                alt="Property Image"
+                className="mx-auto"
+              />
+            </div>
+          )}
 
           <div className="flex flex-col justify-between items-center w-[80%] mx-auto mt-4">
-            <div className="flex justify-between w-full mb-10">
+            <div className="flex flex-row justify-between w-[80%] mb-10 infoContainer">
               {/* Detalhes da Reserva */}
-              <div className="flex-1 text-left ml-[10%]">
+              <div className="text-left">
                 {reservationData && reservationData.requestBody ? (
                   Array.isArray(
                     JSON.parse(reservationData.requestBody)[0]?.Reservation
@@ -166,7 +167,7 @@ const JsonViewPage = () => {
               </div>
 
               {/* Detalhes do Hóspede */}
-              <div className="flex-1 text-left ml-[40%] mt-4">
+              <div className="text-left mt-4">
                 {reservationData && reservationData.requestBody ? (
                   Array.isArray(
                     JSON.parse(reservationData.requestBody)[0]?.GuestInfo
@@ -201,7 +202,7 @@ const JsonViewPage = () => {
                   <th className="border border-gray-300 p-2 text-xl h-20">
                     DATE
                   </th>
-                  <th className="border border-gray-300 p-2  text-xl">
+                  <th className="border border-gray-300 p-2 text-xl">
                     DESCRIPTION
                   </th>
                   <th className="border border-gray-300 p-2 text-xl">QTY</th>
@@ -260,7 +261,7 @@ const JsonViewPage = () => {
 
             </table>
 
-            <div className="flex justify-end w-[80%] mx-auto">
+            <div className="flex justify-end w-[80%] mx-auto tableTotal">
               {reservationData && reservationData.requestBody ? (
                 (() => {
                   const parsedData = JSON.parse(reservationData.requestBody);
@@ -298,10 +299,6 @@ const JsonViewPage = () => {
           {/* </div> */}
 
           <div className="mb-4 mt-20">
-            {/* <h4 className='mb-2 font-semibold'>Fiscal Tax</h4> */}
-            <div className="flex justify-center w-[65%] mx-auto">
-              <div className="bg-gray-300 h-0.5 w-full"></div>
-            </div>
             <table className="w-auto border-collapse mb-4 text-xs ml-[17%]">
               {" "}
               {/* Mantém a margem alinhada à esquerda */}
@@ -349,56 +346,62 @@ const JsonViewPage = () => {
             </table>
           </div>
 
-          <div className="flex flex-col justify-center text-center">
-            {reservationData && reservationData.requestBody ? (
-              (() => {
-                // Faz o parse do requestBody uma única vez para evitar parse múltiplo
-                const parsedRequestBody = JSON.parse(reservationData.requestBody);
+          <div className="fixed bottom-0 left-0 w-full bg-white shadow-md">
+              {/* <h4 className='mb-2 font-semibold'>Fiscal Tax</h4> */}
+              <div className="flex justify-center w-[65%] mx-auto mb-2 lineContainer">
+              <div className="bg-gray-300 h-0.5 w-full"></div>
+            </div>
+            <div className="flex justify-between items-center mx-auto w-[65%] footerContainer">
+              <div className="">
+                {reservationData && reservationData.requestBody ? (
+                  (() => {
+                    // Faz o parse do requestBody uma única vez para evitar parse múltiplo
+                    const parsedRequestBody = JSON.parse(reservationData.requestBody);
 
-                // Verifica se parsedRequestBody é um array e se o primeiro item tem o array de HotelInfo
-                return Array.isArray(parsedRequestBody) &&
-                  Array.isArray(parsedRequestBody[0]?.HotelInfo) ? (
-                  parsedRequestBody[0].HotelInfo.map((hotelInfo, index) => (
-                    <p key={index}>{hotelInfo.HotelName}</p>
-                  ))
+                    // Verifica se parsedRequestBody é um array e se o primeiro item tem o array de HotelInfo
+                    return Array.isArray(parsedRequestBody) &&
+                      Array.isArray(parsedRequestBody[0]?.HotelInfo) ? (
+                      parsedRequestBody[0].HotelInfo.map((hotelInfo, index) => (
+                        <p key={index}>{hotelInfo.HotelName}</p>
+                      ))
+                    ) : (
+                      <p>Hotel information not available</p> // Exibe mensagem caso HotelInfo esteja ausente
+                    );
+                  })()
                 ) : (
-                  <p>Hotel information not available</p> // Exibe mensagem caso HotelInfo esteja ausente
-                );
-              })()
-            ) : (
-              <p>No reservation data available</p> // Exibe mensagem caso reservationData ou requestBody estejam ausentes
-            )}
+                  <p>No reservation data available</p> // Exibe mensagem caso reservationData ou requestBody estejam ausentes
+                )}
+              </div>
+
+              {/* Botões de Ação */}
+              <div className="flex gap-3">
+                <CancelPIN
+                  buttonName={"Cancel"}
+                  buttonColor={"transparent"}
+                  modalHeader={"Insira o PIN"}
+                  formTypeModal={11}
+                  editor={"teste"}
+                />
+                <button
+                  className="bg-primary text-white font-semibold rounded-lg mb-3"
+                  onClick={handleOkClick}
+                >
+                  <OkPIN
+                    buttonName={"Ok"}
+                    buttonColor={"transparent"}
+                    modalHeader={"Insira o PIN"}
+                    formTypeModal={11}
+                    editor={"teste"}
+                  />
+                </button>
+              </div>
+            </div>
           </div>
-
-          {/* Botões de Ação */}
-          <div className="flex gap-4 justify-end mt-4 mr-[17%] mb-3 ">
-            <CancelPIN
-              buttonName={"Cancel"}
-              buttonColor={"transparent"}
-              modalHeader={"Insira o PIN"}
-              formTypeModal={11}
-              editor={"teste"}
-            />
-            <button
-              className="bg-primary text-white font-semibold rounded-lg mb-3"
-              onClick={handleOkClick}
-            >
-              <OkPIN
-                buttonName={"Ok"}
-                buttonColor={"transparent"}
-                modalHeader={"Insira o PIN"}
-                formTypeModal={11}
-                editor={"teste"}
-              />
-            </button>
-          </div>
-
-
         </>
       ) : (
         <p>Nenhum dado encontrado.</p>
       )}
-    </main>
+    </div>
   );
 };
 
