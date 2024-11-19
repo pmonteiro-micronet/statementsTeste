@@ -45,16 +45,15 @@ const VistosPage = () => {
 
   useEffect(() => {
     if (propertyIDs.length > 0) {
-      getDataJsons(true);
-      const interval = setInterval(getDataJsons(false), 5000);
+      getDataJsons();
+      const interval = setInterval(getDataJsons, 5000);
       return () => clearInterval(interval);
     }
   }, [propertyIDs]);
 
-  const filteredJsons = getJsons.filter(
+  const uniqueJsons = getJsons.filter(
     (json) => propertyIDs.includes(json.propertyID) && json.seen // Filtrar pelos propertyIDs e vistos
   );
-  console.log(filteredJsons);
 
   const handleCardClick = (json) => {
     localStorage.setItem("recordID", json.requestID);

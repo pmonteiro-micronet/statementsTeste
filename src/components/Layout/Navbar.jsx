@@ -1,7 +1,7 @@
 // NavBar.jsx
 
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { TbLayoutSidebarLeftExpand } from "react-icons/tb";
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
@@ -54,7 +54,7 @@ export default function NavBar({ listItems }) {
   return (
     <nav className="w-full fixed top-0 z-10 flex items-center justify-between p-4 bg-white shadow-md">
       {/* Logo */}
-      <div className="font-semibold text-indigo-800">Hotel Extensions</div>
+      <div className="font-semibold text-sm">Extensions myPMS</div>
 
       {/* Menu Toggle Button */}
       <button onClick={toggleMenu} className="text-2xl">
