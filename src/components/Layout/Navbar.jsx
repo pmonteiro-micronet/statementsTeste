@@ -52,7 +52,7 @@ export default function NavBar({ listItems }) {
   }, []);
 
   return (
-    <nav className="w-full fixed top-0 z-10 flex items-center justify-between p-4 bg-white shadow-md">
+    <nav className="w-full fixed top-0 z-50 flex items-center justify-between p-4 bg-white shadow-md">
       {/* Logo */}
       <div className="font-semibold text-sm">Extensions myPMS</div>
 
@@ -61,6 +61,7 @@ export default function NavBar({ listItems }) {
         <TbLayoutSidebarLeftExpand />
       </button>
 
+      {/* Fullscreen Menu */}
       {/* Fullscreen Menu */}
       {menuOpen && (
         <div className="fixed inset-0 z-50 bg-white flex flex-col p-6">
@@ -94,25 +95,33 @@ export default function NavBar({ listItems }) {
             </div>
           ))}
 
-          {/* Profile and Logout */}
-          <div className="flex items-center mt-8">
-            <div className="w-10 h-10 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-800">
-              <FaUser />
+          {/* Profile and Logout at the bottom */}
+          <div className="mt-auto flex flex-col">
+            {/* Profile */}
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center text-primary">
+                <FaUser />
+              </div>
+              <div className="ml-3 text-center">
+                <p className="font-medium">{session ? `${session.user.firstName} ${session.user.secondName}` : "Usuário Desconhecido"}</p>
+                <span className="text-xs text-gray-600 ml-3">
+                  {session ? session.user.email : "Email Desconhecido"}
+                </span>
+              </div>
             </div>
-            <div className="ml-3">
-              <p>{session ? `${session.user.firstName} ${session.user.secondName}` : "Usuário Desconhecido"}</p>
-              <span className="text-xs text-gray-600">
-                {session ? session.user.email : "Email Desconhecido"}
-              </span>
-            </div>
-          </div>
 
-          <button onClick={handleLogout} className="flex items-center mt-5 text-red-500 hover:text-red-700">
-            <FaSignOutAlt className="mr-2" />
-            Logout
-          </button>
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="flex items-center justify-center text-white bg-red-500 h-10 rounded-lg hover:bg-red-600"
+            >
+              <FaSignOutAlt className="mr-2" />
+              Logout
+            </button>
+          </div>
         </div>
       )}
+
     </nav>
   );
 }
