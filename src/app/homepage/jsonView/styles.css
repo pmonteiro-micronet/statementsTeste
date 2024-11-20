@@ -1,0 +1,65 @@
+@media (max-width: 768px) {
+    body {
+        padding-top: 5rem;
+        overflow: hidden; /* Impede a rolagem no body */
+    }
+
+    .bodyContainer {
+        height: calc(100vh - 5rem); /* Altura total da tela menos o topo */
+        width: 100%; /* Impede overflow horizontal */
+        overflow-y: auto; /* Rolagem vertical apenas no contêiner */
+        overflow-x: hidden; 
+        margin: 0 auto;
+        padding-bottom: 5rem;
+    }
+
+    .roomInfo{
+        font-size: 20px;
+    }
+
+    .textInfo{
+        font-size: 13px;
+    }
+
+    .infoContainer {
+        display: flex;
+        flex-direction: column;
+        margin: 0 auto;
+        margin-left: -1rem;
+        padding: 1rem;
+    }
+
+    .footerContainer {
+        display: flex;
+        flex-direction: column;
+        font-size: 10px;
+        gap: 4px;
+        width: 100%; /* Garante largura fixa */
+    }
+
+    .lineContainer {
+        width: 100%;
+    }
+
+    .tableTotal {
+        font-size: 14px;
+    }
+
+    .containerTable {
+        width: 100%;
+        overflow-x: auto; /* Permite rolagem horizontal na tabela */
+    }
+
+    .headerTable {
+        font-size: 10px;
+        height: 2rem;
+    }
+
+    .contentTable {
+        font-size: 10px;
+    }
+    .vatTable{
+        margin-left: 9%;
+        margin-top: 5%;
+    }
+}
