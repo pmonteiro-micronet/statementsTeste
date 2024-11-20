@@ -103,7 +103,7 @@ const JsonViewPage = () => {
   }
   
   return (
-    <div className="overflow-y-auto pb-10 bodyContainer">
+    <main className="overflow-y-auto pb-10 bodyContainer">
       {loading ? (
         <p>Carregando dados...</p>
       ) : error ? (
@@ -131,25 +131,25 @@ const JsonViewPage = () => {
                     JSON.parse(reservationData.requestBody)[0].Reservation.map(
                       (reservation, index) => (
                         <div key={index}>
-                          <p className="font-bold text-3xl text-primary">
+                          <p className="font-bold text-3xl text-primary roomInfo">
                             Room:{" "}
                             <span className="font-bold">
                               {reservation.RoomNumber}
                             </span>
                           </p>
-                          <p>
+                          <p className="textInfo">
                             Reservation Number:{" "}
                             <span className="font-bold">
                               {reservation.ReservationNumber}
                             </span>
                           </p>
-                          <p>
+                          <p className="textInfo">
                             Check-In:{" "}
                             <span className="font-bold ml-6">
                               {new Date(reservation.DateCI).toLocaleDateString()}
                             </span>
                           </p>
-                          <p>
+                          <p className="textInfo">
                             Check-Out:{" "}
                             <span className="font-bold ml-3">
                               {new Date(reservation.DateCO).toLocaleDateString()}
@@ -175,14 +175,14 @@ const JsonViewPage = () => {
                     JSON.parse(reservationData.requestBody)[0].GuestInfo.map(
                       (guest, index) => (
                         <div key={index}>
-                          <p className="font-bold">
+                          <p className="font-bold textInfo">
                             {guest.Salution} {guest.FirstName} {guest.LastName}
                           </p>
-                          <p>{guest.Street}</p>
-                          <p>
+                          <p className="textInfo">{guest.Street}</p>
+                          <p className="textInfo">
                             {guest.PostalCode}, {guest.City}, {guest.Country}
                           </p>
-                          <p>NIF: {guest.VatNo}</p>
+                          <p className="textInfo">NIF: {guest.VatNo}</p>
                         </div>
                       )
                     )
@@ -196,20 +196,20 @@ const JsonViewPage = () => {
             </div>
 
             {/* Tabela de Itens */}
-            <table className="w-[80%] border-collapse border border-gray-300 mb-4 mx-auto">
+            <table className="w-[80%] border-collapse border border-gray-300 mb-4 mx-auto containerTable">
               <thead>
                 <tr className="text-white bg-primary">
-                  <th className="border border-gray-300 p-2 text-xl h-20">
+                  <th className="border border-gray-300 p-2 text-xl h-20 headerTable">
                     DATE
                   </th>
-                  <th className="border border-gray-300 p-2 text-xl">
+                  <th className="border border-gray-300 p-2 text-xl headerTable">
                     DESCRIPTION
                   </th>
-                  <th className="border border-gray-300 p-2 text-xl">QTY</th>
-                  <th className="border border-gray-300 p-2 text-xl">
+                  <th className="border border-gray-300 p-2 text-xl headerTable">QTY</th>
+                  <th className="border border-gray-300 p-2 text-xl headerTable">
                     UNIT PRICE
                   </th>
-                  <th className="border border-gray-300 p-2 text-xl">TOTAL</th>
+                  <th className="border border-gray-300 p-2 text-xl headerTable">TOTAL</th>
                 </tr>
               </thead>
               <tbody>
@@ -222,23 +222,23 @@ const JsonViewPage = () => {
                         key={item.ID}
                         className={index % 2 === 0 ? "bg-white" : "bg-primary-100"}
                       >
-                        <td className="border border-gray-300 p-2 w-32 text-center text-lg">
+                        <td className="border border-gray-300 p-2 w-32 text-center text-lg contentTable">
                           {item.Date}
                         </td>
                         <td
-                          className={`border border-gray-300 p-2 h-20 flex flex-col gap-2 text-lg ${!item.Description2 ? "justify-center text-left" : "text-left"
+                          className={`border border-gray-300 p-2 h-20 flex flex-col gap-2 text-lg contentTable ${!item.Description2 ? "justify-center text-left" : "text-left"
                             }`}
                         >
                           <span>{item.Description}</span>
                           {item.Description2 && <span>{item.Description2}</span>}
                         </td>
-                        <td className="border border-gray-300 p-2 text-right w-20 text-lg">
+                        <td className="border border-gray-300 p-2 text-right w-20 text-lg contentTable">
                           {item.Qty}
                         </td>
-                        <td className="border border-gray-300 p-2 text-right w-32 text-lg">
+                        <td className="border border-gray-300 p-2 text-right w-32 text-lg contentTable">
                           {item.UnitPrice.toFixed(2)}€
                         </td>
-                        <td className="border border-gray-300 p-2 text-right w-32 text-lg">
+                        <td className="border border-gray-300 p-2 text-right w-32 text-lg contentTable">
                           {item.Total.toFixed(2)}€
                         </td>
                       </tr>
@@ -261,7 +261,7 @@ const JsonViewPage = () => {
 
             </table>
 
-            <div className="flex justify-end w-[80%] mx-auto tableTotal">
+            <div className="flex justify-end w-[80%] mx-auto">
               {reservationData && reservationData.requestBody ? (
                 (() => {
                   const parsedData = JSON.parse(reservationData.requestBody);
@@ -270,7 +270,7 @@ const JsonViewPage = () => {
                   if (Array.isArray(documentTotals) && documentTotals.length > 0) {
                     return documentTotals.map((total) => (
                       <div key={total.ID} className="w-full">
-                        <p className="mt-4 text-5xl flex font-bold gap-20 justify-end">
+                        <p className="mt-4 text-5xl flex font-bold gap-20 justify-end tableTotal">
                           <span>TOTAL BALANCE</span>
                           <span>{total.Balance.toFixed(2)}€</span>
                         </p>
@@ -296,10 +296,8 @@ const JsonViewPage = () => {
             </div>
           </div>
 
-          {/* </div> */}
-
-          <div className="mb-4 mt-20">
-            <table className="w-auto border-collapse mb-4 text-xs ml-[17%]">
+          <div className="mb-4">
+            <table className="w-auto border-collapse mb-4 text-xs ml-[18.5%] vatTable">
               {" "}
               {/* Mantém a margem alinhada à esquerda */}
               <thead>
@@ -401,7 +399,7 @@ const JsonViewPage = () => {
       ) : (
         <p>Nenhum dado encontrado.</p>
       )}
-    </div>
+    </main>
   );
 };
 

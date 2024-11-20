@@ -242,7 +242,7 @@ export default function Page({ params }) {
               )}
 
               {/* Título "Departure List" separado do título dinâmico */}
-              <h2 className="text-xl">{propertyName} Departure List</h2>
+              <h2 className="text-xl">{propertyName} : Departure List</h2>
             </div>
 
             {/* Botão de refresh alinhado à direita */}
