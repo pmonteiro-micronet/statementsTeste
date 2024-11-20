@@ -1,6 +1,5 @@
 @media (max-width: 768px) {
     body {
-        padding-top: 5rem;
         overflow: hidden; /* Impede a rolagem no body */
     }
 
