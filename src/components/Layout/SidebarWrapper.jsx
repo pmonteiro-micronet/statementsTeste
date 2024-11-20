@@ -14,7 +14,6 @@ export default function SidebarWrapper({ children }) {
   const [isMobile, setIsMobile] = useState(false);
   const [expanded, setExpanded] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
-  console.log(pendingCount);
   const [listItems, setListItems] = useState({
     Statements: {
       icon: <IoDocumentOutline size={20} />,
@@ -109,7 +108,6 @@ export default function SidebarWrapper({ children }) {
 
       Object.entries(updatedListItems).forEach(([key, section]) => {
         let sectionActive = false;
-        console.log(key);
 
         section.items = section.items.map((item) => {
           if (!item.items) {
@@ -145,21 +143,18 @@ export default function SidebarWrapper({ children }) {
   }, [pathname]);
 
   const showSidebar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth");
+  const showNavBar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth");
 
   return (
     <div className="min-h-screen flex flex-col">
-      {isMobile ? (
+      {/* Exibe a NavBar se não estiver nos caminhos restritos */}
+      {showNavBar && isMobile ? (
         <NavBar listItems={listItems} />
       ) : (
-        showSidebar && (
+        !isMobile && showSidebar && (
           <Sidebar setExpanded={setExpanded}>
             {Object.entries(listItems).map(([key, section]) => (
-              <SidebarItem
-                key={key}
-                text={key}
-                icon={section.icon}
-                active={section.active}
-              >
+              <SidebarItem key={key} text={key} icon={section.icon} active={section.active}>
                 {section.items.map((item, index) =>
                   item.items ? (
                     <SidebarItem key={index} text={item.label} icon={section.icon} active={item.active}>
@@ -190,3 +185,6 @@ export default function SidebarWrapper({ children }) {
     </div>
   );
 }
+
+
+

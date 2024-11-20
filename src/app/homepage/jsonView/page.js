@@ -101,7 +101,7 @@ const JsonViewPage = () => {
   if (status === "loading") {
     return <p>Carregando sessão...</p>;
   }
-  
+
   return (
     <main className="overflow-y-auto pb-10 bodyContainer">
       {loading ? (
@@ -225,13 +225,13 @@ const JsonViewPage = () => {
                         <td className="border border-gray-300 p-2 w-32 text-center text-lg contentTable">
                           {item.Date}
                         </td>
-                        <td
-                          className={`border border-gray-300 p-2 h-20 flex flex-col gap-2 text-lg contentTable ${!item.Description2 ? "justify-center text-left" : "text-left"
-                            }`}
-                        >
-                          <span>{item.Description}</span>
-                          {item.Description2 && <span>{item.Description2}</span>}
+                        <td className="border border-gray-300 p-2 h-20 text-lg contentTable">
+                          <div className={`flex flex-col gap-2 ${!item.Description2 ? "justify-center text-left" : "text-left"}`}>
+                            <span>{item.Description}</span>
+                            {item.Description2 && <span>{item.Description2}</span>}
+                          </div>
                         </td>
+
                         <td className="border border-gray-300 p-2 text-right w-20 text-lg contentTable">
                           {item.Qty}
                         </td>
@@ -345,8 +345,8 @@ const JsonViewPage = () => {
           </div>
 
           <div className="fixed bottom-0 left-0 w-full bg-white shadow-md">
-              {/* <h4 className='mb-2 font-semibold'>Fiscal Tax</h4> */}
-              <div className="flex justify-center w-[65%] mx-auto mb-2 lineContainer">
+            {/* <h4 className='mb-2 font-semibold'>Fiscal Tax</h4> */}
+            <div className="flex justify-center w-[65%] mx-auto mb-2 lineContainer">
               <div className="bg-gray-300 h-0.5 w-full"></div>
             </div>
             <div className="flex justify-between items-center mx-auto w-[65%] footerContainer">

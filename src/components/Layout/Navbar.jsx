@@ -1,5 +1,3 @@
-// NavBar.jsx
-
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -9,6 +7,7 @@ import { signOut, useSession } from "next-auth/react";
 
 export default function NavBar({ listItems }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openMenus, setOpenMenus] = useState(new Set()); // Estado para controlar menus abertos
   const { data: session } = useSession();
   let inactivityTimeout;
 
@@ -16,34 +15,34 @@ export default function NavBar({ listItems }) {
     setMenuOpen((prev) => !prev);
   };
 
+  const toggleSubmenu = (key) => {
+    setOpenMenus((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) {
+        newSet.delete(key); // Fecha o submenu se já estiver aberto
+      } else {
+        newSet.add(key); // Abre o submenu
+      }
+      return newSet;
+    });
+  };
+
   const handleLogout = () => {
     signOut({ callbackUrl: "/auth" });
   };
 
   const resetInactivityTimer = () => {
-    // Limpa o timeout anterior
     clearTimeout(inactivityTimeout);
-
-    // Define um novo timeout de 15 minutos
     inactivityTimeout = setTimeout(() => {
-      handleSignOut();
-    }, 15 * 60 * 1000); // 15 minutos em milissegundos
-  };
-
-  const handleSignOut = () => {
-    // Faz logout do usuário
-    signOut();
+      handleLogout();
+    }, 15 * 60 * 1000);
   };
 
   useEffect(() => {
-    // Adiciona listeners para eventos de atividade do usuário
     window.addEventListener("mousemove", resetInactivityTimer);
     window.addEventListener("keydown", resetInactivityTimer);
-
-    // Define o timeout inicial
     resetInactivityTimer();
 
-    // Remove listeners ao desmontar o componente
     return () => {
       window.removeEventListener("mousemove", resetInactivityTimer);
       window.removeEventListener("keydown", resetInactivityTimer);
@@ -62,38 +61,67 @@ export default function NavBar({ listItems }) {
       </button>
 
       {/* Fullscreen Menu */}
-      {/* Fullscreen Menu */}
       {menuOpen && (
-        <div className="fixed inset-0 z-50 bg-white flex flex-col p-6">
+        <div className="fixed inset-0 z-50 bg-white flex flex-col p-6 overflow-auto">
           {/* Close Button */}
           <button onClick={toggleMenu} className="self-end text-2xl mb-4 text-gray-600">
             &times;
           </button>
 
-          {/* Render Menu Items from listItems */}
-          {Object.entries(listItems).map(([key, section]) => (
-            <div key={key} className="mb-4">
-              <div className="font-bold text-indigo-800 mb-2">{key}</div>
-              {section.items.map((item, index) =>
-                item.items ? (
-                  <div key={index} className="pl-4">
-                    <span className="text-gray-800 font-semibold">{item.label}</span>
-                    <div className="pl-4">
-                      {item.items.map((subItem, subIndex) => (
-                        <Link key={subIndex} href={subItem.ref} className="block py-1 text-indigo-600" onClick={toggleMenu}>
-                          {subItem.label}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <Link key={index} href={item.ref} className="py-2 text-indigo-600 block" onClick={toggleMenu}>
-                    {item.label}
-                  </Link>
-                )
-              )}
-            </div>
-          ))}
+          {/* Render Menu Items */}
+          <ul>
+            {Object.entries(listItems).map(([key, section]) => (
+              <li key={key} className="mb-4">
+                <div
+                  className="flex items-center justify-between cursor-pointer font-bold text-indigo-800 mb-2"
+                  onClick={() => toggleSubmenu(key)}
+                >
+                  {key}
+                  {section.items && (
+                    <span className="text-sm text-gray-600">
+                      {openMenus.has(key) ? "-" : "+"}
+                    </span>
+                  )}
+                </div>
+
+                {/* Submenu */}
+                {openMenus.has(key) && (
+                  <ul className="pl-4">
+                    {section.items.map((item, index) =>
+                      item.items ? (
+                        <li key={index} className="mb-2">
+                          <span className="font-semibold text-gray-800">{item.label}</span>
+                          <ul className="pl-4">
+                            {item.items.map((subItem, subIndex) => (
+                              <li key={subIndex} className="mb-1">
+                                <Link
+                                  href={subItem.ref}
+                                  className="block py-1 text-indigo-600"
+                                  onClick={toggleMenu}
+                                >
+                                  {subItem.label}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </li>
+                      ) : (
+                        <li key={index} className="mb-1">
+                          <Link
+                            href={item.ref}
+                            className="block py-2 text-indigo-600"
+                            onClick={toggleMenu}
+                          >
+                            {item.label}
+                          </Link>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
 
           {/* Profile and Logout at the bottom */}
           <div className="mt-auto flex flex-col">
@@ -103,7 +131,11 @@ export default function NavBar({ listItems }) {
                 <FaUser />
               </div>
               <div className="ml-3 text-center">
-                <p className="font-medium">{session ? `${session.user.firstName} ${session.user.secondName}` : "Usuário Desconhecido"}</p>
+                <p className="font-medium">
+                  {session
+                    ? `${session.user.firstName} ${session.user.secondName}`
+                    : "Usuário Desconhecido"}
+                </p>
                 <span className="text-xs text-gray-600 ml-3">
                   {session ? session.user.email : "Email Desconhecido"}
                 </span>
@@ -121,7 +153,6 @@ export default function NavBar({ listItems }) {
           </div>
         </div>
       )}
-
     </nav>
   );
 }
