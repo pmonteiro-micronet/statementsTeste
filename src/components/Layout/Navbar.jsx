@@ -4,6 +4,12 @@ import Link from "next/link";
 import { TbLayoutSidebarLeftExpand } from "react-icons/tb";
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
+import { IoIosArrowDown, IoIosArrowUp  } from "react-icons/io";
+
+// Função utilitária para substituir underscores por espaços
+function replaceUnderscores(text) {
+  return text.replace(/_/g, " ");
+}
 
 export default function NavBar({ listItems }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -76,10 +82,10 @@ export default function NavBar({ listItems }) {
                   className="flex items-center justify-between cursor-pointer font-bold text-indigo-800 mb-2"
                   onClick={() => toggleSubmenu(key)}
                 >
-                  {key}
+                  {replaceUnderscores(key)} {/* Aplica a função aqui */}
                   {section.items && (
                     <span className="text-sm text-gray-600">
-                      {openMenus.has(key) ? "-" : "+"}
+                      {openMenus.has(key) ? <IoIosArrowUp size={15}/> : <IoIosArrowDown size={15}/>}
                     </span>
                   )}
                 </div>
@@ -90,7 +96,7 @@ export default function NavBar({ listItems }) {
                     {section.items.map((item, index) =>
                       item.items ? (
                         <li key={index} className="mb-2">
-                          <span className="font-semibold text-gray-800">{item.label}</span>
+                          <span className="font-semibold text-gray-800">{replaceUnderscores(item.label)}</span> {/* Aplica a função aqui */}
                           <ul className="pl-4">
                             {item.items.map((subItem, subIndex) => (
                               <li key={subIndex} className="mb-1">
@@ -99,7 +105,7 @@ export default function NavBar({ listItems }) {
                                   className="block py-1 text-indigo-600"
                                   onClick={toggleMenu}
                                 >
-                                  {subItem.label}
+                                  {replaceUnderscores(subItem.label)} {/* Aplica a função aqui */}
                                 </Link>
                               </li>
                             ))}
@@ -112,7 +118,7 @@ export default function NavBar({ listItems }) {
                             className="block py-2 text-indigo-600"
                             onClick={toggleMenu}
                           >
-                            {item.label}
+                            {replaceUnderscores(item.label)} {/* Aplica a função aqui */}
                           </Link>
                         </li>
                       )
