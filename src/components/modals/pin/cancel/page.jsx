@@ -6,6 +6,13 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import bcrypt from "bcryptjs";
 
+const isDesktop = () => {
+    if (typeof window !== "undefined") {
+        return window.innerWidth >= 1024; // Define dispositivos desktop como largura maior ou igual a 1024px
+    }
+    return false;
+};
+
 const CancelPIN = ({
     buttonName,
     buttonIcon,
@@ -23,6 +30,7 @@ const CancelPIN = ({
     const { data: session, status } = useSession();
     const [propertyID, setPropertyID] = useState("");
     console.log(propertyID)
+    const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
 
     useEffect(() => {
         const checkSession = async () => {
@@ -40,6 +48,11 @@ const CancelPIN = ({
 
         checkSession();
     }, [session, status, router]);
+
+    useEffect(() => {
+        // Verifica se é desktop no carregamento da página
+        setAutoFocusEnabled(isDesktop());
+    }, []);
 
     // const handlePinSubmit = async (e) => {
     //     if (e) e.preventDefault();
@@ -92,8 +105,8 @@ const CancelPIN = ({
                         isOpen={isOpen}
                         hideCloseButton={true}
                         onOpenChange={handleModalOpenChange}
-                        isDismissable={false}
-                        isKeyboardDismissDisabled={true}
+                        isDismissable={true}
+                        isKeyboardDismissDisabled={false}
                         className="z-50"
                         size="sm"
                     >
@@ -111,13 +124,17 @@ const CancelPIN = ({
                                         </div>
                                     </ModalHeader>
                                     <ModalBody className="flex flex-col mx-5 my-2">
-                                        <input
-                                            type="password"
-                                            value={pin}
-                                            readOnly
-                                            className="border border-gray-300 p-2 w-full text-center mb-4"
-                                            placeholder="• • • •"
-                                        />
+                                    <input
+    type="password"
+    value={pin}
+    autoFocus={autoFocusEnabled}
+    onChange={(e) => {
+        setPin(e.target.value);
+        setIsPinError(false); // Reseta o erro ao digitar
+    }}
+    className="border border-gray-300 p-2 w-full text-center mb-4"
+    placeholder="• • • •"
+/>
                                         {isPinError && (
                                             <p className="text-red-500 -mt-4">
                                                 PIN incorreto. Tente novamente.

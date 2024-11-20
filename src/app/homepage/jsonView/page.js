@@ -375,7 +375,7 @@ const JsonViewPage = () => {
             <CancelPIN
               buttonName={"Cancel"}
               buttonColor={"transparent"}
-              modalHeader={"Insira o PIN"}
+              modalHeader={"Insert PIN"}
               formTypeModal={11}
               editor={"teste"}
             />
@@ -386,7 +386,7 @@ const JsonViewPage = () => {
               <OkPIN
                 buttonName={"Ok"}
                 buttonColor={"transparent"}
-                modalHeader={"Insira o PIN"}
+                modalHeader={"Insert PIN"}
                 formTypeModal={11}
                 editor={"teste"}
               />
