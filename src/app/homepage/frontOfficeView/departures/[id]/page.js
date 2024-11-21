@@ -52,6 +52,7 @@ export default function Page({ params }) {
         await axios.get("/api/reservations/info", {
           params: {
             mpehotel,
+            propertyID
           },
         });
 
