@@ -84,6 +84,7 @@ export default function Page({ params }) {
         params: {
           ResNumber,
           window: windowValue,
+          propertyID
         },
       });
       console.log(`Dados enviados com sucesso para a reserva ${ResNumber} com window: ${windowValue}`);
