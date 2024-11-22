@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/db"; 
 
 const generateUniqueKey = (HotelInfo, Reservation, GuestInfo) => {
   if (!HotelInfo || !Reservation || !GuestInfo) {
@@ -20,7 +18,6 @@ export async function POST(req) {
 
   try {
     const body = await req.json(); // Parse o corpo da requisição
-    console.log("Request body (detailed):", JSON.stringify(body, null, 2));
 
     // Verificar se o corpo da requisição é válido
     if (!Array.isArray(body) || body.length === 0) {
@@ -70,6 +67,7 @@ export async function POST(req) {
     });
 
     console.log("Property found:", property);
+    console.log("Propriedade nao encontrada: ", !property);
     if (!property) {
       return NextResponse.json(
         { message: `Propriedade com Tag '${HotelInfo.Tag}' não encontrada.` },
