@@ -75,20 +75,20 @@ export default function Page({ params }) {
 
 
   // Função para enviar os dados para a API
-  const sendResToAPI = async (ResNumber) => {
-    console.log("Enviando ResNumber para a API:", ResNumber);
+  const sendResToAPI = async (ResNo) => {
+    console.log("Enviando ResNumber para a API:", ResNo);
     const windowValue = 0;
 
     try {
       // Faz a requisição para enviar os dados do statement
       await axios.get("/api/reservations/info/specificReservation", {
         params: {
-          ResNumber,
+          ResNo,
           window: windowValue,
           propertyID
         },
       });
-      console.log(`Dados enviados com sucesso para a reserva ${ResNumber} com window: ${windowValue}`);
+      console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
 
       // Após o envio, busca o recordID do último registro
       const response = await axios.get("/api/get_jsons");
@@ -304,8 +304,8 @@ export default function Page({ params }) {
                                 <DropdownItem
                                   key="show"
                                   onClick={() => {
-                                    if (reserva.ReservationNumber) {
-                                      sendResToAPI(reserva.ReservationNumber);
+                                    if (reserva.ResNo) {
+                                      sendResToAPI(reserva.ResNo);
                                     } else {
                                       console.warn("ReservationNumber não encontrado.");
                                     }

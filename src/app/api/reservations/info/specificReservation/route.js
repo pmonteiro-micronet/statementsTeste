@@ -4,7 +4,7 @@ import prisma from "@/lib/db";  // Certifique-se de que a importação está cor
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const ResNumber = searchParams.get("ResNumber");
+  const ResNumber = searchParams.get("ResNo");
   const window = searchParams.get("window");
   const PropertyID = searchParams.get("propertyID");  // Novo parâmetro PropertyID
 
