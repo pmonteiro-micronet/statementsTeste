@@ -1,19 +1,16 @@
 "use client";
 import React from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, Button, useDisclosure } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@nextui-org/react";
 //imports de icons
 import { MdClose } from "react-icons/md";
 import { Tabs, Tab } from "@nextui-org/react";
 
 const ArrivalInfoForm = ({
-    buttonName,
-    buttonIcon,
     modalHeader,
     editIcon,
     modalEditArrow,
     modalEdit,
     formTypeModal,
-    buttonColor,
     roomNumber,
     dateCI,
     booker,

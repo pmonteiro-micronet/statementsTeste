@@ -247,7 +247,8 @@ export default function Page({ params }) {
                                 closeOnSelect={false}
                                 isOpen={true}
                               >
-                                <DropdownItem key="edit">
+                                <DropdownItem key="edit"  onClick={() => handleOpenModal()}>
+                                  See information
                                 </DropdownItem>
                                 <DropdownItem
                                   key="show"
