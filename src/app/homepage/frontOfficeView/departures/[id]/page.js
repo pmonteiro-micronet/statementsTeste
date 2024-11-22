@@ -36,7 +36,7 @@ export default function Page({ params }) {
   const router = useRouter();
 
   const [propertyName, setPropertyName]=useState([]);
-
+console.log(postSuccessful);
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
     try {
@@ -126,54 +126,43 @@ const handleCloseModal = () => {
   
   // Função para pegar as reservas
   useEffect(() => {
-    const fetchReservas = async (propertyID) => {
-      setIsLoading(true); // Inicia o carregamento
+    const fetchReservas = async () => {
+      setIsLoading(true);
       try {
         const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
-        console.log("Resposta da API:", response.data); // Log da resposta da API
-
-        let reservasFiltradas = [];
-
-        response.data.response.forEach((reserva) => {
-          try {
-            if (reserva.requestBody) {
-              const requestBody = JSON.parse(reserva.requestBody);
-              console.log("requestBody:", requestBody); // Log do requestBody
-
-              for (let key in requestBody) {
-                const reservas = requestBody[key];
-
-                if (Array.isArray(reservas)) {
-                  const reservasComDataAtual = reservas.filter(item => item.DateCO === currentDate);
-                  console.log("Reservas filtradas para a data atual:", reservasComDataAtual); // Log das reservas filtradas
-
-                  reservasFiltradas = [...reservasFiltradas, ...reservasComDataAtual];
-                } else {
-                  console.warn(`Reservas para a chave ${key} não são um array:`, reservas);
-                }
-              }
-            } else {
-              console.warn("requestBody está undefined para a reserva:", reserva);
-            }
-          } catch (e) {
-            console.error("Erro ao fazer o parsing do requestBody:", e);
+        console.log("crlh ", response.data.response);
+  
+        // Parsear o `requestBody` (que é uma string JSON) para um array de objetos
+        const reservasArray = JSON.parse(response.data.response[0].requestBody);
+        console.log("Reservas após parse:", reservasArray);
+  
+        // Converte currentDate para o formato YYYY-MM-DD (sem hora)
+        const formattedCurrentDate = currentDate.split('T')[0]; // Remove qualquer parte de hora de currentDate
+  
+        const reservasFiltradas = reservasArray.filter(reserva => {
+          if (!reserva.DateCO) {
+            console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva); 
+            return false; // Se DateCO não existir, não filtra essa reserva
           }
+  
+          // Formata DateCO para o mesmo formato YYYY-MM-DD
+          const formattedDateCO = reserva.DateCO.split('T')[0]; 
+          return formattedDateCO === formattedCurrentDate;
         });
-
-        // Atualiza o estado com as reservas filtradas
-        setReservas(reservasFiltradas);
+  
+        console.log("Reservas para a data atual:", reservasFiltradas); // Verifique os dados
+        setReservas(reservasFiltradas); // Armazena os dados filtrados no estado
       } catch (error) {
-        console.error(
-          "Erro ao buscar as reservas:",
-          error.response ? error.response.data : error.message
-        );
+        console.error("Erro ao buscar reservas:", error.message);
       } finally {
-        setIsLoading(false); // Para o carregamento, independentemente do sucesso ou erro
+        setIsLoading(false);
       }
     };
-
-    fetchReservas(propertyID);
-  }, [currentDate, postSuccessful]); // Recarrega as reservas sempre que a data mudar
+  
+    fetchReservas();
+  }, [currentDate, propertyID]); // Atualiza dados quando a data ou o ID da propriedade mudar
+  
+  
 
   useEffect(() => {
     const fetchHotelName = async () => {
@@ -310,7 +299,7 @@ const handleCloseModal = () => {
                                 className="relative z-10"
                               >
                                 <DropdownItem key="edit" onClick={() => handleOpenModal()}>
-                                  See information
+                                  Info
                                 </DropdownItem>
                                 <DropdownItem
                                   key="show"
@@ -332,7 +321,7 @@ const handleCloseModal = () => {
                                     modalHeader={"Reservation"}
                                     formTypeModal={11}
                                     editor={"teste"}
-                                    roomNumber={reserva.RoomNumber}  // Passando o roomNumber
+                                    roomNumber={reserva.Room}  // Passando o roomNumber
                                     dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
                                     booker={reserva.Booker}
                                     salutation={reserva.Salutation}
@@ -347,14 +336,14 @@ const handleCloseModal = () => {
                                     onClose={handleCloseModal}
                                   />
                           </td>
-                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.RoomNumber}</td>
+                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.Room}</td>
                           <td className="pl-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
                           <td className="pl-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
                           <td className="pl-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
                           <td className="pl-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
                           <td className="pl-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
                           <td className="pl-2 border-r border-[#e6e6e6] w-64">{reserva.Notes}</td>
-                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.ReservationNumber}</td>
+                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
                           <td className="text-right pr-2">{reserva.DateCO}</td>
                         </tr>
                       );

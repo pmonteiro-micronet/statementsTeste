@@ -77,7 +77,7 @@ export async function POST(request) {
     // Obter o PropertyID diretamente da query string
     const { searchParams } = new URL(request.url);
     const PropertyID = searchParams.get("propertyID");  // Obtém o parâmetro da URL
-    
+
     // Valida se o PropertyID foi encontrado
     if (!PropertyID) {
       return NextResponse.json(
@@ -97,32 +97,24 @@ export async function POST(request) {
       );
     }
 
-    // Processar cada reserva individualmente
-    const reservations = body.data;  // A lista de reservas no corpo da requisição
+    // Salvar o array de reservas como um único registro
+    const newRequest = await prisma.requestRecordsReservations.create({
+      data: {
+        requestBody: JSON.stringify(body.data), // Armazena o array completo como JSON
+        requestType: "POST", // Definido como POST
+        requestDateTime: new Date(), // Data e hora atual
+        responseStatus: "201", // Supondo sucesso inicialmente
+        responseBody: "", // Inicialmente vazio, será atualizado depois
+        propertyID: propertyIDInt, // Usar o propertyID extraído da query
+      },
+    });
 
-    const savedReservations = [];  // Para armazenar as reservas salvas
+    console.log("Data saved to DB:", newRequest);
 
-    // Iterar sobre o array de reservas e salvar cada uma
-    for (let reservation of reservations) {
-      const newRequest = await prisma.requestRecordsReservations.create({
-        data: {
-          requestBody: JSON.stringify(reservation), // Armazena os dados da reserva como JSON
-          requestType: "POST", // Definido como POST
-          requestDateTime: new Date(), // Data e hora atual
-          responseStatus: "201", // Supondo sucesso inicialmente
-          responseBody: "", // Inicialmente vazio, será atualizado depois
-          propertyID: propertyIDInt, // Usar o propertyID extraído da query
-        },
-      });
-
-      console.log("Data saved to DB:", newRequest);
-      savedReservations.push(newRequest);  // Adiciona a reserva salva ao array
-    }
-
-    // Resposta de sucesso com todas as reservas salvas
+    // Resposta de sucesso com o registro salvo
     const responseBody = {
       message: "Dados armazenados com sucesso",
-      data: savedReservations,
+      data: newRequest,
     };
 
     // Envie a resposta ao cliente
@@ -130,7 +122,7 @@ export async function POST(request) {
 
   } catch (error) {
     console.error("Erro ao gravar os dados:", error.message);
-    
+
     // Retorne o erro ao cliente
     return NextResponse.json(
       { message: "Erro ao gravar os dados", error: error.message },
@@ -138,3 +130,4 @@ export async function POST(request) {
     );
   }
 }
+
