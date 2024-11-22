@@ -35,8 +35,8 @@ export default function Page({ params }) {
 
   const router = useRouter();
 
-  const [propertyName, setPropertyName]=useState([]);
-console.log(postSuccessful);
+  const [propertyName, setPropertyName] = useState([]);
+  console.log(postSuccessful);
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
     try {
@@ -113,17 +113,17 @@ console.log(postSuccessful);
         error.response ? error.response.data : error.message
       );
     }
-};
+  };
 
-const handleOpenModal = () => {
-  setIsModalOpen(true);
-};
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
 
-const handleCloseModal = () => {
-  setIsModalOpen(false);
-};
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
-  
+
   // Função para pegar as reservas
   useEffect(() => {
     const fetchReservas = async () => {
@@ -131,25 +131,25 @@ const handleCloseModal = () => {
       try {
         const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
         console.log("crlh ", response.data.response);
-  
+
         // Parsear o `requestBody` (que é uma string JSON) para um array de objetos
         const reservasArray = JSON.parse(response.data.response[0].requestBody);
         console.log("Reservas após parse:", reservasArray);
-  
+
         // Converte currentDate para o formato YYYY-MM-DD (sem hora)
         const formattedCurrentDate = currentDate.split('T')[0]; // Remove qualquer parte de hora de currentDate
-  
+
         const reservasFiltradas = reservasArray.filter(reserva => {
           if (!reserva.DateCO) {
-            console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva); 
+            console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva);
             return false; // Se DateCO não existir, não filtra essa reserva
           }
-  
+
           // Formata DateCO para o mesmo formato YYYY-MM-DD
-          const formattedDateCO = reserva.DateCO.split('T')[0]; 
+          const formattedDateCO = reserva.DateCO.split('T')[0];
           return formattedDateCO === formattedCurrentDate;
         });
-  
+
         console.log("Reservas para a data atual:", reservasFiltradas); // Verifique os dados
         setReservas(reservasFiltradas); // Armazena os dados filtrados no estado
       } catch (error) {
@@ -158,17 +158,17 @@ const handleCloseModal = () => {
         setIsLoading(false);
       }
     };
-  
+
     fetchReservas();
   }, [currentDate, propertyID]); // Atualiza dados quando a data ou o ID da propriedade mudar
-  
-  
+
+
 
   useEffect(() => {
     const fetchHotelName = async () => {
       try {
         const response = await axios.get(`/api/properties/${propertyID}`);
-        
+
         // Verifique se a resposta contém os dados esperados
         if (response.data?.response?.length > 0) {
           const propertyName = response.data.response[0].propertyName; // Obtém o propertyName
@@ -184,10 +184,10 @@ const handleCloseModal = () => {
         );
       }
     };
-  
+
     fetchHotelName();
   }, [propertyID]);
-  
+
 
   // UseMemo para preparar os dados filtrados de acordo com a paginação
   const items = React.useMemo(() => {
@@ -316,25 +316,25 @@ const handleCloseModal = () => {
                               </DropdownMenu>
                             </Dropdown>
                             <DepartureInfoForm
-                                    buttonName={"Info"}
-                                    buttonColor={"transparent"}
-                                    modalHeader={"Reservation"}
-                                    formTypeModal={11}
-                                    editor={"teste"}
-                                    roomNumber={reserva.Room}  // Passando o roomNumber
-                                    dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
-                                    booker={reserva.Booker}
-                                    salutation={reserva.Salutation}
-                                    lastName={reserva.LastName}
-                                    firstName={reserva.FirstName}
-                                    roomType={reserva.RoomType}
-                                    resStatus={reserva.ResStatus}
-                                    totalPax={reserva.TotalPax}
-                                    balance={reserva.Balance}
-                                    country={reserva.Country}
-                                    isOpen={isModalOpen}
-                                    onClose={handleCloseModal}
-                                  />
+                              buttonName={"Info"}
+                              buttonColor={"transparent"}
+                              modalHeader={"Reservation"}
+                              formTypeModal={11}
+                              roomNumber={reserva.Room}  // Passando o roomNumber
+                              dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
+                              booker={reserva.Booker}
+                              salutation={reserva.Salutation}
+                              lastName={reserva.LastName}
+                              firstName={reserva.FirstName}
+                              roomType={reserva.RoomType}
+                              resStatus={reserva.ResStatus}
+                              totalPax={reserva.TotalPax}
+                              balance={reserva.Balance}
+                              country={reserva.Country}
+                              isBackdropVisible={false}
+                              isOpen={isModalOpen}
+                              onClose={handleCloseModal}
+                            />
                           </td>
                           <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.Room}</td>
                           <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
@@ -342,7 +342,7 @@ const handleCloseModal = () => {
                           <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
                           <td className="pl-2 pr-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
                           <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-64">{reserva.Notes}</td>
+                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-64 max-w-xs truncate">{reserva.Notes}</td>
                           <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
                           <td className="text-right pr-2">{reserva.DateCO}</td>
                         </tr>
