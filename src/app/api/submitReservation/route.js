@@ -47,6 +47,7 @@ export async function POST(req) {
 
     // Gerar a chave única para identificar o pedido
     const uniqueKey = generateUniqueKey(HotelInfo, Reservation, GuestInfo);
+    console.log("Generated unique key:", uniqueKey);
 
     // Verificar se já existe um pedido com a mesma chave única
     const existingRequest = await prisma.requestRecords.findFirst({
@@ -55,6 +56,7 @@ export async function POST(req) {
       },
     });
 
+    console.log("Existing request check:", existingRequest);
     if (existingRequest) {
       return NextResponse.json(
         { message: "Pedido com os mesmos dados já existe." },
@@ -67,6 +69,7 @@ export async function POST(req) {
       where: { propertyTag: HotelInfo.Tag },
     });
 
+    console.log("Property found:", property);
     if (!property) {
       return NextResponse.json(
         { message: `Propriedade com Tag '${HotelInfo.Tag}' não encontrada.` },
@@ -88,7 +91,7 @@ export async function POST(req) {
       },
     });
 
-    console.log("Data saved to DB:", newRequest);
+    console.log("New data saved to DB:", newRequest);
 
     return NextResponse.json(
       { message: "Dados armazenados com sucesso.", data: newRequest },
@@ -104,6 +107,7 @@ export async function POST(req) {
     );
   }
 }
+
 
 // Função para lidar com requisições GET
 export async function GET() {
