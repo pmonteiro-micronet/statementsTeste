@@ -266,14 +266,14 @@ const handleCloseModal = () => {
                   <thead>
                     <tr className="bg-primary text-white h-12">
                       <td className="pl-2 w-10 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
-                      <td className="pl-2 border-r border-[#e6e6e6]">ROOM</td>
-                      <td className="pl-2 border-r border-[#e6e6e6]">LAST NAME</td>
-                      <td className="pl-2 border-r border-[#e6e6e6]">FIRST NAME</td>
-                      <td className="pl-2 border-r border-[#e6e6e6]">TRAVEL AGENCY</td>
-                      <td className="pl-2 border-r border-[#e6e6e6]">COMPANY</td>
-                      <td className="pl-2 border-r border-[#e6e6e6]">GROUP</td>
-                      <td className="pl-2 border-r border-[#e6e6e6]">NOTES</td>
-                      <td className="pl-2 border-r border-[#e6e6e6]">RES. NO.</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ROOM</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">LAST NAME</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">FIRST NAME</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">TRAVEL AGENCY</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">COMPANY</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">GROUP</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">NOTES</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">RES. NO.</td>
                       <td className="pl-2">DEPARTURE</td>
                     </tr>
                   </thead>
@@ -337,13 +337,13 @@ const handleCloseModal = () => {
                                   />
                           </td>
                           <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.Room}</td>
-                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
-                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
-                          <td className="pl-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
-                          <td className="pl-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
-                          <td className="pl-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
-                          <td className="pl-2 border-r border-[#e6e6e6] w-64">{reserva.Notes}</td>
-                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
+                          <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
+                          <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
+                          <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
+                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
+                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
+                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-64">{reserva.Notes}</td>
+                          <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
                           <td className="text-right pr-2">{reserva.DateCO}</td>
                         </tr>
                       );
