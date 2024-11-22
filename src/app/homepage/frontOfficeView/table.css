@@ -1,7 +1,6 @@
-
 @media (max-width: 768px) {
   body {
-      margin-top: 5rem;
+      padding-top: 5rem;
   }
   table {
       font-size: 12px;
@@ -13,6 +12,6 @@
       padding: 4px 8px; /* Reduz o espaçamento para células em telas menores */
   }
   .header-container h2{
-    font-size: 10px;
+    font-size: 13px;
   }
 }

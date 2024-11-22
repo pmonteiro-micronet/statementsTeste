@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import OkPIN from "@/components/modals/pin/ok/page";
 import CancelPIN from "@/components/modals/pin/cancel/page";
+import "./styles.css";
 
 const JsonViewPage = () => {
   const [reservationData, setReservationData] = useState(null);
@@ -23,19 +24,19 @@ const JsonViewPage = () => {
     const preventBackNavigation = () => {
       window.history.pushState(null, null, window.location.href);
     };
-  
+
     // Adiciona evento para prevenir retrocesso
     window.addEventListener('popstate', preventBackNavigation);
-  
+
     // Configura o estado inicial do histórico
     window.history.pushState(null, null, window.location.href);
-  
+
     return () => {
       // Remove o evento quando o componente é desmontado
       window.removeEventListener('popstate', preventBackNavigation);
     };
   }, []);
-  
+
 
   useEffect(() => {
     const checkSession = async () => {
@@ -102,7 +103,7 @@ const JsonViewPage = () => {
   }
 
   return (
-    <main className="flex flex-col flex-grow h-full p-0 m-0 overflow-x-hidden">
+    <main className="overflow-y-auto pb-10 bodyContainer">
       {loading ? (
         <p>Carregando dados...</p>
       ) : error ? (
@@ -110,19 +111,19 @@ const JsonViewPage = () => {
       ) : reservationData ? (
         <>
           {imageExists && (
-  <div className="mb-4 w-screen">
-    <img
-      src={`/logos/${propertyID}.png`}
-      alt="Property Image"
-      className="mx-auto"
-    />
-  </div>
-)}  
+            <div className="mb-4 w-screen">
+              <img
+                src={`/logos/${propertyID}.png`}
+                alt="Property Image"
+                className="mx-auto"
+              />
+            </div>
+          )}
 
           <div className="flex flex-col justify-between items-center w-[80%] mx-auto mt-4">
-            <div className="flex justify-between w-full mb-10">
+            <div className="flex flex-row justify-between w-[80%] mb-10 infoContainer">
               {/* Detalhes da Reserva */}
-              <div className="flex-1 text-left ml-[10%]">
+              <div className="text-left">
                 {reservationData && reservationData.requestBody ? (
                   Array.isArray(
                     JSON.parse(reservationData.requestBody)[0]?.Reservation
@@ -130,25 +131,25 @@ const JsonViewPage = () => {
                     JSON.parse(reservationData.requestBody)[0].Reservation.map(
                       (reservation, index) => (
                         <div key={index}>
-                          <p className="font-bold text-3xl text-primary">
+                          <p className="font-bold text-3xl text-primary roomInfo">
                             Room:{" "}
                             <span className="font-bold">
                               {reservation.RoomNumber}
                             </span>
                           </p>
-                          <p>
+                          <p className="textInfo">
                             Reservation Number:{" "}
                             <span className="font-bold">
                               {reservation.ReservationNumber}
                             </span>
                           </p>
-                          <p>
+                          <p className="textInfo">
                             Check-In:{" "}
                             <span className="font-bold ml-6">
                               {new Date(reservation.DateCI).toLocaleDateString()}
                             </span>
                           </p>
-                          <p>
+                          <p className="textInfo">
                             Check-Out:{" "}
                             <span className="font-bold ml-3">
                               {new Date(reservation.DateCO).toLocaleDateString()}
@@ -166,7 +167,7 @@ const JsonViewPage = () => {
               </div>
 
               {/* Detalhes do Hóspede */}
-              <div className="flex-1 text-left ml-[40%] mt-4">
+              <div className="text-left mt-4">
                 {reservationData && reservationData.requestBody ? (
                   Array.isArray(
                     JSON.parse(reservationData.requestBody)[0]?.GuestInfo
@@ -174,14 +175,14 @@ const JsonViewPage = () => {
                     JSON.parse(reservationData.requestBody)[0].GuestInfo.map(
                       (guest, index) => (
                         <div key={index}>
-                          <p className="font-bold">
+                          <p className="font-bold textInfo">
                             {guest.Salution} {guest.FirstName} {guest.LastName}
                           </p>
-                          <p>{guest.Street}</p>
-                          <p>
+                          <p className="textInfo">{guest.Street}</p>
+                          <p className="textInfo">
                             {guest.PostalCode}, {guest.City}, {guest.Country}
                           </p>
-                          <p>NIF: {guest.VatNo}</p>
+                          <p className="textInfo">NIF: {guest.VatNo}</p>
                         </div>
                       )
                     )
@@ -195,20 +196,20 @@ const JsonViewPage = () => {
             </div>
 
             {/* Tabela de Itens */}
-            <table className="w-[80%] border-collapse border border-gray-300 mb-4 mx-auto">
+            <table className="w-[80%] border-collapse border border-gray-300 mb-4 mx-auto containerTable">
               <thead>
                 <tr className="text-white bg-primary">
-                  <th className="border border-gray-300 p-2 text-xl h-20">
+                  <th className="border border-gray-300 p-2 text-xl h-20 headerTable">
                     DATE
                   </th>
-                  <th className="border border-gray-300 p-2  text-xl">
+                  <th className="border border-gray-300 p-2 text-xl headerTable">
                     DESCRIPTION
                   </th>
-                  <th className="border border-gray-300 p-2 text-xl">QTY</th>
-                  <th className="border border-gray-300 p-2 text-xl">
+                  <th className="border border-gray-300 p-2 text-xl headerTable">QTY</th>
+                  <th className="border border-gray-300 p-2 text-xl headerTable">
                     UNIT PRICE
                   </th>
-                  <th className="border border-gray-300 p-2 text-xl">TOTAL</th>
+                  <th className="border border-gray-300 p-2 text-xl headerTable">TOTAL</th>
                 </tr>
               </thead>
               <tbody>
@@ -221,23 +222,23 @@ const JsonViewPage = () => {
                         key={item.ID}
                         className={index % 2 === 0 ? "bg-white" : "bg-primary-100"}
                       >
-                        <td className="border border-gray-300 p-2 w-32 text-center text-lg">
+                        <td className="border border-gray-300 p-2 w-32 text-center text-lg contentTable">
                           {item.Date}
                         </td>
-                        <td
-                          className={`border border-gray-300 p-2 h-20 flex flex-col gap-2 text-lg ${!item.Description2 ? "justify-center text-left" : "text-left"
-                            }`}
-                        >
-                          <span>{item.Description}</span>
-                          {item.Description2 && <span>{item.Description2}</span>}
+                        <td className="border border-gray-300 p-2 h-20 text-lg contentTable">
+                          <div className={`flex flex-col gap-2 ${!item.Description2 ? "justify-center text-left" : "text-left"}`}>
+                            <span>{item.Description}</span>
+                            {item.Description2 && <span>{item.Description2}</span>}
+                          </div>
                         </td>
-                        <td className="border border-gray-300 p-2 text-right w-20 text-lg">
+
+                        <td className="border border-gray-300 p-2 text-right w-20 text-lg contentTable">
                           {item.Qty}
                         </td>
-                        <td className="border border-gray-300 p-2 text-right w-32 text-lg">
+                        <td className="border border-gray-300 p-2 text-right w-32 text-lg contentTable">
                           {item.UnitPrice.toFixed(2)}€
                         </td>
-                        <td className="border border-gray-300 p-2 text-right w-32 text-lg">
+                        <td className="border border-gray-300 p-2 text-right w-32 text-lg contentTable">
                           {item.Total.toFixed(2)}€
                         </td>
                       </tr>
@@ -269,7 +270,7 @@ const JsonViewPage = () => {
                   if (Array.isArray(documentTotals) && documentTotals.length > 0) {
                     return documentTotals.map((total) => (
                       <div key={total.ID} className="w-full">
-                        <p className="mt-4 text-5xl flex font-bold gap-20 justify-end">
+                        <p className="mt-4 text-5xl flex font-bold gap-20 justify-end tableTotal">
                           <span>TOTAL BALANCE</span>
                           <span>{total.Balance.toFixed(2)}€</span>
                         </p>
@@ -295,14 +296,8 @@ const JsonViewPage = () => {
             </div>
           </div>
 
-          {/* </div> */}
-
-          <div className="mb-4 mt-20">
-            {/* <h4 className='mb-2 font-semibold'>Fiscal Tax</h4> */}
-            <div className="flex justify-center w-[65%] mx-auto">
-              <div className="bg-gray-300 h-0.5 w-full"></div>
-            </div>
-            <table className="w-auto border-collapse mb-4 text-xs ml-[17%]">
+          <div className="mb-4">
+            <table className="w-auto border-collapse mb-4 text-xs ml-[18.5%] vatTable">
               {" "}
               {/* Mantém a margem alinhada à esquerda */}
               <thead>
@@ -349,51 +344,56 @@ const JsonViewPage = () => {
             </table>
           </div>
 
-          <div className="flex flex-col justify-center text-center">
-            {reservationData && reservationData.requestBody ? (
-              (() => {
-                // Faz o parse do requestBody uma única vez para evitar parse múltiplo
-                const parsedRequestBody = JSON.parse(reservationData.requestBody);
+          <div className="fixed bottom-0 left-0 w-full bg-white shadow-md">
+            {/* <h4 className='mb-2 font-semibold'>Fiscal Tax</h4> */}
+            <div className="flex justify-center w-[65%] mx-auto mb-2 lineContainer">
+              <div className="bg-gray-300 h-0.5 w-full"></div>
+            </div>
+            <div className="flex justify-between items-center mx-auto w-[65%] footerContainer">
+              <div className="">
+                {reservationData && reservationData.requestBody ? (
+                  (() => {
+                    // Faz o parse do requestBody uma única vez para evitar parse múltiplo
+                    const parsedRequestBody = JSON.parse(reservationData.requestBody);
 
-                // Verifica se parsedRequestBody é um array e se o primeiro item tem o array de HotelInfo
-                return Array.isArray(parsedRequestBody) &&
-                  Array.isArray(parsedRequestBody[0]?.HotelInfo) ? (
-                  parsedRequestBody[0].HotelInfo.map((hotelInfo, index) => (
-                    <p key={index}>{hotelInfo.HotelName}</p>
-                  ))
+                    // Verifica se parsedRequestBody é um array e se o primeiro item tem o array de HotelInfo
+                    return Array.isArray(parsedRequestBody) &&
+                      Array.isArray(parsedRequestBody[0]?.HotelInfo) ? (
+                      parsedRequestBody[0].HotelInfo.map((hotelInfo, index) => (
+                        <p key={index}>{hotelInfo.HotelName}</p>
+                      ))
+                    ) : (
+                      <p>Hotel information not available</p> // Exibe mensagem caso HotelInfo esteja ausente
+                    );
+                  })()
                 ) : (
-                  <p>Hotel information not available</p> // Exibe mensagem caso HotelInfo esteja ausente
-                );
-              })()
-            ) : (
-              <p>No reservation data available</p> // Exibe mensagem caso reservationData ou requestBody estejam ausentes
-            )}
+                  <p>No reservation data available</p> // Exibe mensagem caso reservationData ou requestBody estejam ausentes
+                )}
+              </div>
+              {/* Botões de Ação */}
+              <div className="flex gap-3">
+                <CancelPIN
+                  buttonName={"Cancel"}
+                  buttonColor={"transparent"}
+                  modalHeader={"Insert PIN"}
+                  formTypeModal={11}
+                  editor={"teste"}
+                />
+                <button
+                  className="bg-primary text-white font-semibold rounded-lg mb-3"
+                  onClick={handleOkClick}
+                >
+                  <OkPIN
+                    buttonName={"Ok"}
+                    buttonColor={"transparent"}
+                    modalHeader={"Insert PIN"}
+                    formTypeModal={11}
+                    editor={"teste"}
+                  />
+                </button>
+              </div>
+            </div>
           </div>
-
-          {/* Botões de Ação */}
-          <div className="flex gap-4 justify-end mt-4 mr-[17%] mb-3 ">
-            <CancelPIN
-              buttonName={"Cancel"}
-              buttonColor={"transparent"}
-              modalHeader={"Insert PIN"}
-              formTypeModal={11}
-              editor={"teste"}
-            />
-            <button
-              className="bg-primary text-white font-semibold rounded-lg mb-3"
-              onClick={handleOkClick}
-            >
-              <OkPIN
-                buttonName={"Ok"}
-                buttonColor={"transparent"}
-                modalHeader={"Insert PIN"}
-                formTypeModal={11}
-                editor={"teste"}
-              />
-            </button>
-          </div>
-
-
         </>
       ) : (
         <p>Nenhum dado encontrado.</p>
