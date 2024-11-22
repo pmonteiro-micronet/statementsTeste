@@ -11,7 +11,7 @@ export async function GET(request) {
   if (!PropertyID || !HotelID) {  
     return new NextResponse(
       JSON.stringify({ error: "Faltam parâmetros: HotelID ou PropertyID" }),
-      { status: 400 }
+      { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
     );
   }
 
@@ -22,7 +22,7 @@ export async function GET(request) {
   if (isNaN(propertyIDInt)) {
     return new NextResponse(
       JSON.stringify({ error: "PropertyID inválido, deve ser um número" }),
-      { status: 400 }
+      { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
     );
   }
 
@@ -41,7 +41,7 @@ export async function GET(request) {
     if (!property) {
       return new NextResponse(
         JSON.stringify({ error: "PropertyID não encontrado no banco de dados" }),
-        { status: 404 }
+        { status: 404, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
       );
     }
 
@@ -75,12 +75,15 @@ export async function GET(request) {
 
     // Retorna a resposta do Mock Server para o cliente
     console.log("OK: ", response);
-    return new NextResponse(JSON.stringify(response.data), { status: 200 });
+    return new NextResponse(
+      JSON.stringify(response.data),
+      { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
+    );
   } catch (error) {
     console.error("Erro ao enviar dados para a API:", error.response ? error.response.data : error.message);
     return new NextResponse(
       JSON.stringify({ error: error.response ? error.response.data : "Erro ao enviar dados para a API" }),
-      { status: 500 }
+      { status: 500, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
     );
   }
 }
