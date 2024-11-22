@@ -1,19 +1,16 @@
 "use client";
 import React from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, Button, useDisclosure } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@nextui-org/react";
 //imports de icons
 import { MdClose } from "react-icons/md";
 import { Tabs, Tab } from "@nextui-org/react";
 
 const ArrivalInfoForm = ({
-    buttonName,
-    buttonIcon,
     modalHeader,
     editIcon,
     modalEditArrow,
     modalEdit,
     formTypeModal,
-    buttonColor,
     roomNumber,
     dateCI,
     booker,
@@ -24,22 +21,20 @@ const ArrivalInfoForm = ({
     resStatus,
     totalPax,
     balance,
-    country
+    country,
+    isOpen,
+    onClose,
 }) => {
 
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     return (
         <>
             {formTypeModal === 11 && (
                 <>
-                    <Button fullWidth={true} size="md" onPress={onOpen} color={buttonColor} className="-h-3 flex justify-start -p-3">
-                        {buttonName} {buttonIcon}
-                    </Button>
                     <Modal
                         isOpen={isOpen}
                         hideCloseButton={true}
-                        onOpenChange={onOpenChange}
+                        onOpenChange={onClose}
                         isDismissable={false}
                         isKeyboardDismissDisabled={true}
                         className="z-50"

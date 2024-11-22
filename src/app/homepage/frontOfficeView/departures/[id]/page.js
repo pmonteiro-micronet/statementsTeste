@@ -31,6 +31,7 @@ export default function Page({ params }) {
   // const [sendResSuccess, setSendResSuccess] = useState(false); //estado para envio get statement
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const router = useRouter();
 
@@ -112,15 +113,23 @@ export default function Page({ params }) {
         error.response ? error.response.data : error.message
       );
     }
-  };
+};
+
+const handleOpenModal = () => {
+  setIsModalOpen(true);
+};
+
+const handleCloseModal = () => {
+  setIsModalOpen(false);
+};
 
   
   // Função para pegar as reservas
   useEffect(() => {
-    const fetchReservas = async () => {
+    const fetchReservas = async (propertyID) => {
       setIsLoading(true); // Inicia o carregamento
       try {
-        const response = await axios.get("/api/reservations/checkouts");
+        const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
         console.log("Resposta da API:", response.data); // Log da resposta da API
 
         let reservasFiltradas = [];
@@ -163,7 +172,7 @@ export default function Page({ params }) {
       }
     };
 
-    fetchReservas();
+    fetchReservas(propertyID);
   }, [currentDate, postSuccessful]); // Recarrega as reservas sempre que a data mudar
 
   useEffect(() => {
@@ -296,12 +305,28 @@ export default function Page({ params }) {
                               </DropdownTrigger>
                               <DropdownMenu
                                 aria-label="Static Actions"
-                                closeOnSelect={false}
+                                closeOnSelect={true}
                                 isOpen={true}
                                 className="relative z-10"
                               >
-                                <DropdownItem key="edit">
-                                  <DepartureInfoForm
+                                <DropdownItem key="edit" onClick={() => handleOpenModal()}>
+                                  See information
+                                </DropdownItem>
+                                <DropdownItem
+                                  key="show"
+                                  onClick={() => {
+                                    if (reserva.ReservationNumber) {
+                                      sendResToAPI(reserva.ReservationNumber);
+                                    } else {
+                                      console.warn("ReservationNumber não encontrado.");
+                                    }
+                                  }}
+                                >
+                                  Statement
+                                </DropdownItem>
+                              </DropdownMenu>
+                            </Dropdown>
+                            <DepartureInfoForm
                                     buttonName={"Info"}
                                     buttonColor={"transparent"}
                                     modalHeader={"Reservation"}
@@ -318,22 +343,9 @@ export default function Page({ params }) {
                                     totalPax={reserva.TotalPax}
                                     balance={reserva.Balance}
                                     country={reserva.Country}
+                                    isOpen={isModalOpen}
+                                    onClose={handleCloseModal}
                                   />
-                                </DropdownItem>
-                                <DropdownItem
-                                  key="show"
-                                  onClick={() => {
-                                    if (reserva.ReservationNumber) {
-                                      sendResToAPI(reserva.ReservationNumber);
-                                    } else {
-                                      console.warn("ReservationNumber não encontrado.");
-                                    }
-                                  }}
-                                >
-                                  Statement
-                                </DropdownItem>
-                              </DropdownMenu>
-                            </Dropdown>
                           </td>
                           <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.RoomNumber}</td>
                           <td className="pl-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>

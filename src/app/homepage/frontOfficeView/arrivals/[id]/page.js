@@ -29,6 +29,7 @@ export default function Page({ params }) {
   const [sendResSuccess, setSendResSuccess] = useState(false); //estado para envio get statement
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Função para enviar os dados para a API
   const sendDataToAPI = async (dates) => {
@@ -147,6 +148,14 @@ export default function Page({ params }) {
     sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
   };
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+  
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-[#FAFAFA]">
       <div className="flex-grow overflow-y-auto p-4">
@@ -238,25 +247,8 @@ export default function Page({ params }) {
                                 closeOnSelect={false}
                                 isOpen={true}
                               >
-                                <DropdownItem key="edit">
-                                  <ArrivalInfoForm
-                                    buttonName={"Ver info"}
-                                    buttonColor={"transparent"}
-                                    modalHeader={"Reservation"}
-                                    formTypeModal={11}
-                                    editor={"teste"}
-                                    roomNumber={reserva.RoomNumber}  // Passando o roomNumber
-                                    DateCI={reserva.DateCI}  // Passando a data de check-out (DateCI)
-                                    booker={reserva.Booker}
-                                    salutation={reserva.Salutation}
-                                    lastName={reserva.LastName}
-                                    firstName={reserva.FirstName}
-                                    roomType={reserva.RoomType}
-                                    resStatus={reserva.ResStatus}
-                                    totalPax={reserva.TotalPax}
-                                    balance={reserva.Balance}
-                                    country={reserva.Country}
-                                  />
+                                <DropdownItem key="edit"  onClick={() => handleOpenModal()}>
+                                  See information
                                 </DropdownItem>
                                 <DropdownItem
                                   key="show"
@@ -274,6 +266,26 @@ export default function Page({ params }) {
                                 </DropdownItem>
                               </DropdownMenu>
                             </Dropdown>
+                                  <ArrivalInfoForm
+                                    buttonName={"Ver info"}
+                                    buttonColor={"transparent"}
+                                    modalHeader={"Reservation"}
+                                    formTypeModal={11}
+                                    editor={"teste"}
+                                    roomNumber={reserva.RoomNumber}  // Passando o roomNumber
+                                    DateCI={reserva.DateCI}  // Passando a data de check-out (DateCI)
+                                    booker={reserva.Booker}
+                                    salutation={reserva.Salutation}
+                                    lastName={reserva.LastName}
+                                    firstName={reserva.FirstName}
+                                    roomType={reserva.RoomType}
+                                    resStatus={reserva.ResStatus}
+                                    totalPax={reserva.TotalPax}
+                                    balance={reserva.Balance}
+                                    country={reserva.Country}
+                                    isOpen={isModalOpen}
+                                    onClose={handleCloseModal}
+                                  />
                           </td>
                           <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.RoomNumber}</td>
                           <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.RoomStatus}</td>
