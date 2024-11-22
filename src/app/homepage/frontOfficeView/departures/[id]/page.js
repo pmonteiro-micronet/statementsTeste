@@ -130,7 +130,6 @@ export default function Page({ params }) {
       setIsLoading(true);
       try {
         const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
-        console.log("crlh ", response.data.response);
 
         // Parsear o `requestBody` (que é uma string JSON) para um array de objetos
         const reservasArray = JSON.parse(response.data.response[0].requestBody);
