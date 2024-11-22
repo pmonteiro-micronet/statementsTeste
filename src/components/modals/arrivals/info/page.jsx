@@ -24,22 +24,20 @@ const ArrivalInfoForm = ({
     resStatus,
     totalPax,
     balance,
-    country
+    country,
+    isOpen,
+    onClose,
 }) => {
 
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     return (
         <>
             {formTypeModal === 11 && (
                 <>
-                    <Button fullWidth={true} size="md" onPress={onOpen} color={buttonColor} className="-h-3 flex justify-start -p-3">
-                        {buttonName} {buttonIcon}
-                    </Button>
                     <Modal
                         isOpen={isOpen}
                         hideCloseButton={true}
-                        onOpenChange={onOpenChange}
+                        onOpenChange={onClose}
                         isDismissable={false}
                         isKeyboardDismissDisabled={true}
                         className="z-50"

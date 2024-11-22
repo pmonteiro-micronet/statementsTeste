@@ -31,6 +31,7 @@ export default function Page({ params }) {
   // const [sendResSuccess, setSendResSuccess] = useState(false); //estado para envio get statement
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const router = useRouter();
 
@@ -109,13 +110,21 @@ const sendDataToAPI = async () => {
     );
   }
 };
+
+const handleOpenModal = () => {
+  setIsModalOpen(true);
+};
+
+const handleCloseModal = () => {
+  setIsModalOpen(false);
+};
   
   // Função para pegar as reservas
   useEffect(() => {
-    const fetchReservas = async () => {
+    const fetchReservas = async (propertyID) => {
       setIsLoading(true); // Inicia o carregamento
       try {
-        const response = await axios.get("/api/reservations/checkouts");
+        const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
         console.log("Resposta da API:", response.data); // Log da resposta da API
 
         let reservasFiltradas = [];
@@ -158,7 +167,7 @@ const sendDataToAPI = async () => {
       }
     };
 
-    fetchReservas();
+    fetchReservas(propertyID);
   }, [currentDate, postSuccessful]); // Recarrega as reservas sempre que a data mudar
 
   // UseMemo para preparar os dados filtrados de acordo com a paginação
@@ -268,28 +277,11 @@ const sendDataToAPI = async () => {
                               </DropdownTrigger>
                               <DropdownMenu
                                 aria-label="Static Actions"
-                                closeOnSelect={false}
+                                closeOnSelect={true}
                                 isOpen={true}
                               >
-                                <DropdownItem key="edit">
-                                  <DepartureInfoForm
-                                    buttonName={"Info"}
-                                    buttonColor={"transparent"}
-                                    modalHeader={"Reservation"}
-                                    formTypeModal={11}
-                                    editor={"teste"}
-                                    roomNumber={reserva.RoomNumber}  // Passando o roomNumber
-                                    dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
-                                    booker={reserva.Booker}
-                                    salutation={reserva.Salutation}
-                                    lastName={reserva.LastName}
-                                    firstName={reserva.FirstName}
-                                    roomType={reserva.RoomType}
-                                    resStatus={reserva.ResStatus}
-                                    totalPax={reserva.TotalPax}
-                                    balance={reserva.Balance}
-                                    country={reserva.Country}
-                                  />
+                                <DropdownItem key="edit" onClick={() => handleOpenModal()}>
+                                  See information
                                 </DropdownItem>
                                 <DropdownItem
                                   key="show"
@@ -306,6 +298,26 @@ const sendDataToAPI = async () => {
 
                               </DropdownMenu>
                             </Dropdown>
+                            <DepartureInfoForm
+                                    buttonName={"Info"}
+                                    buttonColor={"transparent"}
+                                    modalHeader={"Reservation"}
+                                    formTypeModal={11}
+                                    editor={"teste"}
+                                    roomNumber={reserva.RoomNumber}  // Passando o roomNumber
+                                    dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
+                                    booker={reserva.Booker}
+                                    salutation={reserva.Salutation}
+                                    lastName={reserva.LastName}
+                                    firstName={reserva.FirstName}
+                                    roomType={reserva.RoomType}
+                                    resStatus={reserva.ResStatus}
+                                    totalPax={reserva.TotalPax}
+                                    balance={reserva.Balance}
+                                    country={reserva.Country}
+                                    isOpen={isModalOpen}
+                                    onClose={handleCloseModal}
+                                  />
                           </td>
                           <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.RoomNumber}</td>
                           <td className="pl-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
