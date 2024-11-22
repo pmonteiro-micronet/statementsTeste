@@ -1,111 +1,98 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/db"; 
+import { PrismaClient } from "@prisma/client";
 
-const generateUniqueKey = (HotelInfo, Reservation, GuestInfo) => {
-  if (!HotelInfo || !Reservation || !GuestInfo) {
-    throw new Error("Dados insuficientes para gerar a chave única.");
-  }
+const prisma = new PrismaClient();
 
-  const { Tag } = HotelInfo;
-  const { RoomNumber, ReservationNumber, DateCI, DateCO } = Reservation;
-  const { FirstName, LastName } = GuestInfo;
-
-  return `${Tag}-${RoomNumber}-${ReservationNumber}-${DateCI}-${DateCO}-${FirstName}-${LastName}`;
-};
-
+// Função para lidar com requisições POST
 export async function POST(req) {
   console.log("Received POST request");
 
+  let newRequest; // Definido para capturar o novo registro
   try {
-    const body = await req.json(); // Parse o corpo da requisição
+    const body = await req.json(); // Ler o corpo da requisição
+    
+    // Extrair o campo Tag do JSON
+    const { HotelInfo } = body[0];
+    const tag = HotelInfo[0].Tag;
 
-    // Verificar se o corpo da requisição é válido
-    if (!Array.isArray(body) || body.length === 0) {
-      return NextResponse.json(
-        { message: "O corpo da requisição deve ser um array não vazio." },
-        { status: 400 }
-      );
-    }
-
-    // Extraindo o primeiro objeto do array
-    const requestData = body[0];
-
-    // Extraindo propriedades e verificando a existência
-    const HotelInfo = requestData.HotelInfo?.[0];
-    const Reservation = requestData.Reservation?.[0];
-    const GuestInfo = requestData.GuestInfo?.[0];
-
-    if (!HotelInfo || !Reservation || !GuestInfo) {
-      return NextResponse.json(
-        { message: "Dados obrigatórios ausentes: HotelInfo, Reservation ou GuestInfo." },
-        { status: 400 }
-      );
-    }
-
-    // Gerar a chave única para identificar o pedido
-    const uniqueKey = generateUniqueKey(HotelInfo, Reservation, GuestInfo);
-    console.log("Generated unique key:", uniqueKey);
-
-    // Verificar se já existe um pedido com a mesma chave única
-    const existingRequest = await prisma.requestRecords.findFirst({
-      where: {
-        uniqueKey: uniqueKey,
-      },
-    });
-
-    console.log("Existing request check:", existingRequest);
-    if (existingRequest) {
-      return NextResponse.json(
-        { message: "Pedido com os mesmos dados já existe." },
-        { status: 409 }
-      );
-    }
-
-    // Buscar a propriedade no banco
+    // Verificar se existe uma propriedade com o campo propertyTag igual ao valor de Tag
     const property = await prisma.properties.findFirst({
-      where: { propertyTag: HotelInfo.Tag },
+      where: { propertyTag: tag },
     });
 
-    console.log("Property found:", property);
-    console.log("Propriedade nao encontrada: ", !property);
     if (!property) {
+      // Se não encontrar a propriedade, retornar erro 404
       return NextResponse.json(
-        { message: `Propriedade com Tag '${HotelInfo.Tag}' não encontrada.` },
+        { message: `Propriedade com Tag '${tag}' não encontrada.`},
         { status: 404 }
       );
     }
 
-    // Criar o registro no banco
-    const newRequest = await prisma.requestRecords.create({
+    // Criar o objeto que vamos salvar em requestRecords, usando o propertyID encontrado
+    newRequest = await prisma.requestRecords.create({
       data: {
-        requestBody: JSON.stringify(body),
+        requestBody: JSON.stringify(body), // Armazena o corpo completo como JSON
         requestType: "POST",
         requestDateTime: new Date(),
         responseStatus: "201",
         responseBody: "",
-        propertyID: property.propertyID,
+        propertyID: property.propertyID, // Usar o propertyID encontrado
         seen: false,
-        uniqueKey: uniqueKey,
       },
     });
 
-    console.log("New data saved to DB:", newRequest);
+    console.log("Data saved to DB:", newRequest);
 
-    return NextResponse.json(
-      { message: "Dados armazenados com sucesso.", data: newRequest },
-      { status: 201 }
-    );
+    // Prepare a resposta a ser enviada
+    const responseBody = {
+      message: "Dados armazenados com sucesso",
+      data: newRequest,
+    };
+
+    return NextResponse.json(responseBody, { status: 201 });
   } catch (error) {
     console.error("Erro ao gravar os dados:", error.message);
     console.error("Detalhes do erro:", error);
 
+    // Se newRequest foi criado, atualize com erro
+    if (newRequest) {
+      await prisma.requestRecords.update({
+        where: { id: newRequest.id },
+        data: {
+          responseStatus: "500",
+          responseBody: JSON.stringify({
+            message: "Erro ao gravar os dados",
+            error: error.message,
+          }),
+        },
+      });
+      console.log("Erro salvo no DB para o request", newRequest.id);
+    } else {
+      // Caso não tenha conseguido criar newRequest, criar um novo registro de erro
+      await prisma.requestRecords.create({
+        data: {
+          requestBody: JSON.stringify(body),
+          requestType: "POST",
+          requestDateTime: new Date(),
+          responseStatus: "500",
+          responseBody: JSON.stringify({
+            message: "Erro ao gravar os dados",
+            error: error.message,
+          }),
+          propertyID: -1,
+          seen: false,
+        },
+      });
+      console.log("Erro ao criar request. Novo erro salvo no DB.");
+    }
+
+    // Retorne o erro ao cliente
     return NextResponse.json(
-      { message: "Erro ao processar a requisição.", error: error.message },
+      { message: "Erro ao gravar os dados", error: error.message },
       { status: 500 }
     );
   }
 }
-
 
 // Função para lidar com requisições GET
 export async function GET() {
