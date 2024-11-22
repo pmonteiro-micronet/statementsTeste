@@ -19,7 +19,7 @@ export async function POST(req) {
   let newRequest; // Variável para armazenar o novo pedido
   try {
     const body = await req.json(); // Ler o corpo da requisição
-    
+    console.log("REQUEST BODY " , body);
     // Extrair os dados necessários do corpo da requisição
     const { HotelInfo, Reservation, GuestInfo } = body[0];
     const uniqueKey = generateUniqueKey(HotelInfo, Reservation, GuestInfo); // Gerar a chave única
