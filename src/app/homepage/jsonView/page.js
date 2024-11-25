@@ -22,7 +22,7 @@ const JsonViewPage = () => {
 
   const { query } = router; // Obtenha o objeto query
   const recordID = query ? query.recordID : null;
-
+  console.log("recordID!!!!!!! ", recordID);
   useEffect(() => {
     const preventBackNavigation = () => {
       window.history.pushState(null, null, window.location.href);
