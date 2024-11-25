@@ -20,6 +20,10 @@ const JsonViewPage = () => {
   const { data: session, status } = useSession();
   const [propertyID, setPropertyID] = useState("");
 
+  // Captura o recordID da query string da URL
+  const { query } = useRouter();
+  const recordID = query.recordID; // assuming the recordID is passed in the URL query string
+
   useEffect(() => {
     const preventBackNavigation = () => {
       window.history.pushState(null, null, window.location.href);
@@ -36,7 +40,6 @@ const JsonViewPage = () => {
       window.removeEventListener('popstate', preventBackNavigation);
     };
   }, []);
-
 
   useEffect(() => {
     const checkSession = async () => {
@@ -57,8 +60,6 @@ const JsonViewPage = () => {
   }, [session, status, router]);
 
   useEffect(() => {
-    const recordID = localStorage.getItem("recordID");
-    console.log("RECORD ID CAPTURADO:", recordID);
     if (recordID && propertyID) {
       const fetchReservation = async () => {
         setLoading(true);
@@ -74,7 +75,7 @@ const JsonViewPage = () => {
       };
       fetchReservation();
     }
-  }, [propertyID]);
+  }, [recordID, propertyID]); // Use recordID na dependência
 
   useEffect(() => {
     // Verifica se a imagem existe

@@ -93,7 +93,7 @@ export default function Page({ params }) {
       console.log("Resposta da API ao salvar statement:", saveResponse.data);
   
       // Aguarda brevemente para dar tempo à base de dados sincronizar o novo registro
-      await new Promise(resolve => setTimeout(resolve, 500)); // 500ms de atraso opcional
+      await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms de atraso opcional
   
       // Após o envio, busca o recordID do último registro
       const response = await axios.get("/api/get_jsons");
@@ -104,12 +104,14 @@ export default function Page({ params }) {
       if (lastRecord && lastRecord.requestID) {
         const lastRecordID = lastRecord.requestID;
   
-        // Salva o recordID no localStorage
-        localStorage.setItem("recordID", lastRecordID);
-        console.log("RecordID armazenado no localStorage:", lastRecordID);
+        console.log("RecordID encontrado:", lastRecordID);
   
-        // Redireciona para a página jsonView
-        router.push("/homepage/jsonView");
+        // Redireciona para a página jsonView, passando o recordID no estado
+        router.push({
+          pathname: "/homepage/jsonView",
+          query: {}, // Sem expor o número diretamente na URL
+          state: { recordID: lastRecordID }, // Armazena no estado do roteamento
+        });
       } else {
         console.warn("RecordID não encontrado na resposta da API.");
       }
@@ -119,7 +121,8 @@ export default function Page({ params }) {
         error.response ? error.response.data : error.message
       );
     }
-  };  
+  };
+  
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
