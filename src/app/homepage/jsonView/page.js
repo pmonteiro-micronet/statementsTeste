@@ -12,34 +12,30 @@ const JsonViewPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [userPinHash, setUserPinHash] = useState(""); // Estado para o hash do pin do usuário logado
-  const router = useRouter();
-  console.log(userPinHash, showModal);
-  const [imageExists, setImageExists] = useState(false);
-
-  const { data: session, status } = useSession();
+  const [userPinHash, setUserPinHash] = useState("");
+  const [recordID, setRecordID] = useState(null); // Estado local para armazenar o recordID
   const [propertyID, setPropertyID] = useState("");
+  const router = useRouter();
+  const { data: session, status } = useSession();
 
-  const { query } = router; // Obtenha o objeto query
-  const recordID = query ? query.recordID : null;
-  console.log("recordID!!!!!!! ", recordID);
+  console.log(userPinHash, showModal, recordID);
+
   useEffect(() => {
     const preventBackNavigation = () => {
       window.history.pushState(null, null, window.location.href);
     };
 
     // Adiciona evento para prevenir retrocesso
-    window.addEventListener('popstate', preventBackNavigation);
+    window.addEventListener("popstate", preventBackNavigation);
 
     // Configura o estado inicial do histórico
     window.history.pushState(null, null, window.location.href);
 
     return () => {
       // Remove o evento quando o componente é desmontado
-      window.removeEventListener('popstate', preventBackNavigation);
+      window.removeEventListener("popstate", preventBackNavigation);
     };
   }, []);
-
 
   useEffect(() => {
     const checkSession = async () => {
@@ -48,16 +44,26 @@ const JsonViewPage = () => {
       if (!session) {
         router.push("/auth");
       } else {
-        // Pega o propertyID e o pin do usuário da sessão
         const userPropertyID = localStorage.getItem("recordPropertyID");
-        const userPinHash = session?.user?.pin; // Supondo que o pin armazenado é o hash
+        const userPinHash = session?.user?.pin;
         setPropertyID(userPropertyID);
-        setUserPinHash(userPinHash); // Armazena o hash do pin
+        setUserPinHash(userPinHash);
       }
     };
 
     checkSession();
   }, [session, status, router]);
+
+  useEffect(() => {
+    if (router.isReady) {
+      const queryRecordID = router.query?.recordID;
+      if (queryRecordID) {
+        setRecordID(queryRecordID); // Atualiza o estado quando recordID está disponível
+      } else {
+        setError("Erro: recordID está undefined.");
+      }
+    }
+  }, [router]);
 
   useEffect(() => {
     if (recordID) {
@@ -74,10 +80,8 @@ const JsonViewPage = () => {
         }
       };
       fetchReservation();
-    } else {
-      setError("Erro: recordID está undefined."); // Define um erro se recordID for undefined
     }
-  }, [recordID]); // Adiciona recordID como dependência
+  }, [recordID]);
 
   useEffect(() => {
     // Verifica se a imagem existe
