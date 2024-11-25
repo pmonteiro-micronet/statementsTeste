@@ -58,6 +58,7 @@ const JsonViewPage = () => {
 
   useEffect(() => {
     const recordID = localStorage.getItem("recordID");
+    console.log("RECORD ID CAPTURADO:", recordID);
     if (recordID && propertyID) {
       const fetchReservation = async () => {
         setLoading(true);
