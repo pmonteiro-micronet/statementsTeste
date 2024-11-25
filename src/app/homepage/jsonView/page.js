@@ -59,6 +59,7 @@ const JsonViewPage = () => {
       const queryRecordID = router.query?.recordID;
       if (queryRecordID) {
         setRecordID(queryRecordID); // Atualiza o estado quando recordID está disponível
+        console.log("recordID!!!!!!!!!!!!! RECID: ", recordID);
       } else {
         setError("Erro: recordID está undefined.");
       }
