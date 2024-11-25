@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import OkPIN from "@/components/modals/pin/ok/page";  // Importação do modal OkPIN
-import CancelPIN from "@/components/modals/pin/cancel/page";  // Importação do modal CancelPIN
+import OkPIN from "@/components/modals/pin/ok/page";
+import CancelPIN from "@/components/modals/pin/cancel/page";
 import "./styles.css";
 
 const JsonViewPage = () => {
@@ -14,6 +14,7 @@ const JsonViewPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [userPinHash, setUserPinHash] = useState(""); // Estado para o hash do pin do usuário logado
   const router = useRouter();
+  console.log(userPinHash, showModal);
   const [imageExists, setImageExists] = useState(false);
 
   const { data: session, status } = useSession();
@@ -36,6 +37,7 @@ const JsonViewPage = () => {
     };
   }, []);
 
+
   useEffect(() => {
     const checkSession = async () => {
       if (status === "loading") return;
@@ -56,7 +58,7 @@ const JsonViewPage = () => {
 
   useEffect(() => {
     const recordID = localStorage.getItem("recordID");
-
+    console.log("RECORD ID CAPTURADO:", recordID);
     if (recordID && propertyID) {
       const fetchReservation = async () => {
         setLoading(true);
@@ -235,22 +237,109 @@ const JsonViewPage = () => {
                           {item.Qty}
                         </td>
                         <td className="border border-gray-300 p-2 text-right w-32 text-lg contentTable">
-                          {item.UnitPrice !== undefined && item.UnitPrice !== null
-                            ? item.UnitPrice.toFixed(2)
-                            : 'N/A'}€
+                          {item.UnitPrice.toFixed(2)}€
                         </td>
                         <td className="border border-gray-300 p-2 text-right w-32 text-lg contentTable">
-                          {item.Total !== undefined && item.Total !== null
-                            ? item.Total.toFixed(2)
-                            : 'N/A'}€
+                          {item.Total.toFixed(2)}€
                         </td>
                       </tr>
                     ))
                   ) : (
-                    <p>No items available</p>
+                    <tr>
+                      <td colSpan="5" className="text-center p-2">
+                        No items found.
+                      </td>
+                    </tr>
                   )
                 ) : (
-                  <p>Loading item data...</p>
+                  <tr>
+                    <td colSpan="5" className="text-center p-2">
+                      Loading reservation data...
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+
+            </table>
+
+            <div className="flex justify-end w-[80%] mx-auto">
+              {reservationData && reservationData.requestBody ? (
+                (() => {
+                  const parsedData = JSON.parse(reservationData.requestBody);
+                  const documentTotals = parsedData[0]?.DocumentTotals;
+
+                  if (Array.isArray(documentTotals) && documentTotals.length > 0) {
+                    return documentTotals.map((total) => (
+                      <div key={total.ID} className="w-full">
+                        <p className="mt-4 text-5xl flex font-bold gap-20 justify-end tableTotal">
+                          <span>TOTAL BALANCE</span>
+                          <span>{total.Balance.toFixed(2)}€</span>
+                        </p>
+                      </div>
+                    ));
+                  } else {
+                    return (
+                      <div className="w-full">
+                        <p className="mt-4 text-5xl flex font-bold gap-20 justify-end text-gray-500">
+                          Nenhum total disponível.
+                        </p>
+                      </div>
+                    );
+                  }
+                })()
+              ) : (
+                <div className="w-full">
+                  <p className="mt-4 text-5xl flex font-bold gap-20 justify-end text-gray-500">
+                    Nenhum total disponível.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <table className="w-auto border-collapse mb-4 text-xs ml-[18.5%] vatTable">
+              {" "}
+              {/* Mantém a margem alinhada à esquerda */}
+              <thead>
+                <tr>
+                  <th className="p-2 text-left">VAT</th>
+                  <th className="p-2 text-right">Gross</th>
+                  <th className="p-2 text-right">Net</th>
+                  <th className="p-2 text-right">Tax</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reservationData && reservationData.requestBody ? (
+                  (() => {
+                    const parsedData = JSON.parse(reservationData.requestBody);
+                    const taxes = parsedData[0]?.Taxes;
+
+                    if (Array.isArray(taxes) && taxes.length > 0) {
+                      return taxes.map((tax) => (
+                        <tr key={tax.ID}>
+                          <td className="p-2">{tax.Taxes}%</td>
+                          <td className="p-2 text-right">{tax.TotalWithTaxes.toFixed(2)}€</td>
+                          <td className="p-2 text-right">{tax.TotalWithOutTaxes.toFixed(2)}€</td>
+                          <td className="p-2 text-right">{tax.TotalTaxes.toFixed(2)}€</td>
+                        </tr>
+                      ));
+                    } else {
+                      return (
+                        <tr>
+                          <td colSpan={4} className="p-2 text-center text-gray-500">
+                            Nenhum imposto disponível.
+                          </td>
+                        </tr>
+                      );
+                    }
+                  })()
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="p-2 text-center text-gray-500">
+                      Carregando dados...
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
