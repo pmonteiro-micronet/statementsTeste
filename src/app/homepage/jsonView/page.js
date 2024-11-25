@@ -20,6 +20,9 @@ const JsonViewPage = () => {
   const { data: session, status } = useSession();
   const [propertyID, setPropertyID] = useState("");
 
+  const { query } = router; // Obtenha o objeto query
+  const recordID = query ? query.recordID : null;
+
   useEffect(() => {
     const preventBackNavigation = () => {
       window.history.pushState(null, null, window.location.href);
@@ -57,9 +60,7 @@ const JsonViewPage = () => {
   }, [session, status, router]);
 
   useEffect(() => {
-    const recordID = localStorage.getItem("recordID");
-    console.log("RECORD ID CAPTURADO:", recordID);
-    if (recordID && propertyID) {
+    if (recordID) {
       const fetchReservation = async () => {
         setLoading(true);
         setError(null);
@@ -67,14 +68,16 @@ const JsonViewPage = () => {
           const response = await axios.get(`/api/get_jsons/${recordID}`);
           setReservationData(response.data.response[0]);
         } catch (error) {
-          setError("Erro ao carregar os dados.", error);
+          setError("Erro ao carregar os dados: " + error.message);
         } finally {
           setLoading(false);
         }
       };
       fetchReservation();
+    } else {
+      setError("Erro: recordID está undefined."); // Define um erro se recordID for undefined
     }
-  }, [propertyID]);
+  }, [recordID]); // Adiciona recordID como dependência
 
   useEffect(() => {
     // Verifica se a imagem existe
