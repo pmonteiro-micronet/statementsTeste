@@ -78,7 +78,7 @@ export default function Page({ params }) {
   const sendResToAPI = async (ResNo) => {
     console.log("Enviando ResNumber para a API:", ResNo);
     const windowValue = 0;
-  
+
     try {
       // Faz a requisição para enviar os dados do statement
       const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
@@ -88,28 +88,24 @@ export default function Page({ params }) {
           propertyID,
         },
       });
-  
+
       console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
       console.log("Resposta da API ao salvar statement:", saveResponse.data);
-  
+
       // Aguarda brevemente para dar tempo à base de dados sincronizar o novo registro
       await new Promise(resolve => setTimeout(resolve, 500)); // 500ms de atraso opcional
-  
+
       // Após o envio, busca o recordID do último registro
       const response = await axios.get("/api/get_jsons");
       console.log("Resposta da API ao buscar registros:", response.data);
-  
+
       // Buscar o último `requestID` na lista de respostas
       const lastRecord = response.data.response.sort((a, b) => b.requestID - a.requestID)[0]; // Ordena por requestID desc
       if (lastRecord && lastRecord.requestID) {
         const lastRecordID = lastRecord.requestID;
-  
-        // Salva o recordID no localStorage
-        localStorage.setItem("recordID", lastRecordID);
-        console.log("RecordID armazenado no localStorage:", lastRecordID);
-  
-        // Redireciona para a página jsonView
-        router.push("/homepage/jsonView");
+
+        // Redireciona para a página jsonView com os parâmetros na URL
+        router.push(`/homepage/jsonView?recordID=${lastRecordID}&propertyID=${propertyID}`);
       } else {
         console.warn("RecordID não encontrado na resposta da API.");
       }
@@ -120,7 +116,7 @@ export default function Page({ params }) {
       );
     }
   };  
-
+  
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };

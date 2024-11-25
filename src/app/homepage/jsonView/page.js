@@ -57,8 +57,12 @@ const JsonViewPage = () => {
   }, [session, status, router]);
 
   useEffect(() => {
-    const recordID = localStorage.getItem("recordID");
-    console.log("RECORD ID CAPTURADO:", recordID);
+    // Captura os parâmetros da URL
+    const queryParams = new URLSearchParams(window.location.search);
+    const recordID = queryParams.get("recordID");
+    const propertyID = queryParams.get("propertyID");
+    setPropertyID(propertyID); // Armazena o propertyID
+
     if (recordID && propertyID) {
       const fetchReservation = async () => {
         setLoading(true);
@@ -67,14 +71,14 @@ const JsonViewPage = () => {
           const response = await axios.get(`/api/get_jsons/${recordID}`);
           setReservationData(response.data.response[0]);
         } catch (error) {
-          setError("Erro ao carregar os dados.", error);
+          setError("Erro ao carregar os dados: ", error);
         } finally {
           setLoading(false);
         }
       };
       fetchReservation();
     }
-  }, [propertyID]);
+  }, []);
 
   useEffect(() => {
     // Verifica se a imagem existe
