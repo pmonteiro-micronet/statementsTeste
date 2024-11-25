@@ -20,9 +20,8 @@ const JsonViewPage = () => {
   const { data: session, status } = useSession();
   const [propertyID, setPropertyID] = useState("");
 
-  // Captura o recordID da query string da URL
-  const { query } = useRouter();
-  const recordID = query.recordID; // assuming the recordID is passed in the URL query string
+  const { query } = router; // Obtenha o objeto query
+  const recordID = query ? query.recordID : null;
 
   useEffect(() => {
     const preventBackNavigation = () => {
@@ -40,6 +39,7 @@ const JsonViewPage = () => {
       window.removeEventListener('popstate', preventBackNavigation);
     };
   }, []);
+
 
   useEffect(() => {
     const checkSession = async () => {
@@ -60,7 +60,7 @@ const JsonViewPage = () => {
   }, [session, status, router]);
 
   useEffect(() => {
-    if (recordID && propertyID) {
+    if (recordID) {
       const fetchReservation = async () => {
         setLoading(true);
         setError(null);
@@ -68,14 +68,16 @@ const JsonViewPage = () => {
           const response = await axios.get(`/api/get_jsons/${recordID}`);
           setReservationData(response.data.response[0]);
         } catch (error) {
-          setError("Erro ao carregar os dados.", error);
+          setError("Erro ao carregar os dados: " + error.message);
         } finally {
           setLoading(false);
         }
       };
       fetchReservation();
+    } else {
+      setError("Erro: recordID está undefined."); // Define um erro se recordID for undefined
     }
-  }, [recordID, propertyID]); // Use recordID na dependência
+  }, [recordID]); // Adiciona recordID como dependência
 
   useEffect(() => {
     // Verifica se a imagem existe
