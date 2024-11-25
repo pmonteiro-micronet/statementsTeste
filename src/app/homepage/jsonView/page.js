@@ -65,7 +65,7 @@ const JsonViewPage = () => {
           const response = await axios.get(`/api/get_jsons/${recordID}`);
           setReservationData(response.data.response[0]);
         } catch (error) {
-          setError("Erro ao carregar os dados.");
+          setError("Erro ao carregar os dados:", error);
         } finally {
           setLoading(false);
         }
