@@ -12,13 +12,13 @@ const JsonViewPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [userPinHash, setUserPinHash] = useState("");
-  const [recordID, setRecordID] = useState(null); // Estado local para armazenar o recordID
-  const [propertyID, setPropertyID] = useState("");
+  const [userPinHash, setUserPinHash] = useState(""); // Estado para o hash do pin do usuário logado
   const router = useRouter();
-  const { data: session, status } = useSession();
+  console.log(userPinHash, showModal);
+  const [imageExists, setImageExists] = useState(false);
 
-  console.log(userPinHash, showModal, recordID);
+  const { data: session, status } = useSession();
+  const [propertyID, setPropertyID] = useState("");
 
   useEffect(() => {
     const preventBackNavigation = () => {
@@ -26,16 +26,17 @@ const JsonViewPage = () => {
     };
 
     // Adiciona evento para prevenir retrocesso
-    window.addEventListener("popstate", preventBackNavigation);
+    window.addEventListener('popstate', preventBackNavigation);
 
     // Configura o estado inicial do histórico
     window.history.pushState(null, null, window.location.href);
 
     return () => {
       // Remove o evento quando o componente é desmontado
-      window.removeEventListener("popstate", preventBackNavigation);
+      window.removeEventListener('popstate', preventBackNavigation);
     };
   }, []);
+
 
   useEffect(() => {
     const checkSession = async () => {
@@ -44,26 +45,16 @@ const JsonViewPage = () => {
       if (!session) {
         router.push("/auth");
       } else {
+        // Pega o propertyID e o pin do usuário da sessão
         const userPropertyID = localStorage.getItem("recordPropertyID");
-        const userPinHash = session?.user?.pin;
+        const userPinHash = session?.user?.pin; // Supondo que o pin armazenado é o hash
         setPropertyID(userPropertyID);
-        setUserPinHash(userPinHash);
+        setUserPinHash(userPinHash); // Armazena o hash do pin
       }
     };
 
     checkSession();
   }, [session, status, router]);
-
-  useEffect(() => {
-    if (router.isReady) {
-      const queryRecordID = router.query.recordID; // Acesse diretamente o recordID
-      if (queryRecordID) {
-        setRecordID(queryRecordID); // Atualiza o estado quando recordID está disponível
-      } else {
-        setError("Erro: recordID está undefined.");
-      }
-    }
-  }, [router.isReady, router.query]); // Adiciona router.query como dependência
 
   useEffect(() => {
     if (recordID) {
@@ -74,14 +65,14 @@ const JsonViewPage = () => {
           const response = await axios.get(`/api/get_jsons/${recordID}`);
           setReservationData(response.data.response[0]);
         } catch (error) {
-          setError("Erro ao carregar os dados: " + error.message);
+          setError("Erro ao carregar os dados.");
         } finally {
           setLoading(false);
         }
       };
       fetchReservation();
     }
-  }, [recordID]);
+  }, [recordID]); // Adiciona recordID como dependência
 
   useEffect(() => {
     // Verifica se a imagem existe

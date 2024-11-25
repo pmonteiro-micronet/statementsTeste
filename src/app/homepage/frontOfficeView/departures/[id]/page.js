@@ -78,7 +78,7 @@ export default function Page({ params }) {
   const sendResToAPI = async (ResNo) => {
     console.log("Enviando ResNumber para a API:", ResNo);
     const windowValue = 0;
-
+  
     try {
       // Faz a requisição para enviar os dados do statement
       const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
@@ -88,30 +88,28 @@ export default function Page({ params }) {
           propertyID,
         },
       });
-
+  
       console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
       console.log("Resposta da API ao salvar statement:", saveResponse.data);
-
+  
       // Aguarda brevemente para dar tempo à base de dados sincronizar o novo registro
       await new Promise(resolve => setTimeout(resolve, 500)); // 500ms de atraso opcional
-
+  
       // Após o envio, busca o recordID do último registro
       const response = await axios.get("/api/get_jsons");
       console.log("Resposta da API ao buscar registros:", response.data);
-
+  
       // Buscar o último `requestID` na lista de respostas
       const lastRecord = response.data.response.sort((a, b) => b.requestID - a.requestID)[0]; // Ordena por requestID desc
       if (lastRecord && lastRecord.requestID) {
         const lastRecordID = lastRecord.requestID;
-
-        // // Salva o recordID no localStorage
-        // localStorage.setItem("recordID", lastRecordID);
-        // console.log("RecordID armazenado no localStorage:", lastRecordID);
-
-        // // Redireciona para a página jsonView
-        // router.push("/homepage/jsonView");
-        // Redireciona para a página jsonView com recordID na URL
-        router.push(`/homepage/jsonView?recordID=${lastRecordID}`);
+  
+        // Salva o recordID no localStorage
+        localStorage.setItem("recordID", lastRecordID);
+        console.log("RecordID armazenado no localStorage:", lastRecordID);
+  
+        // Redireciona para a página jsonView
+        router.push("/homepage/jsonView");
       } else {
         console.warn("RecordID não encontrado na resposta da API.");
       }
@@ -121,7 +119,7 @@ export default function Page({ params }) {
         error.response ? error.response.data : error.message
       );
     }
-  };
+  };  
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -139,7 +137,7 @@ export default function Page({ params }) {
       try {
         const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
         console.log("Response completo:", response);
-
+  
         // Combinar todos os requestBody dentro de response.data.response
         const reservasArray = response.data.response.flatMap(item => {
           try {
@@ -149,15 +147,15 @@ export default function Page({ params }) {
             return [];
           }
         });
-
+  
         console.log("Reservas após parse (todas as linhas):", reservasArray);
-
+  
         // Se nenhuma reserva for encontrada
         if (reservasArray.length === 0) {
           console.warn("Nenhuma reserva encontrada após parse.");
           return;
         }
-
+  
         // Filtrar reservas pela data atual
         const formattedCurrentDate = dayjs(currentDate).format('YYYY-MM-DD');
         const reservasFiltradas = reservasArray.filter(reserva => {
@@ -165,18 +163,18 @@ export default function Page({ params }) {
             console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva);
             return false;
           }
-
+  
           const formattedDateCO = dayjs(reserva.DateCO).format('YYYY-MM-DD');
           return formattedDateCO === formattedCurrentDate;
         });
-
+  
         console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
-
+  
         // Remover duplicatas com base no número da reserva (ResNo)
         const reservasUnicas = Array.from(
           new Map(reservasFiltradas.map(reserva => [reserva.ResNo, reserva])).values()
         );
-
+  
         console.log("Reservas únicas para a data atual:", reservasUnicas);
         setReservas(reservasUnicas);
       } catch (error) {
@@ -185,11 +183,11 @@ export default function Page({ params }) {
         setIsLoading(false);
       }
     };
-
+  
     fetchReservas();
-  }, [currentDate, propertyID]);
-
-
+  }, [currentDate, propertyID]);  
+  
+  
   useEffect(() => {
     const fetchHotelName = async () => {
       try {
