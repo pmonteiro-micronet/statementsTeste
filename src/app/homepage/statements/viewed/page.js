@@ -56,8 +56,11 @@ const VistosPage = () => {
   );
 
   const handleCardClick = (json) => {
-    localStorage.setItem("recordID", json.requestID);
-    router.push("/homepage/jsonView");
+    const recordID = json.requestID;
+    const propertyID = json.propertyID;
+  
+    // Redireciona para a página jsonView com os parâmetros na URL
+    router.push(`/homepage/jsonView?recordID=${recordID}&propertyID=${propertyID}`);
   };
 
   if (status === "loading") {

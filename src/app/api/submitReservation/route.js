@@ -3,6 +3,19 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// Função para gerar a `uniqueKey`
+const generateUniqueKey = (HotelInfo, Reservation, GuestInfo) => {
+  if (!HotelInfo || !Reservation || !GuestInfo) {
+    throw new Error("Dados insuficientes para gerar a chave única.");
+  }
+
+  const { Tag } = HotelInfo;
+  const { RoomNumber, ReservationNumber, DateCI, DateCO } = Reservation;
+  const { FirstName, LastName } = GuestInfo;
+
+  return `${Tag}-${RoomNumber}-${ReservationNumber}-${DateCI}-${DateCO}-${FirstName}-${LastName}`;
+};
+
 // Função para lidar com requisições POST
 export async function POST(req) {
   console.log("Received POST request");
@@ -11,20 +24,46 @@ export async function POST(req) {
   try {
     const body = await req.json(); // Ler o corpo da requisição
     
-    // Extrair o campo Tag do JSON
-    const { HotelInfo } = body[0];
-    const tag = HotelInfo[0].Tag;
+    // Extrair informações do JSON
+    const { HotelInfo, Reservation, GuestInfo } = body[0];
+    const hotelInfo = HotelInfo?.[0];
+    const reservation = Reservation?.[0];
+    const guestInfo = GuestInfo?.[0];
+
+    // Validar que os dados necessários estão presentes
+    if (!hotelInfo || !reservation || !guestInfo) {
+      return NextResponse.json(
+        { message: "Dados obrigatórios ausentes." },
+        { status: 400 }
+      );
+    }
+
+    // Gerar a chave única
+    const uniqueKey = generateUniqueKey(hotelInfo, reservation, guestInfo);
+    console.log("Generated uniqueKey:", uniqueKey);
 
     // Verificar se existe uma propriedade com o campo propertyTag igual ao valor de Tag
     const property = await prisma.properties.findFirst({
-      where: { propertyTag: tag },
+      where: { propertyTag: hotelInfo.Tag },
     });
 
     if (!property) {
       // Se não encontrar a propriedade, retornar erro 404
       return NextResponse.json(
-        { message: `Propriedade com Tag '${tag}' não encontrada.`},
+        { message: `Propriedade com Tag '${hotelInfo.Tag}' não encontrada.` },
         { status: 404 }
+      );
+    }
+
+    // Verificar se já existe um registro com a mesma uniqueKey
+    const existingRequest = await prisma.requestRecords.findFirst({
+      where: { uniqueKey: uniqueKey },
+    });
+
+    if (existingRequest) {
+      return NextResponse.json(
+        { message: "Registro com esta chave única já existe." },
+        { status: 409 }
       );
     }
 
@@ -38,6 +77,7 @@ export async function POST(req) {
         responseBody: "",
         propertyID: property.propertyID, // Usar o propertyID encontrado
         seen: false,
+        uniqueKey: uniqueKey, // Armazenar a chave única
       },
     });
 
