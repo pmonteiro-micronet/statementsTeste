@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import prisma from "@/lib/db";
 
-// Para o método GET (busca por registros da data atual)
 export async function GET() {
   try {
     // Buscar todos os registros na tabela
     const records = await prisma.requestRecordsReservations.findMany();
+    console.log("Registros do banco de dados:", records);
 
     // Processar o campo requestBody, convertendo JSON string para objeto
     const processedRecords = records
@@ -15,15 +15,22 @@ export async function GET() {
           const data = JSON.parse(record.requestBody);
           return Array.isArray(data) ? data : [data]; // Garante que seja um array
         } catch (error) {
-          console.error(`Erro ao parsear requestBody: ${record.id}`, error);
+          console.error(`Erro ao parsear requestBody no registro ${record.id}:`, error);
           return [];
         }
       })
       .flat(); // Combina os arrays em um único array de objetos
 
+    console.log("Registros processados:", processedRecords);
+
     // Filtrar registros pela data atual
     const currentDate = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
-    const filteredRecords = processedRecords.filter(record => record.DateCO === currentDate);
+    const filteredRecords = processedRecords.filter(record => {
+      const recordDate = record.DateCO?.split('T')[0]; // Remove o horário, se houver
+      return recordDate === currentDate;
+    });
+
+    console.log("Registros filtrados por data:", filteredRecords);
 
     // Retornar registros filtrados
     return new NextResponse(JSON.stringify({ response: filteredRecords }), { status: 200 });
