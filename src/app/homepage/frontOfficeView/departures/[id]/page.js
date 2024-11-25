@@ -15,6 +15,7 @@ import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 
 import { useRouter } from "next/navigation";
+import dayjs from 'dayjs';
 
 export default function Page({ params }) {
   const { id } = params;
@@ -130,39 +131,58 @@ export default function Page({ params }) {
       setIsLoading(true);
       try {
         const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
-
-        // Parsear o `requestBody` (que é uma string JSON) para um array de objetos
-        const reservasArray = JSON.parse(response.data.response[0].requestBody);
-        console.log("Reservas após parse:", reservasArray);
-
-        // Converte currentDate para o formato YYYY-MM-DD (sem hora)
-        const formattedCurrentDate = currentDate.split('T')[0]; // Remove qualquer parte de hora de currentDate
-
+        console.log("Response completo:", response);
+  
+        // Combinar todos os requestBody dentro de response.data.response
+        const reservasArray = response.data.response.flatMap(item => {
+          try {
+            return JSON.parse(item.requestBody);
+          } catch (err) {
+            console.error("Erro ao fazer parse de requestBody:", item.requestBody, err);
+            return [];
+          }
+        });
+  
+        console.log("Reservas após parse (todas as linhas):", reservasArray);
+  
+        // Se nenhuma reserva for encontrada
+        if (reservasArray.length === 0) {
+          console.warn("Nenhuma reserva encontrada após parse.");
+          return;
+        }
+  
+        // Filtrar reservas pela data atual
+        const formattedCurrentDate = dayjs(currentDate).format('YYYY-MM-DD');
         const reservasFiltradas = reservasArray.filter(reserva => {
           if (!reserva.DateCO) {
             console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva);
-            return false; // Se DateCO não existir, não filtra essa reserva
+            return false;
           }
-
-          // Formata DateCO para o mesmo formato YYYY-MM-DD
-          const formattedDateCO = reserva.DateCO.split('T')[0];
+  
+          const formattedDateCO = dayjs(reserva.DateCO).format('YYYY-MM-DD');
           return formattedDateCO === formattedCurrentDate;
         });
-
-        console.log("Reservas para a data atual:", reservasFiltradas); // Verifique os dados
-        setReservas(reservasFiltradas); // Armazena os dados filtrados no estado
+  
+        console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
+  
+        // Remover duplicatas com base no número da reserva (ResNo)
+        const reservasUnicas = Array.from(
+          new Map(reservasFiltradas.map(reserva => [reserva.ResNo, reserva])).values()
+        );
+  
+        console.log("Reservas únicas para a data atual:", reservasUnicas);
+        setReservas(reservasUnicas);
       } catch (error) {
         console.error("Erro ao buscar reservas:", error.message);
       } finally {
         setIsLoading(false);
       }
     };
-
+  
     fetchReservas();
-  }, [currentDate, propertyID]); // Atualiza dados quando a data ou o ID da propriedade mudar
-
-
-
+  }, [currentDate, propertyID]);  
+  
+  
   useEffect(() => {
     const fetchHotelName = async () => {
       try {
