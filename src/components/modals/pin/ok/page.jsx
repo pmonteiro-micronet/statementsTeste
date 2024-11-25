@@ -58,7 +58,9 @@ const OkPIN = ({
 
     const handlePinSubmit = async (e) => {
         if (e) e.preventDefault();
-        const recordID = localStorage.getItem("recordID");
+        // Captura os parâmetros da URL
+        const queryParams = new URLSearchParams(window.location.search);
+        const recordID = queryParams.get("recordID");
         console.log(recordID);
 
         try {
@@ -127,23 +129,23 @@ const OkPIN = ({
                                         </div>
                                     </ModalHeader>
                                     <ModalBody className="flex flex-col mx-5 my-2">
-                                    <input
-    type="password"
-    value={pin}
-    autoFocus={autoFocusEnabled}
-    onChange={(e) => {
-        setPin(e.target.value);
-        setIsPinError(false); // Reseta o erro ao digitar
-    }}
-    className="border border-gray-300 p-2 w-full text-center mb-4"
-    placeholder="• • • •"
-/>
+                                        <input
+                                            type="password"
+                                            value={pin}
+                                            autoFocus={autoFocusEnabled}
+                                            onChange={(e) => {
+                                                setPin(e.target.value);
+                                                setIsPinError(false); // Reseta o erro ao digitar
+                                            }}
+                                            className="border border-gray-300 p-2 w-full text-center mb-4"
+                                            placeholder="• • • •"
+                                        />
                                         {isPinError && (
                                             <p className="text-red-500 -mt-4">
                                                 PIN incorreto. Tente novamente.
                                             </p>
                                         )}
-                                        
+
                                         <div className="grid grid-cols-3 gap-2">
                                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "OK"].map((key) => (
                                                 <button
@@ -160,9 +162,8 @@ const OkPIN = ({
                                                             setIsPinError(false);
                                                         }
                                                     }}
-                                                    className={`p-4 rounded ${
-                                                        key === "C" ? "bg-gray-300" : key === "OK" ? "bg-primary text-white" : "bg-gray-100"
-                                                    } text-center font-bold`}
+                                                    className={`p-4 rounded ${key === "C" ? "bg-gray-300" : key === "OK" ? "bg-primary text-white" : "bg-gray-100"
+                                                        } text-center font-bold`}
                                                 >
                                                     {key}
                                                 </button>
