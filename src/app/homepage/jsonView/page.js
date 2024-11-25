@@ -237,11 +237,12 @@ const JsonViewPage = () => {
                           {item.Qty}
                         </td>
                         <td className="border border-gray-300 p-2 text-right w-32 text-lg contentTable">
-                          {item.UnitPrice.toFixed(2)}€
+                          {isNaN(item.UnitPrice) ? 'N/A' : item.UnitPrice.toFixed(2)}€
                         </td>
                         <td className="border border-gray-300 p-2 text-right w-32 text-lg contentTable">
-                          {item.Total.toFixed(2)}€
+                          {isNaN(item.Total) ? 'N/A' : item.Total.toFixed(2)}€
                         </td>
+
                       </tr>
                     ))
                   ) : (
@@ -273,8 +274,9 @@ const JsonViewPage = () => {
                       <div key={total.ID} className="w-full">
                         <p className="mt-4 text-5xl flex font-bold gap-20 justify-end tableTotal">
                           <span>TOTAL BALANCE</span>
-                          <span>{total.Balance.toFixed(2)}€</span>
+                          <span>{isNaN(total.Balance) ? 'N/A' : total.Balance.toFixed(2)}€</span>
                         </p>
+
                       </div>
                     ));
                   } else {
@@ -319,9 +321,10 @@ const JsonViewPage = () => {
                       return taxes.map((tax) => (
                         <tr key={tax.ID}>
                           <td className="p-2">{tax.Taxes}%</td>
-                          <td className="p-2 text-right">{tax.TotalWithTaxes.toFixed(2)}€</td>
-                          <td className="p-2 text-right">{tax.TotalWithOutTaxes.toFixed(2)}€</td>
-                          <td className="p-2 text-right">{tax.TotalTaxes.toFixed(2)}€</td>
+                          <td className="p-2 text-right">{isNaN(tax.TotalWithTaxes) ? 'N/A' : tax.TotalWithTaxes.toFixed(2)}€</td>
+                          <td className="p-2 text-right">{isNaN(tax.TotalWithOutTaxes) ? 'N/A' : tax.TotalWithOutTaxes.toFixed(2)}€</td>
+                          <td className="p-2 text-right">{isNaN(tax.TotalTaxes) ? 'N/A' : tax.TotalTaxes.toFixed(2)}€</td>
+
                         </tr>
                       ));
                     } else {
