@@ -56,15 +56,14 @@ const JsonViewPage = () => {
 
   useEffect(() => {
     if (router.isReady) {
-      const queryRecordID = router.query?.recordID;
+      const queryRecordID = router.query.recordID; // Acesse diretamente o recordID
       if (queryRecordID) {
         setRecordID(queryRecordID); // Atualiza o estado quando recordID está disponível
-        console.log("recordID!!!!!!!!!!!!! RECID: ", recordID);
       } else {
         setError("Erro: recordID está undefined.");
       }
     }
-  }, [router]);
+  }, [router.isReady, router.query]); // Adiciona router.query como dependência
 
   useEffect(() => {
     if (recordID) {
