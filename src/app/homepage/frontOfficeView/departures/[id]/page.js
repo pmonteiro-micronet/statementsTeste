@@ -401,7 +401,7 @@ export default function Page({ params }) {
       </div>
 
       {/* Fixed Pagination Section */}
-      <div className="sticky bottom-0 w-full bg-white p-0 m-0">
+      <div className="sticky bottom-0 w-full bg-white p-0 m-0 pagination-container">
         <PaginationTable
           page={page}
           pages={pages}

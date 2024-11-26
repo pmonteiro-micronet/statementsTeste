@@ -4,7 +4,7 @@
     }
 
     .bodyContainer {
-        height: calc(100vh - 5rem); /* Altura total da tela menos o topo */
+        height: calc(100vh - 3rem); /* Altura total da tela menos o topo */
         width: 100%; /* Impede overflow horizontal */
         overflow-y: auto; /* Rolagem vertical apenas no contêiner */
         overflow-x: hidden; 
