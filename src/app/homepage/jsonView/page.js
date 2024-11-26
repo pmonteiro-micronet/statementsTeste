@@ -174,20 +174,22 @@ const JsonViewPage = () => {
               {/* Detalhes do Hóspede */}
               <div className="text-left mt-4">
                 {reservationData && reservationData.requestBody ? (
-                  Array.isArray(
-                    JSON.parse(reservationData.requestBody)[0]?.GuestInfo
-                  ) ? (
+                  Array.isArray(JSON.parse(reservationData.requestBody)[0]?.GuestInfo) ? (
                     JSON.parse(reservationData.requestBody)[0].GuestInfo.map(
                       (guest, index) => (
                         <div key={index}>
                           <p className="font-bold textInfo">
                             {guest.Salution} {guest.FirstName} {guest.LastName}
                           </p>
-                          <p className="textInfo">{guest.Street}</p>
-                          <p className="textInfo">
-                            {guest.PostalCode}, {guest.City}, {guest.Country}
-                          </p>
-                          <p className="textInfo">NIF: {guest.VatNo}</p>
+                          {guest.Street && <p className="textInfo">{guest.Street}</p>}
+                          {(guest.PostalCode || guest.City || guest.Country) && (
+                            <p className="textInfo">
+                              {guest.PostalCode ? `${guest.PostalCode},` : ""}
+                              {guest.City ? ` ${guest.City},` : ""}
+                              {guest.Country ? ` ${guest.Country}` : ""}
+                            </p>
+                          )}
+                          {guest.VatNo && <p className="textInfo">NIF: {guest.VatNo}</p>}
                         </div>
                       )
                     )
@@ -198,6 +200,7 @@ const JsonViewPage = () => {
                   <p>Loading guest information...</p>
                 )}
               </div>
+
             </div>
 
             {/* Tabela de Itens */}
