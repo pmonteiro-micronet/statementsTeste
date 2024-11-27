@@ -81,24 +81,26 @@ const JsonViewPage = () => {
   }, []);
 
   useEffect(() => {
-    // Verifica se a imagem existe
     const checkImage = async () => {
-      try {
-        const res = await fetch(`/logos/${propertyID}.png`);
-        if (res.ok) {
-          setImageExists(true);
-        } else {
-          setImageExists(false);
-        }
-      } catch (error) {
+      console.log("Checking image for propertyID:", propertyID);
+      const img = new Image();
+      img.src = `/logos/${propertyID}.png`;
+  
+      img.onload = () => {
+        console.log("Image exists for propertyID:", propertyID);
+        setImageExists(true);
+      };
+      img.onerror = () => {
+        console.log("Image not found for propertyID:", propertyID);
         setImageExists(false);
-        console.log(error);
-      }
+      };
     };
-
-    checkImage();
+  
+    if (propertyID) {
+      checkImage();
+    }
   }, [propertyID]);
-
+  
   const handleOkClick = () => {
     setShowModal(true);
   };
@@ -124,6 +126,7 @@ const JsonViewPage = () => {
               />
             </div>
           )}
+
 
           <div className="flex flex-col justify-between items-center w-[80%] mx-auto mt-4">
             <div className="flex flex-row justify-between w-[80%] mb-10 infoContainer">
