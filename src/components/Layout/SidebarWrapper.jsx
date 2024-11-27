@@ -186,6 +186,3 @@ console.log(pendingCount);
     </div>
   );
 }
-
-
-
