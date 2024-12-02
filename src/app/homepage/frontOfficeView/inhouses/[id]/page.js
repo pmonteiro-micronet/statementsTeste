@@ -17,7 +17,7 @@ import LoadingBackdrop from "@/components/Loader/page";
 import { useRouter } from "next/navigation";
 import dayjs from 'dayjs';
 
-export default function inHouses({ params }) {
+export default function InHouses({ params }) {  // Renomeado para InHouses
   const { id } = params;
   const propertyID = id;
   const today = new Date().toISOString().split("T")[0];
@@ -29,7 +29,6 @@ export default function inHouses({ params }) {
   const [reservas, setReservas] = useState([]);
   const [postSuccessful, setPostSuccessful] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  // const [sendResSuccess, setSendResSuccess] = useState(false); //estado para envio get statement
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);

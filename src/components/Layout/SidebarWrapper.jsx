@@ -22,6 +22,8 @@ export default function SidebarWrapper({ children }) {
   const [showSelectionButtons, setShowSelectionButtons] = useState(false);
   const [isHotelConfirmed, setIsHotelConfirmed] = useState(false);
 
+  console.log(showSelectionButtons);
+
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
