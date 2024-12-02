@@ -17,7 +17,7 @@ import LoadingBackdrop from "@/components/Loader/page";
 import { useRouter } from "next/navigation";
 import dayjs from 'dayjs';
 
-export default function Arrivals({ params }) {
+export default function inHouses({ params }) {
   const { id } = params;
   const propertyID = id;
   const today = new Date().toISOString().split("T")[0];
@@ -282,8 +282,8 @@ export default function Arrivals({ params }) {
                 </button>
               )}
 
-              {/* Título "Arrivals List" separado do título dinâmico */}
-              <h2 className="text-xl">{propertyName} : Arrivals List</h2>
+              {/* Título "IN HOUSES List" separado do título dinâmico */}
+              <h2 className="text-xl">{propertyName} : In Houses List</h2>
             </div>
 
             {/* Botão de refresh alinhado à direita */}
@@ -307,16 +307,13 @@ export default function Arrivals({ params }) {
                   <thead>
                     <tr className="bg-primary text-white h-12">
                       <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ROOM</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ROOM STATUS</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ARRIVAL</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">DEPARTURE</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6]">LAST NAME</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6]">FIRST NAME</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">TRAVEL AGENCY</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6]">COMPANY</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">GROUP</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6]">NOTES</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6]">RES. NO.</td>
-                      <td className="pl-2">ARRIVAL</td>
                     </tr>
                   </thead>
                   <tbody>
@@ -378,16 +375,13 @@ export default function Arrivals({ params }) {
                               onClose={handleCloseModal}
                             />
                           </td>
-                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.Room}</td>
-                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.RoomStatus}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-52 max-w-xs truncate">{reserva.Notes}</td>
-                          <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
                           <td className="text-right pr-2 w-28">{reserva.DateCO}</td>
+                          <td className="text-right pr-2 w-28">{reserva.DateCO}</td>
+                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.LastName}</td>
+                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.FirstName}</td>
+                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-32">{reserva.Company}</td>
+                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate">{reserva.Notes}</td>
+                          <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right w-20">{reserva.ResNo}</td>
                         </tr>
                       );
                     })}

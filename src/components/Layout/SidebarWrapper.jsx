@@ -1,34 +1,27 @@
-"use client";
+'use client';
 import React, { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Sidebar, { SidebarItem, SubMenuItem } from "./Sidebar";
 import NavBar from "./Navbar";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 import { IoDocumentOutline } from "react-icons/io5";
 import { FaRegCalendarAlt } from "react-icons/fa";
+import { RiHotelLine } from "react-icons/ri";
 
 export default function SidebarWrapper({ children }) {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [expanded, setExpanded] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
-  const [listItems, setListItems] = useState({
-    Statements: {
-      icon: <IoDocumentOutline size={20} />,
-      items: [
-        { ref: "/homepage/statements/pending", label: "Pendings", count: 0 },
-        { ref: "/homepage/statements/viewed", label: "Viewed" },
-      ],
-    },
-    Front_Office: {
-      icon: <FaRegCalendarAlt size={18} />,
-      items: [],
-    },
-  });
-console.log(pendingCount);
-  // Atualizar o tamanho da tela
+  const [selectedHotelID, setSelectedHotelID] = useState("");
+  const [listItems, setListItems] = useState({});
+  const [hotels, setHotels] = useState([]);
+  const [showSelectionButtons, setShowSelectionButtons] = useState(false);
+  const [isHotelConfirmed, setIsHotelConfirmed] = useState(false);
+
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
@@ -36,38 +29,20 @@ console.log(pendingCount);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Buscar hotéis e configurar items da sidebar
   useEffect(() => {
     const fetchHotels = async () => {
       if (session?.user?.propertyIDs && Array.isArray(session.user.propertyIDs)) {
         try {
-          // Realiza a busca para múltiplos propertyIDs
           const response = await axios.get(
             `/api/properties?propertyIDs=${session.user.propertyIDs.join(",")}`
           );
-          const hotels = Array.isArray(response.data.response) ? response.data.response : [];
-          const filteredHotels = hotels.filter(hotel =>
+          const allHotels = Array.isArray(response.data.response) ? response.data.response : [];
+          const filteredHotels = allHotels.filter((hotel) =>
             session.user.propertyIDs.includes(hotel.propertyID)
           );
-
-          setListItems((prevListItems) => ({
-            ...prevListItems,
-            Front_Office: {
-              ...prevListItems.Front_Office,
-              items: filteredHotels.map((hotel) => ({
-                label: hotel.propertyName,
-                items: [
-                  {
-                    ref: `/homepage/frontOfficeView/departures/${hotel.propertyID}`,
-                    label: "Departures",
-                  },
-                  // Outros subitens podem ser adicionados aqui
-                ],
-              })),
-            },
-          }));
+          setHotels(filteredHotels);
         } catch (error) {
-          console.error("Erro ao buscar os hotéis:", error.response ? error.response.data : error.message);
+          console.error("Erro ao buscar hotéis:", error);
         }
       }
     };
@@ -75,98 +50,188 @@ console.log(pendingCount);
     fetchHotels();
   }, [session]);
 
-  // Atualizar pendências do localStorage
   useEffect(() => {
     const updatePendingCount = () => {
       const count = parseInt(localStorage.getItem("pendingCount"), 10) || 0;
       setPendingCount(count);
-
-      // Atualizar o listItems com a contagem mais recente
-      setListItems((prevListItems) => ({
-        ...prevListItems,
-        Statements: {
-          ...prevListItems.Statements,
-          items: prevListItems.Statements.items.map((item) =>
-            item.ref === "/homepage/statements/pending"
-              ? { ...item, count }
-              : item
-          ),
-        },
-      }));
     };
 
-    updatePendingCount(); // Atualizar ao montar
-    const interval = setInterval(updatePendingCount, 1000); // Atualizar periodicamente
-
-    return () => clearInterval(interval); // Limpar intervalo ao desmontar
+    updatePendingCount();
+    const interval = setInterval(updatePendingCount, 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  // Atualize o estado ativo com base na rota atual
+  // Recupera os dados do hotel selecionado e confirmação do hotel
   useEffect(() => {
-    setListItems((prevListItems) => {
-      const updatedListItems = { ...prevListItems };
+    const savedHotelID = localStorage.getItem("selectedHotelID");
+    const savedIsHotelConfirmed = localStorage.getItem("isHotelConfirmed") === 'true';
+    if (savedHotelID) {
+      setSelectedHotelID(savedHotelID);
+      setIsHotelConfirmed(savedIsHotelConfirmed);
+    }
+  }, []);
 
-      Object.entries(updatedListItems).forEach(([key, section]) => {
-        console.log(key);
-        let sectionActive = false;
+  useEffect(() => {
+    if (selectedHotelID && session?.user) {
+      const isAdmin = session?.user?.permission === 1; // Verifica permissões
 
-        section.items = section.items.map((item) => {
-          if (!item.items) {
-            const isActive = pathname === item.ref;
-            sectionActive = sectionActive || isActive;
-            return {
-              ...item,
-              active: isActive,
-            };
-          }
-
-          const subItems = item.items.map((subItem) => {
-            const isSubActive = pathname === subItem.ref;
-            sectionActive = sectionActive || isSubActive;
-            return {
-              ...subItem,
-              active: isSubActive,
-            };
-          });
-
-          return {
-            ...item,
-            active: subItems.some((subItem) => subItem.active),
-            items: subItems,
-          };
-        });
-
-        section.active = sectionActive;
+      setListItems({
+        Statements: {
+          icon: <IoDocumentOutline size={20} />,
+          items: [
+            { ref: "/homepage/statements", label: "Statements" },
+            { ref: "/homepage/statements/pending", label: "Pendings", count: pendingCount },
+            { ref: "/homepage/statements/viewed", label: "Viewed" },
+          ],
+        },
+        Front_Office: {
+          icon: <FaRegCalendarAlt size={18} />,
+          items: [
+            {
+              ref: `/homepage/frontOfficeView`,
+              label: "Front Office",
+              onClick: () => router.push(`/homepage/frontOfficeView`),
+            },
+            ...(isAdmin
+              ? [
+                  {
+                    ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
+                    label: "Arrivals",
+                    onClick: () =>
+                      router.push(`/homepage/frontOfficeView/arrivals/${selectedHotelID}`),
+                  },
+                  {
+                    ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
+                    label: "In Houses",
+                    onClick: () =>
+                      router.push(`/homepage/frontOfficeView/inhouses/${selectedHotelID}`),
+                  },
+                ]
+              : []), // Somente admins veem esses menus
+            {
+              ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
+              label: "Departures",
+              onClick: () =>
+                router.push(`/homepage/frontOfficeView/departures/${selectedHotelID}`),
+            },
+          ],
+        },
       });
+    } else {
+      setListItems({});
+    }
+  }, [selectedHotelID, pendingCount, session]);
 
-      return updatedListItems;
-    });
-  }, [pathname]);
+  const handleHotelSelect = (hotelID) => {
+    setSelectedHotelID(hotelID);
+    localStorage.setItem("selectedHotelID", hotelID);
+    setIsHotelConfirmed(false); // Resetar a confirmação ao escolher um novo hotel
+    localStorage.setItem("isHotelConfirmed", 'false'); // Armazenar o estado de confirmação
+    setShowSelectionButtons(true);
+  };
+
+  const handleLogout = () => {
+    router.push("/auth/logout");
+  };
+
+  const resetHotelSelection = () => {
+    setSelectedHotelID("");
+    setIsHotelConfirmed(false); // Reseta a confirmação ao resetar a seleção
+    setShowSelectionButtons(false);
+    localStorage.removeItem("selectedHotelID");
+    localStorage.removeItem("isHotelConfirmed"); // Limpar a confirmação no localStorage
+  };
+
+  const confirmHotelSelection = () => {
+    const selectedHotel = hotels.find((hotel) => String(hotel.propertyID) === String(selectedHotelID));
+    if (selectedHotel) {
+      setIsHotelConfirmed(true); // Marca o hotel como confirmado
+      localStorage.setItem("isHotelConfirmed", 'true'); // Armazenar a confirmação
+    }
+    setShowSelectionButtons(false); // Esconde os botões após a confirmação
+  };
+
+  // Verifica se o hotel foi selecionado mas não confirmado ao atualizar a página
+  const showConfirmationModal = selectedHotelID && !isHotelConfirmed;
 
   const showSidebar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth");
   const showNavBar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth");
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Exibe a NavBar se não estiver nos caminhos restritos */}
       {showNavBar && isMobile ? (
-        <NavBar listItems={listItems} />
+        <NavBar
+          listItems={listItems}
+          hotels={hotels}
+          selectedHotelID={selectedHotelID}
+          setSelectedHotelID={setSelectedHotelID}
+        />
       ) : (
         !isMobile && showSidebar && (
           <Sidebar setExpanded={setExpanded}>
-            {Object.entries(listItems).map(([key, section]) => (
+            <div className="sidebar-autocomplete">
+              <select
+                value={selectedHotelID}
+                onChange={(e) => handleHotelSelect(e.target.value)}
+                className="border p-2 rounded w-full mb-4"
+              >
+                <option value="">Select a hotel</option>
+                {hotels.map((hotel) => (
+                  <option key={hotel.propertyID} value={hotel.propertyID}>
+                    {hotel.propertyName}
+                  </option>
+                ))}
+              </select>
+              {!selectedHotelID && (
+                <div className="text-sm text-gray-500 mt-2">
+                  Please select a hotel to access the menus.
+                </div>
+              )}
+            </div>
+
+            {/* Exibe o modal de confirmação do hotel se necessário */}
+            {showConfirmationModal && (
+              <div className="mt-4 border-t pt-4">
+                <div className="text-sm font-semibold mb-2 flex flex-row justify-center items-center">
+                  <RiHotelLine size={20} className="mr-1" />
+                  {hotels.find((hotel) => String(hotel.propertyID) === String(selectedHotelID))?.propertyName || "Não encontrado"}
+                </div>
+                <div className="flex gap-4 justify-center">
+                  <button
+                    onClick={handleLogout}
+                    className="bg-gray-200 text-black text-sm py-1 px-2 rounded hover:bg-gray-300"
+                  >
+                    Logout
+                  </button>
+                  <button
+                    onClick={resetHotelSelection}
+                    className="bg-gray-200 text-black text-sm py-1 px-2 rounded hover:bg-gray-300"
+                  >
+                    Select
+                  </button>
+                  <button
+                    onClick={confirmHotelSelection}
+                    className="bg-primary text-white text-sm py-1 px-2 rounded hover:bg-[#E87A18]"
+                  >
+                    Continue
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Exibe o menu de navegação apenas após a confirmação do hotel */}
+            {isHotelConfirmed && Object.entries(listItems).map(([key, section]) => (
               <SidebarItem key={key} text={key} icon={section.icon} active={section.active}>
-                {section.items.map((item, index) =>
-                  item.items ? (
-                    <SidebarItem key={index} text={item.label} icon={section.icon} active={item.active}>
-                      {item.items.map((subItem, subIndex) => (
-                        <SubMenuItem key={subIndex} text={subItem.label} href={subItem.ref} active={subItem.active} />
-                      ))}
-                    </SidebarItem>
-                  ) : (
-                    <SubMenuItem key={index} text={item.label} href={item.ref} active={item.active} count={item.count} />
-                  )
-                )}
+                {section.items.map((item, index) => (
+                  <SubMenuItem
+                    key={index}
+                    text={item.label}
+                    href={item.ref}
+                    active={item.active}
+                    count={item.count}
+                    onClick={item.onClick}
+                  />
+                ))}
               </SidebarItem>
             ))}
           </Sidebar>
@@ -174,15 +239,15 @@ console.log(pendingCount);
       )}
 
       <main
-        className={`flex-1 min-h-screen overflow-y-auto transition-all duration-300 ${
-          !showSidebar ? "p-0" : "ml-16"
-        }`}
+        className={`flex-1 min-h-screen overflow-y-auto transition-all duration-300 ${isMobile || !showSidebar ? "p-0" : "ml-16"
+          }`}
         style={{
           marginLeft: isMobile || !showSidebar ? "0" : expanded ? "16rem" : "4rem",
         }}
       >
         {children}
       </main>
+
     </div>
   );
 }

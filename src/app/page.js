@@ -3,5 +3,5 @@ import { redirect } from "next/navigation";
 
 export default function Home() {
   // Redireciona para a página desejada
-  redirect("/homepage");
+  redirect("/homepage/statements");
 }

@@ -4,6 +4,7 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import "./styles.css";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -32,7 +33,7 @@ const SignIn = () => {
   return (
     <div className="flex min-h-screen">
       {/* Metade esquerda (Conteúdo de login) */}
-      <div className="w-full md:w-1/2 p-8 flex items-center justify-center -mt-[10%]">
+      <div className="p-8 flex items-center justify-center login-container">
         <div className="flex flex-col items-start w-full md:w-80">
           <p className="mb-[5%]">
             <span className="text-2xl font-semibold text-[#BF6415]">
@@ -89,7 +90,7 @@ const SignIn = () => {
       </div>
 
       {/* Metade direita (Imagem) */}
-      <div className="w-full md:w-1/2 p-0 relative flex items-center justify-end h-screen">
+      <div className="p-0 relative right-image hide-on-mobile">
         <img
           src="login/cover.jpg"
           alt="Imagem na metade direita"
@@ -97,8 +98,8 @@ const SignIn = () => {
         />
       </div>
 
-      {/* Imagem e Informações de Helpdesk no fundo */}
-      <div className="bg-gray-100 h-40 w-full md:w-[50%] fixed bottom-0 left-0 flex flex-row gap-5 items-center z-10">
+      {/* Footer */}
+      <div className="bg-gray-100 h-40 footer flex flex-row gap-5 items-center z-10">
         <div>
           <img src="login/logo_Hits.png" width={180} className="ml-6" />
         </div>

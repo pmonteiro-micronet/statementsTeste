@@ -1,5 +1,5 @@
 import React from "react";
-import "./styles.css";
+import "./statements.css";
 
 const Homepage = () => {
   return (
@@ -7,7 +7,7 @@ const Homepage = () => {
       <main
         className="flex-1 min-h-screen p-8 overflow-y-auto"
       >
-        <h2 className="font-semibold text-2xl mb-4">Homepage</h2>
+        <h2 className="font-semibold text-2xl mb-4">Statements</h2>
 
         <div className="flex flex-row gap-5">
           <div className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2">
