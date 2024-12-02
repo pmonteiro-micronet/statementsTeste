@@ -27,7 +27,7 @@ const handler = NextAuth({
           // Extrair apenas os propertyIDs como um array
           const propertyIDs = userProperties.map((p) => p.propertyID);
 
-          // Retornar os dados do usuário com os propertyIDs
+          // Retornar os dados do usuário com os propertyIDs e permissions
           return {
             id: user.userID,
             email: user.email,
@@ -35,6 +35,7 @@ const handler = NextAuth({
             secondName: user.secondName,
             propertyIDs, // Adicionar os propertyIDs associados
             pin: user.pin,
+            permission: user.permissions, // Adicionar o campo `permissions`
           };
         } else {
           return null;
@@ -58,6 +59,7 @@ const handler = NextAuth({
         token.secondName = user.secondName;
         token.propertyIDs = user.propertyIDs; // Adicionar os propertyIDs ao token
         token.pin = user.pin;
+        token.permission = user.permission; // Adicionar o campo permissions ao token
       }
       return token;
     },
@@ -68,6 +70,7 @@ const handler = NextAuth({
       session.user.secondName = token.secondName;
       session.user.propertyIDs = token.propertyIDs; // Adicionar os propertyIDs à sessão
       session.user.pin = token.pin;
+      session.user.permission = token.permission; // Adicionar o campo permissions à sessão
       return session;
     },
   },

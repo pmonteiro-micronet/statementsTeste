@@ -41,6 +41,7 @@ model users {
   createdAt       DateTime?         @default(now()) @db.Timestamp(0)
   propertyID      Int?
   pin             String?           @db.VarChar(255)
+  permissions     Int               @default(0)
   usersProperties usersProperties[]
 }
 

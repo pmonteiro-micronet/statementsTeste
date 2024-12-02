@@ -306,7 +306,7 @@ export default function Page({ params }) {
                 <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
                   <thead>
                     <tr className="bg-primary text-white h-12">
-                      <td className="pl-2 w-10 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
+                      <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ROOM</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6]">LAST NAME</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6]">FIRST NAME</td>

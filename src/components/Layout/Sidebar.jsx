@@ -64,18 +64,37 @@ export default function Sidebar({ children, setExpanded }) {
     };
   }, []);
 
+  useEffect(() => {
+    const updateHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+
+    // Atualiza na montagem e sempre que a janela for redimensionada
+    window.addEventListener('resize', updateHeight);
+    updateHeight();
+
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+    };
+  }, []);
+
+
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen bg-white border-r shadow-sm transition-all duration-300 ${
-        expanded ? "w-64" : "w-16"
-      }`}
+      className={`fixed top-0 left-0 bg-white border-r shadow-sm transition-all duration-300 ${expanded ? "w-64" : "w-16"
+        }`}
+      style={{
+        height: 'calc(var(--vh, 1vh) * 100)', // Usa a altura visível calculada
+        maxHeight: 'calc(var(--vh, 1vh) * 100)',
+        overflowY: 'auto', // Caso o conteúdo exceda, permite scroll apenas dentro da sidebar
+      }}
     >
       <nav className="h-full flex flex-col">
         <div className="p-4 pb-2 flex justify-between items-center">
           <p
-            className={`font-semibold text-sm overflow-hidden transition-all ${
-              expanded ? "w-64" : "w-0"
-            }`}
+            className={`font-semibold text-sm overflow-hidden transition-all ${expanded ? "w-64" : "w-0"
+              }`}
           >
             Extensions myPMS
           </p>
@@ -97,9 +116,8 @@ export default function Sidebar({ children, setExpanded }) {
           </div>
 
           <div
-            className={`flex justify-between items-center overflow-hidden transition-all ${
-              expanded ? "w-52 ml-3" : "w-0"
-            }`}
+            className={`flex justify-between items-center overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"
+              }`}
           >
             <div className="leading-4">
               <h4 className="font-semibold">
@@ -116,9 +134,8 @@ export default function Sidebar({ children, setExpanded }) {
 
         {/* Botão de Logout */}
         <li
-          className={`flex items-center mx-3 py-[9px] mb-3 mt-1 rounded-md cursor-pointer transition-colors group hover:bg-red-600 ${
-            expanded ? "px-3" : "px-2"
-          } bg-red-500 text-white`} // Cor de fundo e texto
+          className={`flex items-center mx-3 py-[9px] mb-3 mt-1 rounded-md cursor-pointer transition-colors group hover:bg-red-600 ${expanded ? "px-3" : "px-2"
+            } bg-red-500 text-white`} // Cor de fundo e texto
           onClick={handleLogout}
         >
           <div className={`flex items-center justify-between w-full`}>
@@ -146,28 +163,25 @@ export function SidebarItem({ icon, text, active, alert, children }) {
   return (
     <>
       <li
-        className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors group ${
-          active
-            ? "bg-[#FC9D25] text-white"
-            : "hover:bg-primary-50 text-gray-600"
-        }`}
+        className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors group ${active
+          ? "bg-[#FC9D25] text-white"
+          : "hover:bg-primary-50 text-gray-600"
+          }`}
         onClick={() => {
           if (children) setIsOpen((prev) => !prev); // Alterna o submenu se houver filhos
         }}
       >
         {icon}
         <span
-          className={`overflow-hidden transition-all ${
-            expanded ? "w-52 ml-3" : "w-0"
-          }`}
+          className={`overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"
+            }`}
         >
           {replaceUnderscores(text)} {/* Aplica a função aqui */}
         </span>
         {alert && (
           <div
-            className={`absolute right-2 w-2 h-2 rounded bg-primary ${
-              expanded ? "" : "top-2"
-            }`}
+            className={`absolute right-2 w-2 h-2 rounded bg-primary ${expanded ? "" : "top-2"
+              }`}
           />
         )}
 

@@ -1,17 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { TbLayoutSidebarLeftExpand } from "react-icons/tb";
+import { IoMenu } from "react-icons/io5";
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
-import { IoIosArrowDown, IoIosArrowUp  } from "react-icons/io";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 // Função utilitária para substituir underscores por espaços
 function replaceUnderscores(text) {
   return text.replace(/_/g, " ");
 }
 
-export default function NavBar({ listItems }) {
+export default function NavBar({ listItems, hotels = [], selectedHotelID, setSelectedHotelID }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openMenus, setOpenMenus] = useState(new Set()); // Estado para controlar menus abertos
   const { data: session } = useSession();
@@ -35,6 +35,11 @@ export default function NavBar({ listItems }) {
 
   const handleLogout = () => {
     signOut({ callbackUrl: "/auth" });
+  };
+
+  const handleHotelSelect = (hotelID) => {
+    setSelectedHotelID(hotelID);
+    localStorage.setItem("selectedHotelID", hotelID);
   };
 
   const resetInactivityTimer = () => {
@@ -61,9 +66,9 @@ export default function NavBar({ listItems }) {
       {/* Logo */}
       <div className="font-semibold text-sm">Extensions myPMS</div>
 
-      {/* Menu Toggle Button */}
+      {/* Dropdown for hotel selection inside the menu */}
       <button onClick={toggleMenu} className="text-2xl">
-        <TbLayoutSidebarLeftExpand />
+        <IoMenu />
       </button>
 
       {/* Fullscreen Menu */}
@@ -73,6 +78,24 @@ export default function NavBar({ listItems }) {
           <button onClick={toggleMenu} className="self-end text-2xl mb-4 text-gray-600">
             &times;
           </button>
+
+          {/* Hotel Selection (Autocomplete inside the menu) */}
+          <div className="mb-4">
+            <select
+              value={selectedHotelID}
+              onChange={(e) => handleHotelSelect(e.target.value)}
+              className="border p-2 rounded w-full"
+            >
+              <option value="">Select a hotel</option>
+              {/* Safe mapping over hotels */}
+              {Array.isArray(hotels) &&
+                hotels.map((hotel) => (
+                  <option key={hotel.propertyID} value={hotel.propertyID}>
+                    {hotel.propertyName}
+                  </option>
+                ))}
+            </select>
+          </div>
 
           {/* Render Menu Items */}
           <ul>
@@ -85,7 +108,7 @@ export default function NavBar({ listItems }) {
                   {replaceUnderscores(key)} {/* Aplica a função aqui */}
                   {section.items && (
                     <span className="text-sm text-gray-600">
-                      {openMenus.has(key) ? <IoIosArrowUp size={15}/> : <IoIosArrowDown size={15}/>}
+                      {openMenus.has(key) ? <IoIosArrowUp size={15} /> : <IoIosArrowDown size={15} />}
                     </span>
                   )}
                 </div>
@@ -96,7 +119,7 @@ export default function NavBar({ listItems }) {
                     {section.items.map((item, index) =>
                       item.items ? (
                         <li key={index} className="mb-2">
-                          <span className="font-semibold text-gray-800">{replaceUnderscores(item.label)}</span> {/* Aplica a função aqui */}
+                          <span className="font-semibold text-gray-800">{replaceUnderscores(item.label)}</span>
                           <ul className="pl-4">
                             {item.items.map((subItem, subIndex) => (
                               <li key={subIndex} className="mb-1">
@@ -138,9 +161,7 @@ export default function NavBar({ listItems }) {
               </div>
               <div className="ml-3 text-center">
                 <p className="font-medium">
-                  {session
-                    ? `${session.user.firstName} ${session.user.secondName}`
-                    : "Usuário Desconhecido"}
+                  {session ? `${session.user.firstName} ${session.user.secondName}` : "Usuário Desconhecido"}
                 </p>
                 <span className="text-xs text-gray-600 ml-3">
                   {session ? session.user.email : "Email Desconhecido"}
