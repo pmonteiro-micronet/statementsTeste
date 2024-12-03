@@ -12,13 +12,14 @@ const FrontOffice = () => {
   const selectedHotelID = pathname.split('/').pop(); // Extrai o último valor da URL, que deve ser o hotelID
   
   // Estados para armazenar os valores de "arrivals", "inhouses" e "departures"
-  const [arrivals, setArrivals] = useState(0);
-  const [inhouses, setInhouses] = useState(0);
-  const [departures, setDepartures] = useState(0);
+  const [arrivals, setArrivals] = useState(null);
+  const [inhouses, setInhouses] = useState(null);
+  const [departures, setDepartures] = useState(null);
 
   useEffect(() => {
     if (session?.user?.propertyIDs && selectedHotelID) {
       console.log("IDs", session?.user?.propertyIDs); // Verificando os propertyIDs da sessão
+
       // Função para buscar os dados dos contadores
       const fetchCounters = async () => {
         try {
@@ -28,35 +29,29 @@ const FrontOffice = () => {
           console.log("dados", data);
 
           if (response.ok) {
-            // Filtra os dados pela ID do hotel e calcula os valores de arrivals, inhouses e departures
-            const arrivalsSum = data.response
-              .filter(
-                (item) =>
-                  item.counterName === "arrivals" &&
-                  String(item.propertyID) === String(selectedHotelID)
-              )
-              .reduce((sum, item) => sum + (item.count || 0), 0);  // Usando o campo "count"
+            // Filtra os dados pela ID do hotel e pega apenas os dados para o selectedHotelID
+            const arrivalsData = data.response.filter(
+              (item) =>
+                item.counterName === "arrivals" &&
+                String(item.propertyID) === String(selectedHotelID)
+            );
 
-            const inhousesSum = data.response
-              .filter(
-                (item) =>
-                  item.counterName === "inhouses" &&
-                  String(item.propertyID) === String(selectedHotelID)
-              )
-              .reduce((sum, item) => sum + (item.count || 0), 0);  // Usando o campo "count"
+            const inhousesData = data.response.filter(
+              (item) =>
+                item.counterName === "inhouses" &&
+                String(item.propertyID) === String(selectedHotelID)
+            );
 
-            const departuresSum = data.response
-              .filter(
-                (item) =>
-                  item.counterName === "departures" &&
-                  String(item.propertyID) === String(selectedHotelID)
-              )
-              .reduce((sum, item) => sum + (item.count || 0), 0);  // Usando o campo "count"
+            const departuresData = data.response.filter(
+              (item) =>
+                item.counterName === "departures" &&
+                String(item.propertyID) === String(selectedHotelID)
+            );
 
-            // Atualizando o estado com os valores somados
-            setArrivals(arrivalsSum);
-            setInhouses(inhousesSum);
-            setDepartures(departuresSum);
+            // Verifica se há algum dado para o selectedHotelID, caso contrário retorna 0
+            setArrivals(arrivalsData.length > 0 ? arrivalsData[0].count : 0);
+            setInhouses(inhousesData.length > 0 ? inhousesData[0].count : 0);
+            setDepartures(departuresData.length > 0 ? departuresData[0].count : 0);
           } else {
             console.error("Erro ao buscar dados:", data.error);
           }
@@ -77,19 +72,25 @@ const FrontOffice = () => {
         <div className="flex flex-row gap-5">
           <div className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2">
             <div className="flex flex-col">
-              <h3 className="text-5xl text-primary">{arrivals !== null ? arrivals : "Loading..."}</h3>
+              <h3 className="text-5xl text-primary">
+                {arrivals !== null ? arrivals : "Loading..."}
+              </h3>
               <p className="text-gray-400 mt-1">ARRIVALS</p>
             </div>
           </div>
           <div className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2">
             <div className="flex flex-col">
-              <h3 className="text-5xl text-primary">{inhouses !== null ? inhouses : "Loading..."}</h3>
+              <h3 className="text-5xl text-primary">
+                {inhouses !== null ? inhouses : "Loading..."}
+              </h3>
               <p className="text-gray-400 mt-1">IN HOUSES</p>
             </div>
           </div>
           <div className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2">
             <div className="flex flex-col">
-              <h3 className="text-5xl text-primary">{departures !== null ? departures : "Loading..."}</h3>
+              <h3 className="text-5xl text-primary">
+                {departures !== null ? departures : "Loading..."}
+              </h3>
               <p className="text-gray-400 mt-1">DEPARTURES</p>
             </div>
           </div>
