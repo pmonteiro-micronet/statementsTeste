@@ -23,7 +23,6 @@ export default function SidebarWrapper({ children }) {
   const [isHotelConfirmed, setIsHotelConfirmed] = useState(false);
 
   console.log(showSelectionButtons);
-
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
@@ -63,7 +62,6 @@ export default function SidebarWrapper({ children }) {
     return () => clearInterval(interval);
   }, []);
 
-  // Recupera os dados do hotel selecionado e confirmação do hotel
   useEffect(() => {
     const savedHotelID = localStorage.getItem("selectedHotelID");
     const savedIsHotelConfirmed = localStorage.getItem("isHotelConfirmed") === 'true';
@@ -75,13 +73,13 @@ export default function SidebarWrapper({ children }) {
 
   useEffect(() => {
     if (selectedHotelID && session?.user) {
-      const isAdmin = session?.user?.permission === 1; // Verifica permissões
+      const isAdmin = session?.user?.permission === 1;
 
       setListItems({
         Statements: {
           icon: <IoDocumentOutline size={20} />,
           items: [
-            { ref: "/homepage/statements", label: "Statements" },
+            { ref: "/homepage/statements", label: "Dashboard" },
             { ref: "/homepage/statements/pending", label: "Pendings", count: pendingCount },
             { ref: "/homepage/statements/viewed", label: "Viewed" },
           ],
@@ -90,9 +88,9 @@ export default function SidebarWrapper({ children }) {
           icon: <FaRegCalendarAlt size={18} />,
           items: [
             {
-              ref: `/homepage/frontOfficeView`,
-              label: "Front Office",
-              onClick: () => router.push(`/homepage/frontOfficeView`),
+              ref: `/homepage/frontOfficeView/${selectedHotelID}`,
+              label: "Dashboard",
+              onClick: () => router.push(`/homepage/frontOfficeView/${selectedHotelID}`),
             },
             ...(isAdmin
               ? [
@@ -109,7 +107,7 @@ export default function SidebarWrapper({ children }) {
                       router.push(`/homepage/frontOfficeView/inhouses/${selectedHotelID}`),
                   },
                 ]
-              : []), // Somente admins veem esses menus
+              : []),
             {
               ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
               label: "Departures",
@@ -129,7 +127,7 @@ export default function SidebarWrapper({ children }) {
     localStorage.setItem("selectedHotelID", hotelID);
     setIsHotelConfirmed(false); // Resetar a confirmação ao escolher um novo hotel
     localStorage.setItem("isHotelConfirmed", 'false'); // Armazenar o estado de confirmação
-    setShowSelectionButtons(true);
+    setShowSelectionButtons(true); // Exibir os botões "Select" e "Continue"
   };
 
   const handleLogout = () => {
@@ -138,24 +136,42 @@ export default function SidebarWrapper({ children }) {
 
   const resetHotelSelection = () => {
     setSelectedHotelID("");
-    setIsHotelConfirmed(false); // Reseta a confirmação ao resetar a seleção
+    setIsHotelConfirmed(false);
     setShowSelectionButtons(false);
     localStorage.removeItem("selectedHotelID");
-    localStorage.removeItem("isHotelConfirmed"); // Limpar a confirmação no localStorage
+    localStorage.removeItem("isHotelConfirmed");
   };
 
   const confirmHotelSelection = () => {
     const selectedHotel = hotels.find((hotel) => String(hotel.propertyID) === String(selectedHotelID));
+    
     if (selectedHotel) {
-      setIsHotelConfirmed(true); // Marca o hotel como confirmado
-      localStorage.setItem("isHotelConfirmed", 'true'); // Armazenar a confirmação
+      setIsHotelConfirmed(true);
+      localStorage.setItem("isHotelConfirmed", 'true');
+      
+      // Verificar se a URL está no contexto do Front Office
+      if (pathname.includes("/frontOfficeView")) {
+        const currentPath = pathname.split('/'); // Divide a URL em partes
+        const isSubsection = currentPath.length === 5; // URL com subseção terá exatamente 5 partes
+        
+        if (isSubsection) {
+          // Atualiza apenas o hotelID mantendo a subseção
+          const basePath = currentPath.slice(0, 3).join('/'); // Exemplo: /homepage/frontOfficeView
+          const subsection = currentPath[3]; // Exemplo: 'departures'
+          router.push(`${basePath}/${subsection}/${selectedHotelID}`);
+        } else {
+          // Atualiza a URL para a página principal do front office
+          const basePath = currentPath.slice(0, 3).join('/'); // Exemplo: /homepage/frontOfficeView
+          router.push(`${basePath}/${selectedHotelID}`);
+        }
+      }
     }
+    
     setShowSelectionButtons(false); // Esconde os botões após a confirmação
   };
-
-  // Verifica se o hotel foi selecionado mas não confirmado ao atualizar a página
+  
+  
   const showConfirmationModal = selectedHotelID && !isHotelConfirmed;
-
   const showSidebar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth");
   const showNavBar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth");
 
@@ -191,7 +207,6 @@ export default function SidebarWrapper({ children }) {
               )}
             </div>
 
-            {/* Exibe o modal de confirmação do hotel se necessário */}
             {showConfirmationModal && (
               <div className="mt-4 border-t pt-4">
                 <div className="text-sm font-semibold mb-2 flex flex-row justify-center items-center">
@@ -221,7 +236,6 @@ export default function SidebarWrapper({ children }) {
               </div>
             )}
 
-            {/* Exibe o menu de navegação apenas após a confirmação do hotel */}
             {isHotelConfirmed && Object.entries(listItems).map(([key, section]) => (
               <SidebarItem key={key} text={key} icon={section.icon} active={section.active}>
                 {section.items.map((item, index) => (

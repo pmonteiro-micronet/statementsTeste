@@ -35,6 +35,9 @@ const SignIn = () => {
       {/* Metade esquerda (Conteúdo de login) */}
       <div className="p-8 flex items-center justify-center login-container">
         <div className="flex flex-col items-start w-full md:w-80">
+          <div className="hide-on-computer show-on-phone">
+          <img src="login/logo_Hits.png" width={180} className="ml-6" />
+          </div>
           <p className="mb-[5%]">
             <span className="text-2xl font-semibold text-[#BF6415]">
               Extensions
@@ -50,7 +53,7 @@ const SignIn = () => {
               <div>
                 <input
                   placeholder="Email de Utilizador"
-                  className="h-10 w-full border border-gray-300 border-b-2 border-b-[#13678A] rounded-sm outline-none p-2 text-sm"
+                  className="h-10 w-full border border-gray-300 border-b-2 border-b-primary rounded-sm outline-none p-2 text-sm"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -60,7 +63,7 @@ const SignIn = () => {
               <div>
                 <input
                   placeholder="Código de Acesso"
-                  className="h-10 w-full border border-gray-300 border-b-2 border-b-[#13678A] rounded-sm outline-none p-2 text-sm"
+                  className="h-10 w-full border border-gray-300 border-b-2 border-b-primary rounded-sm outline-none p-2 text-sm"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -70,7 +73,7 @@ const SignIn = () => {
             </div>
             <button
               type="submit"
-              className="w-full border border-gray-300 rounded-2xl h-10 text-sm text-gray-500"
+              className="w-full border border-gray-300 rounded-2xl h-10 text-sm text-gray-500 hover:bg-primary-50"
             >
               Entrar
             </button>
@@ -99,7 +102,7 @@ const SignIn = () => {
       </div>
 
       {/* Footer */}
-      <div className="bg-gray-100 h-40 footer flex flex-row gap-5 items-center z-10">
+      <div className="bg-gray-100 h-40 footer flex flex-row gap-5 items-center z-10 hide-on-mobile">
         <div>
           <img src="login/logo_Hits.png" width={180} className="ml-6" />
         </div>

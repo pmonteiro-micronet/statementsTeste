@@ -56,26 +56,27 @@ model usersProperties {
   @@index([propertyID], map: "usersProperties_propertyID_fkey")
 }
 
-model requestRecordsReservations {
+model counter {
+  id          Int    @id @default(autoincrement())
+  counterName String @db.VarChar(255)
+  count       Int?   @default(0)
+  propertyID  Int
+}
+
+model requestRecordsArrivals {
   requestID       Int      @id @default(autoincrement())
   requestBody     String   @db.Text
-  requestType     String   @db.VarChar(8192)
+  requestType     String   @db.VarChar(20)
   requestDateTime DateTime @db.DateTime(0)
   responseStatus  String?  @db.VarChar(20)
   responseBody    String?  @db.Text
   propertyID      Int
 }
 
-model counter {
-  id          Int    @id @default(autoincrement())
-  counterName String @db.VarChar(255)
-  count       Int?   @default(0)
-}
-
-model requestRecordsReservationCI {
+model requestRecordsDepartures {
   requestID       Int      @id @default(autoincrement())
   requestBody     String   @db.Text
-  requestType     String   @db.VarChar(20)
+  requestType     String   @db.VarChar(8192)
   requestDateTime DateTime @db.DateTime(0)
   responseStatus  String?  @db.VarChar(20)
   responseBody    String?  @db.Text
