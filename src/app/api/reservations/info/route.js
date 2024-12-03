@@ -59,7 +59,7 @@ export async function GET(request) {
     // Verifica se a resposta contém dados
     if (response.data && Array.isArray(response.data)) {
       // Salva o array de dados (reservas) como um único registro na tabela
-      const newRequest = await prisma.requestRecordsReservations.create({
+      const newRequest = await prisma.requestRecordsDepartures.create({
         data: {
           requestBody: JSON.stringify(response.data), // Armazena o array completo como JSON
           requestType: "GET", // Tipo da requisição
