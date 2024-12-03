@@ -4,7 +4,7 @@ import prisma from "@/lib/db";
 export async function GET() {
   try {
     // Buscar todos os registros na tabela
-    const records = await prisma.requestRecordsReservations.findMany();
+    const records = await prisma.requestRecordsDepartures.findMany();
     console.log("Registros do banco de dados:", records);
 
     // Processar o campo requestBody, convertendo JSON string para objeto

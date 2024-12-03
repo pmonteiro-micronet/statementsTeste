@@ -152,7 +152,7 @@ export default function Arrivals({ params }) {
     const fetchReservas = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
+        const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
         console.log("Response completo:", response);
 
         // Combinar todos os requestBody dentro de response.data.response

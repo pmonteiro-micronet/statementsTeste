@@ -5,7 +5,7 @@ import prisma from "@/lib/db"; // Importa a instância do Prisma Client que voc�
 // Para o método GET (busca por registros da data atual)
 export async function GET() {
     try {
-      const response = await prisma.requestRecordsReservationCI.findMany();
+      const response = await prisma.requestRecordsArrivals.findMany();
   
       return new NextResponse(JSON.stringify({ response }), { status: 200 });
     } catch (error) {
@@ -34,7 +34,7 @@ export async function POST(request) {
     }
 
     // Cria um registro no banco de dados
-    const newRequest = await prisma.requestRecordsReservationCI.create({
+    const newRequest = await prisma.requestRecordsArrivals.create({
       data: {
         requestBody: JSON.stringify(body), // Armazena o corpo completo como JSON
         requestType: "POST", // Definido como POST

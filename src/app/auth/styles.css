@@ -1,48 +1,70 @@
 /* Estilo padrão para desktop */
 @media (min-width: 801px) {
-    .login-container {
-      width: 50%; /* Mantém a largura de 50% */
-      display: flex;
-      justify-content: center; /* Alinha ao centro verticalmente */
-      align-items: center;
-      margin-top: -10%; /* Mantém a posição original */
-    }
-  
-    .right-image {
-      display: flex; /* Mostra a imagem */
-      width: 50%; /* Metade direita da tela */
-      justify-content: end; /* Alinha ao lado direito */
-      height: 100vh;
-    }
-  
-    .footer {
-      width: 50%; /* Footer ocupa metade da largura */
-      position: fixed;
-      bottom: 0;
-      left: 0;
-    }
+  .hide-on-computer {
+    display: none;
   }
-  
-  /* Estilo para tablets e telemóveis */
-  @media (max-width: 800px) {
-    .hide-on-mobile {
-      display: none; /* Esconde a imagem */
-    }
-  
-    .login-container {
-      width: 100%; /* Ocupa a largura total */
-      display: flex;
-      justify-content: center; /* Centraliza horizontalmente */
-      align-items: center; /* Centraliza verticalmente */
-      min-height: 100vh; /* Garante altura total */
-      margin-top: -10rem;
-    }
-  
-    .footer {
-      width: 100%; /* Footer ocupa a largura total */
-      position: fixed;
-      bottom: 0;
-      left: 0;
-    }
+
+  .login-container {
+    width: 50%;
+    /* Mantém a largura de 50% */
+    display: flex;
+    justify-content: center;
+    /* Alinha ao centro verticalmente */
+    align-items: center;
+    margin-top: -10%;
+    /* Mantém a posição original */
   }
-  
+
+  .right-image {
+    display: flex;
+    /* Mostra a imagem */
+    width: 50%;
+    /* Metade direita da tela */
+    justify-content: end;
+    /* Alinha ao lado direito */
+    height: 100vh;
+  }
+
+  .footer {
+    width: 50%;
+    /* Footer ocupa metade da largura */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+  }
+}
+
+/* Estilo para tablets e telemóveis */
+@media (max-width: 800px) {
+  .hide-on-mobile {
+    display: none;
+    /* Esconde a imagem */
+  }
+
+  .show-on-phone{
+    margin-top: 10rem;
+    margin-bottom: 2rem;
+    margin-left: -1rem;
+  }
+
+  .login-container {
+    width: 100%;
+    /* Ocupa a largura total */
+    display: flex;
+    justify-content: center;
+    /* Centraliza horizontalmente */
+    align-items: center;
+    /* Centraliza verticalmente */
+    min-height: 100vh;
+    /* Garante altura total */
+    margin-top: -10rem;
+  }
+
+  .footer {
+    width: 100%;
+    /* Footer ocupa a largura total */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+  }
+}

@@ -14,7 +14,7 @@ export async function GET(request, { params }) {
     }
 
     // Busca registros com o `propertyID` igual ao `id` fornecido
-    const response = await prisma.requestRecordsDepartures.findMany({
+    const response = await prisma.requestRecordsArrivals.findMany({
       where: {
         propertyID: parseInt(id),
       },
