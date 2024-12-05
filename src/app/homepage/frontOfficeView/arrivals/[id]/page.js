@@ -90,33 +90,25 @@ export default function Arrivals({ params }) {
       try {
         const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
         console.log("Response completo:", response);
-  
+
         // Combinar todos os requestBody dentro de response.data.response
         const reservasArray = response.data.response.flatMap(item => {
           try {
-            const parsedReserva = JSON.parse(item.requestBody);
-  
-            // Adiciona o requestID à reserva
-            const reservasComRequestID = parsedReserva.map(reserva => ({
-              ...reserva, // Aplique todos os campos de reserva
-              requestID: item.requestID, // Aqui você adiciona o requestID à reserva
-            }));
-  
-            return reservasComRequestID;
+            return JSON.parse(item.requestBody);
           } catch (err) {
             console.error("Erro ao fazer parse de requestBody:", item.requestBody, err);
             return [];
           }
         });
-  
-        console.log("Reservas após parse (com requestID):", reservasArray);
-  
+
+        console.log("Reservas após parse (todas as linhas):", reservasArray);
+
         // Se nenhuma reserva for encontrada
         if (reservasArray.length === 0) {
           console.warn("Nenhuma reserva encontrada após parse.");
           return;
         }
-  
+
         // Filtrar reservas pela data atual
         const formattedCurrentDate = dayjs(currentDate).format('YYYY-MM-DD');
         const reservasFiltradas = reservasArray.filter(reserva => {
@@ -124,18 +116,18 @@ export default function Arrivals({ params }) {
             console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva);
             return false;
           }
-  
+
           const formattedDateCO = dayjs(reserva.DateCO).format('YYYY-MM-DD');
           return formattedDateCO === formattedCurrentDate;
         });
-  
+
         console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
-  
+
         // Remover duplicatas com base no número da reserva (ResNo)
         const reservasUnicas = Array.from(
           new Map(reservasFiltradas.map(reserva => [reserva.ResNo, reserva])).values()
         );
-  
+
         console.log("Reservas únicas para a data atual:", reservasUnicas);
         setReservas(reservasUnicas);
       } catch (error) {
@@ -144,12 +136,10 @@ export default function Arrivals({ params }) {
         setIsLoading(false);
       }
     };
-  
+
     fetchReservas();
   }, [currentDate, propertyID]);
-  
 
-console.log("reservas", reservas);
 
   useEffect(() => {
     const fetchHotelName = async () => {
@@ -182,7 +172,7 @@ console.log("reservas", reservas);
     const end = start + rowsPerPage;
 
     return reservas.slice(start, end); // Filtra as reservas com base na página atual e número de linhas por página
-  }, [page, rowsPerPage, reservas]); // A dependência inclui `reservas`, que é onde as reservas filtradas estão
+  }, [page, rowsPerPage, reservas]); // A dependência inclui reservas, que é onde as reservas filtradas estão
 
   const pages = Math.ceil(reservas.length / rowsPerPage); // Calcula o número total de páginas com base no total de reservas
 
@@ -196,36 +186,24 @@ console.log("reservas", reservas);
     sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
   };
 
-  const handleRowClick = (reserva) => {
-    const queryParams = {
-      room: reserva.Room,
-      dateCO: reserva.DateCO,
-      booker: reserva.Booker,
-      salutation: reserva.Salutation,
-      lastName: reserva.LastName,
-      firstName: reserva.FirstName,
-      roomType: reserva.RoomType,
-      resStatus: reserva.ResStatus,
-      totalPax: reserva.TotalPax,
-      balance: reserva.Balance,
-      country: reserva.Country,
-      requestID: reserva.requestID,
-    };
-  
-    // Ensure all values are strings
-    Object.keys(queryParams).forEach(key => {
-      if (queryParams[key] === undefined || queryParams[key] === null) {
-        queryParams[key] = ''; // Replace undefined or null with an empty string
-      } else {
-        queryParams[key] = String(queryParams[key]); // Ensure it's a string
-      }
-    });
-  
-    // Use router.push with a string URL
-    router.push(`/registrationForm?${new URLSearchParams(queryParams).toString()}`);
-  };
-  
-  
+  // const handleRowClick = (reserva) => {
+  //   router.push({
+  //     pathname: "../registrationForm",
+  //     query: {
+  //       room: reserva.Room,
+  //       dateCO: reserva.DateCO,
+  //       booker: reserva.Booker,
+  //       salutation: reserva.Salutation,
+  //       lastName: reserva.LastName,
+  //       firstName: reserva.FirstName,
+  //       roomType: reserva.RoomType,
+  //       resStatus: reserva.ResStatus,
+  //       totalPax: reserva.TotalPax,
+  //       balance: reserva.Balance,
+  //       country: reserva.Country,
+  //     },
+  //   });
+  // };
   
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-[#FAFAFA]">
@@ -321,7 +299,7 @@ console.log("reservas", reservas);
                                 </DropdownItem>
                                 <DropdownItem
                                   key="show"
-                                  onClick={handleRowClick}
+                                  onClick={() => router.push("../registrationForm")}
                                 >
                                   Registration Form
                                 </DropdownItem>
