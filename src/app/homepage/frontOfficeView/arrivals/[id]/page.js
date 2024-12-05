@@ -74,70 +74,6 @@ export default function Arrivals({ params }) {
     }
   };
 
-
-  const sendResToAPI = async (ResNo) => {
-    console.log("Enviando ResNumber para a API:", ResNo);
-    const windowValue = 0;
-
-    try {
-      // Faz a requisição para enviar os dados do statement
-      const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
-        params: {
-          ResNo,
-          window: windowValue,
-          propertyID,
-        },
-      });
-
-      console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
-      console.log("Resposta da API ao salvar statement:", saveResponse.data);
-
-      // Aguarda brevemente para dar tempo à base de dados sincronizar o novo registro
-      await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms de atraso opcional
-
-      // Após o envio, busca o recordID do último registro
-      const response = await axios.get("/api/get_jsons");
-      console.log("Resposta da API ao buscar registros:", response.data);
-
-      // Buscar o último `requestID` na lista de respostas
-      const lastRecord = response.data.response.sort((a, b) => b.requestID - a.requestID)[0]; // Ordena por requestID desc
-      if (lastRecord && lastRecord.requestID) {
-        const lastRecordID = lastRecord.requestID;
-
-        // Redireciona para a página jsonView com os parâmetros na URL
-        router.push(`/homepage/jsonView?recordID=${lastRecordID}&propertyID=${propertyID}`);
-      } else {
-        console.warn("RecordID não encontrado na resposta da API.");
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 409) {
-        // O status 409 indica conflito, ou seja, o registro já existe
-        console.warn("Registro já existente, buscando o requestID do registro existente.");
-
-        // Extraia o requestID do erro, se a API o fornecer
-        const existingRequestID = error.response.data?.existingRequestID;
-
-        if (existingRequestID) {
-          console.log("Registro existente encontrado com requestID:", existingRequestID);
-
-          // Redireciona para a página jsonView com o requestID do registro existente
-          router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
-        } else {
-          console.error(
-            "Não foi possível encontrar o requestID do registro existente.",
-            error.response.data
-          );
-        }
-      } else {
-        console.error(
-          "Erro ao enviar os dados ou buscar o recordID:",
-          error.response ? error.response.data : error.message
-        );
-      }
-    }
-  };
-
-
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
@@ -154,25 +90,33 @@ export default function Arrivals({ params }) {
       try {
         const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
         console.log("Response completo:", response);
-
+  
         // Combinar todos os requestBody dentro de response.data.response
         const reservasArray = response.data.response.flatMap(item => {
           try {
-            return JSON.parse(item.requestBody);
+            const parsedReserva = JSON.parse(item.requestBody);
+  
+            // Adiciona o requestID à reserva
+            const reservasComRequestID = parsedReserva.map(reserva => ({
+              ...reserva, // Aplique todos os campos de reserva
+              requestID: item.requestID, // Aqui você adiciona o requestID à reserva
+            }));
+  
+            return reservasComRequestID;
           } catch (err) {
             console.error("Erro ao fazer parse de requestBody:", item.requestBody, err);
             return [];
           }
         });
-
-        console.log("Reservas após parse (todas as linhas):", reservasArray);
-
+  
+        console.log("Reservas após parse (com requestID):", reservasArray);
+  
         // Se nenhuma reserva for encontrada
         if (reservasArray.length === 0) {
           console.warn("Nenhuma reserva encontrada após parse.");
           return;
         }
-
+  
         // Filtrar reservas pela data atual
         const formattedCurrentDate = dayjs(currentDate).format('YYYY-MM-DD');
         const reservasFiltradas = reservasArray.filter(reserva => {
@@ -180,18 +124,18 @@ export default function Arrivals({ params }) {
             console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva);
             return false;
           }
-
+  
           const formattedDateCO = dayjs(reserva.DateCO).format('YYYY-MM-DD');
           return formattedDateCO === formattedCurrentDate;
         });
-
+  
         console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
-
+  
         // Remover duplicatas com base no número da reserva (ResNo)
         const reservasUnicas = Array.from(
           new Map(reservasFiltradas.map(reserva => [reserva.ResNo, reserva])).values()
         );
-
+  
         console.log("Reservas únicas para a data atual:", reservasUnicas);
         setReservas(reservasUnicas);
       } catch (error) {
@@ -200,10 +144,12 @@ export default function Arrivals({ params }) {
         setIsLoading(false);
       }
     };
-
+  
     fetchReservas();
   }, [currentDate, propertyID]);
+  
 
+console.log("reservas", reservas);
 
   useEffect(() => {
     const fetchHotelName = async () => {
@@ -250,6 +196,37 @@ export default function Arrivals({ params }) {
     sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
   };
 
+  const handleRowClick = (reserva) => {
+    const queryParams = {
+      room: reserva.Room,
+      dateCO: reserva.DateCO,
+      booker: reserva.Booker,
+      salutation: reserva.Salutation,
+      lastName: reserva.LastName,
+      firstName: reserva.FirstName,
+      roomType: reserva.RoomType,
+      resStatus: reserva.ResStatus,
+      totalPax: reserva.TotalPax,
+      balance: reserva.Balance,
+      country: reserva.Country,
+      requestID: reserva.requestID,
+    };
+  
+    // Ensure all values are strings
+    Object.keys(queryParams).forEach(key => {
+      if (queryParams[key] === undefined || queryParams[key] === null) {
+        queryParams[key] = ''; // Replace undefined or null with an empty string
+      } else {
+        queryParams[key] = String(queryParams[key]); // Ensure it's a string
+      }
+    });
+  
+    // Use router.push with a string URL
+    router.push(`/registrationForm?${new URLSearchParams(queryParams).toString()}`);
+  };
+  
+  
+  
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-[#FAFAFA]">
       <div className="flex-grow overflow-y-auto p-4">
@@ -337,7 +314,6 @@ export default function Arrivals({ params }) {
                               <DropdownMenu
                                 aria-label="Static Actions"
                                 closeOnSelect={true}
-                                isOpen={true}
                                 className="relative z-10"
                               >
                                 <DropdownItem key="edit" onClick={() => handleOpenModal()}>
@@ -345,18 +321,13 @@ export default function Arrivals({ params }) {
                                 </DropdownItem>
                                 <DropdownItem
                                   key="show"
-                                  onClick={() => {
-                                    if (reserva.ResNo) {
-                                      sendResToAPI(reserva.ResNo);
-                                    } else {
-                                      console.warn("ReservationNumber não encontrado.");
-                                    }
-                                  }}
+                                  onClick={handleRowClick}
                                 >
-                                  Statement
+                                  Registration Form
                                 </DropdownItem>
                               </DropdownMenu>
                             </Dropdown>
+
                             <DepartureInfoForm
                               buttonName={"Info"}
                               buttonColor={"transparent"}
