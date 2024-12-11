@@ -172,8 +172,8 @@ export default function SidebarWrapper({ children }) {
   
   
   const showConfirmationModal = selectedHotelID && !isHotelConfirmed;
-  const showSidebar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth");
-  const showNavBar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth");
+  const showSidebar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth") && !pathname.includes("/homepage/frontOfficeView/registrationForm");
+  const showNavBar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth") && !pathname.includes("/homepage/frontOfficeView/registrationForm");
 
   return (
     <div className="min-h-screen flex flex-col">

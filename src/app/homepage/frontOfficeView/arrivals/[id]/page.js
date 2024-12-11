@@ -90,44 +90,77 @@ export default function Arrivals({ params }) {
       try {
         const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
         console.log("Response completo:", response);
-
-        // Combinar todos os requestBody dentro de response.data.response
+  
         const reservasArray = response.data.response.flatMap(item => {
           try {
-            return JSON.parse(item.requestBody);
+            // Parsear o `requestBody` como JSON se estiver stringificado
+            const parsedRequestBody = JSON.parse(item.requestBody);
+  
+            // Extrair as informações do formato correto
+            const reservations = Array.isArray(parsedRequestBody)
+              ? parsedRequestBody.flatMap(data =>
+                  data.ReservationInfo?.map(reserva => {
+                    const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
+                    const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
+  
+                    return {
+                      requestID: item.requestID, // Adiciona o requestID
+                      DateCI: reserva.DateCI,
+                      Booker: reserva.Booker,
+                      Company: reserva.Company,
+                      Group: reserva.Group,
+                      Room: reserva.Room,
+                      ResNo: reserva.ResNo,
+                      Notes: reserva.Notes,
+                      RoomStatus: reserva.RoomStatus,
+                      RoomType: reserva.RoomType,
+                      TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
+                      Price: reserva.Price,
+                      CityTax: reserva.CityTax,
+                      Total: reserva.Total,
+                      Salutation: guestDetails.Salution,
+                      LastName: guestDetails.LastName,
+                      FirstName: guestDetails.FirstName,
+                      Country: addressDetails.Country,
+                      Street: addressDetails.Street,
+                      PostalCode: addressDetails.PostalCode,
+                      City: addressDetails.City,
+                      Region: addressDetails.Region,
+                    };
+                  }) || []
+                )
+              : [];
+  
+            return reservations;
           } catch (err) {
-            console.error("Erro ao fazer parse de requestBody:", item.requestBody, err);
+            console.error("Erro ao processar requestBody ou reservas:", err);
             return [];
           }
         });
-
-        console.log("Reservas após parse (todas as linhas):", reservasArray);
-
-        // Se nenhuma reserva for encontrada
+  
+        console.log("Reservas após parse:", reservasArray);
+  
         if (reservasArray.length === 0) {
           console.warn("Nenhuma reserva encontrada após parse.");
           return;
         }
-
-        // Filtrar reservas pela data atual
-        const formattedCurrentDate = dayjs(currentDate).format('YYYY-MM-DD');
+  
+        const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
         const reservasFiltradas = reservasArray.filter(reserva => {
-          if (!reserva.DateCO) {
-            console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva);
+          if (!reserva.DateCI) {
+            console.warn("DateCI está indefinido ou vazio para esta reserva:", reserva);
             return false;
           }
-
-          const formattedDateCO = dayjs(reserva.DateCO).format('YYYY-MM-DD');
-          return formattedDateCO === formattedCurrentDate;
+          const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
+          return formattedDateCI === formattedCurrentDate;
         });
-
+  
         console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
-
-        // Remover duplicatas com base no número da reserva (ResNo)
+  
         const reservasUnicas = Array.from(
-          new Map(reservasFiltradas.map(reserva => [reserva.ResNo, reserva])).values()
+          new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
         );
-
+  
         console.log("Reservas únicas para a data atual:", reservasUnicas);
         setReservas(reservasUnicas);
       } catch (error) {
@@ -136,10 +169,10 @@ export default function Arrivals({ params }) {
         setIsLoading(false);
       }
     };
-
+  
     fetchReservas();
   }, [currentDate, propertyID]);
-
+  
 
   useEffect(() => {
     const fetchHotelName = async () => {
@@ -185,25 +218,6 @@ export default function Arrivals({ params }) {
   const handleRefreshClick = () => {
     sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
   };
-
-  // const handleRowClick = (reserva) => {
-  //   router.push({
-  //     pathname: "../registrationForm",
-  //     query: {
-  //       room: reserva.Room,
-  //       dateCO: reserva.DateCO,
-  //       booker: reserva.Booker,
-  //       salutation: reserva.Salutation,
-  //       lastName: reserva.LastName,
-  //       firstName: reserva.FirstName,
-  //       roomType: reserva.RoomType,
-  //       resStatus: reserva.ResStatus,
-  //       totalPax: reserva.TotalPax,
-  //       balance: reserva.Balance,
-  //       country: reserva.Country,
-  //     },
-  //   });
-  // };
   
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-[#FAFAFA]">
@@ -299,7 +313,9 @@ export default function Arrivals({ params }) {
                                 </DropdownItem>
                                 <DropdownItem
                                   key="show"
-                                  onClick={() => router.push("../registrationForm")}
+                                  onClick={() => 
+                                    router.push(`/homepage/frontOfficeView/registrationForm?requestID=${reserva.requestID}&resNo=${reserva.ResNo}`)
+                                  }
                                 >
                                   Registration Form
                                 </DropdownItem>
@@ -336,7 +352,7 @@ export default function Arrivals({ params }) {
                           <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
                           <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-52 max-w-xs truncate">{reserva.Notes}</td>
                           <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
-                          <td className="text-right pr-2 w-28">{reserva.DateCO}</td>
+                          <td className="text-right pr-2 w-28">{reserva.DateCI}</td>
                         </tr>
                       );
                     })}
