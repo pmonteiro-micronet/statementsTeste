@@ -51,7 +51,7 @@ export default function Arrivals({ params }) {
         const mpehotel = propertyResponse.data.response[0].mpehotel;
         console.log('Mpehotel encontrado:', mpehotel);
 
-        await axios.get("/api/reservations/info", {
+        await axios.get("/api/reservations/checkins/reservations_4_tat", {
           params: {
             mpehotel,
             propertyID
