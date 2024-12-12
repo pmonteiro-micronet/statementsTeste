@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react';
 import axios from "axios";
-import { useSearchParams } from "next/navigation"; // Usando o hook useSearchParams
 import InputFieldControlled from "@/components/input/page";
 import CountryAutocomplete from "@/components/autocompletes/country/page";
 import { IoIosArrowForward } from "react-icons/io";
@@ -23,9 +22,9 @@ export default function Page() {
     const canvasRef = useRef(null);
     const signaturePadRef = useRef(null);
 
-    const searchParams = useSearchParams();  // Usando useSearchParams diretamente
-    const requestID = searchParams.get("requestID");  // Acessando parâmetro de URL
-    const resNo = searchParams.get("resNo");  // Acessando o parâmetro resNo
+    // const searchParams = useSearchParams();  // Usando useSearchParams diretamente
+    // const requestID = searchParams.get("requestID");  // Acessando parâmetro de URL
+    // const resNo = searchParams.get("resNo");  // Acessando o parâmetro resNo
 
     console.log(isLoading);
     const calculateNights = (start, end) => {
@@ -47,58 +46,67 @@ export default function Page() {
     const inputStyleFull = "w-full h-4 outline-none my-2 text-sm text-gray-600 input-field"
     const inputStyleFullWithLine = "w-full border-b-2 border-gray-200 px-1 h-4 outline-none my-2 text-sm text-gray-600 input-field"
 
-    // Função para buscar reserva específica
-    const fetchReservaByRequestID = async () => {
-        setIsLoading(true);
-        try {
-            const response = await axios.get(`/api/reservations/checkins/registrationForm/${requestID}`);
-            console.log("Resposta da API para o requestID:", response);
+       // Captura os parâmetros da URL diretamente
+       useEffect(() => {
+        const queryParams = new URLSearchParams(window.location.search);
+        const requestID = queryParams.get("requestID");
+        const resNo = queryParams.get("resNo");
 
-            if (response.data && response.data.response && response.data.response.length > 0) {
-                const requestBody = response.data.response[0].requestBody;
-                const reservas = JSON.parse(requestBody);
-                console.log("Reservas encontradas no requestBody:", reservas);
-
-                const reservaSelecionada = reservas[0].ReservationInfo.find(r => r.ResNo === parseInt(resNo, 10));
-
-                if (reservaSelecionada) {
-                    console.log("Reserva encontrada:", reservaSelecionada);
-
-                    // Acesse os dados do hóspede e do endereço
-                    const guestInfo = reservas[0].GuestInfo[0].GuestDetails[0];
-                    const address = reservas[0].GuestInfo[0].Address[0];
-                    const personalID = reservas[0].GuestInfo[0].PersonalID[0];
-                    const contacts = reservas[0].GuestInfo[0].Contacts[0];
-
-                    console.log("Informações do hóspede:", guestInfo);
-                    console.log("Informações do endereço:", address);
-                    console.log("Informações do PersonalID:", personalID);
-                    console.log("Informações de contato:", contacts);
-
-                    setReserva(reservaSelecionada);
-                    setGuestInfo(guestInfo);
-                    setAddress(address);
-                    setPersonalID(personalID);
-                    setContacts(contacts);
-
-                } else {
-                    console.warn(`Nenhuma reserva encontrada com ResNo: ${resNo}`);
-                }
-            } else {
-                console.warn(`Nenhuma reserva encontrada para o requestID: ${requestID}`);
+        // Função para buscar reserva específica
+        const fetchReservaByRequestID = async () => {
+            if (!requestID || !resNo) {
+                console.warn("Parâmetros ausentes na URL: requestID ou resNo");
+                return;
             }
-        } catch (error) {
-            console.error("Erro ao buscar reserva específica:", error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
-    useEffect(() => {
+            setIsLoading(true);
+            try {
+                const response = await axios.get(`/api/reservations/checkins/registrationForm/${requestID}`);
+                console.log("Resposta da API para o requestID:", response);
+
+                if (response.data?.response?.length > 0) {
+                    const requestBody = response.data.response[0].requestBody;
+                    const reservas = JSON.parse(requestBody);
+                    console.log("Reservas encontradas no requestBody:", reservas);
+
+                    const reservaSelecionada = reservas[0]?.ReservationInfo?.find(r => r.ResNo === parseInt(resNo, 10));
+
+                    if (reservaSelecionada) {
+                        console.log("Reserva encontrada:", reservaSelecionada);
+
+                        const guestInfo = reservas[0]?.GuestInfo?.[0]?.GuestDetails?.[0] || null;
+                        const address = reservas[0]?.GuestInfo?.[0]?.Address?.[0] || null;
+                        const personalID = reservas[0]?.GuestInfo?.[0]?.PersonalID?.[0] || null;
+                        const contacts = reservas[0]?.GuestInfo?.[0]?.Contacts?.[0] || null;
+
+                        console.log("Informações do hóspede:", guestInfo);
+                        console.log("Informações do endereço:", address);
+                        console.log("Informações do PersonalID:", personalID);
+                        console.log("Informações de contato:", contacts);
+
+                        setReserva(reservaSelecionada);
+                        setGuestInfo(guestInfo);
+                        setAddress(address);
+                        setPersonalID(personalID);
+                        setContacts(contacts);
+                    } else {
+                        console.warn(`Nenhuma reserva encontrada com ResNo: ${resNo}`);
+                    }
+                } else {
+                    console.warn(`Nenhuma reserva encontrada para o requestID: ${requestID}`);
+                }
+            } catch (error) {
+                console.error("Erro ao buscar reserva específica:", error.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        // Chama a função para buscar a reserva
         if (requestID && resNo) {
             fetchReservaByRequestID();
         }
-    }, [requestID, resNo]);
+    }, []);
 
 
     const initializeSignaturePad = () => {
@@ -539,7 +547,7 @@ export default function Page() {
                                         name={"Date of Birth"}
                                         label={"Date of Birth"}
                                         ariaLabel={"Date of Birth:"}
-                                        value={personalID.DateOfBirth}
+                                        value={personalID.DateOfBirth ? personalID.DateOfBirth.split('T')[0] : ""}
                                         style={inputStyleFullWithLine}
                                     />
                                     <InputFieldControlled
@@ -580,7 +588,7 @@ export default function Page() {
                                         name={"Exp. Date"}
                                         label={"Exp. Date"}
                                         ariaLabel={"Exp. Date:"}
-                                        value={personalID.ExpDate}
+                                        value={personalID.ExpDate ? personalID.ExpDate.split('T')[0] : ""}
                                         style={inputStyleFullWithLine}
                                     />
                                     <InputFieldControlled
