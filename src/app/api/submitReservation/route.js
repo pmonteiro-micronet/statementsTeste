@@ -16,7 +16,6 @@ const generateUniqueKey = (HotelInfo, Reservation, GuestInfo) => {
   return `${Tag}-${RoomNumber}-${ReservationNumber}-${DateCI}-${DateCO}-${FirstName}-${LastName}`;
 };
 
-// Função para lidar com requisições POST
 export async function POST(req) {
   console.log("Received POST request");
 
@@ -48,7 +47,6 @@ export async function POST(req) {
     });
 
     if (!property) {
-      // Se não encontrar a propriedade, retornar erro 404
       return NextResponse.json(
         { message: `Propriedade com Tag '${hotelInfo.Tag}' não encontrada.` },
         { status: 404 }
@@ -61,74 +59,54 @@ export async function POST(req) {
     });
 
     if (existingRequest) {
-      return NextResponse.json(
-        { message: "Registro com esta chave única já existe." },
-        { status: 409 }
-      );
-    }
+      console.log("Statement com esta chave única já existe. Atualizando...");
 
-    // Criar o objeto que vamos salvar em requestRecords, usando o propertyID encontrado
-    newRequest = await prisma.requestRecords.create({
-      data: {
-        requestBody: JSON.stringify(body), // Armazena o corpo completo como JSON
-        requestType: "POST",
-        requestDateTime: new Date(),
-        responseStatus: "201",
-        responseBody: "",
-        propertyID: property.propertyID, // Usar o propertyID encontrado
-        seen: false,
-        uniqueKey: uniqueKey, // Armazenar a chave única
-      },
-    });
-
-    console.log("Data saved to DB:", newRequest);
-
-    // Prepare a resposta a ser enviada
-    const responseBody = {
-      message: "Dados armazenados com sucesso",
-      data: newRequest,
-    };
-
-    return NextResponse.json(responseBody, { status: 201 });
-  } catch (error) {
-    console.error("Erro ao gravar os dados:", error.message);
-    console.error("Detalhes do erro:", error);
-
-    // Se newRequest foi criado, atualize com erro
-    if (newRequest) {
-      await prisma.requestRecords.update({
-        where: { id: newRequest.id },
+      // Atualiza o registro existente com os novos dados, utilizando o `requestID` (chave primária)
+      const updatedRequest = await prisma.requestRecords.update({
+        where: { requestID: existingRequest.requestID }, // Usando o `requestID` como chave primária
         data: {
-          responseStatus: "500",
-          responseBody: JSON.stringify({
-            message: "Erro ao gravar os dados",
-            error: error.message,
-          }),
+          requestBody: JSON.stringify(body), // Atualiza o corpo da requisição
+          requestDateTime: new Date(), // Atualiza o timestamp da requisição
+          responseStatus: "201", // Marque como sucesso (ou conforme necessário)
+          responseBody: "", // Defina a resposta se necessário
         },
       });
-      console.log("Erro salvo no DB para o request", newRequest.id);
+
+      console.log("Statement atualizado com sucesso:", updatedRequest);
+
+      return NextResponse.json(
+        { message: "Statement atualizado com sucesso", data: updatedRequest },
+        { status: 200 }
+      );
     } else {
-      // Caso não tenha conseguido criar newRequest, criar um novo registro de erro
-      await prisma.requestRecords.create({
+      // Criar um novo registro se não existir
+      console.log("Statement não encontrado. Criando novo...");
+      newRequest = await prisma.requestRecords.create({
         data: {
-          requestBody: JSON.stringify(body),
+          requestBody: JSON.stringify(body), // Armazena o corpo completo como JSON
           requestType: "POST",
           requestDateTime: new Date(),
-          responseStatus: "500",
-          responseBody: JSON.stringify({
-            message: "Erro ao gravar os dados",
-            error: error.message,
-          }),
-          propertyID: -1,
+          responseStatus: "201",
+          responseBody: "",
+          propertyID: property.propertyID, // Usar o propertyID encontrado
           seen: false,
+          uniqueKey: uniqueKey, // Armazenar a chave única
         },
       });
-      console.log("Erro ao criar request. Novo erro salvo no DB.");
-    }
 
-    // Retorne o erro ao cliente
+      console.log("Novo statement criado:", newRequest);
+
+      return NextResponse.json(
+        { message: "Novo statement criado com sucesso", data: newRequest },
+        { status: 201 }
+      );
+    }
+  } catch (error) {
+    console.error("Erro ao gravar os dados:", error.message);
+
+    // Evitar criar ou registrar um erro na base de dados
     return NextResponse.json(
-      { message: "Erro ao gravar os dados", error: error.message },
+      { message: "Erro ao processar os dados", error: error.message },
       { status: 500 }
     );
   }
