@@ -540,7 +540,7 @@ export default function Page() {
                             {/** Dados de Info pessoal */}
                             <div className='w-1/2 bg-white py-2 px-2 rounded-lg mt-1 px-4 details-on-screen-card'>
                                 <p className='text-[#f7ba83] mb-1'>Personal ID</p>
-                                <div className='flex flex-row justify-between items-center gap-4 mt-4'>
+                                <div className='flex flex-row justify-between gap-4 mt-4'>
                                     <InputFieldControlled
                                         type={"date"}
                                         id={"Date of Birth"}
@@ -568,7 +568,7 @@ export default function Page() {
                                 <div className='flex flex-row justify-between items-center gap-4 mt-4'>
                                     <CountryAutocomplete
                                         label={"ID Doc"}
-                                        style={"w-32 h-20 mt-1"}
+                                        style={"w-32 h-20"}
                                         onChange={(value) => handleSelect(value)}
                                     />
                                     <InputFieldControlled
@@ -578,7 +578,7 @@ export default function Page() {
                                         label={"Nr."}
                                         ariaLabel={"ID Doc Nr.:"}
                                         value={personalID.NrDoc}
-                                        style={inputStyleFullWithLine}
+                                        style={`${inputStyleFullWithLine} mt-4`}
                                     />
                                 </div>
                                 <div className='flex flex-row justify-between gap-4 -mt-2'>

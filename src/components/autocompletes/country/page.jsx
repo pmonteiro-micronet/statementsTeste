@@ -24,7 +24,7 @@ export default function Country({ label, style, onChange, fieldName }) {
         <div className={style}>
             <Autocomplete
                 label={<span style={{ fontSize: '10px' }}>{label}</span>}
-                className="max-w-xs text-gray-600"
+                className="max-w-xs text-gray-400"
                 variant="underlined"
                 onChange={(value) => {
                     onChange(value, fieldName);
