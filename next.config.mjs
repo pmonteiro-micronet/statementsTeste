@@ -8,6 +8,10 @@ const nextConfig = {
 
     return config;
   },
+  i18n: {
+    locales: ['en', 'pt', 'es'], // Idiomas suportados
+    defaultLocale: 'en',        // Idioma padrão
+  },
 };
 
 export default nextConfig;
