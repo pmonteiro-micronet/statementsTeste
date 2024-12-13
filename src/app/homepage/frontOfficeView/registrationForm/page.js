@@ -10,6 +10,7 @@ import './styles.css';
 import { FaPencilAlt } from "react-icons/fa";
 import { GiCancel } from "react-icons/gi";
 import SignaturePad from 'signature_pad';
+import LoadingBackdrop from "@/components/Loader/page";
 
 export default function Page() {
     const [reserva, setReserva] = useState(null);
@@ -232,7 +233,12 @@ export default function Page() {
 
     return (
         <div className='bg-gray-100 main-page min-h-screen'>
-            {/** header */}
+            {isLoading && (
+                <LoadingBackdrop open={isLoading} />
+            )}
+            {!isLoading && (
+            // header 
+            <>
             <div className="pt-2 px-4 flex justify-between flag-position items-center">
                 <div>Torel Quinta da Vacaria</div>
                 <div>
@@ -579,14 +585,14 @@ export default function Page() {
                                     onChange={(value) => handleSelect(value)}
                                 /> */}
                                 <InputFieldControlled
-                                        type={"text"}
-                                        id={"Nacionality"}
-                                        name={"Nacionality"}
-                                        label={"Nacionality"}
-                                        ariaLabel={"Nacionality:"}
-                                        value={personalID.Nacionality}
-                                        style={`${inputStyleFullWithLine}`}
-                                    />
+                                    type={"text"}
+                                    id={"Nacionality"}
+                                    name={"Nacionality"}
+                                    label={"Nacionality"}
+                                    ariaLabel={"Nacionality:"}
+                                    value={personalID.Nacionality}
+                                    style={`${inputStyleFullWithLine}`}
+                                />
                                 <div className='flex flex-row justify-between items-center gap-4 mt-4'>
                                     {/* <CountryAutocomplete
                                         label={"ID Doc"}
@@ -794,6 +800,8 @@ export default function Page() {
                     </div>
                 </div>
             </div>
+            </>
+            )}
         </div>
     );
 }
