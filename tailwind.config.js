@@ -26,6 +26,10 @@ module.exports = {
         colors: {
           background: "#FAFAFA",
           foreground: "#001517",
+          textPrimaryColor: "#000000",
+          textLabelColor: "#404040",
+          textSecondaryLabelColor: "#363636",
+          cardColor: "#FFFFFF",
           primary: {
             50: '#f7e9dc',
             100: '#FAE7D6',
@@ -41,7 +45,21 @@ module.exports = {
           tableColWeekend: '#E3F1FC',
           lightBlueCol: '#F4F7FE',
         },
-
+      },
+      dark: {
+        colors: {
+          background: "#1a1a1a",
+          textPrimaryColor: "#FAFAFA",
+          textLabelColor: "#ebebeb",
+          textSecondaryLabelColor: "#f5f5f5",
+          cardColor: "#403f3f",
+          primary: {
+            50: '#f7e9dc',
+            100: '#FAE7D6',
+            DEFAULT: '#FC9D25',
+            foreground: "#f5f5f5",
+          },
+        }
       }
     }
   })],

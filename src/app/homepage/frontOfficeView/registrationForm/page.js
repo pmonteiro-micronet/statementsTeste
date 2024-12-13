@@ -13,6 +13,8 @@ import SignaturePad from 'signature_pad';
 import LoadingBackdrop from "@/components/Loader/page";
 import TermsConditionsForm from "@/components/terms&conditions/page";
 import ProtectionPolicyForm from "@/components/protectionPolicy/page";
+import { FaRegSun } from "react-icons/fa6";
+import { FaRegMoon } from "react-icons/fa";
 
 export default function Page() {
     const [reserva, setReserva] = useState(null);
@@ -44,10 +46,10 @@ export default function Page() {
         : '-';
 
     //botoes que mudam de cor
-    const halfInputStyle = "w-10 h-4 outline-none my-2 text-sm text-gray-600 input-field"
-    const inputStyle = "w-32 h-4 outline-none my-2 text-sm text-gray-600 input-field"
-    const inputStyleFull = "w-full h-4 outline-none my-2 text-sm text-gray-600 input-field"
-    const inputStyleFullWithLine = "w-full border-b-2 border-gray-200 px-1 h-4 outline-none my-2 text-sm text-gray-600 input-field"
+    const halfInputStyle = "w-10 h-4 outline-none my-2 text-sm !text-textLabelColor bg-cardColor input-field"
+    const inputStyle = "w-32 h-4 outline-none my-2 text-sm !text-textLabelColor bg-cardColor input-field"
+    const inputStyleFull = "w-full h-4 outline-none my-2 text-sm !text-textLabelColor bg-cardColor input-field"
+    const inputStyleFullWithLine = "w-full border-b-2 border-gray-200 px-1 h-4 outline-none my-2 text-sm !text-textLabelColor bg-cardColor input-field"
 
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search);
@@ -233,8 +235,20 @@ export default function Page() {
         }
     };
 
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
+    // Alterna entre os modos
+    const toggleTheme = () => {
+        setIsDarkMode(!isDarkMode);
+        if (!isDarkMode) {
+            document.documentElement.classList.add("dark"); // Adiciona classe "dark"
+        } else {
+            document.documentElement.classList.remove("dark"); // Remove classe "dark"
+        }
+    };
+
     return (
-        <div className='bg-gray-100 main-page min-h-screen'>
+        <div className='bg-background main-page min-h-screen'>
             {isLoading && (
                 <LoadingBackdrop open={isLoading} />
             )}
@@ -242,8 +256,8 @@ export default function Page() {
                 // header 
                 <>
                     <div className="pt-2 px-4 flex justify-between flag-position items-center">
-                        <div>Torel Quinta da Vacaria</div>
-                        <div>
+                        <div className='text-textPrimaryColor'>Torel Quinta da Vacaria</div>
+                        <div className='text-textPrimaryColor'>
                             <p>Registration Form</p>
                         </div>
                         <div className="flex flex-row gap-2 items-center language-row">
@@ -294,7 +308,7 @@ export default function Page() {
 
                             {/* Dropdown Menu */}
                             {dropdownOpen && (
-                                <div className="absolute top-full right-0 bg-white shadow-md rounded mt-1 z-10 w-14">
+                                <div className="absolute top-full right-0 bg-cardColor shadow-md rounded mt-1 z-10 w-14">
                                     <div
                                         className="flex items-center justify-center gap-2 p-2 cursor-pointer"
                                         onClick={() => handleFlagClick('usa-uk')}
@@ -338,7 +352,7 @@ export default function Page() {
                             <div className='w-1/2 ml-4 mr-4 half-screen'>
                                 <div className='flex flex-row details-on-screen'>
                                     {/** Dados de Morada */}
-                                    <div className='w-1/2 bg-white py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
+                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
                                         <div className='flex flex-row items-center'>
                                             <h3 className='text-[#f7ba83]'>Stay Details</h3>
                                             <IoIosArrowForward size={20} color='#f7ba83' />
@@ -417,7 +431,7 @@ export default function Page() {
                                     </div>
 
                                     {/** Dados de Info pessoal */}
-                                    <div className='w-1/2 bg-white py-2 px-2 rounded-lg mt-1 px-4 details-on-screen-card'>
+                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 px-4 details-on-screen-card'>
                                         <p className='text-[#f7ba83] mb-1'>Price Info</p>
                                         <div className='flex flex-row justify-between items-center gap-4 mt-2'>
                                             <InputFieldControlled
@@ -464,7 +478,7 @@ export default function Page() {
                                 </div>
 
                                 {/** Dados de cliente */}
-                                <div className='bg-white py-2 px-2 rounded-lg mt-1'>
+                                <div className='bg-cardColor py-2 px-2 rounded-lg mt-1'>
                                     <p className='text-[#f7ba83] mb-1'>Guest Details</p>
                                     <div className='flex flex-row w-full mt-2'>
                                         <div className='mr-4'>
@@ -475,7 +489,7 @@ export default function Page() {
                                                 label={"Salutation"}
                                                 ariaLabel={"Salutation:"}
                                                 value={guestInfo.Salution}
-                                                style={"w-10 h-5 outline-none my-2 text-lg !text-gray-600"}
+                                                style={"w-10 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
                                             />
                                         </div>
                                         <div className='w-full flex flex-row'>
@@ -487,7 +501,7 @@ export default function Page() {
                                                     label={"Last Name"}
                                                     ariaLabel={"Last Name:"}
                                                     value={guestInfo.LastName}
-                                                    style={"w-72 h-5 outline-none my-2 text-lg !text-gray-600"}
+                                                    style={"w-72 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
                                                 />
                                             </div>
                                             <div className='w-1/2 -ml-2'>
@@ -498,7 +512,7 @@ export default function Page() {
                                                     label={"First Name"}
                                                     ariaLabel={"First Name:"}
                                                     value={guestInfo.FirstName}
-                                                    style={"w-full h-5 outline-none my-2 text-lg !text-gray-600"}
+                                                    style={"w-full h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
                                                 />
                                             </div>
                                         </div>
@@ -507,7 +521,7 @@ export default function Page() {
 
                                 <div className='flex flex-row details-on-screen'>
                                     {/** Dados de Morada */}
-                                    <div className='w-1/2 bg-white py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
+                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
                                         <p className='text-[#f7ba83] mb-1'>Address</p>
                                         <div className='flex flex-col w-full mt-2'>
                                             <InputFieldControlled
@@ -559,7 +573,7 @@ export default function Page() {
                                     </div>
 
                                     {/** Dados de Info pessoal */}
-                                    <div className='w-1/2 bg-white py-2 px-2 rounded-lg mt-1 px-4 details-on-screen-card'>
+                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 px-4 details-on-screen-card'>
                                         <p className='text-[#f7ba83] mb-1'>Personal ID</p>
                                         <div className='flex flex-row justify-between gap-4 mt-4'>
                                             <InputFieldControlled
@@ -645,7 +659,7 @@ export default function Page() {
 
                                 <div className='flex flex-row details-on-screen'>
                                     {/** Dados de contacto */}
-                                    <div className='w-1/2 bg-white py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
+                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
                                         <div className='flex flex-row justify-between'>
                                             <p className='text-[#f7ba83] mb-1'>Contacts</p>
                                             <FaPencilAlt size={15} color='orange' />
@@ -673,13 +687,13 @@ export default function Page() {
                                     </div>
 
                                     {/** Dados de faturação */}
-                                    <div className='w-1/2 bg-white py-2 px-2 rounded-lg mt-1 details-on-screen-card'>
+                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card'>
                                         <div className='flex flex-row justify-between'>
                                             <p className='text-[#f7ba83] mb-1'>Invoice Data</p>
                                             <FaPencilAlt size={15} color='orange' />
                                         </div>
                                         <div className='mt-2'>
-                                            <p className='text-gray-600 text-lg'>{guestInfo.LastName}, {guestInfo.FirstName}</p>
+                                            <p className='!text-textLabelColor text-lg'>{guestInfo.LastName}, {guestInfo.FirstName}</p>
                                             <div className='mt-4'>
                                                 <InputFieldControlled
                                                     type={"text"}
@@ -699,13 +713,13 @@ export default function Page() {
                         )}
                         <div className='w-1/2 ml-4 mr-4 half-screen'>
                             {/** Assinatura */}
-                            <div className='bg-white py-2 px-2 rounded-lg'>
+                            <div className='bg-cardColor py-2 px-2 rounded-lg'>
                                 <p className='text-[#f7ba83] mb-1'>Signature</p>
                                 {/* Termos e condições */}
                                 <div className='flex flex-row mt-2 gap-8 details-on-screen'>
                                     <div className='w-1/2 flex flex-col details-on-screen-card'>
-                                        <p className='text-xs font-semibold'>I accept the Hotel Terms and Conditions:</p>
-                                        <div className='flex flex-row justify-between text-sm'>
+                                        <p className='text-xs font-semibold text-textPrimaryColor'>I accept the Hotel Terms and Conditions:</p>
+                                        <div className='flex flex-row justify-between text-sm text-textPrimaryColor'>
                                             <label className="flex items-center">
                                                 <input
                                                     type="radio"
@@ -735,8 +749,8 @@ export default function Page() {
                                     </div>
 
                                     <div className='w-1/2 flex flex-col details-on-screen-card'>
-                                        <p className='text-xs font-semibold'>I accept the Hotel Data Protection Policy:</p>
-                                        <div className='flex flex-row justify-between text-sm'>
+                                        <p className='text-xs font-semibold text-textPrimaryColor'>I accept the Hotel Data Protection Policy:</p>
+                                        <div className='flex flex-row justify-between text-sm text-textPrimaryColor'>
                                             <label className="flex items-center">
                                                 <input
                                                     type="radio"
@@ -791,6 +805,14 @@ export default function Page() {
                                 Quinta da Vacaria through the website www.torelquintadavacaria.com.
                                 <br></br>I authorize the use of the credit card left as guarantee to cover any consumptions after check-out.
                             </p>
+                            <div className='flex flex-row justify-between'>
+                            <button
+                                    onClick={toggleTheme}
+                                    className={`px-4 py-2 rounded-md ${isDarkMode ? "text-white" : "text-black"
+                                        }`}
+                                >
+                                    {isDarkMode ? <FaRegSun size={20}/> : <FaRegMoon size={20}/>}
+                                </button>
                             <div className='flex flex-row gap-4 justify-end px-4 buttons-style items-center'>
                                 {/** Botão de cancelar */}
                                 <CancelPIN
@@ -807,6 +829,7 @@ export default function Page() {
                                     onClick={handleOkClick}>
                                     Ok
                                 </button>
+                            </div>
                             </div>
                         </div>
                     </div>
