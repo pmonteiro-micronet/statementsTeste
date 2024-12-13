@@ -50,41 +50,41 @@ export default function Page() {
         const queryParams = new URLSearchParams(window.location.search);
         const requestID = queryParams.get("requestID");
         const resNo = queryParams.get("resNo");
-    
+
         const fetchReservaByRequestID = async () => {
             if (!requestID || !resNo) {
                 console.warn("Parâmetros ausentes na URL: requestID ou resNo");
                 return;
             }
-    
+
             setIsLoading(true);
             try {
                 const response = await axios.get(`/api/reservations/checkins/registrationForm/${requestID}`);
                 console.log("Resposta da API para o requestID:", response);
-    
+
                 if (response.data?.response?.length > 0) {
                     const requestBody = response.data.response[0].requestBody;
                     const reservas = JSON.parse(requestBody);
                     console.log("Reservas encontradas no requestBody:", reservas);
-    
+
                     const reservaSelecionada = reservas.find(r =>
                         r.ReservationInfo.some(info => `${info.ResNo}` === `${resNo}`)
                     );
-    
+
                     if (reservaSelecionada) {
                         console.log("Reserva encontrada:", reservaSelecionada);
-    
+
                         // Acessando informações diretamente do primeiro índice de GuestInfo
                         const guestInfo = reservaSelecionada.GuestInfo?.[0]?.GuestDetails?.[0] || null;
                         const address = reservaSelecionada.GuestInfo?.[0]?.Address?.[0] || null;
                         const personalID = reservaSelecionada.GuestInfo?.[0]?.PersonalID?.[0] || null;
                         const contacts = reservaSelecionada.GuestInfo?.[0]?.Contacts?.[0] || null;
-    
+
                         console.log("Informações do hóspede:", guestInfo);
                         console.log("Informações do endereço:", address);
                         console.log("Informações do PersonalID:", personalID);
                         console.log("Informações de contato:", contacts);
-    
+
                         setReserva(reservaSelecionada.ReservationInfo.find(info => `${info.ResNo}` === `${resNo}`));
                         setGuestInfo(guestInfo);
                         setAddress(address);
@@ -102,12 +102,12 @@ export default function Page() {
                 setIsLoading(false);
             }
         };
-    
+
         if (requestID && resNo) {
             fetchReservaByRequestID();
         }
     }, []);
-    
+
 
     const initializeSignaturePad = () => {
         const canvas = canvasRef.current;
@@ -192,14 +192,26 @@ export default function Page() {
 
             // Aqui assumimos que `reserva` já está definido no escopo
             const reservaDetails = {
+                propertyID: reserva.propertyID,
                 ResNo: reserva.ResNo,
                 Room: reserva.Room,
                 DateCI: reserva.DateCI,
                 DateCO: reserva.DateCO,
                 Adults: reserva.Adults,
                 Childs: reserva.Childs,
-                LastName: reserva.LastName,
-                FirstName: reserva.FirstName,
+                LastName: guestInfo.LastName,
+                FirstName: guestInfo.FirstName,
+                Street: address.Street,
+                Country: address.Country,
+                IdDoc: personalID.IdDoc,
+                NrDoc: personalID.NrDoc,
+                Phone: contacts.PhoneNumber,
+                ExpDate: personalID.ExpDate,
+                DateOfBirth: personalID.DateOfBirth,
+                Issue: personalID.Issue,
+                CountryOfBirth: personalID.CountryOfBirth,
+                VatNo: contacts.VatNo,
+                PersonalEmail: contacts.Email,
             };
 
             // Geração do PDF utilizando o template
@@ -352,7 +364,7 @@ export default function Page() {
                                             label={"Adults"}
                                             ariaLabel={"Adults:"}
                                             value={reserva.Adults}
-                                            style={halfInputStyle}
+                                            style={`${halfInputStyle}`}
                                         />
                                         <InputFieldControlled
                                             type={"text"}
@@ -424,9 +436,9 @@ export default function Page() {
                                         type={"text"}
                                         id={"Price"}
                                         name={"Price"}
-                                        label={"Price"}
+                                        label={"Price\\Night"}
                                         ariaLabel={"Price:"}
-                                        value={reserva.Price}
+                                        value={`${reserva.Price.toFixed(2)} €`} // Formata para 2 casas decimais
                                         style={inputStyleFull}
                                     />
                                     <InputFieldControlled
@@ -435,9 +447,10 @@ export default function Page() {
                                         name={"Total"}
                                         label={"Total"}
                                         ariaLabel={"Total:"}
-                                        value={reserva.Total}
+                                        value={`${reserva.Total.toFixed(2)} €`} // Formata para 2 casas decimais
                                         style={inputStyleFull}
                                     />
+
                                 </div>
                             </div>
                         </div>
@@ -547,7 +560,7 @@ export default function Page() {
                                         name={"Date of Birth"}
                                         label={"Date of Birth"}
                                         ariaLabel={"Date of Birth:"}
-                                        value={personalID.DateOfBirth ? personalID.DateOfBirth.split('T')[0] : ""}
+                                        value={personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01' ? personalID.DateOfBirth.split('T')[0] : ""}
                                         style={inputStyleFullWithLine}
                                     />
                                     <InputFieldControlled
@@ -557,19 +570,37 @@ export default function Page() {
                                         label={"Country of Birth"}
                                         ariaLabel={"Country of Birth:"}
                                         value={personalID.CountryOfBirth}
-                                        style={`${inputStyleFullWithLine} -mb-6`}
+                                        style={`${inputStyleFullWithLine}`}
                                     />
                                 </div>
-                                <CountryAutocomplete
+                                {/* <CountryAutocomplete
                                     label={"Nacionality"}
                                     style={"w-full h-9 -mt-2"}
                                     onChange={(value) => handleSelect(value)}
-                                />
+                                /> */}
+                                <InputFieldControlled
+                                        type={"text"}
+                                        id={"Nacionality"}
+                                        name={"Nacionality"}
+                                        label={"Nacionality"}
+                                        ariaLabel={"Nacionality:"}
+                                        value={personalID.Nacionality}
+                                        style={`${inputStyleFullWithLine}`}
+                                    />
                                 <div className='flex flex-row justify-between items-center gap-4 mt-4'>
-                                    <CountryAutocomplete
+                                    {/* <CountryAutocomplete
                                         label={"ID Doc"}
                                         style={"w-32 h-20"}
                                         onChange={(value) => handleSelect(value)}
+                                    /> */}
+                                    <InputFieldControlled
+                                        type={"text"}
+                                        id={"ID Doc"}
+                                        name={"ID Doc"}
+                                        label={"ID Doc"}
+                                        ariaLabel={"ID Doc:"}
+                                        value={""}
+                                        style={`${inputStyleFullWithLine}`}
                                     />
                                     <InputFieldControlled
                                         type={"text"}
@@ -578,17 +609,17 @@ export default function Page() {
                                         label={"Nr."}
                                         ariaLabel={"ID Doc Nr.:"}
                                         value={personalID.NrDoc}
-                                        style={`${inputStyleFullWithLine} mt-4`}
+                                        style={`${inputStyleFullWithLine}`}
                                     />
                                 </div>
-                                <div className='flex flex-row justify-between gap-4 -mt-2'>
+                                <div className='flex flex-row justify-between gap-4 mt-4'>
                                     <InputFieldControlled
                                         type={"date"}
                                         id={"Exp. Date"}
                                         name={"Exp. Date"}
                                         label={"Exp. Date"}
                                         ariaLabel={"Exp. Date:"}
-                                        value={personalID.ExpDate ? personalID.ExpDate.split('T')[0] : ""}
+                                        value={personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31' ? personalID.DateOfBirth.split('T')[0] : ""}
                                         style={inputStyleFullWithLine}
                                     />
                                     <InputFieldControlled

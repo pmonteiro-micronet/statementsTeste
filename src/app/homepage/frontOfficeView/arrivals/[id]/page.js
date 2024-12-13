@@ -104,7 +104,8 @@ export default function Arrivals({ params }) {
                     const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
   
                     return {
-                      requestID: item.requestID, // Adiciona o requestID
+                      requestID: item.requestID,
+                      propertyID: item.propertyID, // Adiciona o requestID
                       DateCI: reserva.DateCI,
                       Booker: reserva.Booker,
                       Company: reserva.Company,
