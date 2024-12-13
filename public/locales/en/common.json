@@ -1,0 +1,33 @@
+{
+    "auth":{
+        "instruction1": "To access Extensions myPMS, enter your Email and Password.",
+        "instruction2": "Forgot your Email or Password?",
+        "instruction3": "I am already a customer but don’t have access. How can I join Extensions myPMS?",
+        "email": "E-mail",
+        "password": "Password",
+        "login": "Login",
+        "footer":{
+            "callCost": "Cost of a call to the national fixed-line network.",
+            "personalizedService": "Personalized service",
+            "activeDays": "Business days, from 9:30 AM to 6:30 PM."
+        }
+    },
+    "navbar": {
+        "alert":{
+            "messagePart1": "You will logout automatically in ",
+            "messagePart2": "seconds!",
+            "continue": "Continue",
+            "logout": "Logout"
+        },
+        "logout": "Logout"
+    },
+    "homepage": {
+        "title": "Homepage",
+        "cardPending": "Pending",
+        "cardViewed": "Viewed"
+    },
+    "errors":{
+            "unknownUser": "Unknown user",
+            "unknownEmail": "Unknown e-mail"
+    }
+}

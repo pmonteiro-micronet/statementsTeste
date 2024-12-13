@@ -79,7 +79,7 @@ const CancelPIN = ({
         try {
             const isPinCorrect = await bcrypt.compare(pin, userPinHash);
             if (isPinCorrect) {
-                router.push("/");
+                router.push("/homepage");
             } else {
                 setPin("");
                 setIsPinError(true);
