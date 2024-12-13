@@ -5,8 +5,13 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import "../styles.css";
 import LoadingBackdrop from "@/components/Loader/page"; // Certifique-se de ter o componente de carregamento
+import en from "../../../../../public/locales/en/common.json";
+
+const translations = { en };
 
 const VistosPage = () => {
+  const locale = "en";
+  const t = translations[locale];
   const [getJsons, setGetJsons] = useState([]);
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -64,12 +69,12 @@ const VistosPage = () => {
   };
 
   if (status === "loading") {
-    return <p>Carregando...</p>;
+    return <p>{t.errors.loading}...</p>;
   }
 
   return (
     <div className="min-h-screen flex flex-col p-8 bg-background">
-      <h2 className="font-semibold text-2xl mb-4">Viewed</h2>
+      <h2 className="font-semibold text-2xl mb-4">{t.statements.view.title}</h2>
       <LoadingBackdrop open={isLoading} />
       {!isLoading && (
         <div className="grid-container">
@@ -86,7 +91,8 @@ const VistosPage = () => {
               const hotelInfo = parsedData[0]?.HotelInfo?.[0];
               const reservation = parsedData[0]?.Reservation?.[0];
               const guestInfo = parsedData[0]?.GuestInfo?.[0];
-              const hotelName = hotelInfo?.Description || "Nome do Hotel";
+              const hotelName = hotelInfo?.Description || t('statements.view.defaultHotelName');
+
 
               if (!reservation || !guestInfo) {
                 return null;
@@ -118,15 +124,15 @@ const VistosPage = () => {
                   <div className="absolute left-4 mt-20 w-full pr-4">
                     <div className="flex flex-col space-y-2 pr-4">
                       <div className="flex justify-between mt-10">
-                        <p className="text-sm font-bold">Reservation Number</p>
+                        <p className="text-sm font-bold">{t.statements.view.reservationNumber}</p>
                         <span>{reservation.ReservationNumber}</span>
                       </div>
                       <div className="flex justify-between">
-                        <p className="text-sm font-bold">Check-In</p>
+                        <p className="text-sm font-bold">{t.statements.view.checkIn}</p>
                         <span>{reservation.DateCI}</span>
                       </div>
                       <div className="flex justify-between">
-                        <p className="text-sm font-bold">Check-Out</p>
+                        <p className="text-sm font-bold">{t.statements.view.checkOut}</p>
                         <span>{reservation.DateCO}</span>
                       </div>
                     </div>
@@ -135,7 +141,7 @@ const VistosPage = () => {
                         className="w-full pt-1 pb-1 text-sm rounded-lg border-2 flex items-center justify-center gap-2 border-primary-50 bg-primary-100 hover:bg-primary hover:text-white transition-colors"
                         onClick={() => handleCardClick(json)}
                       >
-                        Checked Statement
+                        {t.statements.view.checkedStatement}
                       </button>
                     </div>
                   </div>
@@ -143,7 +149,7 @@ const VistosPage = () => {
               );
             })
           ) : (
-            <p className="text-gray-500">No statements seen.</p>
+            <p className="text-gray-500">{t.statements.view.noStatement}</p>
           )}
         </div>
       )}

@@ -2,7 +2,7 @@
     "auth":{
         "instruction1": "To access Extensions myPMS, enter your Email and Password.",
         "instruction2": "Forgot your Email or Password?",
-        "instruction3": "I am already a customer but don’t have access. How can I join Extensions myPMS?",
+        "instruction3": "I am already a customer but do not have access. How can I join Extensions myPMS?",
         "email": "E-mail",
         "password": "Password",
         "login": "Login",
@@ -26,7 +26,41 @@
         "cardPending": "Pending",
         "cardViewed": "Viewed"
     },
+    "statements": {
+        "dashboard": {
+            "title": "Dashboard",
+            "cardPending": "Pending",
+            "cardViewed": "Viewed"
+        },
+        "pending": {
+            "title": "Pendings",
+            "defaultHotelName": "Hotel Name",
+            "reservationNumber": "Reservation Number",
+            "checkIn": "Check-In",
+            "checkOut": "Check-Out",
+            "viewStatement": "View Statement",
+            "noStatement": "No pending statements."
+        },
+        "view": {
+            "title": "Viewed",
+            "defaultHotelName": "Hotel Name",
+            "reservationNumber": "Reservation Number",
+            "checkIn": "Check-In",
+            "checkOut": "Check-Out",
+            "checkedStatement": "Checked Statement",
+            "noStatement": "No statements seen."
+        }
+    },
+    "frontOffice": {
+        "dashboard":{
+            "title": "Front Office",
+            "cardArrivals": "Arrivals",
+            "cardInHouses": "In Houses",
+            "cardDepartures": "Departures"
+        }
+    },
     "errors":{
+            "loading": "Loading",
             "unknownUser": "Unknown user",
             "unknownEmail": "Unknown e-mail"
     }
