@@ -4,7 +4,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, Button, useDisclosure } fr
 //imports de icons
 import { MdClose } from "react-icons/md";
 
-const protectionPolicyForm = ({
+const ProtectionPolicyForm = ({
     buttonName,
     buttonIcon,
     modalHeader,
@@ -76,4 +76,4 @@ const protectionPolicyForm = ({
     );
 };
 
-export default protectionPolicyForm;
+export default ProtectionPolicyForm;
