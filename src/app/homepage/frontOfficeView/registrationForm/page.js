@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from "axios";
 import InputFieldControlled from "@/components/input/page";
-import CountryAutocomplete from "@/components/autocompletes/country/page";
+// import CountryAutocomplete from "@/components/autocompletes/country/page";
 import { IoIosArrowForward } from "react-icons/io";
 import CancelPIN from "@/components/modals/pin/cancel/page";
 import { generatePDFTemplate } from "@/components/pdfTemplate/page";
