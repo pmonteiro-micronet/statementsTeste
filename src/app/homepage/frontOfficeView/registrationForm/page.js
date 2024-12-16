@@ -10,11 +10,8 @@ import './styles.css';
 import { FaPencilAlt } from "react-icons/fa";
 import { GiCancel } from "react-icons/gi";
 import SignaturePad from 'signature_pad';
-import LoadingBackdrop from "@/components/Loader/page";
 import TermsConditionsForm from "@/components/terms&conditions/page";
 import ProtectionPolicyForm from "@/components/protectionPolicy/page";
-import { FaRegSun } from "react-icons/fa6";
-import { FaRegMoon } from "react-icons/fa";
 
 export default function Page() {
     const [reserva, setReserva] = useState(null);
