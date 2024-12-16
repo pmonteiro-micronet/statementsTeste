@@ -315,7 +315,7 @@ export default function Arrivals({ params }) {
                                 <DropdownItem
                                   key="show"
                                   onClick={() => 
-                                    router.push(`/homepage/frontOfficeView/registrationForm?requestID=${reserva.requestID}&resNo=${reserva.ResNo}`)
+                                    router.push(`/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}`)
                                   }
                                 >
                                   Registration Form
