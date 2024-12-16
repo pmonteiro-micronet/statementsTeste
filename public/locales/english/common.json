@@ -57,6 +57,23 @@
             "cardArrivals": "Arrivals",
             "cardInHouses": "In Houses",
             "cardDepartures": "Departures"
+        },
+        "departures": {
+            "today": "Today",
+            "tomorrow": "Tomorrow",
+            "departureList": "Departure List",
+            "room": "Room",
+            "lastName": "Last Name",
+            "firstName": "First Name",
+            "travelAgency": "Travel Agency",
+            "company": "Company",
+            "group": "Group",
+            "notes": "Notes",
+            "resNo": "Res. No.",
+            "departure": "Departure",
+            "info": "Info",
+            "statement": "Statement",
+            "noReservations": "No reservations found."
         }
     },
     "errors":{

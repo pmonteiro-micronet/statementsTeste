@@ -17,7 +17,14 @@ import LoadingBackdrop from "@/components/Loader/page";
 import { useRouter } from "next/navigation";
 import dayjs from 'dayjs';
 
+import en from "../../../../../../public/locales/english/common.json";
+
+const translations = { en };
+
 export default function Page({ params }) {
+  const locale = "en";
+  const t = translations[locale];
+
   const { id } = params;
   const propertyID = id;
   const today = new Date().toISOString().split("T")[0];
@@ -260,7 +267,7 @@ export default function Page({ params }) {
 
               {/* Título dinâmico com a data atual */}
               <h2 className="text-xl">
-                {currentDate === today ? `Today: ${today}` : `Tomorrow: ${currentDate}`}
+                {currentDate === today ? `${t.frontOffice.departures.today}: ${today}` : `${t.frontOffice.departures.tomorrow}: ${currentDate}`}
               </h2>
 
               {/* Seta para avançar para o próximo dia */}
@@ -274,7 +281,7 @@ export default function Page({ params }) {
               )}
 
               {/* Título "Departure List" separado do título dinâmico */}
-              <h2 className="text-xl">{propertyName} : Departure List</h2>
+              <h2 className="text-xl">{propertyName} : {t.frontOffice.departures.departureList}</h2>
             </div>
 
             {/* Botão de refresh alinhado à direita */}
@@ -298,15 +305,15 @@ export default function Page({ params }) {
                   <thead>
                     <tr className="bg-primary text-white h-12">
                       <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ROOM</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">LAST NAME</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">FIRST NAME</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">TRAVEL AGENCY</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">COMPANY</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">GROUP</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">NOTES</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">RES. NO.</td>
-                      <td className="pl-2">DEPARTURE</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.room}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.lastName}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.firstName}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.travelAgency}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.company}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.group}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.notes}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.resNo}</td>
+                      <td className="pl-2 uppercase">{t.frontOffice.departures.departure}</td>
                     </tr>
                   </thead>
                   <tbody>
@@ -331,7 +338,7 @@ export default function Page({ params }) {
                                 className="relative z-10"
                               >
                                 <DropdownItem key="edit" onClick={() => handleOpenModal()}>
-                                  Info
+                                {t.frontOffice.departures.info}
                                 </DropdownItem>
                                 <DropdownItem
                                   key="show"
@@ -343,7 +350,7 @@ export default function Page({ params }) {
                                     }
                                   }}
                                 >
-                                  Statement
+                                  {t.frontOffice.departures.statement}
                                 </DropdownItem>
                               </DropdownMenu>
                             </Dropdown>
@@ -385,7 +392,7 @@ export default function Page({ params }) {
               )}
             </div>
           ) : (
-            <p>No reservations found.</p>
+            <p>{t.frontOffice.departures.noReservations}</p>
           )}
         </div>
 

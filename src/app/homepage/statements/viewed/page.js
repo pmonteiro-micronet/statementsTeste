@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import "../styles.css";
 import LoadingBackdrop from "@/components/Loader/page"; // Certifique-se de ter o componente de carregamento
-import en from "../../../../../public/locales/en/common.json";
+import en from "../../../../../public/locales/english/common.json";
 
 const translations = { en };
 
