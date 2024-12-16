@@ -9,8 +9,8 @@ const nextConfig = {
     return config;
   },
   i18n: {
-    locales: ['en', 'pt', 'es'], // Idiomas suportados
-    defaultLocale: 'en',        // Idioma padrão
+    locales: ['english', 'portuguesPortugal', 'espanol'], // Idiomas suportados
+    defaultLocale: 'english',        // Idioma padrão
   },
 };
 

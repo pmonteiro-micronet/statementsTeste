@@ -1,6 +1,6 @@
 import React from "react";
 import "./styles.css";
-import en from "../../../public/locales/en/common.json";
+import en from "../../../public/locales/english/common.json";
 
 const translations = { en };
 

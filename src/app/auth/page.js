@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "./styles.css";
-import en from "../../../public/locales/en/common.json";
+import en from "../../../public/locales/english/common.json";
 
 const translations = { en };
 

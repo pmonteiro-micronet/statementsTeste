@@ -1,7 +1,7 @@
-// src/app/page.js
+// src/app/pt/page.js
 import { redirect } from "next/navigation";
 
-export default function Home() {
+export default function Pt() {
   // Redireciona para a página desejada
-  redirect("/homepage");
+  redirect("/auth");
 }
