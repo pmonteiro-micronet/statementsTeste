@@ -223,8 +223,10 @@ I authorize the use of the credit card left as guarantee to cover any consumptio
         doc.addImage(signatureBase64, 'PNG', signatureX, signatureStartY + 10, signatureWidth, 10);
     }
 
-    // Adiciona a linha após a assinatura
-    doc.line(10, signatureStartY + 22, 200, signatureStartY + 22); // A linha logo após a assinatura
+    // Centraliza a linha após a assinatura
+    const lineWidth = 150; // Largura da linha
+    const lineStartX = (pageWidth - lineWidth) / 2; // Calcula a posição X da linha para centralizá-la
+    doc.line(lineStartX, signatureStartY + 22, lineStartX + lineWidth, signatureStartY + 22); // Linha centralizada
 
     // Adiciona "Guest Sign" abaixo da linha e centralizado
     doc.setFontSize(9); // Reduz o tamanho da fonte para "Guest Sign"
@@ -241,15 +243,15 @@ I authorize the use of the credit card left as guarantee to cover any consumptio
         "+351 226 001 966   (custo chamada para rede fixa nacional) reservas@torelquintadavacaria.com",
         "Quinta da Vacaria 1616 Vinhos, SA   500359881 - Vilarinho dos Freires   RNET – 12081"
     ];
-    
+
     // Configurações de estilo do rodapé
     doc.setFontSize(8); // Tamanho da fonte pequeno para o rodapé
     doc.setFont('helvetica', 'italic'); // Estilo da fonte itálico
-    
+
     // Ajustar para ficar mais próximo do final da página
     const footerYStart = doc.internal.pageSize.height - 20; // Posição inicial do rodapé, mais abaixo
     const footerLineSpacing = 5; // Espaçamento entre linhas
-    
+
     // Adiciona cada linha do rodapé
     footerLines.forEach((line, index) => {
         const lineWidth = doc.getTextWidth(line);
@@ -257,7 +259,7 @@ I authorize the use of the credit card left as guarantee to cover any consumptio
         const lineY = footerYStart + index * footerLineSpacing; // Calcula a posição Y com espaçamento
         doc.text(line, lineX, lineY);
     });
-    
+
 
     return doc; // Retorna o documento PDF gerado
 

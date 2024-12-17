@@ -13,7 +13,7 @@ export default function InputFieldControlled({
   disabled,
 }) {
   // Verificar se há uma classe de tamanho da fonte no estilo fornecido
-  const hasFontSize = style?.includes("text-");
+  const hasFontSize = style && typeof style === "string" && style.includes("text-");
 
   return (
     <div>
