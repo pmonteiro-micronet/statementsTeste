@@ -13,6 +13,12 @@ import SignaturePad from 'signature_pad';
 import TermsConditionsForm from "@/components/terms&conditions/page";
 import ProtectionPolicyForm from "@/components/protectionPolicy/page";
 
+import { MdSunny } from "react-icons/md";
+import { FaMoon } from "react-icons/fa";
+import { CgDanger } from "react-icons/cg";
+import { IoIosSave } from "react-icons/io";
+import { MdOutlineCancel } from "react-icons/md";
+
 export default function Page() {
     const [reserva, setReserva] = useState(null);
     const [guestInfo, setGuestInfo] = useState(null);
@@ -21,6 +27,7 @@ export default function Page() {
     const [contacts, setContacts] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [propertyID, setPropertyID] = useState(null);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const canvasRef = useRef(null);
     const signaturePadRef = useRef(null);
@@ -95,6 +102,13 @@ export default function Page() {
                         setAddress(address);
                         setPersonalID(personalID);
                         setContacts(contacts);
+
+                        // Verifica se o e-mail termina com "@guest.booking.com"
+                        if (contacts?.Email?.endsWith('@guest.booking.com')) {
+                            setErrorMessage('Email inválido. O email não pode terminar em guest.booking.com');
+                        } else {
+                            setErrorMessage(''); // Limpa a mensagem de erro se o e-mail for válido
+                        }
                     } else {
                         console.warn(`Nenhuma reserva encontrada com ResNo: ${resNo}`);
                     }
@@ -177,25 +191,27 @@ export default function Page() {
         return imgData.data.every((value, index) => index % 4 !== 3 || value === 0);
     };
 
-    const [signatureDataUrl, setSignatureDataUrl] = useState(null); // Para armazenar a base64 da assinatura
+    const [signatureDataUrl] = useState(null); // Para armazenar a base64 da assinatura
 
     console.log(signatureDataUrl);
     // Função para capturar a assinatura e gerar o PDF
     const handleOkClick = async () => {
         if (termsAccepted === null || policyAccepted === null || isCanvasEmpty()) {
             setError('All fields are required: please accept terms, policy, and sign.');
-            setTimeout(() => setError(''), 5000); // Remove error message after 5 seconds
-        } else {
-            setError('');
-            console.log('Form submitted');
-
-            // Captura a assinatura em base64
+            setTimeout(() => setError(''), 5000); 
+            return;
+        }
+    
+        setError('');
+        console.log('Form submitted');
+    
+        try {
+            // Captura a assinatura do canvas em Base64
             const canvas = canvasRef.current;
             if (!canvas) return;
-            const signatureBase64 = canvas.toDataURL();
-            setSignatureDataUrl(signatureBase64);
-
-            // Aqui assumimos que `reserva` já está definido no escopo
+            const signatureBase64 = canvas.toDataURL().split(',')[1]; // Remove prefixo "data:..."
+    
+            // Detalhes da reserva
             const reservaDetails = {
                 PropertyID: propertyID,
                 ResNo: reserva.ResNo,
@@ -218,12 +234,25 @@ export default function Page() {
                 VatNo: contacts.VatNo,
                 PersonalEmail: contacts.Email,
             };
-
-            const pdfDoc = await generatePDFTemplate(reservaDetails, signatureBase64);
-            pdfDoc.save(`ResNo-${reservaDetails.ResNo}.pdf`);
-
+    
+            // Gera o PDF em Base64
+            const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
+            const pdfBase64 = pdfDoc.output('datauristring').split(',')[1]; // Remove o prefixo
+    
+            // Envia os dados usando Axios
+            const response = await axios.post("/api/reservations/checkins/registration_form_base64", {
+                pdfBase64: pdfBase64,
+                fileName: `ResNo-${reserva.ResNo}.pdf`,
+                PropertyId: propertyID
+            });
+    
+            console.log('Resposta da API:', response.data);
+        } catch (error) {
+            console.error('Erro ao gerar ou enviar o PDF:', error);
         }
     };
+    
+    
 
     const clearSignature = () => {
         const canvas = canvasRef.current;
@@ -243,6 +272,52 @@ export default function Page() {
         } else {
             document.documentElement.classList.remove("dark"); // Remove classe "dark"
         }
+    };
+
+    const [email, setEmail] = useState("");
+    const [isEditable, setIsEditable] = useState(false);
+
+    // useEffect para definir o valor inicial de email com contacts.Email
+    useEffect(() => {
+        // Atualiza o estado do email se os dados de contacts mudarem
+        if (contacts?.Email) {
+            setEmail(contacts.Email);
+        }
+    }, [contacts]);
+
+    // Função para lidar com mudanças no email
+    const handleEmailChange = (e) => {
+        const newEmail = e.target.value;
+        setEmail(newEmail);
+
+        // Validação de email
+        if (newEmail && newEmail.endsWith('@guest.booking.com')) {
+            setErrorMessage('Email inválido. O email não pode terminar em guest.booking.com');
+        } else {
+            setErrorMessage('');
+        }
+    };
+
+    // Ativar modo de edição
+    const handleEditClick = () => {
+        setIsEditable(true);
+    };
+
+    // Salvar o novo email
+    const handleSaveClick = () => {
+        // Atualiza o estado de contacts com o novo email
+        setContacts((prevContacts) => ({
+            ...prevContacts,
+            Email: email,
+        }));
+        console.log("Novo email salvo:", email);
+        setIsEditable(false); // Desativa a edição
+    };
+
+    // Cancelar a edição e restaurar o valor salvo
+    const handleCancelClick = () => {
+        setIsEditable(false);
+        setEmail(contacts.Email); // Restaura o valor salvo
     };
 
     return (
@@ -659,18 +734,44 @@ export default function Page() {
                                 <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
                                     <div className='flex flex-row justify-between'>
                                         <p className='text-[#f7ba83] mb-1'>Contacts</p>
-                                        <FaPencilAlt size={15} color='orange' />
+                                        <div className='flex flex-row justify-end gap-4'>
+                                            {isEditable ? (
+                                                <>
+                                                    <button onClick={handleSaveClick} className="text-green-500">
+                                                        <IoIosSave size={20} />
+                                                    </button>
+                                                    <button onClick={handleCancelClick} className="text-red-500">
+                                                        <MdOutlineCancel size={20} />
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <FaPencilAlt size={15} color="orange" onClick={handleEditClick} />
+                                            )}
+                                        </div>
                                     </div>
+
                                     <div className='mt-2'>
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"Email"}
-                                            name={"Email"}
-                                            label={"Personal E-mail"}
-                                            ariaLabel={"Email:"}
-                                            value={contacts.Email}
-                                            style={inputStyleFull}
-                                        />
+                                        <div className='flex flex-row justify-between items-center w-full'>
+                                            <div className='flex-grow'>
+                                                <InputFieldControlled
+                                                    type="text"
+                                                    id="Email"
+                                                    name="Email"
+                                                    label="Personal E-mail"
+                                                    ariaLabel="Email:"
+                                                    value={email}
+                                                    onChange={handleEmailChange}
+                                                    style={inputStyleFull}
+                                                    disabled={!isEditable}
+                                                />
+                                            </div>
+                                            {errorMessage && (
+                                                <p className='text-red-500 text-xs' title={errorMessage}>
+                                                    <CgDanger size={20} color='red' />
+                                                </p>
+                                            )}
+                                        </div>
+
                                         <InputFieldControlled
                                             type={"text"}
                                             id={"PhoneNumber"}
@@ -679,6 +780,7 @@ export default function Page() {
                                             ariaLabel={"PhoneNumber:"}
                                             value={contacts.PhoneNumber}
                                             style={inputStyleFull}
+                                            disabled
                                         />
                                     </div>
                                 </div>
@@ -802,34 +904,40 @@ export default function Page() {
                             Quinta da Vacaria through the website www.torelquintadavacaria.com.
                             <br></br>I authorize the use of the credit card left as guarantee to cover any consumptions after check-out.
                         </p>
-                        <div className='flex flex-row justify-between'>
-                        <button
-    onClick={toggleTheme}
-    className={`relative w-16 h-8 flex items-center bg-gray-300 rounded-full p-1 transition ${
-        isDarkMode ? "bg-black" : "bg-gray-300"
-    }`}
->
-    <span
-        className={`h-6 w-6 rounded-full bg-white shadow-md transform transition ${
-            isDarkMode ? "translate-x-8" : "translate-x-0"
-        } flex items-center justify-center`}
-    >
-        <span
-            className={`text-xs font-semibold text-gray-600 transition ${
-                isDarkMode ? "opacity-0" : "opacity-100"
-            } absolute`}
-        >
-            OFF
-        </span>
-        <span
-            className={`text-xs font-semibold text-gray-600 transition ${
-                isDarkMode ? "opacity-100" : "opacity-0"
-            } absolute`}
-        >
-            ON
-        </span>
-    </span>
-</button>
+                        <div className='flex flex-row justify-between items-center mt-4'>
+                            <button
+                                onClick={toggleTheme}
+                                className="relative w-20 h-8 flex items-center bg-gray-300 rounded-full transition"
+                            >
+                                {/* Ícone do Sol - lado esquerdo */}
+                                <div
+                                    className={`absolute left-2 top-1/2 transform -translate-y-1/2 transition ${isDarkMode ? "opacity-100 text-gray-400" : "opacity-0"
+                                        }`}
+                                >
+                                    <MdSunny size={18} />
+                                </div>
+
+                                {/* Ícone da Lua - lado direito */}
+                                <div
+                                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 transition ${isDarkMode ? "opacity-0" : "opacity-100 text-gray-400"
+                                        }`}
+                                >
+                                    <FaMoon size={18} />
+                                </div>
+
+                                {/* Bolinha Deslizante */}
+                                <span
+                                    className={`absolute w-6 h-6 bg-white rounded-full shadow-md transform transition ${isDarkMode ? "translate-x-12" : "translate-x-0"
+                                        } flex items-center justify-center z-10`}
+                                >
+                                    {/* Ícone dentro da Bolinha */}
+                                    {isDarkMode ? (
+                                        <FaMoon size={14} className="text-orange-400" />
+                                    ) : (
+                                        <MdSunny size={14} className="text-orange-400" />
+                                    )}
+                                </span>
+                            </button>
 
                             <div className='flex flex-row gap-4 justify-end px-4 buttons-style items-center'>
                                 {/** Botão de cancelar */}
