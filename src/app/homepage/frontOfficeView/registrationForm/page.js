@@ -238,7 +238,7 @@ export default function Page() {
             // Gera o PDF em Base64
             const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
             const pdfBase64 = pdfDoc.output('datauristring').split(',')[1]; // Remove o prefixo
-    
+    console.log("base64 ", pdfBase64);
             // Envia os dados usando Axios
             const response = await axios.post("/api/reservations/checkins/registration_form_base64", {
                 pdfBase64: pdfBase64,

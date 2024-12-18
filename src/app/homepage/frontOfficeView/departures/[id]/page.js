@@ -93,9 +93,8 @@ export default function Page({ params }) {
   
       // Se a resposta de salvar o statement foi bem-sucedida, agora verificamos
       // se o statement foi atualizado ou criado, e pegamos o requestID
-      if (saveResponse.data && saveResponse.data.data && saveResponse.data.data.requestID) {
-        const updatedRecord = saveResponse.data.data;
-        const updatedRequestID = updatedRecord.requestID;
+      if (saveResponse.data && saveResponse.data.requestID) {
+        const updatedRequestID = saveResponse.data.requestID;
   
         // Redireciona para a página jsonView com o requestID do registro atualizado
         console.log("Statement atualizado com requestID:", updatedRequestID);
@@ -105,7 +104,10 @@ export default function Page({ params }) {
       }
   
     } catch (error) {
-      console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
+      console.error(
+        "Erro ao enviar os dados ou buscar o recordID:",
+        error.response ? error.response.data : error.message
+      );
   
       if (error.response && error.response.status === 409) {
         // O status 409 indica que já existe um registro com a mesma uniqueKey
@@ -126,7 +128,8 @@ export default function Page({ params }) {
         console.error("Erro inesperado:", error.response ? error.response.data : error.message);
       }
     }
-  };  
+  };
+   
   
 
   const handleOpenModal = () => {
