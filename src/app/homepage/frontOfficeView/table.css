@@ -16,11 +16,11 @@
     font-size: 13px;
   }
   .pagination-container {
-    position: fixed; /* Fixa a posição na janela de visualização */
-    bottom: 0;       /* Posiciona na parte inferior */
-    left: 0;         /* Alinha à esquerda */
-    width: 100%;     /* Ocupa toda a largura */
-    background-color: white; /* Fundo branco para separar do resto */
-    z-index: 1000;   /* Mantém a páginação acima de outros elementos */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    z-index: 10; /* Paginação sobre outros elementos */
   }
 }

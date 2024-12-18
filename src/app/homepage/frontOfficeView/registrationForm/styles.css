@@ -56,12 +56,9 @@
         margin-bottom: 4rem;
     }
     .buttons-style{
-        display: flex;
-        justify-content: center;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #F3F4F6; /* Opcional, para um fundo visível */
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
     }
+
 }
