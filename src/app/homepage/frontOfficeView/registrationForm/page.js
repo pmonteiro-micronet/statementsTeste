@@ -198,19 +198,19 @@ export default function Page() {
     const handleOkClick = async () => {
         if (termsAccepted === null || policyAccepted === null || isCanvasEmpty()) {
             setError('All fields are required: please accept terms, policy, and sign.');
-            setTimeout(() => setError(''), 5000); 
+            setTimeout(() => setError(''), 5000);
             return;
         }
-    
+
         setError('');
         console.log('Form submitted');
-    
+
         try {
             // Captura a assinatura do canvas em Base64
             const canvas = canvasRef.current;
             if (!canvas) return;
             const signatureBase64 = canvas.toDataURL().split(',')[1]; // Remove prefixo "data:..."
-    
+
             // Detalhes da reserva
             const reservaDetails = {
                 PropertyID: propertyID,
@@ -234,25 +234,25 @@ export default function Page() {
                 VatNo: contacts.VatNo,
                 PersonalEmail: contacts.Email,
             };
-    
+
             // Gera o PDF em Base64
             const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
             const pdfBase64 = pdfDoc.output('datauristring').split(',')[1]; // Remove o prefixo
-    console.log("base64 ", pdfBase64);
+
             // Envia os dados usando Axios
             const response = await axios.post("/api/reservations/checkins/registration_form_base64", {
                 pdfBase64: pdfBase64,
                 fileName: `ResNo-${reserva.ResNo}.pdf`,
                 PropertyId: propertyID
             });
-    
+
             console.log('Resposta da API:', response.data);
         } catch (error) {
             console.error('Erro ao gerar ou enviar o PDF:', error);
         }
     };
-    
-    
+
+
 
     const clearSignature = () => {
         const canvas = canvasRef.current;
@@ -376,6 +376,22 @@ export default function Page() {
                                 alt={activeFlag}
                                 className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
                             />
+                            {/* Seta indicando o dropdown */}
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="w-4 h-4 ml-2 transition-transform duration-300 transform" // Tamanho e margem da seta
+                                style={{ transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} // Girar a seta quando aberto
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
                         </div>
 
                         {/* Dropdown Menu */}
@@ -904,7 +920,7 @@ export default function Page() {
                             Quinta da Vacaria through the website www.torelquintadavacaria.com.
                             <br></br>I authorize the use of the credit card left as guarantee to cover any consumptions after check-out.
                         </p>
-                        <div className='flex flex-row justify-between items-center mt-4'>
+                        <div className='flex flex-row justify-between items-center mt-4 buttons-style'>
                             <button
                                 onClick={toggleTheme}
                                 className="relative w-20 h-8 flex items-center bg-gray-300 rounded-full transition"

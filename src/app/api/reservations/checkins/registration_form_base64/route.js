@@ -49,14 +49,18 @@ export async function POST(request) {
     const url = `http://${propertyServer}:${propertyPort}/registration_form_base64`;
     console.log("URL da requisição:", url);
 
-    // Prepara os dados a serem enviados
+    // Prepara os dados a serem enviados (apenas pdfBase64 no corpo)
     const data = {
       pdfBase64,
-      fileName,
     };
 
-    // Envia a requisição POST usando Axios
-    const response = await axios.post(url, data);
+    // Prepara os headers (enviar o fileName como header)
+    const headers = {
+      'fileName': fileName,
+    };
+
+    // Envia a requisição POST usando Axios com headers e body separados
+    const response = await axios.post(url, data, { headers });
 
     // Retorna o resultado ao cliente
     return new NextResponse(
