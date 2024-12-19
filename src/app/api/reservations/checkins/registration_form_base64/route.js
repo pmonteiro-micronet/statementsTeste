@@ -5,7 +5,7 @@ import prisma from "@/lib/db"; // Certifique-se de que o Prisma esteja configura
 export async function POST(request) {
   try {
     // Parse do corpo da requisição
-    const body = await request.json(); // Pega o JSON enviado no corpo
+    const body = await request.json();
     const { PropertyID, pdfBase64, fileName } = body;
 
     // Validação dos campos obrigatórios
@@ -49,18 +49,18 @@ export async function POST(request) {
     const url = `http://${propertyServer}:${propertyPort}/registration_form_base64`;
     console.log("URL da requisição:", url);
 
-    // Prepara os dados a serem enviados (apenas pdfBase64 no corpo)
-    const data = {
-      pdfBase64,
-    };
-
-    // Prepara os headers (enviar o fileName como header)
+    // Prepara o cabeçalho com o nome do arquivo
     const headers = {
-      'fileName': fileName,
+      "FileName": fileName, // Cabeçalho com o nome do arquivo
     };
 
-    // Envia a requisição POST usando Axios com headers e body separados
-    const response = await axios.post(url, data, { headers });
+    // Envia a requisição POST com o corpo contendo apenas o pdfBase64
+    const response = await axios.post(url, pdfBase64, {
+      headers: {
+        ...headers,
+        "Content-Type": "text/plain", // Define o tipo do conteúdo como texto
+      },
+    });
 
     // Retorna o resultado ao cliente
     return new NextResponse(
