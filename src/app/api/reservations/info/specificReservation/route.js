@@ -83,16 +83,12 @@ export async function GET(request) {
     const uniqueKey = generateUniqueKey(hotelInfo, reservation, guestInfo);
     console.log("Generated uniqueKey:", uniqueKey);
 
-    const existingRequest = await prisma.requestRecords.findFirst({
-      where: { uniqueKey },
-    });
-
     let newRequest;
-    if (existingRequest) {
+    if (await prisma.requestRecords.findFirst({ where: { uniqueKey } })) {
       console.log("Statement já existe. Atualizando...");
 
       newRequest = await prisma.requestRecords.update({
-        where: { requestID: existingRequest.requestID },
+        where: { uniqueKey },
         data: {
           requestBody: JSON.stringify(response.data),
           requestDateTime: new Date(),
@@ -121,7 +117,16 @@ export async function GET(request) {
       console.log("Novo statement criado:", newRequest);
     }
 
-    return new NextResponse(JSON.stringify(response.data), { status: 200 });
+    // Retorna os dados necessários, incluindo o requestID
+    return new NextResponse(
+      JSON.stringify({
+        data: {
+          requestID: newRequest.requestID,
+          message: "Dados salvos ou atualizados com sucesso.",
+        },
+      }),
+      { status: 200 }
+    );
   } catch (error) {
     console.error(
       "Erro ao enviar dados para o servidor:",

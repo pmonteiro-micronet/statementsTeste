@@ -126,7 +126,8 @@ export default function Page({ params }) {
         console.error("Erro inesperado:", error.response ? error.response.data : error.message);
       }
     }
-  };  
+  };
+  
   
 
   const handleOpenModal = () => {
