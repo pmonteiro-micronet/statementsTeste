@@ -83,12 +83,22 @@ export async function GET(request) {
     const uniqueKey = generateUniqueKey(hotelInfo, reservation, guestInfo);
     console.log("Generated uniqueKey:", uniqueKey);
 
+    // Verificar se já existe um registro com o mesmo uniqueKey
+    const count = await prisma.requestRecords.count({
+      where: { uniqueKey },  // Contando os registros com o mesmo uniqueKey
+    });
+
     let newRequest;
-    if (await prisma.requestRecords.findFirst({ where: { uniqueKey } })) {
+    if (count > 0) {
       console.log("Statement já existe. Atualizando...");
 
-      newRequest = await prisma.requestRecords.update({
+      // Busca o primeiro registro que tenha o uniqueKey e faz a atualização com requestID
+      const existingRequest = await prisma.requestRecords.findFirst({
         where: { uniqueKey },
+      });
+
+      newRequest = await prisma.requestRecords.update({
+        where: { requestID: existingRequest.requestID },  // Usando requestID para atualização
         data: {
           requestBody: JSON.stringify(response.data),
           requestDateTime: new Date(),
@@ -101,6 +111,7 @@ export async function GET(request) {
     } else {
       console.log("Statement não encontrado. Criando novo...");
 
+      // Criação do novo registro se não existir
       newRequest = await prisma.requestRecords.create({
         data: {
           requestBody: JSON.stringify(response.data),
@@ -128,10 +139,7 @@ export async function GET(request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(
-      "Erro ao enviar dados para o servidor:",
-      error.response ? error.response.data : error.message
-    );
+    console.error("Erro ao enviar dados para o servidor:", error.response ? error.response.data : error.message);
     return new NextResponse(
       JSON.stringify({
         error: error.response ? error.response.data : "Erro ao enviar dados para a API" + error,
