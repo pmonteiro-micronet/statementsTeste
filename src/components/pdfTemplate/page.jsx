@@ -182,12 +182,16 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     const checkboxY = termsRectY + 4; // Espaço superior no retângulo
     const checkboxSize = 5;
 
-    // Desenha a checkbox e marca com um "X"
-    doc.rect(checkboxX, checkboxY, checkboxSize, checkboxSize, 'S'); // Desenha o quadrado da checkbox
-    doc.text('X', checkboxX + 1.5, checkboxY + checkboxSize - 1); // Adiciona "X" centralizado na checkbox
+   // Desenha a checkbox
+doc.rect(checkboxX, checkboxY, checkboxSize, checkboxSize, 'S'); // Desenha o quadrado da checkbox
 
-    // Texto ao lado da checkbox
-    doc.text("I accept the Hotel Data Protection Policy", checkboxX + checkboxSize + 5, checkboxY + checkboxSize - 1);
+// Verifica se ProtectionPolicy é true para adicionar o "X" na checkbox
+if (reserva.ProtectionPolicy) {
+    doc.text('X', checkboxX + 1.5, checkboxY + checkboxSize - 1); // Adiciona "X" centralizado na checkbox
+}
+
+// Texto ao lado da checkbox
+doc.text("I accept the Hotel Data Protection Policy", checkboxX + checkboxSize + 5, checkboxY + checkboxSize - 1);
 
     // Colunas e textos dentro do retângulo (abaixo da checkbox)
     const termsColumn1X = termsRectX + 5; // Margem interna do retângulo
