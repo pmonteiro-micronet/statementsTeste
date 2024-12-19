@@ -240,11 +240,15 @@ export default function Page() {
             const pdfBase64 = pdfDoc.output('datauristring').split(',')[1]; // Remove o prefixo
 
             // Envia os dados usando Axios
-            const response = await axios.post("/api/reservations/checkins/registration_form_base64", {
-                pdfBase64: pdfBase64,
-                fileName: `ResNo-${reserva.ResNo}.pdf`,
-                PropertyId: propertyID
-            });
+            const response = await axios.post(
+                "/api/reservations/checkins/registration_form_base64",
+                { pdfBase64 }, // Apenas o corpo da requisição
+                {
+                    headers: {
+                        fileName: `ResNo-${reserva.ResNo}.pdf`, // Passa o fileName como header
+                    },
+                }
+            );
 
             console.log('Resposta da API:', response.data);
         } catch (error) {
