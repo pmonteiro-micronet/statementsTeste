@@ -197,65 +197,63 @@ export default function Page() {
     // Função para capturar a assinatura e gerar o PDF
     const handleOkClick = async () => {
         if (termsAccepted === null || policyAccepted === null || isCanvasEmpty()) {
-            setError('All fields are required: please accept terms, policy, and sign.');
-            setTimeout(() => setError(''), 5000);
-            return;
+          setError('All fields are required: please accept terms, policy, and sign.');
+          setTimeout(() => setError(''), 5000);
+          return;
         }
-
+      
         setError('');
         console.log('Form submitted');
-
+      
         try {
-            // Captura a assinatura do canvas em Base64
-            const canvas = canvasRef.current;
-            if (!canvas) return;
-            const signatureBase64 = canvas.toDataURL().split(',')[1]; // Remove prefixo "data:..."
-
-            // Detalhes da reserva
-            const reservaDetails = {
-                PropertyID: propertyID,
-                ResNo: reserva.ResNo,
-                Room: reserva.Room,
-                DateCI: reserva.DateCI,
-                DateCO: reserva.DateCO,
-                Adults: reserva.Adults,
-                Childs: reserva.Childs,
-                LastName: guestInfo.LastName,
-                FirstName: guestInfo.FirstName,
-                Street: address.Street,
-                Country: address.Country,
-                IdDoc: personalID.IdDoc,
-                NrDoc: personalID.NrDoc,
-                Phone: contacts.PhoneNumber,
-                ExpDate: personalID.ExpDate,
-                DateOfBirth: personalID.DateOfBirth,
-                Issue: personalID.Issue,
-                CountryOfBirth: personalID.CountryOfBirth,
-                VatNo: contacts.VatNo,
-                PersonalEmail: contacts.Email,
-            };
-
-            // Gera o PDF em Base64
-            const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
-            const pdfBase64 = pdfDoc.output('datauristring').split(',')[1]; // Remove o prefixo
-
-            // Envia os dados usando Axios
-            const response = await axios.post(
-                "/api/reservations/checkins/registration_form_base64",
-                { pdfBase64 }, // Apenas o corpo da requisição
-                {
-                    headers: {
-                        fileName: `ResNo-${reserva.ResNo}.pdf`, // Passa o fileName como header
-                    },
-                }
-            );
-
-            console.log('Resposta da API:', response.data);
+          // Captura a assinatura do canvas em Base64
+          const canvas = canvasRef.current;
+          if (!canvas) return;
+          const signatureBase64 = canvas.toDataURL().split(',')[1]; // Remove prefixo "data:..."
+      
+          // Detalhes da reserva
+          const reservaDetails = {
+            PropertyID: propertyID,
+            ResNo: reserva.ResNo,
+            Room: reserva.Room,
+            DateCI: reserva.DateCI,
+            DateCO: reserva.DateCO,
+            Adults: reserva.Adults,
+            Childs: reserva.Childs,
+            LastName: guestInfo.LastName,
+            FirstName: guestInfo.FirstName,
+            Street: address.Street,
+            Country: address.Country,
+            IdDoc: personalID.IdDoc,
+            NrDoc: personalID.NrDoc,
+            Phone: contacts.PhoneNumber,
+            ExpDate: personalID.ExpDate,
+            DateOfBirth: personalID.DateOfBirth,
+            Issue: personalID.Issue,
+            CountryOfBirth: personalID.CountryOfBirth,
+            VatNo: contacts.VatNo,
+            PersonalEmail: contacts.Email,
+          };
+      
+          // Gera o PDF em Base64
+          const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
+          const pdfBase64 = pdfDoc.output('datauristring').split(',')[1]; // Remove o prefixo
+      
+          // Envia os dados usando Axios
+          const response = await axios.post(
+            "/api/reservations/checkins/registration_form_base64",
+            {
+              PropertyID: propertyID,
+              pdfBase64: pdfBase64, // Correção: inclusão explícita de pdfBase64
+              fileName: `ResNo-${reserva.ResNo}.pdf`,
+            }
+          );
+      
+          console.log('Resposta da API:', response.data);
         } catch (error) {
-            console.error('Erro ao gerar ou enviar o PDF:', error);
+          console.error('Erro ao gerar ou enviar o PDF:', error);
         }
-    };
-
+      };      
 
 
     const clearSignature = () => {
