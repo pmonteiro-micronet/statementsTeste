@@ -233,6 +233,7 @@ export default function Page() {
             CountryOfBirth: personalID.CountryOfBirth,
             VatNo: contacts.VatNo,
             PersonalEmail: contacts.Email,
+            ProtectionPolicy: policyAccepted
           };
       
           // Gera o PDF em Base64
