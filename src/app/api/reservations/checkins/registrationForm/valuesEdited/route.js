@@ -49,10 +49,16 @@ export async function POST(request) {
     const { propertyServer, propertyPort } = property;
 
     // Obtém os dados do corpo da requisição
-    const body = await request.json();
+    const body = await request.json();  // Agora obtém corretamente o corpo da requisição
 
-    // Verifica se os campos necessários estão presentes
-    if (!body.email && !body.vatNo) {
+    // Envia valores vazios se não houver alteração
+    const dataToSend = {
+      email: body.email || "",  // Envia um valor vazio se não houver alteração
+      vatNo: body.vatNo || ""   // Envia um valor vazio se não houver alteração
+    };
+
+    // Verifica se os campos necessários estão presentes, mesmo que vazios
+    if (!dataToSend.email && !dataToSend.vatNo) {
       return new NextResponse(
         JSON.stringify({ error: "Faltam dados: email ou vatNo" }),
         { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
@@ -60,13 +66,13 @@ export async function POST(request) {
     }
 
     // Exibe os dados recebidos no backend (console.log)
-    console.log("Dados recebidos no backend:", body);
+    console.log("Dados recebidos no backend:", dataToSend);
 
     // Define a URL de destino dinamicamente
     const url = `http://${propertyServer}:${propertyPort}/valuesEdited`;
 
     // Envia os dados para a URL externa
-    const response = await axios.post(url, body);
+    const response = await axios.post(url, dataToSend);
 
     // Exibe a resposta da API externa
     console.log("Resposta da API externa:", response.data);
