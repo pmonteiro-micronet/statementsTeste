@@ -6,13 +6,12 @@ export async function POST(request) {
   try {
     // Obtém os parâmetros da URL
     const { searchParams } = new URL(request.url);
-    const HotelID = searchParams.get("mpehotel");
     const PropertyID = searchParams.get("propertyID");
 
     // Verifica se os parâmetros estão presentes
-    if (!PropertyID || !HotelID) {
+    if (!PropertyID) {
       return new NextResponse(
-        JSON.stringify({ error: "Faltam parâmetros: HotelID ou PropertyID" }),
+        JSON.stringify({ error: "Faltam parâmetros: PropertyID" }),
         { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
       );
     }
