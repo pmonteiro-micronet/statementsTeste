@@ -1,12 +1,16 @@
 'use client';
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation"; // Importa o useRouter
 import "./statements.css";
+import en from "../../../../public/locales/english/common.json";
+
+const translations = { en };
 
 const Homepage = () => {
+  const locale = "en";
+  const t = translations[locale];
+
   const { data: session } = useSession();
-  const router = useRouter(); // Instancia o router
   
   // Estado para armazenar os valores de "pendings" e "viewed"
   const [pendings, setPendings] = useState(0);
@@ -57,33 +61,32 @@ const Homepage = () => {
     }
   }, [session?.user?.propertyIDs]); // Dependência para recarregar quando a sessão mudar
 
-  // Função para redirecionar
-  const handleRedirect = (type) => {
-    router.push(`/homepage/statements/${type}`); // Redireciona dinamicamente com base no tipo
-  };
+    // Função para redirecionar
+    const handleRedirect = (type) => {
+      router.push(`/homepage/statements/${type}`); // Redireciona dinamicamente com base no tipo
+    };
 
   return (
     <div className="min-h-screen flex">
       <main className="flex-1 min-h-screen p-8 overflow-y-auto">
-        <h2 className="font-semibold text-2xl mb-4">Statements</h2>
+        <h2 className="font-semibold text-2xl mb-4">{t.statements.dashboard.title}</h2>
 
         <div className="flex flex-row gap-5">
-          <div
-            className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer"
-            onClick={() => handleRedirect("pending")} // Redireciona para pendings
+          <div 
+          className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2"
+          onClick={() => handleRedirect("pending")}
           >
             <div className="flex flex-col">
               <h3 className="text-5xl text-primary">{pendings !== null ? pendings : "Loading..."}</h3>
-              <p className="text-gray-400 mt-1">PENDINGS</p>
+              <p className="text-gray-400 mt-1 uppercase">{t.statements.dashboard.cardPending}</p>
             </div>
           </div>
-          <div
-            className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer"
-            onClick={() => handleRedirect("viewed")} // Redireciona para viewed
-          >
+          <div 
+          className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2"
+          onClick={() => handleRedirect("viewed")}>
             <div className="flex flex-col">
               <h3 className="text-5xl text-primary">{viewed !== null ? viewed : "Loading..."}</h3>
-              <p className="text-gray-400 mt-1">VIEWED</p>
+              <p className="text-gray-400 mt-1 uppercase">{t.statements.dashboard.cardViewed}</p>
             </div>
           </div>
         </div>

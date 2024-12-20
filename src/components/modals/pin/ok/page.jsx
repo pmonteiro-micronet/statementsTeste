@@ -67,7 +67,7 @@ const OkPIN = ({
             const isPinCorrect = await bcrypt.compare(pin, userPinHash);
             if (isPinCorrect) {
                 await axios.patch(`/api/get_jsons/${recordID}`);
-                router.push("/");
+                router.push("/homepage");
             } else {
                 setPin("");
                 setIsPinError(true);

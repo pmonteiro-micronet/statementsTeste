@@ -5,12 +5,18 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "./styles.css";
+import en from "../../../public/locales/english/common.json";
+
+const translations = { en };
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+
+  const locale = "en"; // Substitua pelo valor dinâmico do idioma (e.g., router.locale)
+  const t = translations[locale];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +32,7 @@ const SignIn = () => {
       setError(result.error);
     } else {
       // Redireciona após o login bem-sucedido
-      router.push("/");
+      router.push("/homepage");
     }
   };
 
@@ -36,33 +42,32 @@ const SignIn = () => {
       <div className="p-8 flex items-center justify-center login-container">
         <div className="flex flex-col items-start w-full md:w-80">
           <div className="hide-on-computer show-on-phone">
-          <img src="login/logo_Hits.png" width={180} className="ml-6" />
+            <img src="login/logo_Hits.png" width={180} className="ml-6" />
           </div>
           <p className="mb-[5%]">
             <span className="text-2xl font-semibold text-[#BF6415]">
               Extensions
             </span>{" "}
-            myPMS | <span className="font-semibold">Login</span>
+            myPMS | <span className="font-semibold">{t.auth.login}</span>
           </p>
           <p className="text-sm">
-            Para entrar no Extensions myPMS, introduza o<br /> seu E-mail de
-            utilizador e código de acesso.
+            {t.auth.instruction1}
           </p>
           <form onSubmit={handleSubmit} className="w-full">
             <div className="flex flex-col gap-4 mt-10 mb-5">
               <div>
                 <input
-                  placeholder="Email de Utilizador"
+                  placeholder={t.auth.email}
                   className="h-10 w-full border border-gray-300 border-b-2 border-b-primary rounded-sm outline-none p-2 text-sm"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
+                  
                 />
               </div>
               <div>
                 <input
-                  placeholder="Código de Acesso"
+                  placeholder={t.auth.password}
                   className="h-10 w-full border border-gray-300 border-b-2 border-b-primary rounded-sm outline-none p-2 text-sm"
                   type="password"
                   value={password}
@@ -75,17 +80,15 @@ const SignIn = () => {
               type="submit"
               className="w-full border border-gray-300 rounded-2xl h-10 text-sm text-gray-500 hover:bg-primary-50"
             >
-              Entrar
+              {t.auth.login}
             </button>
             {error && <p style={{ color: "red" }}>{error}</p>}
             <div className="mt-10 flex flex-col gap-4 text-sm text-gray-400">
               <p>
-                Esqueceu-se do E-mail de utilizador ou do código de
-                <br /> acesso?
+                {t.auth.instruction2}
               </p>
               <p>
-                Já sou cliente mas não tenho acesso.
-                <br /> Como aderir ao Extensions myPMS?
+                {t.auth.instruction3}
               </p>
             </div>
           </form>
@@ -112,12 +115,12 @@ const SignIn = () => {
             <br />
             <span className="font-semibold text-black">+351 253 60 30 32</span>
             <br />
-            (Custo de chamada para a rede fixa nacional)
+            {t.auth.footer.callCost}
           </p>
           <p>
-            Atendimento personalizado
+            {t.auth.footer.personalizedService}
             <br />
-            Dias úteis, das 9h30 às 18h30.
+            {t.auth.footer.activeDays}
             <br />
             suporte@hitsnorte.pt
           </p>
