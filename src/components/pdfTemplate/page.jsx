@@ -51,7 +51,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     const contentStartY = logoBase64 ? 50 : 10;
 
     // Adiciona "Registration Form", local e data na mesma linha
-    const location = reserva.PropertyLocation || 'Hotel Location'; // Local da propriedade
+    const location = reserva.HotelName || ''; // Local da propriedade
     const currentDate = new Date().toLocaleDateString(); // Data atual formatada
 
     const headerText = `${location}, Registration Form, ${currentDate}`;
@@ -182,16 +182,16 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     const checkboxY = termsRectY + 4; // Espaço superior no retângulo
     const checkboxSize = 5;
 
-   // Desenha a checkbox
-doc.rect(checkboxX, checkboxY, checkboxSize, checkboxSize, 'S'); // Desenha o quadrado da checkbox
+    // Desenha a checkbox
+    doc.rect(checkboxX, checkboxY, checkboxSize, checkboxSize, 'S'); // Desenha o quadrado da checkbox
 
-// Verifica se ProtectionPolicy é true para adicionar o "X" na checkbox
-if (reserva.ProtectionPolicy) {
-    doc.text('X', checkboxX + 1.5, checkboxY + checkboxSize - 1); // Adiciona "X" centralizado na checkbox
-}
+    // Verifica se ProtectionPolicy é true para adicionar o "X" na checkbox
+    if (reserva.ProtectionPolicy) {
+        doc.text('X', checkboxX + 1.5, checkboxY + checkboxSize - 1); // Adiciona "X" centralizado na checkbox
+    }
 
-// Texto ao lado da checkbox
-doc.text("I accept the Hotel Data Protection Policy", checkboxX + checkboxSize + 5, checkboxY + checkboxSize - 1);
+    // Texto ao lado da checkbox
+    doc.text("I accept the Hotel Data Protection Policy", checkboxX + checkboxSize + 5, checkboxY + checkboxSize - 1);
 
     // Colunas e textos dentro do retângulo (abaixo da checkbox)
     const termsColumn1X = termsRectX + 5; // Margem interna do retângulo
@@ -202,9 +202,7 @@ doc.text("I accept the Hotel Data Protection Policy", checkboxX + checkboxSize +
 
     // Texto justificado dentro do retângulo
     const justificationText = `
-I hereby give my express, informed, free and specific consent to the use and processing of my personal data by Quinta da Vacaria 1616 – Vinhos, SA. 
-I was further informed of the PRIVACY POLICY of the company Quinta da Vacaria 1616 – Vinhos, SA holding of the hotel Torel Quinta da Vacaria through the website www.torelquintadavacaria.com. 
-I authorize the use of the credit card left as guarantee to cover any consumptions after check-out.
+${reserva.HotelMiniTerms}
 `;
 
     doc.text(justificationText, termsColumn1X, termsTextY, { maxWidth: termsRectWidth - 10, align: 'justify' });
@@ -243,9 +241,9 @@ I authorize the use of the credit card left as guarantee to cover any consumptio
 
     // Informações do rodapé
     const footerLines = [
-        "Torel Quinta da Vacaria Douro Valley",
-        "+351 226 001 966   (custo chamada para rede fixa nacional) reservas@torelquintadavacaria.com",
-        "Quinta da Vacaria 1616 Vinhos, SA   500359881 - Vilarinho dos Freires   RNET – 12081"
+        `${reserva.HotelName}`,
+        `${reserva.HotelPhone}   (call cost to national landline network) ${reserva.HotelEmail}`,
+        `${reserva.HotelAddress} ${reserva.HotelPostalCode}, SA   NIF - ${reserva.HotelNIF} RNET – ${reserva.HotelRNET}`
     ];
 
     // Configurações de estilo do rodapé

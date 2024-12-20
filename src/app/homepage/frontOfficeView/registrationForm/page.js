@@ -12,12 +12,11 @@ import { GiCancel } from "react-icons/gi";
 import SignaturePad from 'signature_pad';
 import TermsConditionsForm from "@/components/terms&conditions/page";
 import ProtectionPolicyForm from "@/components/protectionPolicy/page";
+import EditRegistrationForm from "@/components/modals/arrivals/reservationForm/edit/page";
+import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
 
 import { MdSunny } from "react-icons/md";
 import { FaMoon } from "react-icons/fa";
-import { CgDanger } from "react-icons/cg";
-import { IoIosSave } from "react-icons/io";
-import { MdOutlineCancel } from "react-icons/md";
 
 export default function Page() {
     const [reserva, setReserva] = useState(null);
@@ -28,6 +27,16 @@ export default function Page() {
     const [isLoading, setIsLoading] = useState(false);
     const [propertyID, setPropertyID] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
+
+    // Estados para armazenar as informações do hotel
+    const [hotelName, setHotelName] = useState('');
+    const [hotelMiniTerms, setHotelMiniTerms] = useState('');
+    const [hotelNIF, setHotelNIF] = useState('');
+    const [hotelPhone, setHotelPhone] = useState('');
+    const [hotelEmail, setHotelEmail] = useState('');
+    const [hotelAddress, setHotelAddress] = useState('');
+    const [hotelPostalCode, setHotelPostalCode] = useState('');
+    const [hotelRNET, setHotelRNET] = useState('');
 
     const canvasRef = useRef(null);
     const signaturePadRef = useRef(null);
@@ -62,6 +71,58 @@ export default function Page() {
         const resNo = queryParams.get("resNo");
         const propertyID = queryParams.get("propertyID");
         setPropertyID(propertyID);
+
+        const fetchPropertyDetails = async () => {
+            if (!propertyID) {
+                console.warn("Parâmetro ausente na URL: propertyID");
+                return;
+            }
+
+            try {
+                const response = await axios.get(`/api/properties/${propertyID}`);
+                console.log("Resposta da API para as propriedades:", response);
+
+                const property = response.data.response[0]; // Acessando o primeiro item do array 'response'
+                if (property) {
+                    // Agora você pode acessar corretamente as propriedades
+                    const hotelName = property.hotelName; // Note que 'propertyName' é a chave correta
+                    const hotelMiniTerms = property.hotelMiniTerms;
+                    const hotelNIF = property.hotelNIF;
+                    const hotelPhone = property.hotelPhone;
+                    const hotelEmail = property.hotelEmail;
+                    const hotelAddress = property.hotelAddress;
+                    const hotelPostalCode = property.hotelPostalCode;
+                    const hotelRNET = property.hotelRNET;
+
+                    // Aqui você pode armazenar essas informações no estado ou usá-las conforme necessário
+                    console.log("Hotel Information:", {
+                        hotelName,
+                        hotelMiniTerms,
+                        hotelNIF,
+                        hotelPhone,
+                        hotelEmail,
+                        hotelAddress,
+                        hotelPostalCode,
+                        hotelRNET
+                    });
+
+                    // Atualizando o estado
+                    setHotelName(hotelName);
+                    setHotelMiniTerms(hotelMiniTerms);
+                    setHotelNIF(hotelNIF);
+                    setHotelPhone(hotelPhone);
+                    setHotelEmail(hotelEmail);
+                    setHotelAddress(hotelAddress);
+                    setHotelPostalCode(hotelPostalCode);
+                    setHotelRNET(hotelRNET);
+                } else {
+                    console.warn(`Nenhuma propriedade encontrada com propertyID: ${propertyID}`);
+                }
+            } catch (error) {
+                console.error("Erro ao buscar detalhes da propriedade:", error.message);
+            }
+        };
+
 
         const fetchReservaByRequestID = async () => {
             if (!requestID || !resNo) {
@@ -122,8 +183,9 @@ export default function Page() {
             }
         };
 
-        if (requestID && resNo) {
+        if (requestID && resNo && propertyID) {
             fetchReservaByRequestID();
+            fetchPropertyDetails();
         }
     }, []);
 
@@ -177,7 +239,7 @@ export default function Page() {
     };
     const [termsAccepted, setTermsAccepted] = useState(true); // "Agree" por padrão
     const [policyAccepted, setPolicyAccepted] = useState(true); // "Agree" por padrão
-    const [error, setError] = useState('');
+    const [error] = useState('');
 
     // Verifica se o canvas está vazio
     const isCanvasEmpty = () => {
@@ -195,66 +257,123 @@ export default function Page() {
 
     console.log(signatureDataUrl);
     // Função para capturar a assinatura e gerar o PDF
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
+
     const handleOkClick = async () => {
-        if (termsAccepted === null || policyAccepted === null || isCanvasEmpty()) {
-          setError('All fields are required: please accept terms, policy, and sign.');
-          setTimeout(() => setError(''), 5000);
-          return;
+        // Lista de erros
+        let errors = [];
+
+        // Verifique se os campos obrigatórios estão preenchidos
+        if (isCanvasEmpty()) {
+            errors.push("Please fill in all required fields to submit the form.");
         }
-      
-        setError('');
-        console.log('Form submitted');
-      
-        try {
-          // Captura a assinatura do canvas em Base64
-          const canvas = canvasRef.current;
-          if (!canvas) return;
-          const signatureBase64 = canvas.toDataURL().split(',')[1]; // Remove prefixo "data:..."
-      
-          // Detalhes da reserva
-          const reservaDetails = {
-            PropertyID: propertyID,
-            ResNo: reserva.ResNo,
-            Room: reserva.Room,
-            DateCI: reserva.DateCI,
-            DateCO: reserva.DateCO,
-            Adults: reserva.Adults,
-            Childs: reserva.Childs,
-            LastName: guestInfo.LastName,
-            FirstName: guestInfo.FirstName,
-            Street: address.Street,
-            Country: address.Country,
-            IdDoc: personalID.IdDoc,
-            NrDoc: personalID.NrDoc,
-            Phone: contacts.PhoneNumber,
-            ExpDate: personalID.ExpDate,
-            DateOfBirth: personalID.DateOfBirth,
-            Issue: personalID.Issue,
-            CountryOfBirth: personalID.CountryOfBirth,
-            VatNo: contacts.VatNo,
-            PersonalEmail: contacts.Email,
-            ProtectionPolicy: policyAccepted
-          };
-      
-          // Gera o PDF em Base64
-          const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
-          const pdfBase64 = pdfDoc.output('datauristring').split(',')[1]; // Remove o prefixo
-      
-          // Envia os dados usando Axios
-          const response = await axios.post(
-            "/api/reservations/checkins/registration_form_base64",
-            {
-              PropertyID: propertyID,
-              pdfBase64: pdfBase64, // Correção: inclusão explícita de pdfBase64
-              fileName: `ResNo-${reserva.ResNo}.pdf`,
+
+        // Verifique se o email termina com "@guest.booking.com"
+        if (email.endsWith("@guest.booking.com")) {
+            errors.push("The email cannot end with @guest.booking.com.");
+        }
+
+        // Se houver erros, exiba o modal de erro
+        if (errors.length > 0) {
+            setErrorMessage(errors.join("\n")); // Junte os erros em uma string separada por linha
+            setIsErrorModalOpen(true); // Exibe o modal de erro
+            return;
+        }
+
+        // Se não houver erros, continue com o envio do formulário
+        setErrorMessage('');
+        setIsErrorModalOpen(false); // Fecha o modal se o erro não ocorrer
+
+        console.log('Formulário enviado');
+
+        // Verificar se houve alteração no email ou VAT No.
+        const changes = {};
+        if (email !== contacts.Email) {  // Verifica se o email foi alterado
+            changes.email = email;  // Alteração no email
+        }
+
+        if (vatNo !== contacts.VatNo) {  // Verifica se o VAT No. foi alterado
+            changes.vatNo = vatNo;  // Alteração no VAT No.
+        }
+
+        // Enviar as alterações para a API se houver alguma
+        if (Object.keys(changes).length > 0) {
+            try {
+                const response = await axios.post('/api/reservations/checkins/registrationForm/valuesEdited', changes);
+                console.log('Alterações salvas com sucesso:', response.data);
+            } catch (error) {
+                console.error('Erro ao salvar alterações:', error);
+                errors.push("There was an issue saving your changes. Please contact support.");
+                setErrorMessage(errors.join("\n"));
+                setIsErrorModalOpen(true);
+                return;
             }
-          );
-      
-          console.log('Resposta da API:', response.data);
-        } catch (error) {
-          console.error('Erro ao gerar ou enviar o PDF:', error);
         }
-      };      
+
+        // Captura a assinatura e gera o PDF
+        try {
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+
+            const signatureBase64 = canvas.toDataURL().split(',')[1]; // Remove prefixo "data:..."
+
+            const reservaDetails = {
+                // Detalhes da reserva
+                PropertyID: propertyID,
+                ResNo: reserva.ResNo,
+                Room: reserva.Room,
+                DateCI: reserva.DateCI,
+                DateCO: reserva.DateCO,
+                Adults: reserva.Adults,
+                Childs: reserva.Childs,
+                LastName: guestInfo.LastName,
+                FirstName: guestInfo.FirstName,
+                Street: address.Street,
+                Country: address.Country,
+                IdDoc: personalID.IdDoc,
+                NrDoc: personalID.NrDoc,
+                Phone: contacts.PhoneNumber,
+                ExpDate: personalID.ExpDate,
+                DateOfBirth: personalID.DateOfBirth,
+                Issue: personalID.Issue,
+                CountryOfBirth: personalID.CountryOfBirth,
+                VatNo: contacts.VatNo,
+                PersonalEmail: contacts.Email,
+                ProtectionPolicy: policyAccepted,
+                HotelName: hotelName,
+                HotelMiniTerms: hotelMiniTerms,
+                HotelPhone: hotelPhone,
+                HotelEmail: hotelEmail,
+                HotelAddress: hotelAddress,
+                HotelPostalCode: hotelPostalCode,
+                HotelNIF: hotelNIF,
+                HotelRNET: hotelRNET
+            };
+
+            // Geração do PDF
+            const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
+            const pdfBase64 = pdfDoc.output('datauristring').split(',')[1]; // Remove prefixo
+
+            // Envia os dados via Axios
+            const response = await axios.post(
+                "/api/reservations/checkins/registration_form_base64",
+                {
+                    PropertyID: propertyID,
+                    pdfBase64: pdfBase64,
+                    fileName: `ResNo-${reserva.ResNo}.pdf`,
+                }
+            );
+
+            console.log('Resposta da API:', response.data);
+        } catch (error) {
+            console.error('Erro ao gerar ou enviar o PDF:', error);
+
+            // Adiciona uma mensagem de erro genérica para o suporte
+            errors.push("There was an issue generating or sending the form. Please contact support.");
+            setErrorMessage(errors.join("\n")); // Atualiza a mensagem de erro
+            setIsErrorModalOpen(true); // Exibe o modal de erro
+        }
+    };
 
 
     const clearSignature = () => {
@@ -278,50 +397,56 @@ export default function Page() {
     };
 
     const [email, setEmail] = useState("");
-    const [isEditable, setIsEditable] = useState(false);
+    const [vatNo, setVatNo] = useState(""); // Novo estado para VAT No.
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalField, setModalField] = useState(null); // Para identificar o campo em edição
 
-    // useEffect para definir o valor inicial de email com contacts.Email
+    // useEffect para definir o valor inicial de email e VAT No. com contacts
     useEffect(() => {
-        // Atualiza o estado do email se os dados de contacts mudarem
         if (contacts?.Email) {
             setEmail(contacts.Email);
         }
+        if (contacts?.VatNo) {
+            setVatNo(contacts.VatNo); // Define o VAT inicial
+        }
     }, [contacts]);
 
-    // Função para lidar com mudanças no email
-    const handleEmailChange = (e) => {
-        const newEmail = e.target.value;
-        setEmail(newEmail);
-
-        // Validação de email
-        if (newEmail && newEmail.endsWith('@guest.booking.com')) {
-            setErrorMessage('Email inválido. O email não pode terminar em guest.booking.com');
-        } else {
-            setErrorMessage('');
-        }
-    };
-
-    // Ativar modo de edição
-    const handleEditClick = () => {
-        setIsEditable(true);
-    };
-
-    // Salvar o novo email
-    const handleSaveClick = () => {
-        // Atualiza o estado de contacts com o novo email
+    const handleModalSave = (newValue) => {
         setContacts((prevContacts) => ({
             ...prevContacts,
-            Email: email,
+            [modalField]: newValue, // Atualiza o campo correspondente dinamicamente
         }));
-        console.log("Novo email salvo:", email);
-        setIsEditable(false); // Desativa a edição
+
+        if (modalField === "Email") {
+            setEmail(newValue); // Atualiza o email exibido
+        } else if (modalField === "VatNo") {
+            setVatNo(newValue); // Atualiza o VAT exibido
+        }
+
+        setIsModalOpen(false); // Fecha o modal
     };
 
-    // Cancelar a edição e restaurar o valor salvo
-    const handleCancelClick = () => {
-        setIsEditable(false);
-        setEmail(contacts.Email); // Restaura o valor salvo
-    };
+    // const openModalForField = (field) => {
+    //     setModalField(field); // Define qual campo será editado
+    //     setIsModalOpen(true);
+    // };
+
+    // Salvar o novo email
+    // const handleSaveClick = () => {
+    //     // Atualiza o estado de contacts com o novo email
+    //     setContacts((prevContacts) => ({
+    //         ...prevContacts,
+    //         Email: email,
+    //     }));
+    //     console.log("Novo email salvo:", email);
+    //     setIsEditable(false); // Desativa a edição
+    // };
+
+    // // Cancelar a edição e restaurar o valor salvo
+    // const handleCancelClick = () => {
+    //     setIsEditable(false);
+    //     setEmail(contacts.Email); // Restaura o valor salvo
+    // };
 
     return (
         <div className='bg-background main-page min-h-screen'>
@@ -331,7 +456,7 @@ export default function Page() {
             {/* header  */}
             <>
                 <div className="pt-2 px-4 flex justify-between flag-position items-center">
-                    <div className='text-textPrimaryColor'>Torel Quinta da Vacaria</div>
+                    <div className='text-textPrimaryColor'>{hotelName}</div>
                     <div className='text-textPrimaryColor'>
                         <p>Registration Form</p>
                     </div>
@@ -551,16 +676,17 @@ export default function Page() {
                                             name={"Price"}
                                             label={"Price\\Night"}
                                             ariaLabel={"Price:"}
-                                            value={`${reserva.Price.toFixed(2)} €`} // Formata para 2 casas decimais
+                                            value={reserva.Price === 0 ? "" : `${reserva.Price.toFixed(2)} €`} // Se Price for 0, exibe como vazio
                                             style={inputStyleFull}
                                         />
+
                                         <InputFieldControlled
                                             type={"text"}
                                             id={"Total"}
                                             name={"Total"}
                                             label={"Total"}
                                             ariaLabel={"Total:"}
-                                            value={`${reserva.Total.toFixed(2)} €`} // Formata para 2 casas decimais
+                                            value={reserva.Total === 0 ? "" : `${reserva.Total.toFixed(2)} €`} // Se Total for 0, exibe como vazio
                                             style={inputStyleFull}
                                         />
 
@@ -668,14 +794,23 @@ export default function Page() {
                                     <p className='text-[#f7ba83] mb-1'>Personal ID</p>
                                     <div className='flex flex-row justify-between gap-4 mt-4'>
                                         <InputFieldControlled
-                                            type={"date"}
+                                            type={
+                                                personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
+                                                    ? "date"
+                                                    : "text"
+                                            }
                                             id={"Date of Birth"}
                                             name={"Date of Birth"}
                                             label={"Date of Birth"}
                                             ariaLabel={"Date of Birth:"}
-                                            value={personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01' ? personalID.DateOfBirth.split('T')[0] : ""}
+                                            value={
+                                                personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
+                                                    ? personalID.DateOfBirth.split('T')[0]
+                                                    : ""
+                                            }
                                             style={inputStyleFullWithLine}
                                         />
+
                                         <InputFieldControlled
                                             type={"text"}
                                             id={"Country of Birth"}
@@ -727,12 +862,20 @@ export default function Page() {
                                     </div>
                                     <div className='flex flex-row justify-between gap-4 mt-4'>
                                         <InputFieldControlled
-                                            type={"date"}
+                                            type={
+                                                personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
+                                                    ? "date"
+                                                    : "text"
+                                            }
                                             id={"Exp. Date"}
                                             name={"Exp. Date"}
                                             label={"Exp. Date"}
                                             ariaLabel={"Exp. Date:"}
-                                            value={personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31' ? personalID.DateOfBirth.split('T')[0] : ""}
+                                            value={
+                                                personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
+                                                    ? personalID.ExpDate.split('T')[0]
+                                                    : ""
+                                            }
                                             style={inputStyleFullWithLine}
                                         />
                                         <InputFieldControlled
@@ -748,30 +891,26 @@ export default function Page() {
                                 </div>
                             </div>
 
-                            <div className='flex flex-row details-on-screen'>
+                            <div className="flex flex-row details-on-screen">
                                 {/** Dados de contacto */}
-                                <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
-                                    <div className='flex flex-row justify-between'>
-                                        <p className='text-[#f7ba83] mb-1'>Contacts</p>
-                                        <div className='flex flex-row justify-end gap-4'>
-                                            {isEditable ? (
-                                                <>
-                                                    <button onClick={handleSaveClick} className="text-green-500">
-                                                        <IoIosSave size={20} />
-                                                    </button>
-                                                    <button onClick={handleCancelClick} className="text-red-500">
-                                                        <MdOutlineCancel size={20} />
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <FaPencilAlt size={15} color="orange" onClick={handleEditClick} />
-                                            )}
+                                <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card">
+                                    <div className="flex flex-row justify-between">
+                                        <p className="text-[#f7ba83] mb-1">Contacts</p>
+                                        <div className="flex flex-row justify-end gap-4">
+                                            <FaPencilAlt
+                                                size={15}
+                                                color="orange"
+                                                onClick={() => {
+                                                    setModalField("Email"); // Define o campo em edição
+                                                    setIsModalOpen(true); // Abre o modal
+                                                }}
+                                            />
                                         </div>
                                     </div>
 
-                                    <div className='mt-2'>
-                                        <div className='flex flex-row justify-between items-center w-full'>
-                                            <div className='flex-grow'>
+                                    <div className="mt-2">
+                                        <div className="flex flex-row justify-between items-center w-full">
+                                            <div className="flex-grow">
                                                 <InputFieldControlled
                                                     type="text"
                                                     id="Email"
@@ -779,24 +918,18 @@ export default function Page() {
                                                     label="Personal E-mail"
                                                     ariaLabel="Email:"
                                                     value={email}
-                                                    onChange={handleEmailChange}
                                                     style={inputStyleFull}
-                                                    disabled={!isEditable}
+                                                    disabled
                                                 />
                                             </div>
-                                            {errorMessage && (
-                                                <p className='text-red-500 text-xs' title={errorMessage}>
-                                                    <CgDanger size={20} color='red' />
-                                                </p>
-                                            )}
                                         </div>
 
                                         <InputFieldControlled
-                                            type={"text"}
-                                            id={"PhoneNumber"}
-                                            name={"PhoneNumber"}
-                                            label={"Phone Number"}
-                                            ariaLabel={"PhoneNumber:"}
+                                            type="text"
+                                            id="PhoneNumber"
+                                            name="PhoneNumber"
+                                            label="Phone Number"
+                                            ariaLabel="PhoneNumber:"
                                             value={contacts.PhoneNumber}
                                             style={inputStyleFull}
                                             disabled
@@ -805,28 +938,50 @@ export default function Page() {
                                 </div>
 
                                 {/** Dados de faturação */}
-                                <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card'>
-                                    <div className='flex flex-row justify-between'>
-                                        <p className='text-[#f7ba83] mb-1'>Invoice Data</p>
-                                        <FaPencilAlt size={15} color='orange' />
+                                <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card">
+                                    <div className="flex flex-row justify-between">
+                                        <p className="text-[#f7ba83] mb-1">Invoice Data</p>
+                                        <FaPencilAlt
+                                            size={15}
+                                            color="orange"
+                                            onClick={() => {
+                                                setModalField("VatNo"); // Define o campo em edição
+                                                setIsModalOpen(true); // Abre o modal
+                                            }}
+                                        />
                                     </div>
-                                    <div className='mt-2'>
-                                        <p className='!text-textLabelColor text-lg'>{guestInfo.LastName}, {guestInfo.FirstName}</p>
-                                        <div className='mt-4'>
+                                    <div className="mt-2">
+                                        <p className="!text-textLabelColor text-lg">{guestInfo.LastName}, {guestInfo.FirstName}</p>
+                                        <div className="mt-4">
                                             <InputFieldControlled
-                                                type={"text"}
-                                                id={"VAT Nr."}
-                                                name={"VAT Nr."}
-                                                label={"VAT Nr."}
-                                                ariaLabel={"VAT Nr.:"}
+                                                type="text"
+                                                id="VAT Nr."
+                                                name="VAT Nr."
+                                                label="VAT Nr."
+                                                ariaLabel="VAT Nr.:"
                                                 value={contacts.VatNo}
                                                 style={inputStyleFull}
+                                                disabled
                                             />
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
+                                {/** Modal Dinâmico */}
+                                {isModalOpen && (
+                                    <EditRegistrationForm
+                                        currentLabel={modalField === "Email" ? "Email" : "VAT No."}
+                                        currentValue={modalField === "Email" ? email : contacts.VatNo}
+                                        validation={
+                                            modalField === "Email"
+                                                ? (value) => !value.endsWith("@guest.booking.com")
+                                                : null // Adicione validações específicas para VAT No., se necessário
+                                        }
+                                        onSave={(newValue) => handleModalSave(newValue)}
+                                        onClose={() => setIsModalOpen(false)}
+                                    />
+                                )}
+                            </div>
                         </div>
                     )}
                     <div className='w-1/2 ml-4 mr-4 half-screen'>
@@ -974,6 +1129,14 @@ export default function Page() {
                                     onClick={handleOkClick}>
                                     Ok
                                 </button>
+                                {/** Modal de erro */}
+                                {isErrorModalOpen && errorMessage && (
+                                    <ErrorRegistrationForm
+                                        modalHeader="Error"
+                                        errorMessage={errorMessage}
+                                        onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
+                                    />
+                                )}
                             </div>
                         </div>
                     </div>
