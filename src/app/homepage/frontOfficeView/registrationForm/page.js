@@ -284,29 +284,20 @@ export default function Page() {
         console.log("vat: ", vatNo);
         console.log("vat antigo: ", initialVatNo);
     
-        const changes = {};
-
-        // Se o email foi alterado, envia o novo valor, senão envia como vazio
-        if (email !== initialEmail) {
-            changes.email = email;
-            console.log("Alteração de email detectada:", email);
-        } else {
-            changes.email = "";  // Envia o email como vazio se não foi alterado
-        }
+        let emailToSend = email !== initialEmail ? email : ""; // Se o email foi alterado, envia o novo valor, senão vazio
+        let vatNoToSend = vatNo !== initialVatNo ? vatNo : ""; // Se o vatNo foi alterado, envia o novo valor, senão vazio
         
-        // Se o vatNo foi alterado, envia o novo valor, senão envia como vazio
-        if (vatNo !== initialVatNo) {
-            changes.vatNo = vatNo;
-            console.log("Alteração de VAT No detectada:", vatNo);
-        } else {
-            changes.vatNo = "";  // Envia vatNo como vazio se não foi alterado
-        }
+        console.log("Email a ser enviado:", emailToSend);
+        console.log("VAT No a ser enviado:", vatNoToSend);
         
         // Se houver alterações (ou valores a serem enviados), envia para a API
-        if (Object.keys(changes).length > 0) {
-            console.log("Alterações detectadas, enviando dados:", changes);
+        if (emailToSend || vatNoToSend) {  // Verifica se algum dos campos tem valor para ser enviado
+            console.log("Alterações detectadas, enviando dados:", { email: emailToSend, vatNo: vatNoToSend });
             try {
-                const response = await axios.post('/api/reservations/checkins/registrationForm/valuesEdited', changes);
+                const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
+                    email: emailToSend,
+                    vatNo: vatNoToSend
+                });
                 console.log('Alterações salvas com sucesso:', response.data);
             } catch (error) {
                 console.error('Erro ao salvar alterações:', error);
@@ -317,8 +308,8 @@ export default function Page() {
             }
         } else {
             console.log("Nenhuma alteração detectada, nada será enviado.");
-        }        
-
+        }
+        
         // Captura a assinatura e gera o PDF
         try {
             const canvas = canvasRef.current;
