@@ -260,44 +260,46 @@ export default function Page() {
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
 
     const handleOkClick = async () => {
-        // Lista de erros
         let errors = [];
-
-        // Verifique se os campos obrigatórios estão preenchidos
+    
+        // Validações de formulário
         if (isCanvasEmpty()) {
             errors.push("Please fill in all required fields to submit the form.");
         }
-
-        // Verifique se o email termina com "@guest.booking.com"
         if (email.endsWith("@guest.booking.com")) {
             errors.push("The email cannot end with @guest.booking.com.");
         }
-
-        // Se houver erros, exiba o modal de erro
         if (errors.length > 0) {
-            setErrorMessage(errors.join("\n")); // Junte os erros em uma string separada por linha
-            setIsErrorModalOpen(true); // Exibe o modal de erro
+            setErrorMessage(errors.join("\n"));
+            setIsErrorModalOpen(true);
             return;
         }
-
-        // Se não houver erros, continue com o envio do formulário
+    
         setErrorMessage('');
-        setIsErrorModalOpen(false); // Fecha o modal se o erro não ocorrer
-
+        setIsErrorModalOpen(false);
+    
         console.log('Formulário enviado');
-
-        // Verificar se houve alteração no email ou VAT No.
+        console.log("email: ", email);
+        console.log("email antigo: ", initialEmail);
+        console.log("vat: ", vatNo);
+        console.log("vat antigo: ", initialVatNo);
+    
+        // Detectar mudanças
         const changes = {};
-        if (email !== contacts.Email) {  // Verifica se o email foi alterado
-            changes.email = email;  // Alteração no email
+    
+        if (email !== initialEmail) {
+            changes.email = email;
+            console.log("email alterado");
         }
-
-        if (vatNo !== contacts.VatNo) {  // Verifica se o VAT No. foi alterado
-            changes.vatNo = vatNo;  // Alteração no VAT No.
+    
+        if (vatNo !== initialVatNo) {
+            changes.vatNo = vatNo;
+            console.log("vat no alterado");
         }
-
-        // Enviar as alterações para a API se houver alguma
+    
+        // Salvar mudanças
         if (Object.keys(changes).length > 0) {
+            console.log("HOUVE ALTERAÇÕES");
             try {
                 const response = await axios.post('/api/reservations/checkins/registrationForm/valuesEdited', changes);
                 console.log('Alterações salvas com sucesso:', response.data);
@@ -401,30 +403,33 @@ export default function Page() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalField, setModalField] = useState(null); // Para identificar o campo em edição
 
-    // useEffect para definir o valor inicial de email e VAT No. com contacts
+    const [initialEmail, setInitialEmail] = useState("");
+    const [initialVatNo, setInitialVatNo] = useState("");
+    
     useEffect(() => {
-        if (contacts?.Email) {
+        if (contacts?.Email && initialEmail === "") {
             setEmail(contacts.Email);
+            setInitialEmail(contacts.Email); // Armazena o valor inicial
         }
-        if (contacts?.VatNo) {
-            setVatNo(contacts.VatNo); // Define o VAT inicial
+        if (contacts?.VatNo && initialVatNo === "") {
+            setVatNo(contacts.VatNo);
+            setInitialVatNo(contacts.VatNo); // Armazena o valor inicial
         }
-    }, [contacts]);
+    }, [contacts, initialEmail, initialVatNo]);    
+    
 
-    const handleModalSave = (newValue) => {
-        setContacts((prevContacts) => ({
-            ...prevContacts,
-            [modalField]: newValue, // Atualiza o campo correspondente dinamicamente
-        }));
+const handleModalSave = (newValue) => {
+    // Verifica qual campo está sendo editado
+    if (modalField === "Email") {
+        setEmail(newValue); // Atualiza o estado de email
+    } else if (modalField === "VatNo") {
+        setVatNo(newValue); // Atualiza o estado de VAT No
+    }
 
-        if (modalField === "Email") {
-            setEmail(newValue); // Atualiza o email exibido
-        } else if (modalField === "VatNo") {
-            setVatNo(newValue); // Atualiza o VAT exibido
-        }
+    // Fechar o modal após salvar
+    setIsModalOpen(false);
+};
 
-        setIsModalOpen(false); // Fecha o modal
-    };
 
     // const openModalForField = (field) => {
     //     setModalField(field); // Define qual campo será editado
@@ -959,7 +964,7 @@ export default function Page() {
                                                 name="VAT Nr."
                                                 label="VAT Nr."
                                                 ariaLabel="VAT Nr.:"
-                                                value={contacts.VatNo}
+                                                value={vatNo}
                                                 style={inputStyleFull}
                                                 disabled
                                             />

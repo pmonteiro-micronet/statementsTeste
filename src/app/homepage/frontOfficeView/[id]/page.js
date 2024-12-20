@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation"; // Import useRouter
 import "./styles.css";
 import en from "../../../../../public/locales/english/common.json";
 
@@ -10,6 +10,7 @@ const translations = { en };
 const FrontOffice = () => {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const router = useRouter(); // Instancia o hook useRouter
 
   const locale = "en";
   const t = translations[locale];
@@ -70,40 +71,58 @@ const FrontOffice = () => {
     }
   }, [session?.user?.propertyIDs, selectedHotelID]); // Dependência para recarregar quando a sessão ou selectedHotelID mudar
 
-  return (
-    <div className="min-h-screen flex">
-      <main className="flex-1 min-h-screen p-8 overflow-y-auto">
-        <h2 className="font-semibold text-2xl mb-4">{t.frontOffice.dashboard.title}</h2>
+ // Função para redirecionar, aceitando o tipo de contagem como parâmetro
+const handleRedirect = (type) => {
+  if (selectedHotelID) {
+    router.push(`/homepage/frontOfficeView/${type}/${selectedHotelID}`);
+  }
+};
 
-        <div className="flex flex-row gap-5">
-          <div className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2">
-            <div className="flex flex-col">
-              <h3 className="text-5xl text-primary">
-                {arrivals !== null ? arrivals : `${t.errors.loading}...`}
-              </h3>
-              <p className="text-gray-400 mt-1 uppercase">{t.frontOffice.dashboard.cardArrivals}</p>
-            </div>
-          </div>
-          <div className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2">
-            <div className="flex flex-col">
-              <h3 className="text-5xl text-primary">
-                {inhouses !== null ? inhouses : `${t.errors.loading}...`}
-              </h3>
-              <p className="text-gray-400 mt-1 uppercase">{t.frontOffice.dashboard.cardInHouses}</p>
-            </div>
-          </div>
-          <div className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2">
-            <div className="flex flex-col">
-              <h3 className="text-5xl text-primary">
-                {departures !== null ? departures : `${t.errors.loading}...`}
-              </h3>
-              <p className="text-gray-400 mt-1 uppercase">{t.frontOffice.dashboard.cardDepartures}</p>
-            </div>
+// No JSX, adicione o `onClick` com o tipo correspondente
+return (
+  <div className="min-h-screen flex">
+    <main className="flex-1 min-h-screen p-8 overflow-y-auto">
+      <h2 className="font-semibold text-2xl mb-4">Front Office</h2>
+
+      <div className="flex flex-row gap-5">
+        <div
+          className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer"
+          onClick={() => handleRedirect("arrivals")} // Redireciona para "arrivals"
+        >
+          <div className="flex flex-col">
+            <h3 className="text-5xl text-primary">
+              {arrivals !== null ? arrivals : "Loading..."}
+            </h3>
+            <p className="text-gray-400 mt-1">ARRIVALS</p>
           </div>
         </div>
-      </main>
-    </div>
-  );
+        <div
+          className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer"
+          onClick={() => handleRedirect("inhouses")} // Redireciona para "inhouses"
+        >
+          <div className="flex flex-col">
+            <h3 className="text-5xl text-primary">
+              {inhouses !== null ? inhouses : "Loading..."}
+            </h3>
+            <p className="text-gray-400 mt-1">IN HOUSES</p>
+          </div>
+        </div>
+        <div
+          className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer"
+          onClick={() => handleRedirect("departures")} // Redireciona para "departures"
+        >
+          <div className="flex flex-col">
+            <h3 className="text-5xl text-primary">
+              {departures !== null ? departures : "Loading..."}
+            </h3>
+            <p className="text-gray-400 mt-1">DEPARTURES</p>
+
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+);
 };
 
 export default FrontOffice;
