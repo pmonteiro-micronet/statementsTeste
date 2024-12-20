@@ -284,8 +284,8 @@ export default function Page() {
         console.log("vat: ", vatNo);
         console.log("vat antigo: ", initialVatNo);
     
-        let emailToSend = email !== initialEmail ? email : ""; // Se o email foi alterado, envia o novo valor, senão vazio
-        let vatNoToSend = vatNo !== initialVatNo ? vatNo : ""; // Se o vatNo foi alterado, envia o novo valor, senão vazio
+        let emailToSend = email !== initialEmail ? email : undefined; // Envia undefined se não houver alteração
+        let vatNoToSend = vatNo !== initialVatNo ? vatNo : undefined; // Envia undefined se não houver alteração
         
         console.log("Email a ser enviado:", emailToSend);
         console.log("VAT No a ser enviado:", vatNoToSend);
@@ -296,19 +296,20 @@ export default function Page() {
             try {
                 const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
                     email: emailToSend,
-                    vatNo: vatNoToSend
+                    vatNo: vatNoToSend,
+                    propertyID: propertyID
                 });
                 console.log('Alterações salvas com sucesso:', response.data);
             } catch (error) {
                 console.error('Erro ao salvar alterações:', error);
-                errors.push("There was an issue saving your changes. Please contact support.", error);
+                errors.push("There was an issue saving your changes. Please contact support.");
                 setErrorMessage(errors.join("\n"));
                 setIsErrorModalOpen(true);
                 return;
             }
         } else {
             console.log("Nenhuma alteração detectada, nada será enviado.");
-        }
+        }        
         
         // Captura a assinatura e gera o PDF
         try {
