@@ -284,22 +284,27 @@ export default function Page() {
         console.log("vat: ", vatNo);
         console.log("vat antigo: ", initialVatNo);
     
-        // Detectar mudanças
         const changes = {};
-    
+
+        // Se o email foi alterado, envia o novo valor, senão envia como vazio
         if (email !== initialEmail) {
             changes.email = email;
-            console.log("email alterado");
+            console.log("Alteração de email detectada:", email);
+        } else {
+            changes.email = "";  // Envia o email como vazio se não foi alterado
         }
-    
+        
+        // Se o vatNo foi alterado, envia o novo valor, senão envia como vazio
         if (vatNo !== initialVatNo) {
             changes.vatNo = vatNo;
-            console.log("vat no alterado");
+            console.log("Alteração de VAT No detectada:", vatNo);
+        } else {
+            changes.vatNo = "";  // Envia vatNo como vazio se não foi alterado
         }
-    
-        // Salvar mudanças
+        
+        // Se houver alterações (ou valores a serem enviados), envia para a API
         if (Object.keys(changes).length > 0) {
-            console.log("HOUVE ALTERAÇÕES");
+            console.log("Alterações detectadas, enviando dados:", changes);
             try {
                 const response = await axios.post('/api/reservations/checkins/registrationForm/valuesEdited', changes);
                 console.log('Alterações salvas com sucesso:', response.data);
@@ -310,7 +315,9 @@ export default function Page() {
                 setIsErrorModalOpen(true);
                 return;
             }
-        }
+        } else {
+            console.log("Nenhuma alteração detectada, nada será enviado.");
+        }        
 
         // Captura a assinatura e gera o PDF
         try {
