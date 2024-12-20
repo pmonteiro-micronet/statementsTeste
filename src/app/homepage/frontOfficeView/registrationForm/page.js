@@ -301,7 +301,7 @@ export default function Page() {
                 console.log('Alterações salvas com sucesso:', response.data);
             } catch (error) {
                 console.error('Erro ao salvar alterações:', error);
-                errors.push("There was an issue saving your changes. Please contact support.");
+                errors.push("There was an issue saving your changes. Please contact support.", error);
                 setErrorMessage(errors.join("\n"));
                 setIsErrorModalOpen(true);
                 return;
