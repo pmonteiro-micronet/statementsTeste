@@ -3,8 +3,14 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation"; // Importa o useRouter
 import "./statements.css";
+import en from "../../../../public/locales/english/common.json";
+
+const translations = { en };
 
 const Homepage = () => {
+  const locale = "en";
+  const t = translations[locale];
+
   const { data: session } = useSession();
   const router = useRouter(); // Instancia o router
   
@@ -65,7 +71,7 @@ const Homepage = () => {
   return (
     <div className="min-h-screen flex">
       <main className="flex-1 min-h-screen p-8 overflow-y-auto">
-        <h2 className="font-semibold text-2xl mb-4">Statements</h2>
+        <h2 className="font-semibold text-2xl mb-4">{t.statements.dashboard.title}</h2>
 
         <div className="flex flex-row gap-5">
           <div
@@ -74,7 +80,7 @@ const Homepage = () => {
           >
             <div className="flex flex-col">
               <h3 className="text-5xl text-primary">{pendings !== null ? pendings : "Loading..."}</h3>
-              <p className="text-gray-400 mt-1">PENDINGS</p>
+              <p className="text-gray-400 mt-1 uppercase">{t.statements.dashboard.cardPending}</p>
             </div>
           </div>
           <div
@@ -83,7 +89,7 @@ const Homepage = () => {
           >
             <div className="flex flex-col">
               <h3 className="text-5xl text-primary">{viewed !== null ? viewed : "Loading..."}</h3>
-              <p className="text-gray-400 mt-1">VIEWED</p>
+              <p className="text-gray-400 mt-1 uppercase">{t.statements.dashboard.cardViewed}</p>
             </div>
           </div>
         </div>

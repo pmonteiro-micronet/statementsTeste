@@ -1,0 +1,84 @@
+{
+    "auth":{
+        "instruction1": "To access Extensions myPMS, enter your Email and Password.",
+        "instruction2": "Forgot your Email or Password?",
+        "instruction3": "I am already a customer but do not have access. How can I join Extensions myPMS?",
+        "email": "E-mail",
+        "password": "Password",
+        "login": "Login",
+        "footer":{
+            "callCost": "Cost of a call to the national fixed-line network.",
+            "personalizedService": "Personalized service",
+            "activeDays": "Business days, from 9:30 AM to 6:30 PM."
+        }
+    },
+    "navbar": {
+        "alert":{
+            "messagePart1": "You will logout automatically in ",
+            "messagePart2": "seconds!",
+            "continue": "Continue",
+            "logout": "Logout"
+        },
+        "logout": "Logout"
+    },
+    "homepage": {
+        "title": "Homepage",
+        "cardPending": "Pending",
+        "cardViewed": "Viewed"
+    },
+    "statements": {
+        "dashboard": {
+            "title": "Dashboard",
+            "cardPending": "Pending",
+            "cardViewed": "Viewed"
+        },
+        "pending": {
+            "title": "Pendings",
+            "defaultHotelName": "Hotel Name",
+            "reservationNumber": "Reservation Number",
+            "checkIn": "Check-In",
+            "checkOut": "Check-Out",
+            "viewStatement": "View Statement",
+            "noStatement": "No pending statements."
+        },
+        "view": {
+            "title": "Viewed",
+            "defaultHotelName": "Hotel Name",
+            "reservationNumber": "Reservation Number",
+            "checkIn": "Check-In",
+            "checkOut": "Check-Out",
+            "checkedStatement": "Checked Statement",
+            "noStatement": "No statements seen."
+        }
+    },
+    "frontOffice": {
+        "dashboard":{
+            "title": "Front Office",
+            "cardArrivals": "Arrivals",
+            "cardInHouses": "In Houses",
+            "cardDepartures": "Departures"
+        },
+        "departures": {
+            "today": "Today",
+            "tomorrow": "Tomorrow",
+            "departureList": "Departure List",
+            "room": "Room",
+            "lastName": "Last Name",
+            "firstName": "First Name",
+            "travelAgency": "Travel Agency",
+            "company": "Company",
+            "group": "Group",
+            "notes": "Notes",
+            "resNo": "Res. No.",
+            "departure": "Departure",
+            "info": "Info",
+            "statement": "Statement",
+            "noReservations": "No reservations found."
+        }
+    },
+    "errors":{
+            "loading": "Loading",
+            "unknownUser": "Unknown user",
+            "unknownEmail": "Unknown e-mail"
+    }
+}

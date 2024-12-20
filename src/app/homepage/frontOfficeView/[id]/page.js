@@ -3,11 +3,17 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation"; // Import useRouter
 import "./styles.css";
+import en from "../../../../../public/locales/english/common.json";
+
+const translations = { en };
 
 const FrontOffice = () => {
   const { data: session } = useSession();
   const pathname = usePathname();
   const router = useRouter(); // Instancia o hook useRouter
+
+  const locale = "en";
+  const t = translations[locale];
 
   // Pegando o selectedHotelID da URL
   const selectedHotelID = pathname.split('/').pop(); // Extrai o último valor da URL, que deve ser o hotelID
@@ -110,6 +116,7 @@ return (
               {departures !== null ? departures : "Loading..."}
             </h3>
             <p className="text-gray-400 mt-1">DEPARTURES</p>
+
           </div>
         </div>
       </div>
