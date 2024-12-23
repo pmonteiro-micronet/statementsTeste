@@ -19,6 +19,8 @@ import dayjs from 'dayjs';
 
 import en from "../../../../../../public/locales/english/common.json";
 
+import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
+
 const translations = { en };
 
 export default function Page({ params }) {
@@ -42,6 +44,9 @@ export default function Page({ params }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const router = useRouter();
+
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
 
   const [propertyName, setPropertyName] = useState([]);
   console.log(postSuccessful);
@@ -75,6 +80,8 @@ export default function Page({ params }) {
         "Erro ao enviar os dados:",
         error.response ? error.response.data : error.message
       );
+      setErrorMessage("We were unable to fulfill your order. Please contact support.");
+      setIsErrorModalOpen(true);
       setPostSuccessful(false);
     } finally {
       setIsLoading(false);
@@ -84,7 +91,7 @@ export default function Page({ params }) {
   const sendResToAPI = async (ResNo) => {
     console.log("Enviando ResNumber para a API:", ResNo);
     const windowValue = 0;
-  
+
     try {
       // Faz a requisição para enviar os dados do statement
       const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
@@ -94,36 +101,36 @@ export default function Page({ params }) {
           propertyID,
         },
       });
-  
+
       console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
       console.log("Resposta da API ao salvar statement:", saveResponse.data);
-  
+
       // Se a resposta de salvar o statement foi bem-sucedida, agora verificamos
       // se o statement foi atualizado ou criado, e pegamos o requestID
       if (saveResponse.data && saveResponse.data.data && saveResponse.data.data.requestID) {
         const updatedRecord = saveResponse.data.data;
         const updatedRequestID = updatedRecord.requestID;
-  
+
         // Redireciona para a página jsonView com o requestID do registro atualizado
         console.log("Statement atualizado com requestID:", updatedRequestID);
         router.push(`/homepage/jsonView?recordID=${updatedRequestID}&propertyID=${propertyID}`);
       } else {
         console.warn("Resposta da API não contém requestID.");
       }
-  
+
     } catch (error) {
       console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
-  
+
       if (error.response && error.response.status === 409) {
         // O status 409 indica que já existe um registro com a mesma uniqueKey
         console.warn("Registro já existente, buscando o requestID do registro existente.");
-  
+
         // Extraia o requestID do erro, caso a API o forneça
         const existingRequestID = error.response.data?.existingRequestID;
-  
+
         if (existingRequestID) {
           console.log("Registro existente encontrado com requestID:", existingRequestID);
-  
+
           // Redireciona para a página jsonView com o requestID do registro existente
           router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
         } else {
@@ -134,8 +141,8 @@ export default function Page({ params }) {
       }
     }
   };
-  
-  
+
+
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -153,7 +160,7 @@ export default function Page({ params }) {
       try {
         const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
         console.log("Response completo:", response);
-  
+
         // Combinar todos os requestBody dentro de response.data.response
         const reservasArray = response.data.response.flatMap(item => {
           try {
@@ -163,15 +170,15 @@ export default function Page({ params }) {
             return [];
           }
         });
-  
+
         console.log("Reservas após parse (todas as linhas):", reservasArray);
-  
+
         // Se nenhuma reserva for encontrada
         if (reservasArray.length === 0) {
           console.warn("Nenhuma reserva encontrada após parse.");
           return;
         }
-  
+
         // Filtrar reservas pela data atual
         const formattedCurrentDate = dayjs(currentDate).format('YYYY-MM-DD');
         const reservasFiltradas = reservasArray.filter(reserva => {
@@ -179,18 +186,18 @@ export default function Page({ params }) {
             console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva);
             return false;
           }
-  
+
           const formattedDateCO = dayjs(reserva.DateCO).format('YYYY-MM-DD');
           return formattedDateCO === formattedCurrentDate;
         });
-  
+
         console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
-  
+
         // Remover duplicatas com base no número da reserva (ResNo)
         const reservasUnicas = Array.from(
           new Map(reservasFiltradas.map(reserva => [reserva.ResNo, reserva])).values()
         );
-  
+
         console.log("Reservas únicas para a data atual:", reservasUnicas);
         setReservas(reservasUnicas);
       } catch (error) {
@@ -199,11 +206,11 @@ export default function Page({ params }) {
         setIsLoading(false);
       }
     };
-  
+
     fetchReservas();
-  }, [currentDate, propertyID]);  
-  
-  
+  }, [currentDate, propertyID]);
+
+
   useEffect(() => {
     const fetchHotelName = async () => {
       try {
@@ -339,7 +346,7 @@ export default function Page({ params }) {
                                 className="relative z-10"
                               >
                                 <DropdownItem key="edit" onClick={() => handleOpenModal()}>
-                                {t.frontOffice.departures.info}
+                                  {t.frontOffice.departures.info}
                                 </DropdownItem>
                                 <DropdownItem
                                   key="show"
@@ -419,6 +426,14 @@ export default function Page({ params }) {
           }))}
         />
       </div>
+      {/** Modal de erro */}
+      {isErrorModalOpen && errorMessage && (
+        <ErrorRegistrationForm
+          modalHeader="Attention"
+          errorMessage={errorMessage}
+          onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
+        />
+      )}
     </main>
   );
 }
