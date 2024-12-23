@@ -3,14 +3,10 @@ import axios from "axios";
 import prisma from "@/lib/db";
 
 // Função para gerar a `uniqueKey`
-const generateUniqueKey = (HotelInfo, Reservation, GuestInfo) => {
-  if (!HotelInfo || !Reservation || !GuestInfo) {
-    throw new Error("Dados insuficientes para gerar a chave única.");
-  }
-
-  const { Tag } = HotelInfo;
-  const { RoomNumber, ReservationNumber, DateCI, DateCO } = Reservation;
-  const { FirstName, LastName } = GuestInfo;
+const generateUniqueKey = (HotelInfo, Reservation, GuestInfo = {}) => {
+  const { Tag } = HotelInfo || {};
+  const { RoomNumber, ReservationNumber, DateCI, DateCO } = Reservation || {};
+  const { FirstName = "Unknown", LastName = "Unknown" } = GuestInfo || {};
 
   return `${Tag}-${RoomNumber}-${ReservationNumber}-${DateCI}-${DateCO}-${FirstName}-${LastName}`;
 };
@@ -40,13 +36,8 @@ export async function GET(request) {
 
   try {
     const property = await prisma.properties.findUnique({
-      where: {
-        propertyID: propertyIDInt,
-      },
-      select: {
-        propertyServer: true,
-        propertyPort: true,
-      },
+      where: { propertyID: propertyIDInt },
+      select: { propertyServer: true, propertyPort: true },
     });
 
     if (!property) {
@@ -61,19 +52,18 @@ export async function GET(request) {
 
     console.log("URL para requisição:", url);
 
-    const response = await axios.get(url, {
-      params: { ResNumber, window },
-    });
+    const response = await axios.get(url, { params: { ResNumber, window } });
 
-    console.log("Resposta recebida do endpoint:", response.data);
+    // Formata a resposta recebida
+    const formattedResponse = JSON.stringify(response.data, null, 2);
+    console.log("Resposta formatada recebida do endpoint:", formattedResponse);
 
     const data = response.data[0];
-    const { HotelInfo, Reservation, GuestInfo } = data;
-    const hotelInfo = HotelInfo?.[0];
-    const reservation = Reservation?.[0];
-    const guestInfo = GuestInfo?.[0];
+    const hotelInfo = data.HotelInfo?.[0] || {};
+    const reservation = data.Reservation?.[0] || {};
+    const guestInfo = data.GuestInfo?.[0] || {};
 
-    if (!hotelInfo || !reservation || !guestInfo) {
+    if (!hotelInfo || !reservation) {
       return NextResponse.json(
         { error: "Dados obrigatórios ausentes na resposta do endpoint." },
         { status: 400 }
@@ -84,26 +74,21 @@ export async function GET(request) {
     console.log("Generated uniqueKey:", uniqueKey);
 
     // Verificar se já existe um registro com o mesmo uniqueKey
-    const count = await prisma.requestRecords.count({
-      where: { uniqueKey },  // Contando os registros com o mesmo uniqueKey
+    const existingRequest = await prisma.requestRecords.findFirst({
+      where: { uniqueKey },
     });
 
     let newRequest;
-    if (count > 0) {
+    if (existingRequest) {
       console.log("Statement já existe. Atualizando...");
 
-      // Busca o primeiro registro que tenha o uniqueKey e faz a atualização com requestID
-      const existingRequest = await prisma.requestRecords.findFirst({
-        where: { uniqueKey },
-      });
-
       newRequest = await prisma.requestRecords.update({
-        where: { requestID: existingRequest.requestID },  // Usando requestID para atualização
+        where: { requestID: existingRequest.requestID },
         data: {
-          requestBody: JSON.stringify(response.data),
+          requestBody: formattedResponse,
           requestDateTime: new Date(),
           responseStatus: "200",
-          responseBody: JSON.stringify(response.data),
+          responseBody: formattedResponse,
         },
       });
 
@@ -111,14 +96,13 @@ export async function GET(request) {
     } else {
       console.log("Statement não encontrado. Criando novo...");
 
-      // Criação do novo registro se não existir
       newRequest = await prisma.requestRecords.create({
         data: {
-          requestBody: JSON.stringify(response.data),
+          requestBody: formattedResponse,
           requestType: "GET",
           requestDateTime: new Date(),
           responseStatus: "200",
-          responseBody: JSON.stringify(response.data),
+          responseBody: formattedResponse,
           propertyID: propertyIDInt,
           seen: false,
           uniqueKey,
@@ -128,7 +112,6 @@ export async function GET(request) {
       console.log("Novo statement criado:", newRequest);
     }
 
-    // Retorna os dados necessários, incluindo o requestID
     return new NextResponse(
       JSON.stringify({
         data: {
@@ -142,7 +125,7 @@ export async function GET(request) {
     console.error("Erro ao enviar dados para o servidor:", error.response ? error.response.data : error.message);
     return new NextResponse(
       JSON.stringify({
-        error: error.response ? error.response.data : "Erro ao enviar dados para a API" + error,
+        error: error.response ? error.response.data : "Erro ao enviar dados para a API: " + error,
       }),
       { status: 500 }
     );
