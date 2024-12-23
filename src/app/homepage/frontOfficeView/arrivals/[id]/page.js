@@ -17,6 +17,8 @@ import LoadingBackdrop from "@/components/Loader/page";
 import { useRouter } from "next/navigation";
 import dayjs from 'dayjs';
 
+import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
+
 export default function Arrivals({ params }) {
   const { id } = params;
   const propertyID = id;
@@ -35,6 +37,8 @@ export default function Arrivals({ params }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
 
   const [propertyName, setPropertyName] = useState([]);
   console.log(postSuccessful);
@@ -68,6 +72,8 @@ export default function Arrivals({ params }) {
         "Erro ao enviar os dados:",
         error.response ? error.response.data : error.message
       );
+      setErrorMessage("We were unable to fulfill your order. Please contact support.");
+      setIsErrorModalOpen(true);
       setPostSuccessful(false);
     } finally {
       setIsLoading(false);
@@ -90,62 +96,62 @@ export default function Arrivals({ params }) {
       try {
         const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
         console.log("Response completo:", response);
-  
+
         const reservasArray = response.data.response.flatMap(item => {
           try {
             // Parsear o `requestBody` como JSON se estiver stringificado
             const parsedRequestBody = JSON.parse(item.requestBody);
-  
+
             // Extrair as informações do formato correto
             const reservations = Array.isArray(parsedRequestBody)
               ? parsedRequestBody.flatMap(data =>
-                  data.ReservationInfo?.map(reserva => {
-                    const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
-                    const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
-  
-                    return {
-                      requestID: item.requestID,
-                      propertyID: item.propertyID, // Adiciona o requestID
-                      DateCI: reserva.DateCI,
-                      Booker: reserva.Booker,
-                      Company: reserva.Company,
-                      Group: reserva.Group,
-                      Room: reserva.Room,
-                      ResNo: reserva.ResNo,
-                      Notes: reserva.Notes,
-                      RoomStatus: reserva.RoomStatus,
-                      RoomType: reserva.RoomType,
-                      TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
-                      Price: reserva.Price,
-                      CityTax: reserva.CityTax,
-                      Total: reserva.Total,
-                      Salutation: guestDetails.Salution,
-                      LastName: guestDetails.LastName,
-                      FirstName: guestDetails.FirstName,
-                      Country: addressDetails.Country,
-                      Street: addressDetails.Street,
-                      PostalCode: addressDetails.PostalCode,
-                      City: addressDetails.City,
-                      Region: addressDetails.Region,
-                    };
-                  }) || []
-                )
+                data.ReservationInfo?.map(reserva => {
+                  const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
+                  const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
+
+                  return {
+                    requestID: item.requestID,
+                    propertyID: item.propertyID, // Adiciona o requestID
+                    DateCI: reserva.DateCI,
+                    Booker: reserva.Booker,
+                    Company: reserva.Company,
+                    Group: reserva.Group,
+                    Room: reserva.Room,
+                    ResNo: reserva.ResNo,
+                    Notes: reserva.Notes,
+                    RoomStatus: reserva.RoomStatus,
+                    RoomType: reserva.RoomType,
+                    TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
+                    Price: reserva.Price,
+                    CityTax: reserva.CityTax,
+                    Total: reserva.Total,
+                    Salutation: guestDetails.Salution,
+                    LastName: guestDetails.LastName,
+                    FirstName: guestDetails.FirstName,
+                    Country: addressDetails.Country,
+                    Street: addressDetails.Street,
+                    PostalCode: addressDetails.PostalCode,
+                    City: addressDetails.City,
+                    Region: addressDetails.Region,
+                  };
+                }) || []
+              )
               : [];
-  
+
             return reservations;
           } catch (err) {
             console.error("Erro ao processar requestBody ou reservas:", err);
             return [];
           }
         });
-  
+
         console.log("Reservas após parse:", reservasArray);
-  
+
         if (reservasArray.length === 0) {
           console.warn("Nenhuma reserva encontrada após parse.");
           return;
         }
-  
+
         const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
         const reservasFiltradas = reservasArray.filter(reserva => {
           if (!reserva.DateCI) {
@@ -155,13 +161,13 @@ export default function Arrivals({ params }) {
           const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
           return formattedDateCI === formattedCurrentDate;
         });
-  
+
         console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
-  
+
         const reservasUnicas = Array.from(
           new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
         );
-  
+
         console.log("Reservas únicas para a data atual:", reservasUnicas);
         setReservas(reservasUnicas);
       } catch (error) {
@@ -170,10 +176,10 @@ export default function Arrivals({ params }) {
         setIsLoading(false);
       }
     };
-  
+
     fetchReservas();
   }, [currentDate, propertyID]);
-  
+
 
   useEffect(() => {
     const fetchHotelName = async () => {
@@ -219,7 +225,7 @@ export default function Arrivals({ params }) {
   const handleRefreshClick = () => {
     sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
   };
-  
+
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-[#FAFAFA]">
       <div className="flex-grow overflow-y-auto p-4">
@@ -314,7 +320,7 @@ export default function Arrivals({ params }) {
                                 </DropdownItem>
                                 <DropdownItem
                                   key="show"
-                                  onClick={() => 
+                                  onClick={() =>
                                     router.push(`/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}`)
                                   }
                                 >
@@ -388,6 +394,14 @@ export default function Arrivals({ params }) {
           }))}
         />
       </div>
+      {/** Modal de erro */}
+      {isErrorModalOpen && errorMessage && (
+        <ErrorRegistrationForm
+          modalHeader="Attention"
+          errorMessage={errorMessage}
+          onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
+        />
+      )}
     </main>
   );
 }

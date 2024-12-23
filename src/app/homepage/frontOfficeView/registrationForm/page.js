@@ -975,7 +975,7 @@ const handleModalSave = (newValue) => {
                                 {isModalOpen && (
                                     <EditRegistrationForm
                                         currentLabel={modalField === "Email" ? "Email" : "VAT No."}
-                                        currentValue={modalField === "Email" ? email : contacts.VatNo}
+                                        currentValue={modalField === "Email" ? email : vatNo}
                                         validation={
                                             modalField === "Email"
                                                 ? (value) => !value.endsWith("@guest.booking.com")
@@ -1077,10 +1077,7 @@ const handleModalSave = (newValue) => {
                             {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
                         </div>
                         <p className='text-xs text-gray-500 mt-4 text-justify text-style'>
-                            I hereby give my express, informed, free and specific consent to the use and processing of my personal data by Quinta da Vacaria 1616 –
-                            Vinhos, SA. I was further informed of the PRIVACY POLICY of the company Quinta da Vacaria 1616 – Vinhos, SA holding of the hotel Torel
-                            Quinta da Vacaria through the website www.torelquintadavacaria.com.
-                            <br></br>I authorize the use of the credit card left as guarantee to cover any consumptions after check-out.
+                        {hotelMiniTerms}
                         </p>
                         <div className='flex flex-row justify-between items-center mt-4 buttons-style'>
                             <button
@@ -1136,7 +1133,7 @@ const handleModalSave = (newValue) => {
                                 {/** Modal de erro */}
                                 {isErrorModalOpen && errorMessage && (
                                     <ErrorRegistrationForm
-                                        modalHeader="Error"
+                                        modalHeader="Attention"
                                         errorMessage={errorMessage}
                                         onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
                                     />
