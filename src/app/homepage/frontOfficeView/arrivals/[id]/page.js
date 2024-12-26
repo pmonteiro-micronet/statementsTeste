@@ -90,8 +90,17 @@ export default function Arrivals({ params }) {
 
 
   useEffect(() => {
-    const fetchReservas = async () => {
-      setIsLoading(true);
+    let timeoutId = null;
+  
+    const fetchReservas = async (isInitialCall = false) => {
+      // Exibe o loading apenas na primeira chamada ou se estiver demorando
+      if (isInitialCall) {
+        setIsLoading(true);
+      } else {
+        // Exibe o loading apenas se demorar mais de 2 segundos
+        timeoutId = setTimeout(() => setIsLoading(true), 2000);
+      }
+  
       try {
         const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
         console.log("Response completo:", response);
@@ -160,19 +169,24 @@ export default function Arrivals({ params }) {
       } catch (error) {
         console.error("Erro ao buscar reservas:", error.message);
       } finally {
+        clearTimeout(timeoutId); // Cancela o timeout caso a chamada seja concluída antes dos 2 segundos
         setIsLoading(false);
       }
     };
   
     // Faz o fetch inicial
-    fetchReservas();
+    fetchReservas(true);
   
     // Configura o polling para buscar dados a cada 5 segundos (5000ms)
-    const intervalId = setInterval(fetchReservas, 5000);
+    const intervalId = setInterval(() => fetchReservas(false), 5000);
   
-    // Limpa o intervalo quando o componente é desmontado
-    return () => clearInterval(intervalId);
+    // Limpa o intervalo e timeout quando o componente é desmontado
+    return () => {
+      clearInterval(intervalId);
+      clearTimeout(timeoutId);
+    };
   }, [currentDate, propertyID]);
+  
   
 
 
