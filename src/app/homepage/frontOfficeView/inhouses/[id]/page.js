@@ -145,63 +145,97 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     setIsModalOpen(false);
   };
 
+    // Usando useState para armazenar a última resposta
+    const [lastResponse, setLastResponse] = useState(null);
 
   // Função para pegar as reservas
-  useEffect(() => {
-    const fetchReservas = async () => {
+ useEffect(() => {
+  let timeoutId = null; // Para controlar o timeout de carregamento após 3 segundos
+  let timeoutThresholdId = null; // Para garantir o carregamento caso a requisição seja lenta
+
+  const fetchReservas = async (isInitialCall = true) => {
+    // Verifica se os dados mudaram em comparação com a última resposta
+    const isDataChanged = lastResponse !== null && lastResponse !== JSON.stringify(response.data.response);
+
+    // Exibe o loading imediatamente para chamada inicial ou se os dados mudaram
+    if (isInitialCall || isDataChanged) {
       setIsLoading(true);
-      try {
-        const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
-        console.log("Response completo:", response);
+    } else {
+      // Exibe o loading apenas após 3 segundos se os dados não mudaram
+      timeoutThresholdId = setTimeout(() => setIsLoading(true), 3000);
+    }
 
-        // Combinar todos os requestBody dentro de response.data.response
-        const reservasArray = response.data.response.flatMap(item => {
-          try {
-            return JSON.parse(item.requestBody);
-          } catch (err) {
-            console.error("Erro ao fazer parse de requestBody:", item.requestBody, err);
-            return [];
-          }
-        });
+    try {
+      const response = await axios.get(`/api/reservations/inHouses/${propertyID}`);
+      console.log("Response completo:", response);
 
-        console.log("Reservas após parse (todas as linhas):", reservasArray);
+      // Combinar todos os requestBody dentro de response.data.response
+      const reservasArray = response.data.response.flatMap(item => {
+        try {
+          return JSON.parse(item.requestBody);
+        } catch (err) {
+          console.error("Erro ao fazer parse de requestBody:", item.requestBody, err);
+          return [];
+        }
+      });
 
-        // Se nenhuma reserva for encontrada
-        if (reservasArray.length === 0) {
-          console.warn("Nenhuma reserva encontrada após parse.");
-          return;
+      console.log("Reservas após parse (todas as linhas):", reservasArray);
+
+      // Se nenhuma reserva for encontrada
+      if (reservasArray.length === 0) {
+        console.warn("Nenhuma reserva encontrada após parse.");
+        return;
+      }
+
+      // Filtrar reservas pela data atual
+      const formattedCurrentDate = dayjs(currentDate).format('YYYY-MM-DD');
+      const reservasFiltradas = reservasArray.filter(reserva => {
+        if (!reserva.DateCO) {
+          console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva);
+          return false;
         }
 
-        // Filtrar reservas pela data atual
-        const formattedCurrentDate = dayjs(currentDate).format('YYYY-MM-DD');
-        const reservasFiltradas = reservasArray.filter(reserva => {
-          if (!reserva.DateCO) {
-            console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva);
-            return false;
-          }
+        const formattedDateCO = dayjs(reserva.DateCO).format('YYYY-MM-DD');
+        return formattedDateCO === formattedCurrentDate;
+      });
 
-          const formattedDateCO = dayjs(reserva.DateCO).format('YYYY-MM-DD');
-          return formattedDateCO === formattedCurrentDate;
-        });
+      console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
 
-        console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
+      // Remover duplicatas com base no número da reserva (ResNo)
+      const reservasUnicas = Array.from(
+        new Map(reservasFiltradas.map(reserva => [reserva.ResNo, reserva])).values()
+      );
 
-        // Remover duplicatas com base no número da reserva (ResNo)
-        const reservasUnicas = Array.from(
-          new Map(reservasFiltradas.map(reserva => [reserva.ResNo, reserva])).values()
-        );
+      console.log("Reservas únicas para a data atual:", reservasUnicas);
+      setReservas(reservasUnicas);
 
-        console.log("Reservas únicas para a data atual:", reservasUnicas);
-        setReservas(reservasUnicas);
-      } catch (error) {
-        console.error("Erro ao buscar reservas:", error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      // Atualiza o estado da última resposta para comparações futuras
+      setLastResponse(JSON.stringify(response.data.response));
 
-    fetchReservas();
-  }, [currentDate, propertyID]);
+    } catch (error) {
+      console.error("Erro ao buscar reservas:", error.message);
+    } finally {
+      // Cancela os timeouts e desativa o estado de carregamento
+      clearTimeout(timeoutId);
+      clearTimeout(timeoutThresholdId);
+      setIsLoading(false);
+    }
+  };
+
+  // Executa a primeira chamada
+  fetchReservas(true);
+
+  // Configura o polling para buscar dados a cada 5 segundos
+  const intervalId = setInterval(() => fetchReservas(false), 5000);
+
+  // Limpa o intervalo e timeouts ao desmontar o componente
+  return () => {
+    clearInterval(intervalId);
+    clearTimeout(timeoutId);
+    clearTimeout(timeoutThresholdId);
+  };
+}, [currentDate, propertyID]); // Dependências
+
 
 
   useEffect(() => {
