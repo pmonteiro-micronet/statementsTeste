@@ -1,0 +1,116 @@
+{
+    "auth": {
+        "instruction1": "Para aceder ao Extensions myPMS, insira o seu Email e Palavra-passe.",
+        "instruction2": "Esqueceu o seu Email ou Palavra-passe?",
+        "instruction3": "Já sou cliente mas não tenho acesso. Como posso aderir ao Extensions myPMS?",
+        "email": "E-mail",
+        "password": "Palavra-passe",
+        "login": "Entrar",
+        "footer": {
+            "callCost": "Custo de uma chamada para a rede fixa nacional.",
+            "personalizedService": "Serviço personalizado",
+            "activeDays": "Dias úteis, das 9:30 às 18:30."
+        }
+    },
+    "navbar": {
+        "alert": {
+            "messagePart1": "Será desconectado automaticamente em ",
+            "messagePart2": "segundos!",
+            "continue": "Continuar",
+            "logout": "Sair"
+        },
+        "logout": "Sair"
+    },
+    "homepage": {
+        "title": "Página Inicial",
+        "cardPending": "Pendente",
+        "cardViewed": "Visualizado"
+    },
+    "statements": {
+        "dashboard": {
+            "title": "Painel de Controlo",
+            "cardPending": "Pendente",
+            "cardViewed": "Visualizado"
+        },
+        "pending": {
+            "title": "Pendentes",
+            "defaultHotelName": "Nome do Hotel",
+            "reservationNumber": "Número de Reserva",
+            "checkIn": "Check-In",
+            "checkOut": "Check-Out",
+            "viewStatement": "Ver Declaração",
+            "noStatement": "Sem declarações pendentes."
+        },
+        "view": {
+            "title": "Visualizados",
+            "defaultHotelName": "Nome do Hotel",
+            "reservationNumber": "Número de Reserva",
+            "checkIn": "Check-In",
+            "checkOut": "Check-Out",
+            "checkedStatement": "Declaração Verificada",
+            "noStatement": "Sem declarações visualizadas."
+        }
+    },
+    "frontOffice": {
+        "dashboard": {
+            "title": "Recepção",
+            "cardArrivals": "Chegadas",
+            "cardInHouses": "Hospedados",
+            "cardDepartures": "Partidas"
+        },
+        "departures": {
+            "today": "Hoje",
+            "tomorrow": "Amanhã",
+            "departureList": "Lista de Partidas",
+            "room": "Quarto",
+            "lastName": "Apelido",
+            "firstName": "Nome",
+            "travelAgency": "Agência de Viagens",
+            "company": "Empresa",
+            "group": "Grupo",
+            "notes": "Notas",
+            "resNo": "Nº de Reserva",
+            "departure": "Partida",
+            "info": "Informação",
+            "statement": "Declaração",
+            "noReservations": "Sem reservas encontradas."
+        },
+        "arrivals": {
+            "today": "Hoje",
+            "tomorrow": "Amanhã",
+            "arrivalList": "Lista de Chegadas",
+            "room": "Quarto",
+            "lastName": "Apelido",
+            "firstName": "Nome",
+            "travelAgency": "Agência de Viagens",
+            "company": "Empresa",
+            "group": "Grupo",
+            "notes": "Notas",
+            "resNo": "Nº de Reserva",
+            "arrival": "Chegada",
+            "info": "Informação",
+            "statement": "Declaração",
+            "noReservations": "Sem reservas encontradas."
+        },
+        "inHouses": {
+            "title": "Hospedados",
+            "room": "Quarto",
+            "lastName": "Apelido",
+            "firstName": "Nome",
+            "travelAgency": "Agência de Viagens",
+            "company": "Empresa",
+            "group": "Grupo",
+            "notes": "Notas",
+            "resNo": "Nº de Reserva",
+            "departure": "Partida",
+            "info": "Informação",
+            "statement": "Declaração",
+            "noReservations": "Sem reservas encontradas."
+        }
+    },
+    "errors": {
+        "loading": "A carregar",
+        "unknownUser": "Utilizador desconhecido",
+        "unknownEmail": "E-mail desconhecido"
+    }
+}

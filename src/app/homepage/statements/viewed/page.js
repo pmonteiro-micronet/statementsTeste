@@ -6,8 +6,10 @@ import { useSession } from "next-auth/react";
 import "../styles.css";
 import LoadingBackdrop from "@/components/Loader/page"; // Certifique-se de ter o componente de carregamento
 import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
 
-const translations = { en };
+const translations = { en, pt, es };
 
 const VistosPage = () => {
   const locale = "en";

@@ -6,8 +6,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "./styles.css";
 import en from "../../../public/locales/english/common.json";
+import pt from "../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../public/locales/espanol/common.json";
 
-const translations = { en };
+const translations = { en, pt, es };
 
 const SignIn = () => {
   const [email, setEmail] = useState("");

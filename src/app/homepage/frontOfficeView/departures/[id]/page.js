@@ -18,10 +18,12 @@ import { useRouter } from "next/navigation";
 import dayjs from 'dayjs';
 
 import en from "../../../../../../public/locales/english/common.json";
+import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../../public/locales/espanol/common.json";
 
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
 
-const translations = { en };
+const translations = { en, pt, es };
 
 export default function Page({ params }) {
   const locale = "en";

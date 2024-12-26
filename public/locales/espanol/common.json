@@ -1,0 +1,116 @@
+{
+    "auth": {
+        "instruction1": "Para acceder a Extensiones myPMS, ingrese su Correo Electrónico y Contraseña.",
+        "instruction2": "¿Olvidó su Correo Electrónico o Contraseña?",
+        "instruction3": "Ya soy cliente pero no tengo acceso. ¿Cómo puedo unirme a Extensiones myPMS?",
+        "email": "Correo Electrónico",
+        "password": "Contraseña",
+        "login": "Iniciar Sesión",
+        "footer": {
+            "callCost": "Costo de una llamada a la red fija nacional.",
+            "personalizedService": "Servicio personalizado",
+            "activeDays": "Días hábiles, de 9:30 AM a 6:30 PM."
+        }
+    },
+    "navbar": {
+        "alert": {
+            "messagePart1": "Cerrarás sesión automáticamente en ",
+            "messagePart2": "segundos!",
+            "continue": "Continuar",
+            "logout": "Cerrar Sesión"
+        },
+        "logout": "Cerrar Sesión"
+    },
+    "homepage": {
+        "title": "Página Principal",
+        "cardPending": "Pendiente",
+        "cardViewed": "Visto"
+    },
+    "statements": {
+        "dashboard": {
+            "title": "Tablero",
+            "cardPending": "Pendiente",
+            "cardViewed": "Visto"
+        },
+        "pending": {
+            "title": "Pendientes",
+            "defaultHotelName": "Nombre del Hotel",
+            "reservationNumber": "Número de Reserva",
+            "checkIn": "Check-In",
+            "checkOut": "Check-Out",
+            "viewStatement": "Ver Estado de Cuenta",
+            "noStatement": "No hay estados de cuenta pendientes."
+        },
+        "view": {
+            "title": "Visto",
+            "defaultHotelName": "Nombre del Hotel",
+            "reservationNumber": "Número de Reserva",
+            "checkIn": "Check-In",
+            "checkOut": "Check-Out",
+            "checkedStatement": "Estado de Cuenta Verificado",
+            "noStatement": "No hay estados de cuenta vistos."
+        }
+    },
+    "frontOffice": {
+        "dashboard": {
+            "title": "Recepción",
+            "cardArrivals": "Llegadas",
+            "cardInHouses": "En Casa",
+            "cardDepartures": "Salidas"
+        },
+        "departures": {
+            "today": "Hoy",
+            "tomorrow": "Mañana",
+            "departureList": "Lista de Salidas",
+            "room": "Habitación",
+            "lastName": "Apellido",
+            "firstName": "Nombre",
+            "travelAgency": "Agencia de Viajes",
+            "company": "Empresa",
+            "group": "Grupo",
+            "notes": "Notas",
+            "resNo": "No. de Res.",
+            "departure": "Salida",
+            "info": "Información",
+            "statement": "Estado de Cuenta",
+            "noReservations": "No se encontraron reservas."
+        },
+        "arrivals": {
+            "today": "Hoy",
+            "tomorrow": "Mañana",
+            "arrivalList": "Lista de Llegadas",
+            "room": "Habitación",
+            "lastName": "Apellido",
+            "firstName": "Nombre",
+            "travelAgency": "Agencia de Viajes",
+            "company": "Empresa",
+            "group": "Grupo",
+            "notes": "Notas",
+            "resNo": "No. de Res.",
+            "arrival": "Llegada",
+            "info": "Información",
+            "statement": "Estado de Cuenta",
+            "noReservations": "No se encontraron reservas."
+        },
+        "inHouses": {
+            "title": "En Casa",
+            "room": "Habitación",
+            "lastName": "Apellido",
+            "firstName": "Nombre",
+            "travelAgency": "Agencia de Viajes",
+            "company": "Empresa",
+            "group": "Grupo",
+            "notes": "Notas",
+            "resNo": "No. de Res.",
+            "departure": "Salida",
+            "info": "Información",
+            "statement": "Estado de Cuenta",
+            "noReservations": "No se encontraron reservas."
+        }
+    },
+    "errors": {
+        "loading": "Cargando",
+        "unknownUser": "Usuario desconocido",
+        "unknownEmail": "Correo electrónico desconocido"
+    }
+}
