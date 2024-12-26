@@ -128,7 +128,7 @@ const PendentesPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col p-8 bg-background">
-      <h2 className="font-semibold text-2xl mb-4">{t.statements.pending.title}</h2>
+      <h2 className="font-semibold text-textPrimaryColor text-2xl mb-4">{t.statements.pending.title}</h2>
       <LoadingBackdrop open={isLoading} />
       {!isLoading && (
         <div className="grid-container">

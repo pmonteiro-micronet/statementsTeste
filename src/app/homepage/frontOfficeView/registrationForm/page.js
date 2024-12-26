@@ -267,7 +267,7 @@ export default function Page() {
             errors.push("Please fill in all required fields to submit the form.");
         }
         if (email.endsWith("@guest.booking.com")) {
-            errors.push("The email cannot end with @guest.booking.com.");
+            errors.push("The e-mail cannot end with @guest.booking.com.");
         }
         if (errors.length > 0) {
             setErrorMessage(errors.join("\n"));
@@ -277,12 +277,6 @@ export default function Page() {
     
         setErrorMessage('');
         setIsErrorModalOpen(false);
-    
-        console.log('Formulário enviado');
-        console.log("email: ", email);
-        console.log("email antigo: ", initialEmail);
-        console.log("vat: ", vatNo);
-        console.log("vat antigo: ", initialVatNo);
     
         let emailToSend = email !== initialEmail ? email : undefined; // Envia undefined se não houver alteração
         let vatNoToSend = vatNo !== initialVatNo ? vatNo : undefined; // Envia undefined se não houver alteração
@@ -974,7 +968,7 @@ const handleModalSave = (newValue) => {
                                 {/** Modal Dinâmico */}
                                 {isModalOpen && (
                                     <EditRegistrationForm
-                                        currentLabel={modalField === "Email" ? "Email" : "VAT No."}
+                                        currentLabel={modalField === "Email" ? "E-mail" : "VAT No."}
                                         currentValue={modalField === "Email" ? email : vatNo}
                                         validation={
                                             modalField === "Email"

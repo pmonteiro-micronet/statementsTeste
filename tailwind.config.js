@@ -24,6 +24,7 @@ module.exports = {
     themes: {
       light: {
         colors: {
+          primaryBackground: "#FFFFFF",
           background: "#FAFAFA",
           foreground: "#001517",
           textPrimaryColor: "#000000",
@@ -48,17 +49,20 @@ module.exports = {
       },
       dark: {
         colors: {
+          primaryBackground: "#141414",
           background: "#1a1a1a",
           textPrimaryColor: "#FAFAFA",
           textLabelColor: "#ebebeb",
           textSecondaryLabelColor: "#f5f5f5",
           cardColor: "#403f3f",
           primary: {
-            50: '#f7e9dc',
+            50: '#debfa2',
             100: '#FAE7D6',
             DEFAULT: '#FC9D25',
             foreground: "#f5f5f5",
           },
+          tableFooter: "#404040",
+          tableFooterBorder: "#2e2d2d",
         }
       }
     }

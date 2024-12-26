@@ -7,6 +7,9 @@ import { useRouter } from "next/navigation"; // Importando o hook de navegação
 import { FaSignOutAlt } from "react-icons/fa"; // Importa o ícone de logout
 import { FaUser } from "react-icons/fa";
 
+import { MdSunny } from "react-icons/md";
+import { FaMoon, FaGlobe, FaChevronDown, FaChevronUp } from "react-icons/fa"; // Novos ícones adicionados
+
 const SidebarContext = createContext();
 let inactivityTimeout;
 let warningTimeout;
@@ -110,6 +113,26 @@ export default function Sidebar({ children, setExpanded }) {
     };
   }, []);
 
+  const [isDropdownOpen, setDropdownOpen] = useState(false); // Controle do dropdown
+  const [isDarkMode, setIsDarkMode] = useState(false); // Controle do tema
+  const [language, setLanguage] = useState("pt"); // Idioma padrão
+
+  // Alternar o tema
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    if (!isDarkMode) {
+      document.documentElement.classList.add("dark"); // Adiciona o tema escuro
+    } else {
+      document.documentElement.classList.remove("dark"); // Remove o tema escuro
+    }
+  };
+
+  const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
+    setDropdownOpen(false); // Fecha o dropdown após selecionar
+  };
+
   return (
     <>
       {warningVisible && (
@@ -135,7 +158,7 @@ export default function Sidebar({ children, setExpanded }) {
       )}
 
       <aside
-        className={` overflow-x-hidden fixed top-0 left-0 bg-white border-r shadow-sm transition-all duration-300 ${expanded ? "w-64" : "w-16"
+        className={` overflow-x-hidden fixed top-0 left-0 bg-primaryBackground border-r shadow-sm transition-all duration-300 ${expanded ? "w-64" : "w-16"
           }`}
         style={{
           height: 'calc(var(--vh, 1vh) * 100)', // Usa a altura visível calculada
@@ -146,16 +169,16 @@ export default function Sidebar({ children, setExpanded }) {
         <nav className="h-full flex flex-col">
           <div className="p-4 pb-2 flex justify-between items-center">
             <p
-              className={`font-semibold text-sm overflow-hidden transition-all ${expanded ? "w-64" : "w-0"
+              className={`font-semibold text-sm overflow-hidden transition-all text-textPrimaryColor ${expanded ? "w-64" : "w-0"
                 }`}
             >
               Extensions myPMS
             </p>
             <button
               onClick={handleToggle}
-              className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100"
+              className="p-1.5 rounded-lg bg-primaryBackground hover:primaryBackground"
             >
-              <TbLayoutSidebarLeftExpand />
+              <TbLayoutSidebarLeftExpand className="text-textPrimaryColor"/>
             </button>
           </div>
 
@@ -168,8 +191,9 @@ export default function Sidebar({ children, setExpanded }) {
               <FaUser style={{ color: "#FC9D25" }} />
             </div>
 
+            {/* Informações do usuário */}
             <div
-              className={`flex justify-between items-center overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"
+              className={`flex justify-between text-textPrimaryColor items-center overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"
                 }`}
             >
               <div className="leading-4">
@@ -178,26 +202,87 @@ export default function Sidebar({ children, setExpanded }) {
                     ? `${session.user.firstName} ${session.user.secondName}`
                     : "Usuário Desconhecido"}
                 </h4>
-                <span className="text-xs text-gray-600">
+                <span className="text-xs text-textLabelColor">
                   {session ? session.user.email : "Email Desconhecido"}
                 </span>
               </div>
-            </div>
-          </div>
 
-          {/* Botão de Logout */}
-          <li
-            className={`flex items-center mx-3 py-[9px] mb-3 mt-1 rounded-md cursor-pointer transition-colors group hover:bg-red-600 ${expanded ? "px-3" : "px-2"
-              } bg-red-500 text-white`} // Cor de fundo e texto
-            onClick={handleLogout}
-          >
-            <div className={`flex items-center justify-between w-full`}>
-              <div className={`flex items-center`}>
-                <FaSignOutAlt className="mr-2" /> {/* Ícone de logout */}
-                <span className={`${expanded ? "block" : "hidden"}`}>Logout</span>
-              </div>
+              {/* Botão de seta para abrir dropdown */}
+              <button onClick={toggleDropdown} className="ml-2 text-gray-600">
+                {isDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
+              </button>
             </div>
-          </li>
+
+            {/* Dropdown */}
+            {isDropdownOpen && (
+              <div className="absolute bottom-14 right-0 bg-background shadow-lg rounded-md p-3 w-56 z-50 text-textPrimaryColor">
+                <ul>
+                  {/* Tema Escuro */}
+                  <li className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-background">
+                    <span>View Mode</span>
+                    <button
+                      onClick={toggleTheme}
+                      className="relative w-20 h-8 flex items-center bg-gray-300 rounded-full transition"
+                    >
+                      {/* Sol - lado esquerdo */}
+                      <div
+                        className={`absolute left-2 top-1/2 transform -translate-y-1/2 transition ${isDarkMode ? "opacity-100 text-gray-400" : "opacity-0"
+                          }`}
+                      >
+                        <MdSunny size={18} />
+                      </div>
+
+                      {/* Lua - lado direito */}
+                      <div
+                        className={`absolute right-2 top-1/2 transform -translate-y-1/2 transition ${isDarkMode ? "opacity-0" : "opacity-100 text-gray-400"
+                          }`}
+                      >
+                        <FaMoon size={18} />
+                      </div>
+
+                      {/* Botão deslizante */}
+                      <span
+                        className={`absolute w-6 h-6 bg-white rounded-full shadow-md transform transition ${isDarkMode ? "translate-x-12" : "translate-x-0"
+                          } flex items-center justify-center z-10`}
+                      >
+                        {isDarkMode ? (
+                          <FaMoon size={14} className="text-orange-400" />
+                        ) : (
+                          <MdSunny size={14} className="text-orange-400" />
+                        )}
+                      </span>
+                    </button>
+                  </li>
+
+                  {/* Idiomas */}
+                  <li className="py-2 px-3 rounded-md flex flex-row justify-between">
+                    <span className="flex items-center">
+                      <FaGlobe className="mr-2" />
+                      Idioma
+                    </span>
+                    <select
+                      className="ml-2 bg-transparent outline-none cursor-pointer"
+                      value={language}
+                      onChange={(e) => handleLanguageChange(e.target.value)}
+                    >
+                      <option value="pt">Pt</option>
+                      <option value="en">En</option>
+                      <option value="es">Es</option>
+                    </select>
+                  </li>
+
+                  {/* Logout */}
+                  <li
+                    className="flex items-center py-2 px-3 rounded-md text-red-500 hover:bg-background cursor-pointer"
+                    onClick={handleLogout}
+                  >
+                    <FaSignOutAlt className="mr-2" />
+                    Logout
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
         </nav>
       </aside>
     </>

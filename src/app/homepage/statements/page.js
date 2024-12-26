@@ -69,7 +69,7 @@ const Homepage = () => {
   return (
     <div className="min-h-screen flex">
       <main className="flex-1 min-h-screen p-8 overflow-y-auto">
-        <h2 className="font-semibold text-2xl mb-4">{t.statements.dashboard.title}</h2>
+        <h2 className="font-semibold text-textPrimaryColor text-2xl mb-4">{t.statements.dashboard.title}</h2>
 
         <div className="flex flex-row gap-5">
           <div 

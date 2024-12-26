@@ -64,18 +64,18 @@ const EditRegistrationForm = ({ currentLabel, currentValue, onSave, onClose, val
                                 <MdClose size={30} />
                             </Button>
                         </ModalHeader>
-                        <ModalBody className="flex flex-col mx-5 my-5 space-y-4">
+                        <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor">
                             <div>
                                 <label className="block text-sm font-medium text-gray-400">{`Current ${currentLabel}:`}</label>
                                 <input
                                     type="text"
                                     value={currentValue}
                                     readOnly
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 bg-gray-100 text-gray-400 focus:outline-none"
+                                    className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-800">{`New ${currentLabel}:`}</label>
+                                <label className="block text-sm font-medium text-textPrimaryColor">{`New ${currentLabel}:`}</label>
                                 <input
                                     ref={inputRef} // Referencia o input
                                     type="text"

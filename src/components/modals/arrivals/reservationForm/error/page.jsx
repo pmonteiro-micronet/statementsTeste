@@ -22,13 +22,13 @@ const ErrorRegistrationForm = ({
             className="z-50"
         >
             <ModalContent>
-                <ModalHeader className="flex flex-row justify-between items-center bg-primary text-white gap-1 text-lg py-1">
+                <ModalHeader className="flex flex-row justify-between items-center bg-primary text-white gap-1 text-lg py-1 ">
                     {modalHeader}
                     <Button color="transparent" variant="light" className={"w-auto min-w-0 p-0 m-0 -pr-4"} onClick={onClose}>
                         <MdClose size={25} />
                     </Button>
                 </ModalHeader>
-                <ModalBody className="flex flex-col mx-1 my-5 space-y-8 max-h-96 overflow-y-auto">
+                <ModalBody className="flex flex-col mx-1 my-5 space-y-8 max-h-96 overflow-y-auto text-textPrimaryColor">
                     {/* Renderiza cada erro em uma lista */}
                     <ul>
                         {errorMessages.map((msg, index) => (
