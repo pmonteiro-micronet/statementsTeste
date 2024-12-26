@@ -50,7 +50,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
         const mpehotel = propertyResponse.data.response[0].mpehotel;
         console.log('Mpehotel encontrado:', mpehotel);
 
-        await axios.get("/api/reservations/info", {
+        await axios.get("/api/reservations/inHouses/reservations_4_tat", {
           params: {
             mpehotel,
             propertyID
@@ -279,10 +279,14 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   };
 
   // Função chamada quando o botão de refresh é clicado
-  const handleRefreshClick = () => {
-    sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
-  };
+  // const handleRefreshClick = () => {
+  //   sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
+  // };
 
+    useEffect(() => {
+      sendDataToAPI(); // Chama a função automaticamente ao carregar a página
+    }, []); // O array de dependências vazio garante que seja executado apenas uma vez
+    
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       <div className="flex-grow overflow-y-auto p-4">
@@ -322,7 +326,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
             {/* Botão de refresh alinhado à direita */}
             <div className="flex items-center">
               <button
-                onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
+                // onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
                 className="text-white bg-primary rounded-lg cursor-pointer p-2"
               >
                 <MdOutlineRefresh size={20} />
