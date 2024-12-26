@@ -157,6 +157,7 @@ export default function Page({ params }) {
   // Função para pegar as reservas
   useEffect(() => {
     let timeoutId = null;
+    let timeoutThresholdId = null; // Controle do tempo limite para exibir o loading após 3 segundos
   
     const fetchReservas = async (isInitialCall = false) => {
       // Verifica se os dados mudaram em comparação com a última resposta
@@ -166,8 +167,8 @@ export default function Page({ params }) {
       if (isInitialCall || isDataChanged) {
         setIsLoading(true);
       } else {
-        // Exibe o loading apenas se demorar mais de 2 segundos
-        timeoutId = setTimeout(() => setIsLoading(true), 2000);
+        // Exibe o loading após 3 segundos se os dados não mudaram (timeout de 3 segundos)
+        timeoutThresholdId = setTimeout(() => setIsLoading(true), 3000);
       }
   
       try {
@@ -220,8 +221,9 @@ export default function Page({ params }) {
       } catch (error) {
         console.error("Erro ao buscar reservas:", error.message);
       } finally {
-        clearTimeout(timeoutId); // Cancela o timeout caso a chamada seja concluída antes dos 2 segundos
-        setIsLoading(false);
+        clearTimeout(timeoutId); // Cancela o timeout caso a chamada seja concluída antes dos 3 segundos
+        clearTimeout(timeoutThresholdId); // Cancela o timeout de 3 segundos se a requisição for rápida
+        setIsLoading(false); // Remove o carregamento
       }
     };
   
@@ -235,11 +237,10 @@ export default function Page({ params }) {
     return () => {
       clearInterval(intervalId);
       clearTimeout(timeoutId);
+      clearTimeout(timeoutThresholdId);
     };
-  }, [currentDate, propertyID]); // Dependências
+  }, [currentDate, propertyID]); // Dependências  
   
-
-
   useEffect(() => {
     const fetchHotelName = async () => {
       try {
