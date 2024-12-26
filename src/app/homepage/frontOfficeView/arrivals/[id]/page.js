@@ -88,12 +88,11 @@ export default function Arrivals({ params }) {
     setIsModalOpen(false);
   };
 
-
+    // Usando useState para armazenar a última resposta
+    const [lastResponse, setLastResponse] = useState(null);
   useEffect(() => {
     let timeoutId = null;
     
-    // Usando useState para armazenar a última resposta
-    const [lastResponse, setLastResponse] = useState(null);
   
     const fetchReservas = async (isInitialCall = false) => {
       const isDataChanged = lastResponse !== null && lastResponse !== JSON.stringify(response.data.response);
