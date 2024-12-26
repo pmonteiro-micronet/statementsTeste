@@ -151,7 +151,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     const fetchReservas = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
+        const response = await axios.get(`/api/reservations/inHouses/${propertyID}`);
         console.log("Response completo:", response);
 
         // Combinar todos os requestBody dentro de response.data.response

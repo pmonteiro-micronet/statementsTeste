@@ -101,8 +101,8 @@ export default function Arrivals({ params }) {
         if (isInitialCall || isDataChanged) {
           setIsLoading(true);
         } else {
-          // Exibe o loading após 3 segundos se os dados não mudaram (timeout de 3 segundos)
-          timeoutThresholdId = setTimeout(() => setIsLoading(true), 3000);
+          // Exibe o loading após 3 segundos se os dados não mudaram (timeout de 2 segundos)
+          timeoutThresholdId = setTimeout(() => setIsLoading(true), 2000);
         }
     
         try {
