@@ -138,7 +138,7 @@ const JsonViewPage = () => {
                   ) ? (
                     JSON.parse(reservationData.requestBody)[0].Reservation.map(
                       (reservation, index) => (
-                        <div key={index}>
+                        <div key={index} className="text-textPrimaryColor">
                           <p className="font-bold text-3xl text-primary roomInfo">
                             Room:{" "}
                             <span className="font-bold">
@@ -175,7 +175,7 @@ const JsonViewPage = () => {
               </div>
 
               {/* Detalhes do Hóspede */}
-              <div className="text-left mt-4">
+              <div className="text-left mt-4 text-textPrimaryColor">
                 {reservationData && reservationData.requestBody ? (
                   Array.isArray(JSON.parse(reservationData.requestBody)[0]?.GuestInfo) ? (
                     JSON.parse(reservationData.requestBody)[0].GuestInfo.map(
@@ -282,7 +282,7 @@ const JsonViewPage = () => {
                   if (Array.isArray(documentTotals) && documentTotals.length > 0) {
                     return documentTotals.map((total) => (
                       <div key={total.ID} className="w-full">
-                        <p className="mt-4 text-5xl flex font-bold gap-20 justify-end tableTotal">
+                        <p className="mt-4 text-5xl flex font-bold gap-20 justify-end tableTotal text-textPrimaryColor">
                           <span>TOTAL BALANCE</span>
                           <span>{isNaN(total.Balance) ? 'N/A' : total.Balance.toFixed(2)}€</span>
                         </p>
@@ -358,7 +358,7 @@ const JsonViewPage = () => {
             </table>
           </div>
 
-          <div className="fixed bottom-0 left-0 w-full bg-white shadow-md">
+          <div className="fixed bottom-0 left-0 w-full shadow-md bg-background text-textPrimaryColor">
             {/* <h4 className='mb-2 font-semibold'>Fiscal Tax</h4> */}
             <div className="flex justify-center w-[65%] mx-auto mb-2 lineContainer">
               <div className="bg-gray-300 h-0.5 w-full"></div>

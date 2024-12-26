@@ -80,6 +80,11 @@ export default function Arrivals({ params }) {
     }
   };
 
+  // Chama a função sendDataToAPI ao carregar a página
+  useEffect(() => {
+    sendDataToAPI();
+  }, [propertyID]);
+
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
@@ -88,114 +93,99 @@ export default function Arrivals({ params }) {
     setIsModalOpen(false);
   };
 
-    // Usando useState para armazenar a última resposta
-    const [lastResponse, setLastResponse] = useState(null);
-    useEffect(() => {
-      let timeoutId = null;
-      let timeoutThresholdId = null; // Controle de tempo limite para exibir loading após 3 segundos
-    
-      const fetchReservas = async (isInitialCall = false) => {
-        const isDataChanged = lastResponse !== null && lastResponse !== JSON.stringify(response.data.response);
-    
-        // Exibe o loading se for uma nova chamada ou se os dados mudaram
-        if (isInitialCall || isDataChanged) {
-          setIsLoading(true);
-        } else {
-          // Exibe o loading após 3 segundos se os dados não mudaram (timeout de 2 segundos)
-          timeoutThresholdId = setTimeout(() => setIsLoading(true), 2000);
+
+  // Função para pegar as reservas
+  useEffect(() => {
+    const fetchReservas = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
+        console.log("Response completo:", response);
+
+        const reservasArray = response.data.response.flatMap(item => {
+          try {
+            // Parsear o `requestBody` como JSON se estiver stringificado
+            const parsedRequestBody = JSON.parse(item.requestBody);
+
+            // Extrair as informações do formato correto
+            const reservations = Array.isArray(parsedRequestBody)
+              ? parsedRequestBody.flatMap(data =>
+                data.ReservationInfo?.map(reserva => {
+                  const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
+                  const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
+
+                  return {
+                    requestID: item.requestID,
+                    propertyID: item.propertyID, // Adiciona o requestID
+                    DateCI: reserva.DateCI,
+                    Booker: reserva.Booker,
+                    Company: reserva.Company,
+                    Group: reserva.Group,
+                    Room: reserva.Room,
+                    ResNo: reserva.ResNo,
+                    Notes: reserva.Notes,
+                    RoomStatus: reserva.RoomStatus,
+                    RoomType: reserva.RoomType,
+                    TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
+                    Price: reserva.Price,
+                    CityTax: reserva.CityTax,
+                    Total: reserva.Total,
+                    Salutation: guestDetails.Salution,
+                    LastName: guestDetails.LastName,
+                    FirstName: guestDetails.FirstName,
+                    Country: addressDetails.Country,
+                    Street: addressDetails.Street,
+                    PostalCode: addressDetails.PostalCode,
+                    City: addressDetails.City,
+                    Region: addressDetails.Region,
+                  };
+                }) || []
+              )
+              : [];
+
+            return reservations;
+          } catch (err) {
+            console.error("Erro ao processar requestBody ou reservas:", err);
+            return [];
+          }
+        });
+
+        console.log("Reservas após parse:", reservasArray);
+
+        if (reservasArray.length === 0) {
+          console.warn("Nenhuma reserva encontrada após parse.");
+          return;
         }
-    
-        try {
-          const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
-          console.log("Response completo:", response);
-    
-          const reservasArray = response.data.response.flatMap(item => {
-            try {
-              const parsedRequestBody = JSON.parse(item.requestBody);
-    
-              const reservations = Array.isArray(parsedRequestBody)
-                ? parsedRequestBody.flatMap(data =>
-                    data.ReservationInfo?.map(reserva => {
-                      const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
-                      const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
-    
-                      return {
-                        requestID: item.requestID,
-                        propertyID: item.propertyID,
-                        DateCI: reserva.DateCI,
-                        Booker: reserva.Booker,
-                        Company: reserva.Company,
-                        Group: reserva.Group,
-                        Room: reserva.Room,
-                        ResNo: reserva.ResNo,
-                        Notes: reserva.Notes,
-                        RoomStatus: reserva.RoomStatus,
-                        RoomType: reserva.RoomType,
-                        TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
-                        Price: reserva.Price,
-                        CityTax: reserva.CityTax,
-                        Total: reserva.Total,
-                        Salutation: guestDetails.Salution,
-                        LastName: guestDetails.LastName,
-                        FirstName: guestDetails.FirstName,
-                        Country: addressDetails.Country,
-                        Street: addressDetails.Street,
-                        PostalCode: addressDetails.PostalCode,
-                        City: addressDetails.City,
-                        Region: addressDetails.Region,
-                      };
-                    }) || []
-                  )
-                : [];
-    
-              return reservations;
-            } catch (err) {
-              console.error("Erro ao processar requestBody ou reservas:", err);
-              return [];
-            }
-          });
-    
-          const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
-          const reservasFiltradas = reservasArray.filter(reserva => {
-            if (!reserva.DateCI) {
-              console.warn("DateCI está indefinido ou vazio para esta reserva:", reserva);
-              return false;
-            }
-            const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
-            return formattedDateCI === formattedCurrentDate;
-          });
-    
-          const reservasUnicas = Array.from(
-            new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
-          );
-    
-          setReservas(reservasUnicas);
-    
-          // Armazena a última resposta para comparação nas próximas chamadas
-          setLastResponse(JSON.stringify(response.data.response));  // Atualizando o estado de lastResponse
-        } catch (error) {
-          console.error("Erro ao buscar reservas:", error.message);
-        } finally {
-          clearTimeout(timeoutId); // Cancela o timeout para iniciar o loading
-          clearTimeout(timeoutThresholdId); // Cancela o timeout de 3 segundos se a requisição for rápida
-          setIsLoading(false); // Remove o carregamento
-        }
-      };
-    
-      // Faz o fetch inicial
-      fetchReservas(true);
-    
-      // Configura o polling para buscar dados a cada 5 segundos (5000ms)
-      const intervalId = setInterval(() => fetchReservas(false), 5000);
-    
-      // Limpa o intervalo e timeout quando o componente é desmontado
-      return () => {
-        clearInterval(intervalId);
-        clearTimeout(timeoutId);
-        clearTimeout(timeoutThresholdId);
-      };
-    }, [currentDate, propertyID]); // Dependências    
-  
+
+        const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
+        const reservasFiltradas = reservasArray.filter(reserva => {
+          if (!reserva.DateCI) {
+            console.warn("DateCI está indefinido ou vazio para esta reserva:", reserva);
+            return false;
+          }
+          const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
+          return formattedDateCI === formattedCurrentDate;
+        });
+
+        console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
+
+        const reservasUnicas = Array.from(
+          new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
+        );
+
+        console.log("Reservas únicas para a data atual:", reservasUnicas);
+        setReservas(reservasUnicas);
+      } catch (error) {
+        console.error("Erro ao buscar reservas:", error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReservas();
+  }, [currentDate, propertyID]);
+
+
   useEffect(() => {
     const fetchHotelName = async () => {
       try {
@@ -237,14 +227,10 @@ export default function Arrivals({ params }) {
   };
 
   // Função chamada quando o botão de refresh é clicado
-  // const handleRefreshClick = () => {
-  //   sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
-  // };
+  const handleRefreshClick = () => {
+    sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
+  };
 
-  useEffect(() => {
-    sendDataToAPI(); // Chama a função automaticamente ao carregar a página
-  }, []); // O array de dependências vazio garante que seja executado apenas uma vez
-  
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       <div className="flex-grow overflow-y-auto p-4">
@@ -284,7 +270,7 @@ export default function Arrivals({ params }) {
             {/* Botão de refresh alinhado à direita */}
             <div className="flex items-center">
               <button
-                // onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
+                onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
                 className="text-white bg-primary rounded-lg cursor-pointer p-2"
               >
                 <MdOutlineRefresh size={20} />

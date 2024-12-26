@@ -45,6 +45,8 @@ module.exports = {
           tableCol: '#F8F8F8',
           tableColWeekend: '#E3F1FC',
           lightBlueCol: '#F4F7FE',
+          lightGray: '#ededed',
+          mediumGray: '#dbd9d9'
         },
       },
       dark: {
@@ -63,6 +65,8 @@ module.exports = {
           },
           tableFooter: "#404040",
           tableFooterBorder: "#2e2d2d",
+          lightGray: '#525252',
+          mediumGray: '#383838'
         }
       }
     }

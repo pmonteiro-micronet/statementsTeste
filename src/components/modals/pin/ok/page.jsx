@@ -137,7 +137,7 @@ const OkPIN = ({
                                                 setPin(e.target.value);
                                                 setIsPinError(false); // Reseta o erro ao digitar
                                             }}
-                                            className="border border-gray-300 p-2 w-full text-center mb-4"
+                                            className="border border-gray-300 p-2 w-full text-center mb-4 text-textPrimaryColor"
                                             placeholder="• • • •"
                                         />
                                         {isPinError && (
@@ -162,7 +162,7 @@ const OkPIN = ({
                                                             setIsPinError(false);
                                                         }
                                                     }}
-                                                    className={`p-4 rounded ${key === "C" ? "bg-gray-300" : key === "OK" ? "bg-primary text-white" : "bg-gray-100"
+                                                    className={`p-4 rounded ${key === "C" ? "bg-mediumGray text-textPrimaryColor" : key === "OK" ? "bg-primary text-white" : "bg-lightGray text-textPrimaryColor"
                                                         } text-center font-bold`}
                                                 >
                                                     {key}
