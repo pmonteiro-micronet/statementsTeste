@@ -91,10 +91,13 @@ export default function Arrivals({ params }) {
 
   useEffect(() => {
     let timeoutId = null;
+    let lastResponse = null; // Variável para armazenar a última resposta
   
     const fetchReservas = async (isInitialCall = false) => {
-      // Exibe o loading apenas na primeira chamada ou se estiver demorando
-      if (isInitialCall) {
+      const isDataChanged = lastResponse !== null && lastResponse !== JSON.stringify(response.data.response);
+  
+      // Exibe o loading se for uma nova chamada ou se os dados mudaram
+      if (isInitialCall || isDataChanged) {
         setIsLoading(true);
       } else {
         // Exibe o loading apenas se demorar mais de 2 segundos
@@ -111,37 +114,37 @@ export default function Arrivals({ params }) {
   
             const reservations = Array.isArray(parsedRequestBody)
               ? parsedRequestBody.flatMap(data =>
-                data.ReservationInfo?.map(reserva => {
-                  const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
-                  const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
+                  data.ReservationInfo?.map(reserva => {
+                    const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
+                    const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
   
-                  return {
-                    requestID: item.requestID,
-                    propertyID: item.propertyID,
-                    DateCI: reserva.DateCI,
-                    Booker: reserva.Booker,
-                    Company: reserva.Company,
-                    Group: reserva.Group,
-                    Room: reserva.Room,
-                    ResNo: reserva.ResNo,
-                    Notes: reserva.Notes,
-                    RoomStatus: reserva.RoomStatus,
-                    RoomType: reserva.RoomType,
-                    TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
-                    Price: reserva.Price,
-                    CityTax: reserva.CityTax,
-                    Total: reserva.Total,
-                    Salutation: guestDetails.Salution,
-                    LastName: guestDetails.LastName,
-                    FirstName: guestDetails.FirstName,
-                    Country: addressDetails.Country,
-                    Street: addressDetails.Street,
-                    PostalCode: addressDetails.PostalCode,
-                    City: addressDetails.City,
-                    Region: addressDetails.Region,
-                  };
-                }) || []
-              )
+                    return {
+                      requestID: item.requestID,
+                      propertyID: item.propertyID,
+                      DateCI: reserva.DateCI,
+                      Booker: reserva.Booker,
+                      Company: reserva.Company,
+                      Group: reserva.Group,
+                      Room: reserva.Room,
+                      ResNo: reserva.ResNo,
+                      Notes: reserva.Notes,
+                      RoomStatus: reserva.RoomStatus,
+                      RoomType: reserva.RoomType,
+                      TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
+                      Price: reserva.Price,
+                      CityTax: reserva.CityTax,
+                      Total: reserva.Total,
+                      Salutation: guestDetails.Salution,
+                      LastName: guestDetails.LastName,
+                      FirstName: guestDetails.FirstName,
+                      Country: addressDetails.Country,
+                      Street: addressDetails.Street,
+                      PostalCode: addressDetails.PostalCode,
+                      City: addressDetails.City,
+                      Region: addressDetails.Region,
+                    };
+                  }) || []
+                )
               : [];
   
             return reservations;
@@ -166,6 +169,9 @@ export default function Arrivals({ params }) {
         );
   
         setReservas(reservasUnicas);
+  
+        // Armazena a última resposta para comparação nas próximas chamadas
+        lastResponse = JSON.stringify(response.data.response);
       } catch (error) {
         console.error("Erro ao buscar reservas:", error.message);
       } finally {
@@ -188,8 +194,6 @@ export default function Arrivals({ params }) {
   }, [currentDate, propertyID]);
   
   
-
-
   useEffect(() => {
     const fetchHotelName = async () => {
       try {
