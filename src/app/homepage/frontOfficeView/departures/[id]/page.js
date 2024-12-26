@@ -151,17 +151,18 @@ export default function Page({ params }) {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-
+    // Usando useState para armazenar a última resposta
+    const [lastResponse, setLastResponse] = useState(null);
 
   // Função para pegar as reservas
   useEffect(() => {
     let timeoutId = null;
-    let lastResponse = null; // Variável para armazenar a última resposta
   
     const fetchReservas = async (isInitialCall = false) => {
+      // Verifica se os dados mudaram em comparação com a última resposta
       const isDataChanged = lastResponse !== null && lastResponse !== JSON.stringify(response.data.response);
   
-      // Exibe o loading se for uma nova chamada e os dados mudaram
+      // Exibe o loading se for uma nova chamada ou se os dados mudaram
       if (isInitialCall || isDataChanged) {
         setIsLoading(true);
       } else {
@@ -173,7 +174,7 @@ export default function Page({ params }) {
         const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
         console.log("Response completo:", response);
   
-        // Combinar todos os requestBody dentro de response.data.response
+        // Combina todos os requestBody dentro de response.data.response
         const reservasArray = response.data.response.flatMap(item => {
           try {
             return JSON.parse(item.requestBody);
@@ -213,8 +214,8 @@ export default function Page({ params }) {
         console.log("Reservas únicas para a data atual:", reservasUnicas);
         setReservas(reservasUnicas);
   
-        // Armazena a última resposta para comparar nas próximas chamadas
-        lastResponse = JSON.stringify(response.data.response);
+        // Armazena a última resposta para comparação nas próximas chamadas
+        setLastResponse(JSON.stringify(response.data.response));  // Atualiza o estado de lastResponse
   
       } catch (error) {
         console.error("Erro ao buscar reservas:", error.message);
@@ -235,7 +236,8 @@ export default function Page({ params }) {
       clearInterval(intervalId);
       clearTimeout(timeoutId);
     };
-  }, [currentDate, propertyID]);  
+  }, [currentDate, propertyID]); // Dependências
+  
 
 
   useEffect(() => {

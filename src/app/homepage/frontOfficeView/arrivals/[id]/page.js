@@ -88,10 +88,11 @@ export default function Arrivals({ params }) {
     setIsModalOpen(false);
   };
 
-
+    // Usando useState para armazenar a última resposta
+    const [lastResponse, setLastResponse] = useState(null);
   useEffect(() => {
     let timeoutId = null;
-    let lastResponse = null; // Variável para armazenar a última resposta
+    
   
     const fetchReservas = async (isInitialCall = false) => {
       const isDataChanged = lastResponse !== null && lastResponse !== JSON.stringify(response.data.response);
@@ -171,7 +172,7 @@ export default function Arrivals({ params }) {
         setReservas(reservasUnicas);
   
         // Armazena a última resposta para comparação nas próximas chamadas
-        lastResponse = JSON.stringify(response.data.response);
+        setLastResponse(JSON.stringify(response.data.response));  // Atualizando o estado de lastResponse
       } catch (error) {
         console.error("Erro ao buscar reservas:", error.message);
       } finally {
@@ -191,8 +192,7 @@ export default function Arrivals({ params }) {
       clearInterval(intervalId);
       clearTimeout(timeoutId);
     };
-  }, [currentDate, propertyID]);
-  
+  }, [currentDate, propertyID]);  // Dependências  
   
   useEffect(() => {
     const fetchHotelName = async () => {
