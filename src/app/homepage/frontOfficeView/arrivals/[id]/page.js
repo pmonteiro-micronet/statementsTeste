@@ -89,29 +89,26 @@ export default function Arrivals({ params }) {
   };
 
 
-  // Função para pegar as reservas
   useEffect(() => {
     const fetchReservas = async () => {
       setIsLoading(true);
       try {
         const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
         console.log("Response completo:", response);
-
+  
         const reservasArray = response.data.response.flatMap(item => {
           try {
-            // Parsear o `requestBody` como JSON se estiver stringificado
             const parsedRequestBody = JSON.parse(item.requestBody);
-
-            // Extrair as informações do formato correto
+  
             const reservations = Array.isArray(parsedRequestBody)
               ? parsedRequestBody.flatMap(data =>
                 data.ReservationInfo?.map(reserva => {
                   const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
                   const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
-
+  
                   return {
                     requestID: item.requestID,
-                    propertyID: item.propertyID, // Adiciona o requestID
+                    propertyID: item.propertyID,
                     DateCI: reserva.DateCI,
                     Booker: reserva.Booker,
                     Company: reserva.Company,
@@ -137,21 +134,14 @@ export default function Arrivals({ params }) {
                 }) || []
               )
               : [];
-
+  
             return reservations;
           } catch (err) {
             console.error("Erro ao processar requestBody ou reservas:", err);
             return [];
           }
         });
-
-        console.log("Reservas após parse:", reservasArray);
-
-        if (reservasArray.length === 0) {
-          console.warn("Nenhuma reserva encontrada após parse.");
-          return;
-        }
-
+  
         const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
         const reservasFiltradas = reservasArray.filter(reserva => {
           if (!reserva.DateCI) {
@@ -161,14 +151,11 @@ export default function Arrivals({ params }) {
           const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
           return formattedDateCI === formattedCurrentDate;
         });
-
-        console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
-
+  
         const reservasUnicas = Array.from(
           new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
         );
-
-        console.log("Reservas únicas para a data atual:", reservasUnicas);
+  
         setReservas(reservasUnicas);
       } catch (error) {
         console.error("Erro ao buscar reservas:", error.message);
@@ -176,9 +163,17 @@ export default function Arrivals({ params }) {
         setIsLoading(false);
       }
     };
-
+  
+    // Faz o fetch inicial
     fetchReservas();
+  
+    // Configura o polling para buscar dados a cada 5 segundos (5000ms)
+    const intervalId = setInterval(fetchReservas, 5000);
+  
+    // Limpa o intervalo quando o componente é desmontado
+    return () => clearInterval(intervalId);
   }, [currentDate, propertyID]);
+  
 
 
   useEffect(() => {
@@ -222,10 +217,14 @@ export default function Arrivals({ params }) {
   };
 
   // Função chamada quando o botão de refresh é clicado
-  const handleRefreshClick = () => {
-    sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
-  };
+  // const handleRefreshClick = () => {
+  //   sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
+  // };
 
+  useEffect(() => {
+    sendDataToAPI(); // Chama a função automaticamente ao carregar a página
+  }, []); // O array de dependências vazio garante que seja executado apenas uma vez
+  
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       <div className="flex-grow overflow-y-auto p-4">
@@ -265,7 +264,7 @@ export default function Arrivals({ params }) {
             {/* Botão de refresh alinhado à direita */}
             <div className="flex items-center">
               <button
-                onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
+                // onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
                 className="text-white bg-primary rounded-lg cursor-pointer p-2"
               >
                 <MdOutlineRefresh size={20} />
