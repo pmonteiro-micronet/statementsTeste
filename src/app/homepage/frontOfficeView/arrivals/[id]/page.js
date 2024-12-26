@@ -90,109 +90,111 @@ export default function Arrivals({ params }) {
 
     // Usando useState para armazenar a última resposta
     const [lastResponse, setLastResponse] = useState(null);
-  useEffect(() => {
-    let timeoutId = null;
+    useEffect(() => {
+      let timeoutId = null;
+      let timeoutThresholdId = null; // Controle de tempo limite para exibir loading após 3 segundos
     
-  
-    const fetchReservas = async (isInitialCall = false) => {
-      const isDataChanged = lastResponse !== null && lastResponse !== JSON.stringify(response.data.response);
-  
-      // Exibe o loading se for uma nova chamada ou se os dados mudaram
-      if (isInitialCall || isDataChanged) {
-        setIsLoading(true);
-      } else {
-        // Exibe o loading apenas se demorar mais de 2 segundos
-        timeoutId = setTimeout(() => setIsLoading(true), 2000);
-      }
-  
-      try {
-        const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
-        console.log("Response completo:", response);
-  
-        const reservasArray = response.data.response.flatMap(item => {
-          try {
-            const parsedRequestBody = JSON.parse(item.requestBody);
-  
-            const reservations = Array.isArray(parsedRequestBody)
-              ? parsedRequestBody.flatMap(data =>
-                  data.ReservationInfo?.map(reserva => {
-                    const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
-                    const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
-  
-                    return {
-                      requestID: item.requestID,
-                      propertyID: item.propertyID,
-                      DateCI: reserva.DateCI,
-                      Booker: reserva.Booker,
-                      Company: reserva.Company,
-                      Group: reserva.Group,
-                      Room: reserva.Room,
-                      ResNo: reserva.ResNo,
-                      Notes: reserva.Notes,
-                      RoomStatus: reserva.RoomStatus,
-                      RoomType: reserva.RoomType,
-                      TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
-                      Price: reserva.Price,
-                      CityTax: reserva.CityTax,
-                      Total: reserva.Total,
-                      Salutation: guestDetails.Salution,
-                      LastName: guestDetails.LastName,
-                      FirstName: guestDetails.FirstName,
-                      Country: addressDetails.Country,
-                      Street: addressDetails.Street,
-                      PostalCode: addressDetails.PostalCode,
-                      City: addressDetails.City,
-                      Region: addressDetails.Region,
-                    };
-                  }) || []
-                )
-              : [];
-  
-            return reservations;
-          } catch (err) {
-            console.error("Erro ao processar requestBody ou reservas:", err);
-            return [];
-          }
-        });
-  
-        const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
-        const reservasFiltradas = reservasArray.filter(reserva => {
-          if (!reserva.DateCI) {
-            console.warn("DateCI está indefinido ou vazio para esta reserva:", reserva);
-            return false;
-          }
-          const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
-          return formattedDateCI === formattedCurrentDate;
-        });
-  
-        const reservasUnicas = Array.from(
-          new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
-        );
-  
-        setReservas(reservasUnicas);
-  
-        // Armazena a última resposta para comparação nas próximas chamadas
-        setLastResponse(JSON.stringify(response.data.response));  // Atualizando o estado de lastResponse
-      } catch (error) {
-        console.error("Erro ao buscar reservas:", error.message);
-      } finally {
-        clearTimeout(timeoutId); // Cancela o timeout caso a chamada seja concluída antes dos 2 segundos
-        setIsLoading(false);
-      }
-    };
-  
-    // Faz o fetch inicial
-    fetchReservas(true);
-  
-    // Configura o polling para buscar dados a cada 5 segundos (5000ms)
-    const intervalId = setInterval(() => fetchReservas(false), 5000);
-  
-    // Limpa o intervalo e timeout quando o componente é desmontado
-    return () => {
-      clearInterval(intervalId);
-      clearTimeout(timeoutId);
-    };
-  }, [currentDate, propertyID]);  // Dependências  
+      const fetchReservas = async (isInitialCall = false) => {
+        const isDataChanged = lastResponse !== null && lastResponse !== JSON.stringify(response.data.response);
+    
+        // Exibe o loading se for uma nova chamada ou se os dados mudaram
+        if (isInitialCall || isDataChanged) {
+          setIsLoading(true);
+        } else {
+          // Exibe o loading após 3 segundos se os dados não mudaram (timeout de 3 segundos)
+          timeoutThresholdId = setTimeout(() => setIsLoading(true), 3000);
+        }
+    
+        try {
+          const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
+          console.log("Response completo:", response);
+    
+          const reservasArray = response.data.response.flatMap(item => {
+            try {
+              const parsedRequestBody = JSON.parse(item.requestBody);
+    
+              const reservations = Array.isArray(parsedRequestBody)
+                ? parsedRequestBody.flatMap(data =>
+                    data.ReservationInfo?.map(reserva => {
+                      const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
+                      const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
+    
+                      return {
+                        requestID: item.requestID,
+                        propertyID: item.propertyID,
+                        DateCI: reserva.DateCI,
+                        Booker: reserva.Booker,
+                        Company: reserva.Company,
+                        Group: reserva.Group,
+                        Room: reserva.Room,
+                        ResNo: reserva.ResNo,
+                        Notes: reserva.Notes,
+                        RoomStatus: reserva.RoomStatus,
+                        RoomType: reserva.RoomType,
+                        TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
+                        Price: reserva.Price,
+                        CityTax: reserva.CityTax,
+                        Total: reserva.Total,
+                        Salutation: guestDetails.Salution,
+                        LastName: guestDetails.LastName,
+                        FirstName: guestDetails.FirstName,
+                        Country: addressDetails.Country,
+                        Street: addressDetails.Street,
+                        PostalCode: addressDetails.PostalCode,
+                        City: addressDetails.City,
+                        Region: addressDetails.Region,
+                      };
+                    }) || []
+                  )
+                : [];
+    
+              return reservations;
+            } catch (err) {
+              console.error("Erro ao processar requestBody ou reservas:", err);
+              return [];
+            }
+          });
+    
+          const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
+          const reservasFiltradas = reservasArray.filter(reserva => {
+            if (!reserva.DateCI) {
+              console.warn("DateCI está indefinido ou vazio para esta reserva:", reserva);
+              return false;
+            }
+            const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
+            return formattedDateCI === formattedCurrentDate;
+          });
+    
+          const reservasUnicas = Array.from(
+            new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
+          );
+    
+          setReservas(reservasUnicas);
+    
+          // Armazena a última resposta para comparação nas próximas chamadas
+          setLastResponse(JSON.stringify(response.data.response));  // Atualizando o estado de lastResponse
+        } catch (error) {
+          console.error("Erro ao buscar reservas:", error.message);
+        } finally {
+          clearTimeout(timeoutId); // Cancela o timeout para iniciar o loading
+          clearTimeout(timeoutThresholdId); // Cancela o timeout de 3 segundos se a requisição for rápida
+          setIsLoading(false); // Remove o carregamento
+        }
+      };
+    
+      // Faz o fetch inicial
+      fetchReservas(true);
+    
+      // Configura o polling para buscar dados a cada 5 segundos (5000ms)
+      const intervalId = setInterval(() => fetchReservas(false), 5000);
+    
+      // Limpa o intervalo e timeout quando o componente é desmontado
+      return () => {
+        clearInterval(intervalId);
+        clearTimeout(timeoutId);
+        clearTimeout(timeoutThresholdId);
+      };
+    }, [currentDate, propertyID]); // Dependências    
   
   useEffect(() => {
     const fetchHotelName = async () => {
