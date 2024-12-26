@@ -250,7 +250,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   };
 
   return (
-    <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-[#FAFAFA]">
+    <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       <div className="flex-grow overflow-y-auto p-4">
         <div className="flex justify-between items-center w-full">
           <div className="header-container flex items-center justify-between w-full">
@@ -260,14 +260,14 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
               {currentDate !== today && (
                 <button
                   onClick={() => setCurrentDate(today)}
-                  className="p-2 text-gray-500"
+                  className="p-2 text-gray-500 text-textPrimaryColor"
                 >
                   <IoIosArrowBack size={20} />
                 </button>
               )}
 
               {/* Título dinâmico com a data atual */}
-              <h2 className="text-xl">
+              <h2 className="text-xl text-textPrimaryColor">
                 {currentDate === today ? `Today: ${today}` : `Tomorrow: ${currentDate}`}
               </h2>
 
@@ -275,14 +275,14 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
               {currentDate !== tomorrowDate && (
                 <button
                   onClick={() => setCurrentDate(tomorrowDate)}
-                  className="p-2 text-gray-500"
+                  className="p-2 text-gray-500 text-textPrimaryColor"
                 >
                   <IoIosArrowForward size={20} />
                 </button>
               )}
 
               {/* Título "IN HOUSES List" separado do título dinâmico */}
-              <h2 className="text-xl">{propertyName} : In Houses List</h2>
+              <h2 className="text-xl text-textPrimaryColor">{propertyName} : In Houses List</h2>
             </div>
 
             {/* Botão de refresh alinhado à direita */}
@@ -319,7 +319,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     {items.map((reserva, index) => {
                       // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                       return (
-                        <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left hover:bg-primary-50">
+                        <tr key={index} className="h-10 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">
                           <td className="pl-1 flex items-start border-r border-[#e6e6e6] relative z-10">
                             <Dropdown>
                               <DropdownTrigger>
@@ -334,7 +334,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                                 aria-label="Static Actions"
                                 closeOnSelect={true}
                                 isOpen={true}
-                                className="relative z-10"
+                                className="relative z-10 text-textPrimaryColor"
                               >
                                 <DropdownItem key="edit" onClick={() => handleOpenModal()}>
                                   Info
@@ -389,7 +389,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
               )}
             </div>
           ) : (
-            <p>No reservations found.</p>
+            <p className="text-textLabelColor">No reservations found.</p>
           )}
         </div>
 

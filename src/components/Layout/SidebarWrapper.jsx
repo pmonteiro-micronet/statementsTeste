@@ -191,11 +191,11 @@ export default function SidebarWrapper({ children }) {
               <select
                 value={selectedHotelID}
                 onChange={(e) => handleHotelSelect(e.target.value)}
-                className="border p-2 rounded w-full mb-4"
+                className="border p-2 rounded w-full mb-4 text-textPrimaryColor"
               >
-                <option value="">Select a hotel</option>
+                <option value="" className="text-textPrimaryColor">Select a hotel</option>
                 {hotels.map((hotel) => (
-                  <option key={hotel.propertyID} value={hotel.propertyID}>
+                  <option className="text-textPrimaryColor" key={hotel.propertyID} value={hotel.propertyID}>
                     {hotel.propertyName}
                   </option>
                 ))}
@@ -209,7 +209,7 @@ export default function SidebarWrapper({ children }) {
 
             {showConfirmationModal && (
               <div className="mt-4 border-t pt-4">
-                <div className="text-sm font-semibold mb-2 flex flex-row justify-center items-center">
+                <div className="text-sm font-semibold mb-2 flex flex-row justify-center items-center text-textPrimaryColor">
                   <RiHotelLine size={20} className="mr-1" />
                   {hotels.find((hotel) => String(hotel.propertyID) === String(selectedHotelID))?.propertyName || "Não encontrado"}
                 </div>
@@ -255,7 +255,7 @@ export default function SidebarWrapper({ children }) {
       )}
 
       <main
-        className={`flex-1 min-h-screen overflow-y-auto transition-all duration-300 ${isMobile || !showSidebar ? "p-0" : "ml-16"
+        className={`flex-1 min-h-screen overflow-y-auto transition-all duration-300 bg-background ${isMobile || !showSidebar ? "p-0" : "ml-16"
           }`}
         style={{
           marginLeft: isMobile || !showSidebar ? "0" : expanded ? "16rem" : "4rem",
