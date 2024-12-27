@@ -342,7 +342,7 @@ export default function Page() {
                 HotelAddress: hotelAddress,
                 HotelPostalCode: hotelPostalCode,
                 HotelNIF: hotelNIF,
-                HotelRNET: hotelRNET
+                HotelRNET: hotelRNET,
             };
 
             // Geração do PDF
@@ -355,7 +355,7 @@ export default function Page() {
                 {
                     PropertyID: propertyID,
                     pdfBase64: pdfBase64,
-                    fileName: `ResNo-${reserva.ResNo}.pdf`,
+                    fileName: `ResNo-${reserva.ResNo}_ProfileID-${guestInfo.ProfileID}.pdf`,
                 }
             );
 

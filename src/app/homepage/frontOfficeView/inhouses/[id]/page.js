@@ -8,7 +8,6 @@ import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
-import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 import DepartureInfoForm from "@/components/modals/departures/info/page";
 import "../../table.css";
@@ -25,7 +24,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowDate = tomorrow.toISOString().split("T")[0];
 
-  const [currentDate, setCurrentDate] = useState(today);
+  const [currentDate] = useState(today);
   const [reservas, setReservas] = useState([]);
   const [postSuccessful, setPostSuccessful] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -158,7 +157,6 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
         const response = await axios.get(`/api/reservations/inHouses/${propertyID}`);
         console.log("Response completo:", response);
 
-        // Combinar todos os requestBody dentro de response.data.response
         const reservasArray = response.data.response.flatMap(item => {
           try {
             return JSON.parse(item.requestBody);
@@ -170,29 +168,38 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
         console.log("Reservas após parse (todas as linhas):", reservasArray);
 
-        // Se nenhuma reserva for encontrada
         if (reservasArray.length === 0) {
           console.warn("Nenhuma reserva encontrada após parse.");
-          return;
+          setIsLoading(false);
+          return; // Interrompe a execução se não houver reservas
         }
-
-        // Filtrar reservas pela data atual
-        const formattedCurrentDate = dayjs(currentDate).format('YYYY-MM-DD');
+        
+        const today = dayjs(currentDate, 'YYYY-MM-DD', true);
+        console.log("Data atual formatada:", today.format());
+        
         const reservasFiltradas = reservasArray.filter(reserva => {
-          if (!reserva.DateCO) {
-            console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva);
+          const dateCI = dayjs(reserva.DateCI).startOf('day');
+          const dateCO = dayjs(reserva.DateCO).startOf('day');
+          const today = dayjs(currentDate).startOf('day');
+        
+          console.log(`Reserva: ${reserva.LastName}, Check-in: ${dateCI.format()}, Check-out: ${dateCO.format()}`);
+          console.log(`today(${today.format()}) >= dateCI(${dateCI.format()}) && today(${today.format()}) < dateCO(${dateCO.format()})`);
+        
+          if (!dateCI.isValid() || !dateCO.isValid()) {
+            console.warn("Data inválida encontrada:", reserva);
             return false;
           }
-
-          const formattedDateCO = dayjs(reserva.DateCO).format('YYYY-MM-DD');
-          return formattedDateCO === formattedCurrentDate;
+        
+          return today.isSameOrAfter(dateCI) && today.isBefore(dateCO);
         });
-
-        console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
-
-        // Remover duplicatas com base no número da reserva (ResNo)
+        
+        console.log("Reservas filtradas:", reservasFiltradas);
+        
+        // Remover duplicatas baseadas no nome e quarto
         const reservasUnicas = Array.from(
-          new Map(reservasFiltradas.map(reserva => [reserva.ResNo, reserva])).values()
+          new Map(
+            reservasFiltradas.map(reserva => [`${reserva.LastName}-${reserva.Room}`, reserva])
+          ).values()
         );
 
         console.log("Reservas únicas para a data atual:", reservasUnicas);
@@ -206,6 +213,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
     fetchReservas();
   }, [currentDate, propertyID]);
+
 
 
   useEffect(() => {
@@ -258,34 +266,9 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
       <div className="flex-grow overflow-y-auto p-4">
         <div className="flex justify-between items-center w-full">
           <div className="header-container flex items-center justify-between w-full">
-            {/* Div para o conteúdo centralizado (setas e título dinâmico) */}
+            {/* Div para o conteúdo centralizado */}
             <div className="flex items-center space-x-4 mx-auto">
-              {/* Seta para voltar para o dia de hoje */}
-              {currentDate !== today && (
-                <button
-                  onClick={() => setCurrentDate(today)}
-                  className="p-2 text-gray-500 text-textPrimaryColor"
-                >
-                  <IoIosArrowBack size={20} />
-                </button>
-              )}
-
-              {/* Título dinâmico com a data atual */}
-              <h2 className="text-xl text-textPrimaryColor">
-                {currentDate === today ? `Today: ${today}` : `Tomorrow: ${currentDate}`}
-              </h2>
-
-              {/* Seta para avançar para o próximo dia */}
-              {currentDate !== tomorrowDate && (
-                <button
-                  onClick={() => setCurrentDate(tomorrowDate)}
-                  className="p-2 text-gray-500 text-textPrimaryColor"
-                >
-                  <IoIosArrowForward size={20} />
-                </button>
-              )}
-
-              {/* Título "IN HOUSES List" separado do título dinâmico */}
+              <h2 className="text-xl text-textPrimaryColor">Today: {dayjs().format('YYYY-MM-DD')}</h2>
               <h2 className="text-xl text-textPrimaryColor">{propertyName} : In Houses List</h2>
             </div>
 
@@ -320,7 +303,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     </tr>
                   </thead>
                   <tbody>
-                    {items.map((reserva, index) => {
+                  {reservas.map((reserva, index) => {
                       // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                       return (
                         <tr key={index} className="h-10 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">

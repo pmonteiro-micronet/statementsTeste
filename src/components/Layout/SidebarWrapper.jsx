@@ -134,13 +134,13 @@ export default function SidebarWrapper({ children }) {
     router.push("/auth/logout");
   };
 
-  const resetHotelSelection = () => {
-    setSelectedHotelID("");
-    setIsHotelConfirmed(false);
-    setShowSelectionButtons(false);
-    localStorage.removeItem("selectedHotelID");
-    localStorage.removeItem("isHotelConfirmed");
-  };
+  // const resetHotelSelection = () => {
+  //   setSelectedHotelID("");
+  //   setIsHotelConfirmed(false);
+  //   setShowSelectionButtons(false);
+  //   localStorage.removeItem("selectedHotelID");
+  //   localStorage.removeItem("isHotelConfirmed");
+  // };
 
   const confirmHotelSelection = () => {
     const selectedHotel = hotels.find((hotel) => String(hotel.propertyID) === String(selectedHotelID));
@@ -221,16 +221,10 @@ export default function SidebarWrapper({ children }) {
                     Logout
                   </button>
                   <button
-                    onClick={resetHotelSelection}
-                    className="bg-gray-200 text-black text-sm py-1 px-2 rounded hover:bg-gray-300"
-                  >
-                    Select
-                  </button>
-                  <button
                     onClick={confirmHotelSelection}
                     className="bg-primary text-white text-sm py-1 px-2 rounded hover:bg-[#E87A18]"
                   >
-                    Continue
+                    Select
                   </button>
                 </div>
               </div>
