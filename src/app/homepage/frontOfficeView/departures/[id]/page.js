@@ -88,6 +88,11 @@ export default function Page({ params }) {
     }
   };
 
+  // Chama a função sendDataToAPI ao carregar a página
+  useEffect(() => {
+    sendDataToAPI();
+  }, [propertyID]);
+
   const sendResToAPI = async (ResNo) => {
     console.log("Enviando ResNumber para a API:", ResNo);
     const windowValue = 0;
@@ -151,31 +156,17 @@ export default function Page({ params }) {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-    // Usando useState para armazenar a última resposta
-    const [lastResponse, setLastResponse] = useState(null);
+
 
   // Função para pegar as reservas
   useEffect(() => {
-    let timeoutId = null;
-    let timeoutThresholdId = null; // Controle do tempo limite para exibir o loading após 3 segundos
-  
-    const fetchReservas = async (isInitialCall = false) => {
-      // Verifica se os dados mudaram em comparação com a última resposta
-      const isDataChanged = lastResponse !== null && lastResponse !== JSON.stringify(response.data.response);
-  
-      // Exibe o loading se for uma nova chamada ou se os dados mudaram
-      if (isInitialCall || isDataChanged) {
-        setIsLoading(true);
-      } else {
-        // Exibe o loading após 3 segundos se os dados não mudaram (timeout de 2 segundos)
-        timeoutThresholdId = setTimeout(() => setIsLoading(true), 2000);
-      }
-  
+    const fetchReservas = async () => {
+      setIsLoading(true);
       try {
         const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
         console.log("Response completo:", response);
-  
-        // Combina todos os requestBody dentro de response.data.response
+
+        // Combinar todos os requestBody dentro de response.data.response
         const reservasArray = response.data.response.flatMap(item => {
           try {
             return JSON.parse(item.requestBody);
@@ -184,15 +175,15 @@ export default function Page({ params }) {
             return [];
           }
         });
-  
+
         console.log("Reservas após parse (todas as linhas):", reservasArray);
-  
+
         // Se nenhuma reserva for encontrada
         if (reservasArray.length === 0) {
           console.warn("Nenhuma reserva encontrada após parse.");
           return;
         }
-  
+
         // Filtrar reservas pela data atual
         const formattedCurrentDate = dayjs(currentDate).format('YYYY-MM-DD');
         const reservasFiltradas = reservasArray.filter(reserva => {
@@ -200,47 +191,31 @@ export default function Page({ params }) {
             console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva);
             return false;
           }
-  
+
           const formattedDateCO = dayjs(reserva.DateCO).format('YYYY-MM-DD');
           return formattedDateCO === formattedCurrentDate;
         });
-  
+
         console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
-  
+
         // Remover duplicatas com base no número da reserva (ResNo)
         const reservasUnicas = Array.from(
           new Map(reservasFiltradas.map(reserva => [reserva.ResNo, reserva])).values()
         );
-  
+
         console.log("Reservas únicas para a data atual:", reservasUnicas);
         setReservas(reservasUnicas);
-  
-        // Armazena a última resposta para comparação nas próximas chamadas
-        setLastResponse(JSON.stringify(response.data.response));  // Atualiza o estado de lastResponse
-  
       } catch (error) {
         console.error("Erro ao buscar reservas:", error.message);
       } finally {
-        clearTimeout(timeoutId); // Cancela o timeout caso a chamada seja concluída antes dos 3 segundos
-        clearTimeout(timeoutThresholdId); // Cancela o timeout de 3 segundos se a requisição for rápida
-        setIsLoading(false); // Remove o carregamento
+        setIsLoading(false);
       }
     };
-  
-    // Faz o fetch inicial
-    fetchReservas(true);
-  
-    // Configura o polling para buscar dados a cada 5 segundos (5000ms)
-    const intervalId = setInterval(() => fetchReservas(false), 5000);
-  
-    // Limpa o intervalo e timeout quando o componente é desmontado
-    return () => {
-      clearInterval(intervalId);
-      clearTimeout(timeoutId);
-      clearTimeout(timeoutThresholdId);
-    };
-  }, [currentDate, propertyID]); // Dependências  
-  
+
+    fetchReservas();
+  }, [currentDate, propertyID]);
+
+
   useEffect(() => {
     const fetchHotelName = async () => {
       try {
@@ -282,14 +257,10 @@ export default function Page({ params }) {
   };
 
   // Função chamada quando o botão de refresh é clicado
-  // const handleRefreshClick = () => {
-  //   sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
-  // };
+  const handleRefreshClick = () => {
+    sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
+  };
 
-    useEffect(() => {
-      sendDataToAPI(); // Chama a função automaticamente ao carregar a página
-    }, []); // O array de dependências vazio garante que seja executado apenas uma vez
-    
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       <div className="flex-grow overflow-y-auto p-4">
@@ -329,7 +300,7 @@ export default function Page({ params }) {
             {/* Botão de refresh alinhado à direita */}
             <div className="flex items-center">
               <button
-                // onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
+                onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
                 className="text-white bg-primary rounded-lg cursor-pointer p-2"
               >
                 <MdOutlineRefresh size={20} />
@@ -370,7 +341,7 @@ export default function Page({ params }) {
                                   variant="light"
                                   className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
                                 >
-                                  <BsThreeDotsVertical size={20} className="text-black" />
+                                  <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
                                 </Button>
                               </DropdownTrigger>
                               <DropdownMenu
