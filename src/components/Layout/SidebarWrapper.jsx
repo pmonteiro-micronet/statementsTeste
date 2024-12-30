@@ -102,7 +102,7 @@ export default function SidebarWrapper({ children }) {
                   },
                   {
                     ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
-                    label: "In Houses",
+                    label: "InHouses",
                     onClick: () =>
                       router.push(`/homepage/frontOfficeView/inhouses/${selectedHotelID}`),
                   },

@@ -14,6 +14,7 @@ import TermsConditionsForm from "@/components/terms&conditions/page";
 import ProtectionPolicyForm from "@/components/protectionPolicy/page";
 import EditRegistrationForm from "@/components/modals/arrivals/reservationForm/edit/page";
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
+import LoadingBackdrop from "@/components/Loader/page";
 
 import { MdSunny } from "react-icons/md";
 import { FaMoon } from "react-icons/fa";
@@ -228,23 +229,31 @@ export default function Page() {
     };
 
     // Inicializar o SignaturePad
-    useEffect(() => {
+   // Inicializar o SignaturePad
+useEffect(() => {
+    const initializeOrResizeCanvas = () => {
         if (canvasRef.current) {
             initializeSignaturePad();
         }
+    };
 
-        // Atualizar o canvas ao redimensionar a janela
-        const handleResize = () => {
-            initializeSignaturePad();
-        };
+    if (!isLoading) {
+        initializeOrResizeCanvas(); // Inicializa o SignaturePad após o carregamento completo
+    }
 
-        window.addEventListener('resize', handleResize);
+    // Atualizar o canvas ao redimensionar a janela
+    const handleResize = () => {
+        initializeOrResizeCanvas();
+    };
 
-        // Cleanup do event listener ao desmontar o componente
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup do event listener ao desmontar o componente
+    return () => {
+        window.removeEventListener('resize', handleResize);
+    };
+}, [isLoading]); // Adiciona `isLoading` como dependência
+
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
     // Estado para controlar a bandeira ativa
@@ -373,7 +382,7 @@ export default function Page() {
                 {
                     PropertyID: propertyID,
                     pdfBase64: pdfBase64,
-                    fileName: `ResNo-${reserva.ResNo}_ProfileID-${guestInfo.ProfileID}.pdf`,
+                    fileName: `RegistrationForm_ProfileID_${guestInfo.ProfileID}.pdf`,
                 }
             );
 
@@ -466,10 +475,10 @@ export default function Page() {
 
     return (
         <div className='bg-background main-page min-h-screen'>
-            {/* {isLoading ? (
-            <LoadingBackdrop open={isLoading} />
-        ) : ( */}
-            {/* header  */}
+           {/* Exibe o loader enquanto isLoading for verdadeiro */}
+        {isLoading ? (
+            <LoadingBackdrop open={true} />
+        ) : (
             <>
                 <div className="pt-2 px-4 flex justify-between flag-position items-center">
                     <div className='text-textPrimaryColor'>{hotelName}</div>
@@ -1000,6 +1009,7 @@ export default function Page() {
                             </div>
                         </div>
                     )}
+                    
                     <div className='w-1/2 ml-4 mr-4 half-screen'>
                         {/** Assinatura */}
                         <div className='bg-cardColor py-2 px-2 rounded-lg'>
@@ -1154,8 +1164,8 @@ export default function Page() {
                         </div>
                     </div>
                 </div>
-            </>
-            {/* )} */}
+                </>
+        )}
         </div>
     );
 }

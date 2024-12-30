@@ -278,12 +278,13 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
+      {isLoading && <LoadingBackdrop open={isLoading} />}
       <div className="flex-grow overflow-y-auto p-4">
         <div className="flex justify-between items-center w-full">
           <div className="header-container flex items-center justify-between w-full">
             {/* Div para o conteúdo centralizado */}
             <div className="flex items-center space-x-4 mx-auto">
-              <h2 className="text-xl text-textPrimaryColor">{propertyName} : In Houses List</h2>
+              <h2 className="text-xl text-textPrimaryColor">{propertyName} : InHouses</h2>
             </div>
 
             {/* Botão de refresh alinhado à direita */}
@@ -299,10 +300,9 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
         </div>
 
         <div className="mt-5">
-          {reservas.length > 0 ? (
-            <div className="overflow-auto md:overflow-visible">
-              <LoadingBackdrop open={isLoading} />
-              {!isLoading && (
+             {isLoading ? (
+            <LoadingBackdrop open={isLoading} /> // Exibe o carregamento enquanto os dados estão sendo carregados
+          ) : reservas.length > 0 ? (
                 <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
                   <thead>
                     <tr className="bg-primary text-white h-12">
@@ -383,16 +383,14 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                           <td className="pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate">{reserva.Notes}</td>
                           <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right w-20">{reserva.ResNo}</td>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                       );
+                      })}
+                    </tbody>
+                  </table>
+              ) : (
+                <p className="text-textLabelColor">No reservations found.</p>
               )}
             </div>
-          ) : (
-            <p className="text-textLabelColor">No reservations found.</p>
-          )}
-        </div>
 
       </div>
 
