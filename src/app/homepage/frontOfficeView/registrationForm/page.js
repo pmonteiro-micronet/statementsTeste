@@ -14,6 +14,7 @@ import TermsConditionsForm from "@/components/terms&conditions/page";
 import ProtectionPolicyForm from "@/components/protectionPolicy/page";
 import EditRegistrationForm from "@/components/modals/arrivals/reservationForm/edit/page";
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
+import LoadingBackdrop from "@/components/Loader/page";
 
 import { MdSunny } from "react-icons/md";
 import { FaMoon } from "react-icons/fa";
@@ -46,6 +47,24 @@ export default function Page() {
     // const resNo = searchParams.get("resNo");  // Acessando o parâmetro resNo
 
     console.log(isLoading);
+
+    useEffect(() => {
+        const preventBackNavigation = () => {
+            window.history.pushState(null, null, window.location.href);
+        };
+
+        // Adiciona evento para prevenir retrocesso
+        window.addEventListener('popstate', preventBackNavigation);
+
+        // Configura o estado inicial do histórico
+        window.history.pushState(null, null, window.location.href);
+
+        return () => {
+            // Remove o evento quando o componente é desmontado
+            window.removeEventListener('popstate', preventBackNavigation);
+        };
+    }, []);
+
     const calculateNights = (start, end) => {
         if (!start || !end) return '-';
         const startDate = new Date(start);
@@ -210,23 +229,31 @@ export default function Page() {
     };
 
     // Inicializar o SignaturePad
-    useEffect(() => {
+   // Inicializar o SignaturePad
+useEffect(() => {
+    const initializeOrResizeCanvas = () => {
         if (canvasRef.current) {
             initializeSignaturePad();
         }
+    };
 
-        // Atualizar o canvas ao redimensionar a janela
-        const handleResize = () => {
-            initializeSignaturePad();
-        };
+    if (!isLoading) {
+        initializeOrResizeCanvas(); // Inicializa o SignaturePad após o carregamento completo
+    }
 
-        window.addEventListener('resize', handleResize);
+    // Atualizar o canvas ao redimensionar a janela
+    const handleResize = () => {
+        initializeOrResizeCanvas();
+    };
 
-        // Cleanup do event listener ao desmontar o componente
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup do event listener ao desmontar o componente
+    return () => {
+        window.removeEventListener('resize', handleResize);
+    };
+}, [isLoading]); // Adiciona `isLoading` como dependência
+
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
     // Estado para controlar a bandeira ativa
@@ -261,7 +288,7 @@ export default function Page() {
 
     const handleOkClick = async () => {
         let errors = [];
-    
+
         // Validações de formulário
         if (isCanvasEmpty()) {
             errors.push("Please fill in all required fields to submit the form.");
@@ -274,16 +301,16 @@ export default function Page() {
             setIsErrorModalOpen(true);
             return;
         }
-    
+
         setErrorMessage('');
         setIsErrorModalOpen(false);
-    
+
         let emailToSend = email !== initialEmail ? email : undefined; // Envia undefined se não houver alteração
         let vatNoToSend = vatNo !== initialVatNo ? vatNo : undefined; // Envia undefined se não houver alteração
-        
+
         console.log("Email a ser enviado:", emailToSend);
         console.log("VAT No a ser enviado:", vatNoToSend);
-        
+
         // Se houver alterações (ou valores a serem enviados), envia para a API
         if (emailToSend || vatNoToSend) {  // Verifica se algum dos campos tem valor para ser enviado
             console.log("Alterações detectadas, enviando dados:", { email: emailToSend, vatNo: vatNoToSend });
@@ -303,8 +330,8 @@ export default function Page() {
             }
         } else {
             console.log("Nenhuma alteração detectada, nada será enviado.");
-        }        
-        
+        }
+
         // Captura a assinatura e gera o PDF
         try {
             const canvas = canvasRef.current;
@@ -355,7 +382,7 @@ export default function Page() {
                 {
                     PropertyID: propertyID,
                     pdfBase64: pdfBase64,
-                    fileName: `ResNo-${reserva.ResNo}_ProfileID-${guestInfo.ProfileID}.pdf`,
+                    fileName: `RegistrationForm_ProfileID_${guestInfo.ProfileID}.pdf`,
                 }
             );
 
@@ -398,7 +425,7 @@ export default function Page() {
 
     const [initialEmail, setInitialEmail] = useState("");
     const [initialVatNo, setInitialVatNo] = useState("");
-    
+
     useEffect(() => {
         if (contacts?.Email && initialEmail === "") {
             setEmail(contacts.Email);
@@ -408,20 +435,20 @@ export default function Page() {
             setVatNo(contacts.VatNo);
             setInitialVatNo(contacts.VatNo); // Armazena o valor inicial
         }
-    }, [contacts, initialEmail, initialVatNo]);    
-    
+    }, [contacts, initialEmail, initialVatNo]);
 
-const handleModalSave = (newValue) => {
-    // Verifica qual campo está sendo editado
-    if (modalField === "Email") {
-        setEmail(newValue); // Atualiza o estado de email
-    } else if (modalField === "VatNo") {
-        setVatNo(newValue); // Atualiza o estado de VAT No
-    }
 
-    // Fechar o modal após salvar
-    setIsModalOpen(false);
-};
+    const handleModalSave = (newValue) => {
+        // Verifica qual campo está sendo editado
+        if (modalField === "Email") {
+            setEmail(newValue); // Atualiza o estado de email
+        } else if (modalField === "VatNo") {
+            setVatNo(newValue); // Atualiza o estado de VAT No
+        }
+
+        // Fechar o modal após salvar
+        setIsModalOpen(false);
+    };
 
 
     // const openModalForField = (field) => {
@@ -448,10 +475,10 @@ const handleModalSave = (newValue) => {
 
     return (
         <div className='bg-background main-page min-h-screen'>
-            {/* {isLoading ? (
-            <LoadingBackdrop open={isLoading} />
-        ) : ( */}
-            {/* header  */}
+           {/* Exibe o loader enquanto isLoading for verdadeiro */}
+        {isLoading ? (
+            <LoadingBackdrop open={true} />
+        ) : (
             <>
                 <div className="pt-2 px-4 flex justify-between flag-position items-center">
                     <div className='text-textPrimaryColor'>{hotelName}</div>
@@ -474,7 +501,7 @@ const handleModalSave = (newValue) => {
                             onClick={() => handleFlagClick('pt-br')}
                         >
                             <img
-                                src="/flags/pt.webp"
+                                src="/flags/pt.png"
                                 alt="portuguese"
                                 className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
                             />
@@ -982,6 +1009,7 @@ const handleModalSave = (newValue) => {
                             </div>
                         </div>
                     )}
+                    
                     <div className='w-1/2 ml-4 mr-4 half-screen'>
                         {/** Assinatura */}
                         <div className='bg-cardColor py-2 px-2 rounded-lg'>
@@ -1071,7 +1099,7 @@ const handleModalSave = (newValue) => {
                             {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
                         </div>
                         <p className='text-xs text-gray-500 mt-4 text-justify text-style'>
-                        {hotelMiniTerms}
+                            {hotelMiniTerms}
                         </p>
                         <div className='flex flex-row justify-between items-center mt-4 buttons-style'>
                             <button
@@ -1136,8 +1164,8 @@ const handleModalSave = (newValue) => {
                         </div>
                     </div>
                 </div>
-            </>
-            {/* )} */}
+                </>
+        )}
         </div>
     );
 }

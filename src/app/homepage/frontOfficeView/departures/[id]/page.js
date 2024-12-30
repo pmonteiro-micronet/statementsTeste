@@ -263,6 +263,7 @@ export default function Page({ params }) {
 
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
+      {isLoading && <LoadingBackdrop open={isLoading} />}
       <div className="flex-grow overflow-y-auto p-4">
         <div className="flex justify-between items-center w-full">
           <div className="header-container flex items-center justify-between w-full">
@@ -310,10 +311,9 @@ export default function Page({ params }) {
         </div>
 
         <div className="mt-5">
-          {reservas.length > 0 ? (
-            <div className="overflow-auto md:overflow-visible">
-              <LoadingBackdrop open={isLoading} />
-              {!isLoading && (
+        {isLoading ? (
+            <LoadingBackdrop open={isLoading} /> // Exibe o carregamento enquanto os dados estão sendo carregados
+          ) : reservas.length > 0 ? (
                 <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
                   <thead>
                     <tr className="bg-primary text-white h-12">
@@ -398,15 +398,13 @@ export default function Page({ params }) {
                           <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
                           <td className="text-right pr-2">{reserva.DateCO}</td>
                         </tr>
-                      );
-                    })}
+                       );
+                      })}
                   </tbody>
                 </table>
-              )}
-            </div>
-          ) : (
-            <p className="text-textLabelColor">{t.frontOffice.departures.noReservations}</p>
-          )}
+                  ) : (
+                    <p className="text-textLabelColor">{t.frontOffice.departures.noReservations}</p>
+                  )}
         </div>
 
       </div>

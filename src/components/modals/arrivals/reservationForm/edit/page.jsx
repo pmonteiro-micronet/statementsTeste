@@ -4,7 +4,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@nextui-org
 import { MdClose } from "react-icons/md";
 
 const EditRegistrationForm = ({ currentLabel, currentValue, onSave, onClose, validation }) => {
-    const [newValue, setNewValue] = useState("");  
+    const [newValue, setNewValue] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
     // Cria a referência para o input
@@ -17,31 +17,46 @@ const EditRegistrationForm = ({ currentLabel, currentValue, onSave, onClose, val
         if (inputRef.current) {
             inputRef.current.focus();
         }
-    }, [currentValue]); 
+    }, [currentValue]);
 
     const handleSave = () => {
-        const isEmail = currentLabel.toLowerCase() === "email"; // Verifica se o campo é um email
-        
-        if (isEmail) {
-            const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newValue); // Validação básica de email
-            const hasInvalidDomain = /@guest\.booking\.com$/.test(newValue); // Verifica o domínio inválido
-    
-            if (!isValidEmail) {
-                setErrorMessage("Please enter a valid email address."); // Mensagem para formato inválido
-            } else if (hasInvalidDomain) {
-                setErrorMessage("Invalid email. It cannot end with @guest.booking.com"); // Mensagem para domínio proibido
-            } else {
-                setErrorMessage(""); // Limpa o erro se for válido
-                onSave(newValue); // Salva o valor
-            }
-        } else if (validation && !validation(newValue)) {
-            setErrorMessage(`${currentLabel} is invalid. Please check the value.`);
-        } else {
-            setErrorMessage(""); // Limpa o erro
-            onSave(newValue); // Salva o valor
+        const isEmail = currentLabel.toLowerCase() === "e-mail"; // Verifica se é um e-mail
+        const trimmedValue = newValue.trim(); // Remove espaços extras
+
+        // Validação - Campo vazio
+        if (!trimmedValue) {
+            setErrorMessage(`${currentLabel} cannot be empty.`);
+            return;
         }
+
+        if (isEmail) {
+            // Expressão regular atualizada e testada
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Valida formato
+            const isValidEmail = emailRegex.test(trimmedValue); // Testa o e-mail
+            const hasInvalidDomain = /@guest\.booking\.com$/i.test(trimmedValue); // Domínio proibido
+
+            // Validação de formato
+            if (!isValidEmail) {
+                setErrorMessage("Please enter a valid email address.");
+                return;
+            }
+
+            // Validação de domínio proibido
+            if (hasInvalidDomain) {
+                setErrorMessage("Invalid email. It cannot end with @guest.booking.com");
+                return;
+            }
+        } else if (validation && !validation(trimmedValue)) {
+            // Validação personalizada para outros campos
+            setErrorMessage(`${currentLabel} is invalid. Please check the value.`);
+            return;
+        }
+
+        // Se todas as validações passarem
+        setErrorMessage(""); // Limpa mensagens de erro
+        onSave(trimmedValue); // Salva o valor
     };
-    
+
     return (
         <Modal
             isOpen={true}

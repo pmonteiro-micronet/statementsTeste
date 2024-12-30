@@ -156,7 +156,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
       try {
         const response = await axios.get(`/api/reservations/inHouses/${propertyID}`);
         console.log("Response completo:", response);
-
+  
+        // Parse das reservas
         const reservasArray = response.data.response.flatMap(item => {
           try {
             return JSON.parse(item.requestBody);
@@ -165,57 +166,71 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
             return [];
           }
         });
-
+  
         console.log("Reservas após parse (todas as linhas):", reservasArray);
-
+  
         if (reservasArray.length === 0) {
           console.warn("Nenhuma reserva encontrada após parse.");
           setIsLoading(false);
           return; // Interrompe a execução se não houver reservas
         }
-        
+  
+        // Obtemos a data atual no formato YYYY-MM-DD
         const today = dayjs(currentDate, 'YYYY-MM-DD', true);
         console.log("Data atual formatada:", today.format());
-        
+  
+        // Filtramos as reservas para pegar apenas as que têm a data no campo requestDateTime igual à data atual
         const reservasFiltradas = reservasArray.filter(reserva => {
-          const dateCI = dayjs(reserva.DateCI).startOf('day');
-          const dateCO = dayjs(reserva.DateCO).startOf('day');
-          const today = dayjs(currentDate).startOf('day');
-        
-          console.log(`Reserva: ${reserva.LastName}, Check-in: ${dateCI.format()}, Check-out: ${dateCO.format()}`);
-          console.log(`today(${today.format()}) >= dateCI(${dateCI.format()}) && today(${today.format()}) < dateCO(${dateCO.format()})`);
-        
-          if (!dateCI.isValid() || !dateCO.isValid()) {
-            console.warn("Data inválida encontrada:", reserva);
-            return false;
-          }
-        
-          return today.isSameOrAfter(dateCI) && today.isBefore(dateCO);
+          const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+          
+          // Compara apenas a data, sem considerar a hora
+          const isSameDay = requestDateTime.isSame(today, 'day');
+  
+          console.log(`Reserva: ${reserva.LastName}, RequestDateTime: ${requestDateTime.format()}`);
+          return isSameDay;
         });
-        
-        console.log("Reservas filtradas:", reservasFiltradas);
-        
-        // Remover duplicatas baseadas no nome e quarto
-        const reservasUnicas = Array.from(
-          new Map(
-            reservasFiltradas.map(reserva => [`${reserva.LastName}-${reserva.Room}`, reserva])
-          ).values()
-        );
-
-        console.log("Reservas únicas para a data atual:", reservasUnicas);
-        setReservas(reservasUnicas);
+  
+        console.log("Reservas filtradas pela data atual:", reservasFiltradas);
+  
+        // Agora vamos agrupar as reservas por 'LastName' e 'Room' e pegar a mais recente de cada grupo
+        const reservasMaisRecentes = [];
+  
+        // Usando um Map para garantir que, para cada combinação LastName + Room, só a reserva mais recente seja adicionada
+        const seen = new Map();
+  
+        reservasFiltradas.forEach(reserva => {
+          const key = `${reserva.LastName}-${reserva.Room}`;
+          const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+  
+          if (!seen.has(key)) {
+            seen.set(key, reserva);
+          } else {
+            const existingReserva = seen.get(key);
+            const existingDate = dayjs(existingReserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+  
+            // Se a reserva atual for mais recente, substituímos a existente
+            if (requestDateTime.isAfter(existingDate)) {
+              seen.set(key, reserva);
+            }
+          }
+        });
+  
+        // Agora, obtemos todas as reservas mais recentes
+        reservasMaisRecentes.push(...seen.values());
+  
+        console.log("Reservas mais recentes para o dia de hoje:", reservasMaisRecentes);
+        setReservas(reservasMaisRecentes);
       } catch (error) {
         console.error("Erro ao buscar reservas:", error.message);
       } finally {
         setIsLoading(false);
       }
     };
-
+  
     fetchReservas();
   }, [currentDate, propertyID]);
-
-
-
+  
+  
   useEffect(() => {
     const fetchHotelName = async () => {
       try {
@@ -263,13 +278,13 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
+      {isLoading && <LoadingBackdrop open={isLoading} />}
       <div className="flex-grow overflow-y-auto p-4">
         <div className="flex justify-between items-center w-full">
           <div className="header-container flex items-center justify-between w-full">
             {/* Div para o conteúdo centralizado */}
             <div className="flex items-center space-x-4 mx-auto">
-              <h2 className="text-xl text-textPrimaryColor">Today: {dayjs().format('YYYY-MM-DD')}</h2>
-              <h2 className="text-xl text-textPrimaryColor">{propertyName} : In Houses List</h2>
+              <h2 className="text-xl text-textPrimaryColor">{propertyName} : InHouses</h2>
             </div>
 
             {/* Botão de refresh alinhado à direita */}
@@ -285,10 +300,9 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
         </div>
 
         <div className="mt-5">
-          {reservas.length > 0 ? (
-            <div className="overflow-auto md:overflow-visible">
-              <LoadingBackdrop open={isLoading} />
-              {!isLoading && (
+             {isLoading ? (
+            <LoadingBackdrop open={isLoading} /> // Exibe o carregamento enquanto os dados estão sendo carregados
+          ) : reservas.length > 0 ? (
                 <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
                   <thead>
                     <tr className="bg-primary text-white h-12">
@@ -369,16 +383,14 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                           <td className="pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate">{reserva.Notes}</td>
                           <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right w-20">{reserva.ResNo}</td>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                       );
+                      })}
+                    </tbody>
+                  </table>
+              ) : (
+                <p className="text-textLabelColor">No reservations found.</p>
               )}
             </div>
-          ) : (
-            <p className="text-textLabelColor">No reservations found.</p>
-          )}
-        </div>
 
       </div>
 

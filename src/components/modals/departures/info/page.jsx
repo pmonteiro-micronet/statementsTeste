@@ -26,7 +26,6 @@ const DepartureInfoForm = ({
     onClose,
 }) => {
 
-
     return (
         <>
             {formTypeModal === 11 && (
@@ -39,6 +38,7 @@ const DepartureInfoForm = ({
                         isKeyboardDismissDisabled={true}
                         className="z-50"
                         size="sm"
+                        backdrop="transparent"
                     >
                         <ModalContent>
                             {(onClose) => (
@@ -52,7 +52,7 @@ const DepartureInfoForm = ({
                                                 <Button color="transparent" variant="light" className={"w-auto min-w-0 p-0 m-0 -pr-4"} onClick={() => { onClose() }}><MdClose size={30} /></Button>
                                             </div>
                                         </ModalHeader>
-                                        <ModalBody className="flex flex-col mx-5 my-2 space-y-8 bg-background">
+                                        <ModalBody className="flex flex-col space-y-8 bg-background">
                                             <Tabs aria-label="Options" className="flex justify-center">
                                                 <Tab key="reservation" title="Reservation">
                                                     {/* Exibindo Room Number e DateCO */}
