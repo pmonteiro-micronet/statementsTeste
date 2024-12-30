@@ -127,6 +127,10 @@ export default function Sidebar({ children, setExpanded }) {
     }
   };
 
+  const [isLanguageDropdownOpen, setLanguageDropdownOpen] = useState(false); // Controle do dropdown de idiomas
+
+  const toggleLanguageDropdown = () => setLanguageDropdownOpen(!isLanguageDropdownOpen);
+
   const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
@@ -270,16 +274,50 @@ export default function Sidebar({ children, setExpanded }) {
                       <FaGlobe className="mr-2" />
                       Language
                     </span>
-                    <select
-                      className="ml-2 bg-transparent outline-none cursor-pointer"
-                      value={language}
-                      onChange={(e) => handleLanguageChange(e.target.value)}
-                    >
-                      <option value="pt">Pt</option>
-                      <option value="en">En</option>
-                      <option value="es">Es</option>
-                    </select>
+                    <div className="relative">
+                      {/* Botão de seleção */}
+                      <button
+                        onClick={toggleLanguageDropdown} // Alterna o dropdown de idiomas
+                        className="ml-2 bg-transparent outline-none cursor-pointer flex items-center"
+                      >
+                        {/* Exibe a bandeira ativa */}
+                        <img
+                          src={`/flags/${language}.png`}
+                          alt={language}
+                          className="w-6 h-6 object-cover"
+                        />
+                        {/* Botão de seta para abrir o dropdown */}
+                        <button onClick={toggleLanguageDropdown} className="ml-2 text-gray-600">
+                          {isLanguageDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
+                        </button>
+                      </button>
+
+                      {/* Dropdown customizado */}
+                      {isLanguageDropdownOpen && (
+                        <ul className="absolute top-10 left-0 bg-white shadow-md rounded-md w-32 z-50">
+                          <li
+                            onClick={() => handleLanguageChange('pt')}
+                            className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
+                          >
+                            <img src="/flags/pt.png" alt="portuguese" className="w-4 h-4 object-cover mr-4" />
+                          </li>
+                          <li
+                            onClick={() => handleLanguageChange('uk')}
+                            className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
+                          >
+                            <img src="/flags/uk.png" alt="english" className="w-4 h-4 object-cover mr-4" />
+                          </li>
+                          <li
+                            onClick={() => handleLanguageChange('sp')}
+                            className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
+                          >
+                            <img src="/flags/sp.png" alt="spanish" className="w-4 h-4 object-cover mr-4" />
+                          </li>
+                        </ul>
+                      )}
+                    </div>
                   </li>
+
 
                   {/* Logout */}
                   <li

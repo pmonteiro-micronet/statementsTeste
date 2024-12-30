@@ -250,7 +250,7 @@ export default function SidebarWrapper({ children }) {
 
       <main
         className={`flex-1 min-h-screen overflow-y-auto transition-all duration-300 bg-background ${isMobile || !showSidebar ? "p-0" : "ml-16"
-          }`}
+          } ${showNavBar ? "" : ""} `}
         style={{
           marginLeft: isMobile || !showSidebar ? "0" : expanded ? "16rem" : "4rem",
         }}
