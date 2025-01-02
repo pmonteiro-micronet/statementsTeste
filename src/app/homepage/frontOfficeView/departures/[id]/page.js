@@ -383,7 +383,7 @@ export default function Page({ params }) {
                               totalPax={reserva.TotalPax}
                               balance={reserva.Balance}
                               country={reserva.Country}
-                              isBackdropVisible={false}
+                              isBackdropVisible={true}
                               isOpen={isModalOpen}
                               onClose={handleCloseModal}
                             />

@@ -58,6 +58,13 @@ export async function GET(request) {
 
     // Verifica se a resposta contém dados
     if (response.data && Array.isArray(response.data)) {
+      // Apagar todos os registros da tabela antes de inserir novos dados
+      await prisma.requestRecordsArrivals.deleteMany({
+        where: {
+          propertyID: propertyIDInt,  // Apaga os registros relacionados ao PropertyID
+        },
+      });
+
       // Salva o array de dados (reservas) como um único registro na tabela
       const newRequest = await prisma.requestRecordsArrivals.create({
         data: {

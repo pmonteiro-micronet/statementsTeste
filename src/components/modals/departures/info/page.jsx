@@ -30,7 +30,7 @@ const DepartureInfoForm = ({
         <>
             {formTypeModal === 11 && (
                 <>
-                    <Modal
+                   <Modal
                         isOpen={isOpen}
                         hideCloseButton={true}
                         onOpenChange={onClose}
@@ -38,7 +38,6 @@ const DepartureInfoForm = ({
                         isKeyboardDismissDisabled={true}
                         className="z-50"
                         size="sm"
-                        backdrop="transparent"
                     >
                         <ModalContent>
                             {(onClose) => (
@@ -48,8 +47,10 @@ const DepartureInfoForm = ({
                                             <div className="flex flex-row justify-start gap-4 pl-4">
                                                 {editIcon} {modalHeader} {modalEditArrow} {modalEdit}
                                             </div>
-                                            <div className='flex flex-row items-center justify-end'>
-                                                <Button color="transparent" variant="light" className={"w-auto min-w-0 p-0 m-0 -pr-4"} onClick={() => { onClose() }}><MdClose size={30} /></Button>
+                                            <div className='flex flex-row items-center'>
+                                                <Button color="transparent" variant="light" className="w-auto min-w-0 p-0 m-0" onClick={() => onClose()}>
+                                                    <MdClose size={30} />
+                                                </Button>
                                             </div>
                                         </ModalHeader>
                                         <ModalBody className="flex flex-col space-y-8 bg-background">

@@ -18,7 +18,7 @@ const LoadingBackdrop = ({ open }) => {
           borderRadius: '8px'
         }}
       >
-        <h2 style={{ marginBottom: '8px' }} className="text-black">Extensions</h2>
+        <h2 style={{ marginBottom: '8px' }} className="text-black">Extensions myPMS</h2>
         <img 
           src="/loading/extensionsLoader.gif" 
           alt="Loading..." 
