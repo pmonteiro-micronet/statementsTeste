@@ -1,11 +1,10 @@
-"use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { IoMenu } from "react-icons/io5";
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-
+import { FaGlobe, FaChevronDown, FaChevronUp } from "react-icons/fa"; // Novos ícones adicionados
 function replaceUnderscores(text) {
   return text.replace(/_/g, " ");
 }
@@ -15,6 +14,7 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
   const [openMenus, setOpenMenus] = useState(new Set());
   const [warningVisible, setWarningVisible] = useState(false);
   const [countdown, setCountdown] = useState(60);
+  const [userMenuOpen, setUserMenuOpen] = useState(false); // Novo estado para o menu do usuário
   const { data: session } = useSession();
   let inactivityTimeout;
   let warningTimeout;
@@ -33,6 +33,10 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
       }
       return newSet;
     });
+  };
+
+  const toggleUserMenu = () => {
+    setUserMenuOpen((prev) => !prev); // Alterna o estado do menu do usuário
   };
 
   const handleLogout = () => {
@@ -102,6 +106,30 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
     };
   }, []);
 
+  const [setDropdownOpen] = useState(false); // Controle do dropdown
+  const [isDarkMode, setIsDarkMode] = useState(false); // Controle do tema
+  const [language, setLanguage] = useState("pt"); // Idioma padrão
+
+  // Alternar o tema
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    if (!isDarkMode) {
+      document.documentElement.classList.add("dark"); // Adiciona o tema escuro
+    } else {
+      document.documentElement.classList.remove("dark"); // Remove o tema escuro
+    }
+  };
+
+  const [isLanguageDropdownOpen, setLanguageDropdownOpen] = useState(false); // Controle do dropdown de idiomas
+
+  const toggleLanguageDropdown = () => setLanguageDropdownOpen(!isLanguageDropdownOpen);
+
+  // const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
+    setDropdownOpen(false); // Fecha o dropdown após selecionar
+  };
+
   return (
     <nav className="w-full fixed top-0 z-50 flex items-center justify-between p-4 bg-white shadow-md">
       {/* Logo */}
@@ -115,9 +143,12 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
       {/* Fullscreen Menu */}
       {menuOpen && (
         <div className="fixed inset-0 z-50 bg-white flex flex-col p-6 overflow-auto">
-          <button onClick={toggleMenu} className="self-end text-2xl mb-4 text-gray-600">
-            &times;
-          </button>
+          <div className="flex justify-between items-center mb-4 -mt-3">
+            <div className="font-semibold text-sm">Extensions myPMS</div>
+            <button onClick={toggleMenu} className="text-2xl text-gray-600">
+              &times;
+            </button>
+          </div>
 
           <div className="mb-4">
             <select
@@ -189,26 +220,101 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
           </ul>
 
           <div className="mt-auto flex flex-col">
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center text-primary">
-                <FaUser />
-              </div>
-              <div className="ml-3 text-center">
-                <p className="font-medium">
-                  {session ? `${session.user.firstName} ${session.user.secondName}` : "Usuário Desconhecido"}
-                </p>
-                <span className="text-xs text-gray-600 ml-3">
-                  {session ? session.user.email : "Email Desconhecido"}
-                </span>
+            <div className="flex flex-row justify-between">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center text-primary">
+                  <FaUser />
+                </div>
+                <div className="ml-3 text-center">
+                  <p className="font-medium">
+                    {session ? `${session.user.firstName} ${session.user.secondName}` : "Usuário Desconhecido"}
+                  </p>
+                  <span className="text-xs text-gray-600 ml-3">
+                    {session ? session.user.email : "Email Desconhecido"}
+                  </span>
+                </div>
+                <div className="relative">
+                  <button
+                    onClick={toggleUserMenu}
+                    className="flex items-center justify-center w-full py-2 text-sm text-gray-700"
+                  >
+                    <IoIosArrowDown className="ml-2" />
+                  </button>
+
+                  {userMenuOpen && (
+                    <div className="absolute bottom-full bg-white shadow-lg rounded mb-2 w-40">
+                      <ul className="py-2">
+                        <li>
+                          <button
+                            onClick={() => {
+                              // Lógica para alternar o modo de visualização
+                              toggleTheme();
+                            }}
+                            className="block px-4 py-2 text-sm text-gray-700"
+                          >
+                            {isDarkMode ? "Light Mode" : "Dark Mode"}
+                          </button>
+                        </li>
+                        <li className="py-2 px-3 rounded-md flex flex-row justify-between">
+                          <span className="flex items-center">
+                            <FaGlobe className="mr-2" />
+                            Language
+                          </span>
+                          {/* Botão de seleção */}
+                          <button
+                            onClick={toggleLanguageDropdown} // Alterna o dropdown de idiomas
+                            className="ml-2 bg-transparent outline-none cursor-pointer flex items-center"
+                          >
+                            {/* Exibe a bandeira ativa */}
+                            <img
+                              src={`/flags/${language}.png`}
+                              alt={language}
+                              className="w-4 h-4 object-cover"
+                            />
+                            {/* Botão de seta para abrir o dropdown */}
+                            <button onClick={toggleLanguageDropdown} className="ml-2 text-gray-600">
+                              {isLanguageDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
+                            </button>
+                          </button>
+                          {/* Dropdown customizado */}
+                          {isLanguageDropdownOpen && (
+                            <ul className="absolute top-10 right-0 bg-white shadow-md rounded-md w-10 z-50">
+                              <li
+                                onClick={() => handleLanguageChange('pt')}
+                                className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
+                              >
+                                <img src="/flags/pt.png" alt="portuguese" className="w-4 h-4 object-cover mr-4" />
+                              </li>
+                              <li
+                                onClick={() => handleLanguageChange('uk')}
+                                className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
+                              >
+                                <img src="/flags/uk.png" alt="english" className="w-4 h-4 object-cover mr-4" />
+                              </li>
+                              <li
+                                onClick={() => handleLanguageChange('sp')}
+                                className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
+                              >
+                                <img src="/flags/sp.png" alt="spanish" className="w-4 h-4 object-cover mr-4" />
+                              </li>
+                            </ul>
+                          )}
+                        </li>
+                        <li>
+                          <button
+                            onClick={handleLogout}
+                            className="block px-4 py-2 text-sm text-red-600 flex items-center"
+                          >
+                            <FaSignOutAlt className="mr-2" />
+                            Logout
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center justify-center text-white bg-red-500 h-10 rounded-lg hover:bg-red-600"
-            >
-              <FaSignOutAlt className="mr-2" />
-              Logout
-            </button>
           </div>
         </div>
       )}
@@ -219,11 +325,11 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
           <div className="bg-white p-6 rounded shadow-md w-80 text-center">
             <h1 className="text-xl font-bold mb-4">You will logout automatically in {countdown} seconds!</h1>
             <div className="flex justify-around mt-4">
-            <button
+              <button
                 onClick={handleContinueSession}
                 className="bg-primary text-white px-4 py-2 rounded hover:bg-green-600"
               >
-                Continuar Sessão
+                Continue Session
               </button>
               <button
                 onClick={handleLogout}

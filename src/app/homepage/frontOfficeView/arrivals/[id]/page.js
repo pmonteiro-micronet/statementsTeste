@@ -350,7 +350,7 @@ export default function Arrivals({ params }) {
                             totalPax={reserva.TotalPax}
                             balance={reserva.Balance}
                             country={reserva.Country}
-                            isBackdropVisible={false}
+                            isBackdropVisible={true}
                             isOpen={isModalOpen}
                             onClose={handleCloseModal}
                           />

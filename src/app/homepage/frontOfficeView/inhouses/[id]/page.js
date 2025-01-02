@@ -156,7 +156,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
       try {
         const response = await axios.get(`/api/reservations/inHouses/${propertyID}`);
         console.log("Response completo:", response);
-  
+
         // Parse das reservas
         const reservasArray = response.data.response.flatMap(item => {
           try {
@@ -166,58 +166,58 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
             return [];
           }
         });
-  
+
         console.log("Reservas após parse (todas as linhas):", reservasArray);
-  
+
         if (reservasArray.length === 0) {
           console.warn("Nenhuma reserva encontrada após parse.");
           setIsLoading(false);
           return; // Interrompe a execução se não houver reservas
         }
-  
+
         // Obtemos a data atual no formato YYYY-MM-DD
         const today = dayjs(currentDate, 'YYYY-MM-DD', true);
         console.log("Data atual formatada:", today.format());
-  
+
         // Filtramos as reservas para pegar apenas as que têm a data no campo requestDateTime igual à data atual
         const reservasFiltradas = reservasArray.filter(reserva => {
           const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-          
+
           // Compara apenas a data, sem considerar a hora
           const isSameDay = requestDateTime.isSame(today, 'day');
-  
+
           console.log(`Reserva: ${reserva.LastName}, RequestDateTime: ${requestDateTime.format()}`);
           return isSameDay;
         });
-  
+
         console.log("Reservas filtradas pela data atual:", reservasFiltradas);
-  
+
         // Agora vamos agrupar as reservas por 'LastName' e 'Room' e pegar a mais recente de cada grupo
         const reservasMaisRecentes = [];
-  
+
         // Usando um Map para garantir que, para cada combinação LastName + Room, só a reserva mais recente seja adicionada
         const seen = new Map();
-  
+
         reservasFiltradas.forEach(reserva => {
           const key = `${reserva.LastName}-${reserva.Room}`;
           const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-  
+
           if (!seen.has(key)) {
             seen.set(key, reserva);
           } else {
             const existingReserva = seen.get(key);
             const existingDate = dayjs(existingReserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-  
+
             // Se a reserva atual for mais recente, substituímos a existente
             if (requestDateTime.isAfter(existingDate)) {
               seen.set(key, reserva);
             }
           }
         });
-  
+
         // Agora, obtemos todas as reservas mais recentes
         reservasMaisRecentes.push(...seen.values());
-  
+
         console.log("Reservas mais recentes para o dia de hoje:", reservasMaisRecentes);
         setReservas(reservasMaisRecentes);
       } catch (error) {
@@ -226,11 +226,11 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
         setIsLoading(false);
       }
     };
-  
+
     fetchReservas();
   }, [currentDate, propertyID]);
-  
-  
+
+
   useEffect(() => {
     const fetchHotelName = async () => {
       try {
@@ -300,97 +300,97 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
         </div>
 
         <div className="mt-5">
-             {isLoading ? (
+          {isLoading ? (
             <LoadingBackdrop open={isLoading} /> // Exibe o carregamento enquanto os dados estão sendo carregados
           ) : reservas.length > 0 ? (
-                <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
-                  <thead>
-                    <tr className="bg-primary text-white h-12">
-                      <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ARRIVAL</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">DEPARTURE</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">LAST NAME</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">FIRST NAME</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">COMPANY</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">NOTES</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">RES. NO.</td>
+            <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
+              <thead>
+                <tr className="bg-primary text-white h-12">
+                  <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ARRIVAL</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">DEPARTURE</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">LAST NAME</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">FIRST NAME</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">COMPANY</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">NOTES</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">RES. NO.</td>
+                </tr>
+              </thead>
+              <tbody>
+                {reservas.map((reserva, index) => {
+                  // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
+                  return (
+                    <tr key={index} className="h-10 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">
+                      <td className="pl-1 flex items-start border-r border-[#e6e6e6] relative z-10">
+                        <Dropdown>
+                          <DropdownTrigger>
+                            <Button
+                              variant="light"
+                              className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
+                            >
+                              <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu
+                            aria-label="Static Actions"
+                            closeOnSelect={true}
+                            isOpen={true}
+                            className="relative z-10 text-textPrimaryColor"
+                          >
+                            <DropdownItem key="edit" onClick={() => handleOpenModal()}>
+                              Info
+                            </DropdownItem>
+                            <DropdownItem
+                              key="show"
+                              onClick={() => {
+                                if (reserva.ResNo) {
+                                  sendResToAPI(reserva.ResNo);
+                                } else {
+                                  console.warn("ReservationNumber não encontrado.");
+                                }
+                              }}
+                            >
+                              Statement
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                        <DepartureInfoForm
+                          buttonName={"Info"}
+                          buttonColor={"transparent"}
+                          modalHeader={"Reservation"}
+                          formTypeModal={11}
+                          roomNumber={reserva.Room}  // Passando o roomNumber
+                          dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
+                          booker={reserva.Booker}
+                          salutation={reserva.Salutation}
+                          lastName={reserva.LastName}
+                          firstName={reserva.FirstName}
+                          roomType={reserva.RoomType}
+                          resStatus={reserva.ResStatus}
+                          totalPax={reserva.TotalPax}
+                          balance={reserva.Balance}
+                          country={reserva.Country}
+                          isBackdropVisible={true}
+                          isOpen={isModalOpen}
+                          onClose={handleCloseModal}
+                        />
+                      </td>
+                      <td className="text-right pr-2 w-28">{reserva.DateCO}</td>
+                      <td className="text-right pr-2 w-28">{reserva.DateCO}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.LastName}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.FirstName}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-32">{reserva.Company}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate">{reserva.Notes}</td>
+                      <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right w-20">{reserva.ResNo}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                  {reservas.map((reserva, index) => {
-                      // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
-                      return (
-                        <tr key={index} className="h-10 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">
-                          <td className="pl-1 flex items-start border-r border-[#e6e6e6] relative z-10">
-                            <Dropdown>
-                              <DropdownTrigger>
-                                <Button
-                                  variant="light"
-                                  className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
-                                >
-                                  <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
-                                </Button>
-                              </DropdownTrigger>
-                              <DropdownMenu
-                                aria-label="Static Actions"
-                                closeOnSelect={true}
-                                isOpen={true}
-                                className="relative z-10 text-textPrimaryColor"
-                              >
-                                <DropdownItem key="edit" onClick={() => handleOpenModal()}>
-                                  Info
-                                </DropdownItem>
-                                <DropdownItem
-                                  key="show"
-                                  onClick={() => {
-                                    if (reserva.ResNo) {
-                                      sendResToAPI(reserva.ResNo);
-                                    } else {
-                                      console.warn("ReservationNumber não encontrado.");
-                                    }
-                                  }}
-                                >
-                                  Statement
-                                </DropdownItem>
-                              </DropdownMenu>
-                            </Dropdown>
-                            <DepartureInfoForm
-                              buttonName={"Info"}
-                              buttonColor={"transparent"}
-                              modalHeader={"Reservation"}
-                              formTypeModal={11}
-                              roomNumber={reserva.Room}  // Passando o roomNumber
-                              dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
-                              booker={reserva.Booker}
-                              salutation={reserva.Salutation}
-                              lastName={reserva.LastName}
-                              firstName={reserva.FirstName}
-                              roomType={reserva.RoomType}
-                              resStatus={reserva.ResStatus}
-                              totalPax={reserva.TotalPax}
-                              balance={reserva.Balance}
-                              country={reserva.Country}
-                              isBackdropVisible={false}
-                              isOpen={isModalOpen}
-                              onClose={handleCloseModal}
-                            />
-                          </td>
-                          <td className="text-right pr-2 w-28">{reserva.DateCO}</td>
-                          <td className="text-right pr-2 w-28">{reserva.DateCO}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.LastName}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.FirstName}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-32">{reserva.Company}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate">{reserva.Notes}</td>
-                          <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right w-20">{reserva.ResNo}</td>
-                        </tr>
-                       );
-                      })}
-                    </tbody>
-                  </table>
-              ) : (
-                <p className="text-textLabelColor">No reservations found.</p>
-              )}
-            </div>
+                  );
+                })}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-textLabelColor">No reservations found.</p>
+          )}
+        </div>
 
       </div>
 

@@ -172,13 +172,13 @@ export default function Sidebar({ children, setExpanded }) {
       >
         <nav className="h-full flex flex-col">
           <div className="p-4 pb-2 flex justify-between items-center">
-            <div className="flex gap-4 items-center">
+            <div className="flex flex-row gap-4 items-center">
               {/* Imagem */}
               <img
                 src="/icon/extensionsLogoWeb.png"
                 alt="extensions"
-                width={15}
-                height={15}
+                width={20}
+                height={20}
               />
 
               {/* Texto "Extensions myPMS" */}
