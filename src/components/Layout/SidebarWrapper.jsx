@@ -94,19 +94,19 @@ export default function SidebarWrapper({ children }) {
             },
             ...(isAdmin
               ? [
-                  {
-                    ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
-                    label: "Arrivals",
-                    onClick: () =>
-                      router.push(`/homepage/frontOfficeView/arrivals/${selectedHotelID}`),
-                  },
-                  {
-                    ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
-                    label: "InHouses",
-                    onClick: () =>
-                      router.push(`/homepage/frontOfficeView/inhouses/${selectedHotelID}`),
-                  },
-                ]
+                {
+                  ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
+                  label: "Arrivals",
+                  onClick: () =>
+                    router.push(`/homepage/frontOfficeView/arrivals/${selectedHotelID}`),
+                },
+                {
+                  ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
+                  label: "InHouses",
+                  onClick: () =>
+                    router.push(`/homepage/frontOfficeView/inhouses/${selectedHotelID}`),
+                },
+              ]
               : []),
             {
               ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
@@ -144,16 +144,16 @@ export default function SidebarWrapper({ children }) {
 
   const confirmHotelSelection = () => {
     const selectedHotel = hotels.find((hotel) => String(hotel.propertyID) === String(selectedHotelID));
-    
+
     if (selectedHotel) {
       setIsHotelConfirmed(true);
       localStorage.setItem("isHotelConfirmed", 'true');
-      
+
       // Verificar se a URL está no contexto do Front Office
       if (pathname.includes("/frontOfficeView")) {
         const currentPath = pathname.split('/'); // Divide a URL em partes
         const isSubsection = currentPath.length === 5; // URL com subseção terá exatamente 5 partes
-        
+
         if (isSubsection) {
           // Atualiza apenas o hotelID mantendo a subseção
           const basePath = currentPath.slice(0, 3).join('/'); // Exemplo: /homepage/frontOfficeView
@@ -166,11 +166,11 @@ export default function SidebarWrapper({ children }) {
         }
       }
     }
-    
+
     setShowSelectionButtons(false); // Esconde os botões após a confirmação
   };
-  
-  
+
+
   const showConfirmationModal = selectedHotelID && !isHotelConfirmed;
   const showSidebar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth") && !pathname.includes("/homepage/frontOfficeView/registrationForm");
   const showNavBar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth") && !pathname.includes("/homepage/frontOfficeView/registrationForm");
