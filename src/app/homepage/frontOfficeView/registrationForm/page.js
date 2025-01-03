@@ -155,9 +155,9 @@ export default function Page() {
                 console.log("Resposta da API para o requestID:", response);
 
                 if (response.data?.response?.length > 0) {
-                    const requestBody = response.data.response[0].requestBody;
+                    const requestBody = response.data.response[0].responseBody;
                     const reservas = JSON.parse(requestBody);
-                    console.log("Reservas encontradas no requestBody:", reservas);
+                    console.log("Reservas encontradas no responseBody:", reservas);
 
                     const reservaSelecionada = reservas.find(r =>
                         r.ReservationInfo.some(info => `${info.ResNo}` === `${resNo}`)
