@@ -56,49 +56,45 @@ export async function GET(request) {
       params: { HotelID }, // Usando HotelID na requisição
     });
 
-    // Verifica se a resposta contém dados
-    if (response.data && Array.isArray(response.data)) {
-      // Busca o último registro existente na tabela com o mesmo PropertyID
-      const existingRecord = await prisma.requestRecordsArrivals.findFirst({
-        where: {
-          propertyID: propertyIDInt,
-        },
-        orderBy: {
-          requestDateTime: "desc", // Ordena por data mais recente
-        },
-      });
+   // Verifica se a resposta contém dados
+if (response.data && Array.isArray(response.data)) {
+  // Busca o último registro existente na tabela com o mesmo PropertyID
+  const existingRecord = await prisma.requestRecordsArrivals.findFirst({
+    where: { propertyID: propertyIDInt },
+    orderBy: { requestDateTime: "desc" },  // Ordena por data mais recente
+  });
 
-      if (existingRecord) {
-        // Atualiza o registro existente
-        const updatedRequest = await prisma.requestRecordsArrivals.update({
-          where: {
-            id: existingRecord.id, // Usa o ID do registro encontrado
-          },
-          data: {
-            requestBody: JSON.stringify(response.data), // Atualiza com os novos dados
-            requestDateTime: new Date(), // Atualiza a data e hora
-            responseStatus: "200", // Supondo sucesso inicialmente
-            responseBody: JSON.stringify(response.data), // Atualiza com a nova resposta
-          },
-        });
-
-        console.log("Registro atualizado no DB:", updatedRequest);
-      } else {
-        // Se não existir registro anterior, cria um novo
-        const newRequest = await prisma.requestRecordsArrivals.create({
-          data: {
-            requestBody: JSON.stringify(response.data), // Armazena o array completo como JSON
-            requestType: "GET", // Tipo da requisição
-            requestDateTime: new Date(), // Data e hora atual
-            responseStatus: "200", // Supondo sucesso inicialmente
-            responseBody: JSON.stringify(response.data), // Armazena a resposta completa
-            propertyID: propertyIDInt, // Usar o propertyID extraído da query
-          },
-        });
-
-        console.log("Novo registro criado no DB:", newRequest);
-      }
-    }
+  if (existingRecord) {
+    // Caso o registro exista, você pode atualizar
+    const updatedRecord = await prisma.requestRecordsArrivals.update({
+      where: {
+        requestID: existingRecord.requestID,  // Usa o requestID do registro existente
+      },
+      data: {
+        requestBody: JSON.stringify(response.data),  // Atualiza o corpo da requisição
+        requestType: "GET",  // Tipo da requisição
+        requestDateTime: new Date(),  // Data e hora da atualização
+        responseStatus: "200",  // Status de resposta
+        responseBody: JSON.stringify(response.data),  // Resposta completa
+        propertyID: propertyIDInt,  // Atualiza o propertyID
+      },
+    });
+    console.log("Registro atualizado:", updatedRecord);
+  } else {
+    // Caso o registro não exista, você pode inserir um novo
+    const newRequest = await prisma.requestRecordsArrivals.create({
+      data: {
+        requestBody: JSON.stringify(response.data),  // Corpo da requisição
+        requestType: "GET",  // Tipo da requisição
+        requestDateTime: new Date(),  // Data e hora atual
+        responseStatus: "200",  // Status de resposta
+        responseBody: JSON.stringify(response.data),  // Resposta completa
+        propertyID: propertyIDInt,  // Propriedade associada
+      },
+    });
+    console.log("Novo registro inserido:", newRequest);
+  }
+}
 
     // Retorna a resposta do Mock Server para o cliente
     console.log("OK: ", response);
