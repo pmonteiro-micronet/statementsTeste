@@ -171,7 +171,7 @@ export default function Sidebar({ children, setExpanded }) {
         }}
       >
         <nav className="h-full flex flex-col">
-          <div className="p-4 pb-2 flex justify-between items-center">
+          <div className="p-4 pb-2 flex !justify-between items-center">
             <div className="flex flex-row gap-4 !items-center">
               {/* Imagem */}
               <img
@@ -190,10 +190,11 @@ export default function Sidebar({ children, setExpanded }) {
             </div>
             <button
               onClick={handleToggle}
-              className="p-1.5 rounded-lg bg-primaryBackground hover:primaryBackground"
+              className="p-1.5 rounded-lg bg-primaryBackground hover:bg-primaryBackground absolute top-0 right-1 z-20 transform translate-x-1 translate-y-1"
             >
-              <TbLayoutSidebarLeftExpand className="text-textPrimaryColor"/>
+              <TbLayoutSidebarLeftExpand className="text-textPrimaryColor" />
             </button>
+
           </div>
 
           <SidebarContext.Provider value={{ expanded }}>
