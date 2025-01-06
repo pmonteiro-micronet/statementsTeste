@@ -4,7 +4,10 @@ import { IoMenu } from "react-icons/io5";
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { FaGlobe, FaChevronDown, FaChevronUp } from "react-icons/fa"; // Novos ícones adicionados
+import { FaGlobe, FaChevronDown, FaChevronUp, FaMoon } from "react-icons/fa"; // Novos ícones adicionados
+
+import { MdSunny } from "react-icons/md";
+
 function replaceUnderscores(text) {
   return text.replace(/_/g, " ");
 }
@@ -131,21 +134,37 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
   };
 
   return (
-    <nav className="w-full fixed top-0 z-50 flex items-center justify-between p-4 bg-white shadow-md">
+    <nav className="w-full fixed top-0 z-50 flex items-center justify-between p-4 bg-primaryBackground shadow-md">
       {/* Logo */}
-      <div className="font-semibold text-sm">Extensions myPMS</div>
+      <div className="flex !flex-row !items-center gap-2">
+        <img
+          src="/icon/extensionsLogoWeb.png"
+          alt="extensions"
+          width={20}
+          height={20}
+        />
+        <div className="font-semibold text-textPrimaryColor text-sm mt-1">Extensions myPMS</div>
+      </div>
 
       {/* Dropdown for hotel selection inside the menu */}
-      <button onClick={toggleMenu} className="text-2xl">
+      <button onClick={toggleMenu} className="text-textPrimaryColor text-2xl">
         <IoMenu />
       </button>
 
       {/* Fullscreen Menu */}
       {menuOpen && (
-        <div className="fixed inset-0 z-50 bg-white flex flex-col p-6 overflow-auto">
+        <div className="fixed inset-0 z-50 bg-primaryBackground flex flex-col p-6 overflow-auto">
           <div className="flex justify-between items-center mb-4 -mt-3">
-            <div className="font-semibold text-sm">Extensions myPMS</div>
-            <button onClick={toggleMenu} className="text-2xl text-gray-600">
+            <div className="flex !flex-row !items-center gap-2">
+              <img
+                src="/icon/extensionsLogoWeb.png"
+                alt="extensions"
+                width={20}
+                height={20}
+              />
+              <div className="font-semibold text-textPrimaryColor text-sm mt-1">Extensions myPMS</div>
+            </div>
+            <button onClick={toggleMenu} className="text-2xl text-textPrimaryColor">
               &times;
             </button>
           </div>
@@ -154,7 +173,7 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
             <select
               value={selectedHotelID}
               onChange={(e) => handleHotelSelect(e.target.value)}
-              className="border p-2 rounded w-full"
+              className="border p-2 rounded w-full text-textPrimaryColor"
             >
               <option value="">Select a hotel</option>
               {Array.isArray(hotels) &&
@@ -192,7 +211,7 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
                               <li key={subIndex} className="mb-1">
                                 <Link
                                   href={subItem.ref}
-                                  className="block py-1 text-indigo-600"
+                                  className="block py-1 text-textPrimaryColor"
                                   onClick={toggleMenu}
                                 >
                                   {replaceUnderscores(subItem.label)}
@@ -225,7 +244,7 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
                 <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center text-primary">
                   <FaUser />
                 </div>
-                <div className="ml-3 text-center">
+                <div className="ml-3 text-textPrimaryColor text-center">
                   <p className="font-medium">
                     {session ? `${session.user.firstName} ${session.user.secondName}` : "Usuário Desconhecido"}
                   </p>
@@ -242,63 +261,91 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute bottom-full bg-white shadow-lg rounded mb-2 w-40">
+                    <div className="absolute bottom-full bg-background text-textPrimaryColor shadow-lg rounded mb-2 w-48">
                       <ul className="py-2">
                         <li>
-                          <button
-                            onClick={() => {
-                              // Lógica para alternar o modo de visualização
-                              toggleTheme();
-                            }}
-                            className="block px-4 py-2 text-sm text-gray-700"
-                          >
-                            {isDarkMode ? "Light Mode" : "Dark Mode"}
-                          </button>
-                        </li>
-                        <li className="py-2 px-3 rounded-md flex flex-row justify-between">
-                          <span className="flex items-center">
-                            <FaGlobe className="mr-2" />
-                            Language
-                          </span>
-                          {/* Botão de seleção */}
-                          <button
-                            onClick={toggleLanguageDropdown} // Alterna o dropdown de idiomas
-                            className="ml-2 bg-transparent outline-none cursor-pointer flex items-center"
-                          >
-                            {/* Exibe a bandeira ativa */}
-                            <img
-                              src={`/flags/${language}.png`}
-                              alt={language}
-                              className="w-4 h-4 object-cover"
-                            />
-                            {/* Botão de seta para abrir o dropdown */}
-                            <button onClick={toggleLanguageDropdown} className="ml-2 text-gray-600">
-                              {isLanguageDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
+                          <div className="flex items-center justify-between px-4 py-2 text-sm text-textPrimaryColor">
+                            <span>View Mode</span>
+                            <button
+                              onClick={toggleTheme}
+                              className="relative w-20 h-8 flex items-center bg-gray-300 rounded-full transition"
+                            >
+                              {/* Sol - lado esquerdo */}
+                              <div
+                                className={`absolute left-2 top-1/2 transform -translate-y-1/2 transition ${isDarkMode ? "opacity-100 text-gray-400" : "opacity-0"
+                                  }`}
+                              >
+                                <MdSunny size={18} />
+                              </div>
+
+                              {/* Lua - lado direito */}
+                              <div
+                                className={`absolute right-2 top-1/2 transform -translate-y-1/2 transition ${isDarkMode ? "opacity-0" : "opacity-100 text-gray-400"
+                                  }`}
+                              >
+                                <FaMoon size={18} />
+                              </div>
+
+                              {/* Botão deslizante */}
+                              <span
+                                className={`absolute w-6 h-6 bg-white rounded-full shadow-md transform transition ${isDarkMode ? "translate-x-12" : "translate-x-0"
+                                  } flex items-center justify-center z-10`}
+                              >
+                                {isDarkMode ? (
+                                  <FaMoon size={14} className="text-orange-400" />
+                                ) : (
+                                  <MdSunny size={14} className="text-orange-400" />
+                                )}
+                              </span>
                             </button>
-                          </button>
-                          {/* Dropdown customizado */}
-                          {isLanguageDropdownOpen && (
-                            <ul className="absolute top-10 right-0 bg-white shadow-md rounded-md w-10 z-50">
-                              <li
-                                onClick={() => handleLanguageChange('pt')}
-                                className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
-                              >
-                                <img src="/flags/pt.png" alt="portuguese" className="w-4 h-4 object-cover mr-4" />
-                              </li>
-                              <li
-                                onClick={() => handleLanguageChange('uk')}
-                                className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
-                              >
-                                <img src="/flags/uk.png" alt="english" className="w-4 h-4 object-cover mr-4" />
-                              </li>
-                              <li
-                                onClick={() => handleLanguageChange('sp')}
-                                className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
-                              >
-                                <img src="/flags/sp.png" alt="spanish" className="w-4 h-4 object-cover mr-4" />
-                              </li>
-                            </ul>
-                          )}
+                          </div>
+                        </li>
+                        <li className="py-2 px-3 rounded-md flex flex-row">
+                          <div className="flex justify-between">
+                            <span className="flex items-center">
+                              <FaGlobe className="mr-2" />
+                              Language
+                            </span>
+                            {/* Botão de seleção */}
+                            <button
+                              onClick={toggleLanguageDropdown} // Alterna o dropdown de idiomas
+                              className="ml-2 bg-transparent outline-none cursor-pointer flex items-center"
+                            >
+                              {/* Exibe a bandeira ativa */}
+                              <img
+                                src={`/flags/${language}.png`}
+                                alt={language}
+                                className="w-4 h-4 object-cover"
+                              />
+                              {/* Botão de seta para abrir o dropdown */}
+                              <button onClick={toggleLanguageDropdown} className="ml-2 text-gray-600">
+                                {isLanguageDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
+                              </button>
+                            </button>
+                            {/* Dropdown customizado */}
+                            {isLanguageDropdownOpen && (
+                              <ul className="absolute top-20 right-4 bg-background shadow-md rounded-md w-12 z-50">
+                                <li
+                                  onClick={() => handleLanguageChange('pt')}
+                                  className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
+                                >
+                                  <img src="/flags/pt.png" alt="portuguese" className="w-6 h-6 object-cover mr-4" />
+                                </li>
+                                <li
+                                  onClick={() => handleLanguageChange('uk')}
+                                  className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
+                                >
+                                  <img src="/flags/uk.png" alt="english" className="w-6 h-6 object-cover mr-4" />
+                                </li>
+                                <li
+                                  onClick={() => handleLanguageChange('sp')}
+                                  className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
+                                >
+                                  <img src="/flags/sp.png" alt="spanish" className="w-6 h-6 object-cover mr-4" />
+                                </li>
+                              </ul>
+                            )}
+                          </div>
                         </li>
                         <li>
                           <button

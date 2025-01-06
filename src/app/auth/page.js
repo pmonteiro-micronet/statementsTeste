@@ -14,7 +14,7 @@ const SignIn = () => {
   const [error, setError] = useState("");
   const router = useRouter();
   const [selectedHotelID, setSelectedHotelID] = useState(""); // Estado do Hotel ID
-
+  console.log(router);
   const locale = "en"; // Substitua pelo valor dinâmico do idioma (e.g., router.locale)
   const t = translations[locale];
 
@@ -41,8 +41,7 @@ const SignIn = () => {
     if (result?.error) {
       setError(result.error);
     } else {
-      // Redireciona após o login bem-sucedido
-      router.push(`/homepage/frontOfficeView/${selectedHotelID}`); // Usa o Hotel ID salvo
+      window.location.href = `/homepage/frontOfficeView/${selectedHotelID}`; // Força a atualização completa da página
     }
   };
 

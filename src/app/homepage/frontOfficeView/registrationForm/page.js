@@ -229,30 +229,30 @@ export default function Page() {
     };
 
     // Inicializar o SignaturePad
-   // Inicializar o SignaturePad
-useEffect(() => {
-    const initializeOrResizeCanvas = () => {
-        if (canvasRef.current) {
-            initializeSignaturePad();
+    // Inicializar o SignaturePad
+    useEffect(() => {
+        const initializeOrResizeCanvas = () => {
+            if (canvasRef.current) {
+                initializeSignaturePad();
+            }
+        };
+
+        if (!isLoading) {
+            initializeOrResizeCanvas(); // Inicializa o SignaturePad após o carregamento completo
         }
-    };
 
-    if (!isLoading) {
-        initializeOrResizeCanvas(); // Inicializa o SignaturePad após o carregamento completo
-    }
+        // Atualizar o canvas ao redimensionar a janela
+        const handleResize = () => {
+            initializeOrResizeCanvas();
+        };
 
-    // Atualizar o canvas ao redimensionar a janela
-    const handleResize = () => {
-        initializeOrResizeCanvas();
-    };
+        window.addEventListener('resize', handleResize);
 
-    window.addEventListener('resize', handleResize);
-
-    // Cleanup do event listener ao desmontar o componente
-    return () => {
-        window.removeEventListener('resize', handleResize);
-    };
-}, [isLoading]); // Adiciona `isLoading` como dependência
+        // Cleanup do event listener ao desmontar o componente
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, [isLoading]); // Adiciona `isLoading` como dependência
 
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -475,697 +475,722 @@ useEffect(() => {
 
     return (
         <div className='bg-background main-page min-h-screen'>
-           {/* Exibe o loader enquanto isLoading for verdadeiro */}
-        {isLoading ? (
-            <LoadingBackdrop open={true} />
-        ) : (
-            <>
-                <div className="pt-2 px-4 flex justify-between flag-position items-center">
-                    <div className='text-textPrimaryColor'>{hotelName}</div>
-                    <div className='text-textPrimaryColor'>
-                        <p>Registration Form</p>
-                    </div>
-                    <div className="flex flex-row gap-2 items-center language-row">
-                        <div
-                            className={`flag ${activeFlag === 'usa-uk' ? 'active' : 'inactive'}`}
-                            onClick={() => handleFlagClick('usa-uk')}
-                        >
-                            <img
-                                src="/flags/uk.png"
-                                alt="english"
-                                className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                            />
+            {/* Exibe o loader enquanto isLoading for verdadeiro */}
+            {isLoading ? (
+                <LoadingBackdrop open={true} />
+            ) : (
+                <>
+                    <div className="pt-2 px-4 flex justify-between flag-position items-center">
+                        <div className='text-textPrimaryColor'>{hotelName}</div>
+                        <div className='text-textPrimaryColor'>
+                            <p>Registration Form</p>
                         </div>
-                        <div
-                            className={`flag ${activeFlag === 'pt-br' ? 'active' : 'inactive'}`}
-                            onClick={() => handleFlagClick('pt-br')}
-                        >
-                            <img
-                                src="/flags/pt.png"
-                                alt="portuguese"
-                                className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                            />
-                        </div>
-                        <div
-                            className={`flag ${activeFlag === 'sp' ? 'active' : 'inactive'}`}
-                            onClick={() => handleFlagClick('sp')}
-                        >
-                            <img
-                                src="/flags/sp.png"
-                                alt="spanish"
-                                className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                            />
-                        </div>
-
-                    </div>
-                    {/* Combo Box with Flag Images */}
-                    <div className="ml-4 relative language-combobox">
-                        <div
-                            className="flex items-center cursor-pointer"
-                            onClick={() => setDropdownOpen(!dropdownOpen)}
-                        >
-                            <img
-                                src={`/flags/${activeFlag === 'usa-uk' ? 'uk.png' : activeFlag === 'pt-br' ? 'pt.webp' : 'sp.png'}`}
-                                alt={activeFlag}
-                                className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                            />
-                            {/* Seta indicando o dropdown */}
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="w-4 h-4 ml-2 transition-transform duration-300 transform" // Tamanho e margem da seta
-                                style={{ transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} // Girar a seta quando aberto
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
+                        <div className="flex flex-row gap-2 items-center language-row">
+                            <div
+                                className={`flag ${activeFlag === 'usa-uk' ? 'active' : 'inactive'}`}
+                                onClick={() => handleFlagClick('usa-uk')}
                             >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M19 9l-7 7-7-7"
+                                <img
+                                    src="/flags/uk.png"
+                                    alt="english"
+                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
                                 />
-                            </svg>
-                        </div>
-
-                        {/* Dropdown Menu */}
-                        {dropdownOpen && (
-                            <div className="absolute top-full right-0 bg-cardColor shadow-md rounded mt-1 z-10 w-14">
-                                <div
-                                    className="flex items-center justify-center gap-2 p-2 cursor-pointer"
-                                    onClick={() => handleFlagClick('usa-uk')}
-                                >
-                                    <img
-                                        src="/flags/uk.png"
-                                        alt="english"
-                                        className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                    />
-                                </div>
-                                <div
-                                    className="flex items-center justify-center gap-2 p-2 cursor-pointer"
-                                    onClick={() => handleFlagClick('pt-br')}
-                                >
-                                    <img
-                                        src="/flags/pt.webp"
-                                        alt="portuguese"
-                                        className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                    />
-                                </div>
-                                <div
-                                    className="flex items-center justify-center gap-2 p-2 cursor-pointer"
-                                    onClick={() => handleFlagClick('sp')}
-                                >
-                                    <img
-                                        src="/flags/sp.png"
-                                        alt="spanish"
-                                        className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                    />
-                                </div>
                             </div>
-                        )}
-                    </div>
-                </div>
+                            <div
+                                className={`flag ${activeFlag === 'pt-br' ? 'active' : 'inactive'}`}
+                                onClick={() => handleFlagClick('pt-br')}
+                            >
+                                <img
+                                    src="/flags/pt.png"
+                                    alt="portuguese"
+                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+                                />
+                            </div>
+                            <div
+                                className={`flag ${activeFlag === 'sp' ? 'active' : 'inactive'}`}
+                                onClick={() => handleFlagClick('sp')}
+                            >
+                                <img
+                                    src="/flags/sp.png"
+                                    alt="spanish"
+                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+                                />
+                            </div>
 
+                        </div>
+                        {/* Combo Box with Flag Images */}
+                        <div className="ml-4 relative language-combobox">
+                            <div
+                                className="flex items-center cursor-pointer"
+                                onClick={() => setDropdownOpen(!dropdownOpen)}
+                            >
+                                <img
+                                    src={`/flags/${activeFlag === 'usa-uk' ? 'uk.png' : activeFlag === 'pt-br' ? 'pt.webp' : 'sp.png'}`}
+                                    alt={activeFlag}
+                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+                                />
+                                {/* Seta indicando o dropdown */}
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="w-4 h-4 ml-2 transition-transform duration-300 transform" // Tamanho e margem da seta
+                                    style={{ transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} // Girar a seta quando aberto
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M19 9l-7 7-7-7"
+                                    />
+                                </svg>
+                            </div>
 
-
-                {/* Divisão de tela  */}
-                <div className='flex flex-row mt-1 screen-division'>
-                    {reserva && guestInfo && address && personalID && contacts && (
-                        <div className='w-1/2 ml-4 mr-4 half-screen'>
-                            <div className='flex flex-row details-on-screen'>
-                                {/** Dados de Morada */}
-                                <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
-                                    <div className='flex flex-row items-center'>
-                                        <h3 className='text-[#f7ba83]'>Stay Details</h3>
-                                        <IoIosArrowForward size={20} color='#f7ba83' />
-                                        <h3 className='text-[#f7ba83]'>Res. Nr.: {reserva.ResNo}</h3>
+                            {/* Dropdown Menu */}
+                            {dropdownOpen && (
+                                <div className="absolute top-full right-0 bg-cardColor shadow-md rounded mt-1 z-10 w-14">
+                                    <div
+                                        className="flex items-center justify-center gap-2 p-2 cursor-pointer"
+                                        onClick={() => handleFlagClick('usa-uk')}
+                                    >
+                                        <img
+                                            src="/flags/uk.png"
+                                            alt="english"
+                                            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+                                        />
                                     </div>
-                                    {/** Info do quarto */}
-                                    <div className='flex flex-row gap-5 mt-2'>
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"de"}
-                                            name={"De"}
-                                            label={"Room"}
-                                            ariaLabel={"De:"}
-                                            value={reserva.Room}
-                                            style={inputStyle}
+                                    <div
+                                        className="flex items-center justify-center gap-2 p-2 cursor-pointer"
+                                        onClick={() => handleFlagClick('pt-br')}
+                                    >
+                                        <img
+                                            src="/flags/pt.webp"
+                                            alt="portuguese"
+                                            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
                                         />
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"roomType"}
-                                            name={"roomType"}
-                                            label={"Room Type"}
-                                            ariaLabel={"Room Type:"}
-                                            value={reserva.RoomType}
-                                            style={inputStyleFull}
+                                    </div>
+                                    <div
+                                        className="flex items-center justify-center gap-2 p-2 cursor-pointer"
+                                        onClick={() => handleFlagClick('sp')}
+                                    >
+                                        <img
+                                            src="/flags/sp.png"
+                                            alt="spanish"
+                                            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
                                         />
-                                        <div className='flex flex-row gap-2'>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+
+
+                    {/* Divisão de tela  */}
+                    <div className='flex flex-row mt-1 screen-division'>
+                        {reserva && guestInfo && address && personalID && contacts && (
+                            <div className='w-1/2 ml-4 mr-4 half-screen'>
+                                <div className='flex flex-row details-on-screen'>
+                                    {/** Dados de Morada */}
+                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
+                                        <div className='flex flex-row items-center'>
+                                            <h3 className='text-[#f7ba83]'>Stay Details</h3>
+                                            <IoIosArrowForward size={20} color='#f7ba83' />
+                                            <h3 className='text-[#f7ba83]'>Res. Nr.: {reserva.ResNo}</h3>
+                                        </div>
+                                        {/** Info do quarto */}
+                                        <div className='flex flex-row gap-5 mt-2'>
                                             <InputFieldControlled
                                                 type={"text"}
-                                                id={"Adults"}
-                                                name={"Adults"}
-                                                label={"Adults"}
-                                                ariaLabel={"Adults:"}
-                                                value={reserva.Adults}
-                                                style={`${halfInputStyle}`}
+                                                id={"de"}
+                                                name={"De"}
+                                                label={"Room"}
+                                                ariaLabel={"De:"}
+                                                value={reserva.Room}
+                                                style={inputStyle}
                                             />
                                             <InputFieldControlled
                                                 type={"text"}
-                                                id={"Childs"}
-                                                name={"Childs"}
-                                                label={"Childs"}
-                                                ariaLabel={"Childs:"}
-                                                value={reserva.Childs}
+                                                id={"roomType"}
+                                                name={"roomType"}
+                                                label={"Room Type"}
+                                                ariaLabel={"Room Type:"}
+                                                value={reserva.RoomType}
+                                                style={inputStyleFull}
+                                            />
+                                            <div className='flex flex-row gap-2'>
+                                                <InputFieldControlled
+                                                    type={"text"}
+                                                    id={"Adults"}
+                                                    name={"Adults"}
+                                                    label={"Adults"}
+                                                    ariaLabel={"Adults:"}
+                                                    value={reserva.Adults}
+                                                    style={`${halfInputStyle}`}
+                                                />
+                                                <InputFieldControlled
+                                                    type={"text"}
+                                                    id={"Childs"}
+                                                    name={"Childs"}
+                                                    label={"Childs"}
+                                                    ariaLabel={"Childs:"}
+                                                    value={reserva.Childs}
+                                                    style={halfInputStyle}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className='flex flex-row justify-start gap-5 mt-2'>
+                                            <InputFieldControlled
+                                                type={"date"}
+                                                id={"Arrival"}
+                                                name={"Arrival"}
+                                                label={"Arrival"}
+                                                ariaLabel={"Arrival:"}
+                                                value={reserva.DateCI}
+                                                style={inputStyle}
+                                            />
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"Nights"}
+                                                name={"Nights"}
+                                                label={"Nights"}
+                                                ariaLabel={"Nights:"}
+                                                value={nights}
                                                 style={halfInputStyle}
                                             />
-                                        </div>
-                                    </div>
-                                    <div className='flex flex-row justify-start gap-5 mt-2'>
-                                        <InputFieldControlled
-                                            type={"date"}
-                                            id={"Arrival"}
-                                            name={"Arrival"}
-                                            label={"Arrival"}
-                                            ariaLabel={"Arrival:"}
-                                            value={reserva.DateCI}
-                                            style={inputStyle}
-                                        />
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"Nights"}
-                                            name={"Nights"}
-                                            label={"Nights"}
-                                            ariaLabel={"Nights:"}
-                                            value={nights}
-                                            style={halfInputStyle}
-                                        />
-                                        <InputFieldControlled
-                                            type={"date"}
-                                            id={"Departure"}
-                                            name={"Departure"}
-                                            label={"Departure"}
-                                            ariaLabel={"Departure:"}
-                                            value={reserva.DateCO}
-                                            style={inputStyle}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/** Dados de Info pessoal */}
-                                <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 px-4 details-on-screen-card'>
-                                    <p className='text-[#f7ba83] mb-1'>Price Info</p>
-                                    <div className='flex flex-row justify-between items-center gap-4 mt-2'>
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"Rate Code"}
-                                            name={"Rate Code"}
-                                            label={"Rate Code"}
-                                            ariaLabel={"Rate Code:"}
-                                            value={reserva.RateCode}
-                                            style={inputStyleFull}
-                                        />
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"City Tax"}
-                                            name={"City Tax"}
-                                            label={"City Tax"}
-                                            ariaLabel={"City Tax:"}
-                                            value={reserva.CityTax}
-                                            style={inputStyleFull}
-                                        />
-                                    </div>
-                                    <div className='flex flex-row justify-between items-center gap-4 mt-2'>
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"Price"}
-                                            name={"Price"}
-                                            label={"Price\\Night"}
-                                            ariaLabel={"Price:"}
-                                            value={reserva.Price === 0 ? "" : `${reserva.Price.toFixed(2)} €`} // Se Price for 0, exibe como vazio
-                                            style={inputStyleFull}
-                                        />
-
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"Total"}
-                                            name={"Total"}
-                                            label={"Total"}
-                                            ariaLabel={"Total:"}
-                                            value={reserva.Total === 0 ? "" : `${reserva.Total.toFixed(2)} €`} // Se Total for 0, exibe como vazio
-                                            style={inputStyleFull}
-                                        />
-
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/** Dados de cliente */}
-                            <div className='bg-cardColor py-2 px-2 rounded-lg mt-1'>
-                                <p className='text-[#f7ba83] mb-1'>Guest Details</p>
-                                <div className='flex flex-row w-full mt-2'>
-                                    <div className='mr-4'>
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"Salutation"}
-                                            name={"Salutation"}
-                                            label={"Salutation"}
-                                            ariaLabel={"Salutation:"}
-                                            value={guestInfo.Salution}
-                                            style={"w-10 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
-                                        />
-                                    </div>
-                                    <div className='w-full flex flex-row'>
-                                        <div className='w-1/2'>
                                             <InputFieldControlled
-                                                type={"text"}
-                                                id={"Last Name"}
-                                                name={"Last Name"}
-                                                label={"Last Name"}
-                                                ariaLabel={"Last Name:"}
-                                                value={guestInfo.LastName}
-                                                style={"w-72 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
-                                            />
-                                        </div>
-                                        <div className='w-1/2 -ml-2'>
-                                            <InputFieldControlled
-                                                type={"text"}
-                                                id={"First Name"}
-                                                name={"First Name"}
-                                                label={"First Name"}
-                                                ariaLabel={"First Name:"}
-                                                value={guestInfo.FirstName}
-                                                style={"w-full h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
+                                                type={"date"}
+                                                id={"Departure"}
+                                                name={"Departure"}
+                                                label={"Departure"}
+                                                ariaLabel={"Departure:"}
+                                                value={reserva.DateCO}
+                                                style={inputStyle}
                                             />
                                         </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            <div className='flex flex-row details-on-screen'>
-                                {/** Dados de Morada */}
-                                <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
-                                    <p className='text-[#f7ba83] mb-1'>Address</p>
-                                    <div className='flex flex-col w-full mt-2'>
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"Country"}
-                                            name={"Country"}
-                                            label={"Country"}
-                                            ariaLabel={"Country:"}
-                                            value={address.Country}
-                                            style={inputStyleFull}
-                                        />
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"Street Address"}
-                                            name={"Street Address"}
-                                            label={"Street Address"}
-                                            ariaLabel={"Street Address:"}
-                                            value={address.Street}
-                                            style={inputStyleFull}
-                                        />
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"ZIP / Postal Code"}
-                                            name={"ZIP / Postal Code"}
-                                            label={"ZIP / Postal Code"}
-                                            ariaLabel={"ZIP / Postal Code:"}
-                                            value={address.PostalCode}
-                                            style={inputStyleFull}
-                                        />
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"City"}
-                                            name={"City"}
-                                            label={"City"}
-                                            ariaLabel={"City:"}
-                                            value={address.City}
-                                            style={inputStyleFull}
-                                        />
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"State / Province / Region"}
-                                            name={"State / Province / Region"}
-                                            label={"State / Province / Region"}
-                                            ariaLabel={"State / Province / Region:"}
-                                            value={address.Region}
-                                            style={inputStyleFull}
-                                        />
+                                    {/** Dados de Info pessoal */}
+                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 px-4 details-on-screen-card'>
+                                        <p className='text-[#f7ba83] mb-1'>Price Info</p>
+                                        <div className='flex flex-row justify-between items-center gap-4 mt-2'>
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"Rate Code"}
+                                                name={"Rate Code"}
+                                                label={"Rate Code"}
+                                                ariaLabel={"Rate Code:"}
+                                                value={reserva.RateCode}
+                                                style={inputStyleFull}
+                                            />
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"City Tax"}
+                                                name={"City Tax"}
+                                                label={"City Tax"}
+                                                ariaLabel={"City Tax:"}
+                                                value={reserva.CityTax}
+                                                style={inputStyleFull}
+                                            />
+                                        </div>
+                                        <div className='flex flex-row justify-between items-center gap-4 mt-2'>
+                                            {reserva.toShow === 1 ? (
+                                                <>
+                                                    <InputFieldControlled
+                                                        type={"text"}
+                                                        id={"Price"}
+                                                        name={"Price"}
+                                                        label={"Price\\Night"}
+                                                        ariaLabel={"Price:"}
+                                                        value={reserva.Price === 0 ? "" : `${reserva.Price.toFixed(2)} €`} // Se Price for 0, exibe como vazio
+                                                        style={inputStyleFull}
+                                                    />
+
+                                                    <InputFieldControlled
+                                                        type={"text"}
+                                                        id={"Total"}
+                                                        name={"Total"}
+                                                        label={"Total"}
+                                                        ariaLabel={"Total:"}
+                                                        value={reserva.Total === 0 ? "" : `${reserva.Total.toFixed(2)} €`} // Se Total for 0, exibe como vazio
+                                                        style={inputStyleFull}
+                                                    />
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <InputFieldControlled
+                                                        type={"text"}
+                                                        id={"Price"}
+                                                        name={"Price"}
+                                                        label={"Price\\Night"}
+                                                        ariaLabel={"Price:"}
+                                                        value={""} // Campos vazios
+                                                        style={inputStyleFull}
+                                                    />
+
+                                                    <InputFieldControlled
+                                                        type={"text"}
+                                                        id={"Total"}
+                                                        name={"Total"}
+                                                        label={"Total"}
+                                                        ariaLabel={"Total:"}
+                                                        value={""} // Campos vazios
+                                                        style={inputStyleFull}
+                                                    />
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/** Dados de Info pessoal */}
-                                <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 px-4 details-on-screen-card'>
-                                    <p className='text-[#f7ba83] mb-1'>Personal ID</p>
-                                    <div className='flex flex-row justify-between gap-4 mt-4'>
-                                        <InputFieldControlled
-                                            type={
-                                                personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
-                                                    ? "date"
-                                                    : "text"
-                                            }
-                                            id={"Date of Birth"}
-                                            name={"Date of Birth"}
-                                            label={"Date of Birth"}
-                                            ariaLabel={"Date of Birth:"}
-                                            value={
-                                                personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
-                                                    ? personalID.DateOfBirth.split('T')[0]
-                                                    : ""
-                                            }
-                                            style={inputStyleFullWithLine}
-                                        />
-
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"Country of Birth"}
-                                            name={"Country of Birth"}
-                                            label={"Country of Birth"}
-                                            ariaLabel={"Country of Birth:"}
-                                            value={personalID.CountryOfBirth}
-                                            style={`${inputStyleFullWithLine}`}
-                                        />
+                                {/** Dados de cliente */}
+                                <div className='bg-cardColor py-2 px-2 rounded-lg mt-1'>
+                                    <p className='text-[#f7ba83] mb-1'>Guest Details</p>
+                                    <div className='flex flex-row w-full mt-2'>
+                                        <div className='mr-4'>
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"Salutation"}
+                                                name={"Salutation"}
+                                                label={"Salutation"}
+                                                ariaLabel={"Salutation:"}
+                                                value={guestInfo.Salution}
+                                                style={"w-10 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
+                                            />
+                                        </div>
+                                        <div className='w-full flex flex-row'>
+                                            <div className='w-1/2'>
+                                                <InputFieldControlled
+                                                    type={"text"}
+                                                    id={"Last Name"}
+                                                    name={"Last Name"}
+                                                    label={"Last Name"}
+                                                    ariaLabel={"Last Name:"}
+                                                    value={guestInfo.LastName}
+                                                    style={"w-72 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
+                                                />
+                                            </div>
+                                            <div className='w-1/2 -ml-2'>
+                                                <InputFieldControlled
+                                                    type={"text"}
+                                                    id={"First Name"}
+                                                    name={"First Name"}
+                                                    label={"First Name"}
+                                                    ariaLabel={"First Name:"}
+                                                    value={guestInfo.FirstName}
+                                                    style={"w-full h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
-                                    {/* <CountryAutocomplete
+                                </div>
+
+                                <div className='flex flex-row details-on-screen'>
+                                    {/** Dados de Morada */}
+                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
+                                        <p className='text-[#f7ba83] mb-1'>Address</p>
+                                        <div className='flex flex-col w-full mt-2'>
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"Country"}
+                                                name={"Country"}
+                                                label={"Country"}
+                                                ariaLabel={"Country:"}
+                                                value={address.Country}
+                                                style={inputStyleFull}
+                                            />
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"Street Address"}
+                                                name={"Street Address"}
+                                                label={"Street Address"}
+                                                ariaLabel={"Street Address:"}
+                                                value={address.Street}
+                                                style={inputStyleFull}
+                                            />
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"ZIP / Postal Code"}
+                                                name={"ZIP / Postal Code"}
+                                                label={"ZIP / Postal Code"}
+                                                ariaLabel={"ZIP / Postal Code:"}
+                                                value={address.PostalCode}
+                                                style={inputStyleFull}
+                                            />
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"City"}
+                                                name={"City"}
+                                                label={"City"}
+                                                ariaLabel={"City:"}
+                                                value={address.City}
+                                                style={inputStyleFull}
+                                            />
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"State / Province / Region"}
+                                                name={"State / Province / Region"}
+                                                label={"State / Province / Region"}
+                                                ariaLabel={"State / Province / Region:"}
+                                                value={address.Region}
+                                                style={inputStyleFull}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/** Dados de Info pessoal */}
+                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 px-4 details-on-screen-card'>
+                                        <p className='text-[#f7ba83] mb-1'>Personal ID</p>
+                                        <div className='flex flex-row justify-between gap-4 mt-4'>
+                                            <InputFieldControlled
+                                                type={
+                                                    personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
+                                                        ? "date"
+                                                        : "text"
+                                                }
+                                                id={"Date of Birth"}
+                                                name={"Date of Birth"}
+                                                label={"Date of Birth"}
+                                                ariaLabel={"Date of Birth:"}
+                                                value={
+                                                    personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
+                                                        ? personalID.DateOfBirth.split('T')[0]
+                                                        : ""
+                                                }
+                                                style={inputStyleFullWithLine}
+                                            />
+
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"Country of Birth"}
+                                                name={"Country of Birth"}
+                                                label={"Country of Birth"}
+                                                ariaLabel={"Country of Birth:"}
+                                                value={personalID.CountryOfBirth}
+                                                style={`${inputStyleFullWithLine}`}
+                                            />
+                                        </div>
+                                        {/* <CountryAutocomplete
                                     label={"Nacionality"}
                                     style={"w-full h-9 -mt-2"}
                                     onChange={(value) => handleSelect(value)}
                                 /> */}
-                                    <InputFieldControlled
-                                        type={"text"}
-                                        id={"Nacionality"}
-                                        name={"Nacionality"}
-                                        label={"Nacionality"}
-                                        ariaLabel={"Nacionality:"}
-                                        value={personalID.Nacionality}
-                                        style={`${inputStyleFullWithLine}`}
-                                    />
-                                    <div className='flex flex-row justify-between items-center gap-4 mt-4'>
-                                        {/* <CountryAutocomplete
+                                        <InputFieldControlled
+                                            type={"text"}
+                                            id={"Nacionality"}
+                                            name={"Nacionality"}
+                                            label={"Nacionality"}
+                                            ariaLabel={"Nacionality:"}
+                                            value={personalID.Nacionality}
+                                            style={`${inputStyleFullWithLine}`}
+                                        />
+                                        <div className='flex flex-row justify-between items-center gap-4 mt-4'>
+                                            {/* <CountryAutocomplete
                                         label={"ID Doc"}
                                         style={"w-32 h-20"}
                                         onChange={(value) => handleSelect(value)}
                                     /> */}
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"ID Doc"}
-                                            name={"ID Doc"}
-                                            label={"ID Doc"}
-                                            ariaLabel={"ID Doc:"}
-                                            value={""}
-                                            style={`${inputStyleFullWithLine}`}
-                                        />
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"ID Doc Nr."}
-                                            name={"ID Doc Nr."}
-                                            label={"Nr."}
-                                            ariaLabel={"ID Doc Nr.:"}
-                                            value={personalID.NrDoc}
-                                            style={`${inputStyleFullWithLine}`}
-                                        />
-                                    </div>
-                                    <div className='flex flex-row justify-between gap-4 mt-4'>
-                                        <InputFieldControlled
-                                            type={
-                                                personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
-                                                    ? "date"
-                                                    : "text"
-                                            }
-                                            id={"Exp. Date"}
-                                            name={"Exp. Date"}
-                                            label={"Exp. Date"}
-                                            ariaLabel={"Exp. Date:"}
-                                            value={
-                                                personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
-                                                    ? personalID.ExpDate.split('T')[0]
-                                                    : ""
-                                            }
-                                            style={inputStyleFullWithLine}
-                                        />
-                                        <InputFieldControlled
-                                            type={"text"}
-                                            id={"Country issue"}
-                                            name={"Country issue"}
-                                            label={"Issue"}
-                                            ariaLabel={"Country issue:"}
-                                            value={personalID.Issue}
-                                            style={inputStyleFullWithLine}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-row details-on-screen">
-                                {/** Dados de contacto */}
-                                <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card">
-                                    <div className="flex flex-row justify-between">
-                                        <p className="text-[#f7ba83] mb-1">Contacts</p>
-                                        <div className="flex flex-row justify-end gap-4">
-                                            <FaPencilAlt
-                                                size={15}
-                                                color="orange"
-                                                onClick={() => {
-                                                    setModalField("Email"); // Define o campo em edição
-                                                    setIsModalOpen(true); // Abre o modal
-                                                }}
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"ID Doc"}
+                                                name={"ID Doc"}
+                                                label={"ID Doc"}
+                                                ariaLabel={"ID Doc:"}
+                                                value={""}
+                                                style={`${inputStyleFullWithLine}`}
+                                            />
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"ID Doc Nr."}
+                                                name={"ID Doc Nr."}
+                                                label={"Nr."}
+                                                ariaLabel={"ID Doc Nr.:"}
+                                                value={personalID.NrDoc}
+                                                style={`${inputStyleFullWithLine}`}
+                                            />
+                                        </div>
+                                        <div className='flex flex-row justify-between gap-4 mt-4'>
+                                            <InputFieldControlled
+                                                type={
+                                                    personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
+                                                        ? "date"
+                                                        : "text"
+                                                }
+                                                id={"Exp. Date"}
+                                                name={"Exp. Date"}
+                                                label={"Exp. Date"}
+                                                ariaLabel={"Exp. Date:"}
+                                                value={
+                                                    personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
+                                                        ? personalID.ExpDate.split('T')[0]
+                                                        : ""
+                                                }
+                                                style={inputStyleFullWithLine}
+                                            />
+                                            <InputFieldControlled
+                                                type={"text"}
+                                                id={"Country issue"}
+                                                name={"Country issue"}
+                                                label={"Issue"}
+                                                ariaLabel={"Country issue:"}
+                                                value={personalID.Issue}
+                                                style={inputStyleFullWithLine}
                                             />
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div className="mt-2">
-                                        <div className="flex flex-row justify-between items-center w-full">
-                                            <div className="flex-grow">
-                                                <InputFieldControlled
-                                                    type="text"
-                                                    id="Email"
-                                                    name="Email"
-                                                    label="Personal E-mail"
-                                                    ariaLabel="Email:"
-                                                    value={email}
-                                                    style={inputStyleFull}
-                                                    disabled
+                                <div className="flex flex-row details-on-screen">
+                                    {/** Dados de contacto */}
+                                    <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card">
+                                        <div className="flex flex-row justify-between">
+                                            <p className="text-[#f7ba83] mb-1">Contacts</p>
+                                            <div className="flex flex-row justify-end gap-4">
+                                                <FaPencilAlt
+                                                    size={15}
+                                                    color="orange"
+                                                    onClick={() => {
+                                                        setModalField("Email"); // Define o campo em edição
+                                                        setIsModalOpen(true); // Abre o modal
+                                                    }}
                                                 />
                                             </div>
                                         </div>
 
-                                        <InputFieldControlled
-                                            type="text"
-                                            id="PhoneNumber"
-                                            name="PhoneNumber"
-                                            label="Phone Number"
-                                            ariaLabel="PhoneNumber:"
-                                            value={contacts.PhoneNumber}
-                                            style={inputStyleFull}
-                                            disabled
-                                        />
-                                    </div>
-                                </div>
+                                        <div className="mt-2">
+                                            <div className="flex flex-row justify-between items-center w-full">
+                                                <div className="flex-grow">
+                                                    <InputFieldControlled
+                                                        type="text"
+                                                        id="Email"
+                                                        name="Email"
+                                                        label="Personal E-mail"
+                                                        ariaLabel="Email:"
+                                                        value={email}
+                                                        style={inputStyleFull}
+                                                        disabled
+                                                    />
+                                                </div>
+                                            </div>
 
-                                {/** Dados de faturação */}
-                                <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card">
-                                    <div className="flex flex-row justify-between">
-                                        <p className="text-[#f7ba83] mb-1">Invoice Data</p>
-                                        <FaPencilAlt
-                                            size={15}
-                                            color="orange"
-                                            onClick={() => {
-                                                setModalField("VatNo"); // Define o campo em edição
-                                                setIsModalOpen(true); // Abre o modal
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="mt-2">
-                                        <p className="!text-textLabelColor text-lg">{guestInfo.LastName}, {guestInfo.FirstName}</p>
-                                        <div className="mt-4">
                                             <InputFieldControlled
                                                 type="text"
-                                                id="VAT Nr."
-                                                name="VAT Nr."
-                                                label="VAT Nr."
-                                                ariaLabel="VAT Nr.:"
-                                                value={vatNo}
+                                                id="PhoneNumber"
+                                                name="PhoneNumber"
+                                                label="Phone Number"
+                                                ariaLabel="PhoneNumber:"
+                                                value={contacts.PhoneNumber}
                                                 style={inputStyleFull}
                                                 disabled
                                             />
                                         </div>
                                     </div>
-                                </div>
 
-                                {/** Modal Dinâmico */}
-                                {isModalOpen && (
-                                    <EditRegistrationForm
-                                        currentLabel={modalField === "Email" ? "E-mail" : "VAT No."}
-                                        currentValue={modalField === "Email" ? email : vatNo}
-                                        validation={
-                                            modalField === "Email"
-                                                ? (value) => !value.endsWith("@guest.booking.com")
-                                                : null // Adicione validações específicas para VAT No., se necessário
-                                        }
-                                        onSave={(newValue) => handleModalSave(newValue)}
-                                        onClose={() => setIsModalOpen(false)}
-                                    />
-                                )}
-                            </div>
-                        </div>
-                    )}
-                    
-                    <div className='w-1/2 ml-4 mr-4 half-screen'>
-                        {/** Assinatura */}
-                        <div className='bg-cardColor py-2 px-2 rounded-lg'>
-                            <p className='text-[#f7ba83] mb-1'>Signature</p>
-                            {/* Termos e condições */}
-                            <div className='flex flex-row mt-2 gap-8 details-on-screen'>
-                                <div className='w-1/2 flex flex-col details-on-screen-card'>
-                                    <p className='text-xs font-semibold text-textPrimaryColor'>I accept the Hotel Terms and Conditions:</p>
-                                    <div className='flex flex-row justify-between text-sm text-textPrimaryColor'>
-                                        <label className="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="terms"
-                                                className="mr-2"
-                                                checked={termsAccepted === true}
-                                                onChange={() => setTermsAccepted(true)}
+                                    {/** Dados de faturação */}
+                                    <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card">
+                                        <div className="flex flex-row justify-between">
+                                            <p className="text-[#f7ba83] mb-1">Invoice Data</p>
+                                            <FaPencilAlt
+                                                size={15}
+                                                color="orange"
+                                                onClick={() => {
+                                                    setModalField("VatNo"); // Define o campo em edição
+                                                    setIsModalOpen(true); // Abre o modal
+                                                }}
                                             />
-                                            Agree
-                                        </label>
-                                        <label className="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="terms"
-                                                className="mr-2"
-                                                checked={termsAccepted === false}
-                                                onChange={() => setTermsAccepted(false)}
-                                            />
-                                            Disagree
-                                        </label>
-                                        <TermsConditionsForm
-                                            buttonName={"Read more"}
-                                            modalHeader={"Hotel Terms and Conditions"}
-                                            formTypeModal={11}
+                                        </div>
+                                        <div className="mt-2">
+                                            <p className="!text-textLabelColor text-lg">{guestInfo.LastName}, {guestInfo.FirstName}</p>
+                                            <div className="mt-4">
+                                                <InputFieldControlled
+                                                    type="text"
+                                                    id="VAT Nr."
+                                                    name="VAT Nr."
+                                                    label="VAT Nr."
+                                                    ariaLabel="VAT Nr.:"
+                                                    value={vatNo}
+                                                    style={inputStyleFull}
+                                                    disabled
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/** Modal Dinâmico */}
+                                    {isModalOpen && (
+                                        <EditRegistrationForm
+                                            currentLabel={modalField === "Email" ? "E-mail" : "VAT No."}
+                                            currentValue={modalField === "Email" ? email : vatNo}
+                                            validation={
+                                                modalField === "Email"
+                                                    ? (value) => !value.endsWith("@guest.booking.com")
+                                                    : null // Adicione validações específicas para VAT No., se necessário
+                                            }
+                                            onSave={(newValue) => handleModalSave(newValue)}
+                                            onClose={() => setIsModalOpen(false)}
                                         />
-                                    </div>
-                                </div>
-
-                                <div className='w-1/2 flex flex-col details-on-screen-card'>
-                                    <p className='text-xs font-semibold text-textPrimaryColor'>I accept the Hotel Data Protection Policy:</p>
-                                    <div className='flex flex-row justify-between text-sm text-textPrimaryColor'>
-                                        <label className="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="policy"
-                                                className="mr-2"
-                                                checked={policyAccepted === true}
-                                                onChange={() => setPolicyAccepted(true)}
-                                            />
-                                            Agree
-                                        </label>
-                                        <label className="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="policy"
-                                                className="mr-2"
-                                                checked={policyAccepted === false}
-                                                onChange={() => setPolicyAccepted(false)}
-                                            />
-                                            Disagree
-                                        </label>
-                                        <ProtectionPolicyForm
-                                            buttonName={"Read more"}
-                                            modalHeader={"Hotel Data Protection Policy"}
-                                            formTypeModal={11}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Área para assinatura digital */}
-                            <div className='mt-2'>
-                                <div className='border-2 border-gray-300 py-2 px-2'>
-                                    <div className='flex justify-end'>
-                                        <button
-                                            onClick={clearSignature}
-                                        >
-                                            <GiCancel size={20} color='orange' />
-                                        </button>
-                                    </div>
-                                    <canvas
-                                        ref={canvasRef}
-                                        className='w-full h-32'
-                                    ></canvas>
-                                </div>
-                            </div>
-                            {/* Mensagem de Erro */}
-                            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
-                        </div>
-                        <p className='text-xs text-gray-500 mt-4 text-justify text-style'>
-                            {hotelMiniTerms}
-                        </p>
-                        <div className='flex flex-row justify-between items-center mt-4 buttons-style'>
-                            <button
-                                onClick={toggleTheme}
-                                className="relative w-20 h-8 flex items-center bg-gray-300 rounded-full transition"
-                            >
-                                {/* Ícone do Sol - lado esquerdo */}
-                                <div
-                                    className={`absolute left-2 top-1/2 transform -translate-y-1/2 transition ${isDarkMode ? "opacity-100 text-gray-400" : "opacity-0"
-                                        }`}
-                                >
-                                    <MdSunny size={18} />
-                                </div>
-
-                                {/* Ícone da Lua - lado direito */}
-                                <div
-                                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 transition ${isDarkMode ? "opacity-0" : "opacity-100 text-gray-400"
-                                        }`}
-                                >
-                                    <FaMoon size={18} />
-                                </div>
-
-                                {/* Bolinha Deslizante */}
-                                <span
-                                    className={`absolute w-6 h-6 bg-white rounded-full shadow-md transform transition ${isDarkMode ? "translate-x-12" : "translate-x-0"
-                                        } flex items-center justify-center z-10`}
-                                >
-                                    {/* Ícone dentro da Bolinha */}
-                                    {isDarkMode ? (
-                                        <FaMoon size={14} className="text-orange-400" />
-                                    ) : (
-                                        <MdSunny size={14} className="text-orange-400" />
                                     )}
-                                </span>
-                            </button>
+                                </div>
+                            </div>
+                        )}
 
-                            <div className='flex flex-row gap-4 justify-end px-4 buttons-style items-center'>
-                                {/** Botão de cancelar */}
-                                <CancelPIN
-                                    buttonName={"Cancel"}
-                                    buttonColor={"transparent"}
-                                    modalHeader={"Insert PIN"}
-                                    formTypeModal={11}
-                                    editor={"teste"}
-                                />
+                        <div className='w-1/2 ml-4 mr-4 half-screen'>
+                            {/** Assinatura */}
+                            <div className='bg-cardColor py-2 px-2 rounded-lg'>
+                                <p className='text-[#f7ba83] mb-1'>Signature</p>
+                                {/* Termos e condições */}
+                                <div className='flex flex-row mt-2 gap-8 details-on-screen'>
+                                    <div className='w-1/2 flex flex-col details-on-screen-card'>
+                                        <p className='text-xs font-semibold text-textPrimaryColor'>I accept the Hotel Terms and Conditions:</p>
+                                        <div className='flex flex-row justify-between text-sm text-textPrimaryColor'>
+                                            <label className="flex items-center">
+                                                <input
+                                                    type="radio"
+                                                    name="terms"
+                                                    className="mr-2"
+                                                    checked={termsAccepted === true}
+                                                    onChange={() => setTermsAccepted(true)}
+                                                />
+                                                Agree
+                                            </label>
+                                            <label className="flex items-center">
+                                                <input
+                                                    type="radio"
+                                                    name="terms"
+                                                    className="mr-2"
+                                                    checked={termsAccepted === false}
+                                                    onChange={() => setTermsAccepted(false)}
+                                                />
+                                                Disagree
+                                            </label>
+                                            <TermsConditionsForm
+                                                buttonName={"Read more"}
+                                                modalHeader={"Hotel Terms and Conditions"}
+                                                formTypeModal={11}
+                                            />
+                                        </div>
+                                    </div>
 
-                                {/** Botão de aceitar */}
+                                    <div className='w-1/2 flex flex-col details-on-screen-card'>
+                                        <p className='text-xs font-semibold text-textPrimaryColor'>I accept the Hotel Data Protection Policy:</p>
+                                        <div className='flex flex-row justify-between text-sm text-textPrimaryColor'>
+                                            <label className="flex items-center">
+                                                <input
+                                                    type="radio"
+                                                    name="policy"
+                                                    className="mr-2"
+                                                    checked={policyAccepted === true}
+                                                    onChange={() => setPolicyAccepted(true)}
+                                                />
+                                                Agree
+                                            </label>
+                                            <label className="flex items-center">
+                                                <input
+                                                    type="radio"
+                                                    name="policy"
+                                                    className="mr-2"
+                                                    checked={policyAccepted === false}
+                                                    onChange={() => setPolicyAccepted(false)}
+                                                />
+                                                Disagree
+                                            </label>
+                                            <ProtectionPolicyForm
+                                                buttonName={"Read more"}
+                                                modalHeader={"Hotel Data Protection Policy"}
+                                                formTypeModal={11}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Área para assinatura digital */}
+                                <div className='mt-2'>
+                                    <div className='border-2 border-gray-300 py-2 px-2'>
+                                        <div className='flex justify-end'>
+                                            <button
+                                                onClick={clearSignature}
+                                            >
+                                                <GiCancel size={20} color='orange' />
+                                            </button>
+                                        </div>
+                                        <canvas
+                                            ref={canvasRef}
+                                            className='w-full h-32'
+                                        ></canvas>
+                                    </div>
+                                </div>
+                                {/* Mensagem de Erro */}
+                                {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+                            </div>
+                            <p className='text-xs text-gray-500 mt-4 text-justify text-style'>
+                                {hotelMiniTerms}
+                            </p>
+                            <div className='flex flex-row justify-between items-center mt-4 buttons-style'>
                                 <button
-                                    className='bg-primary font-semibold text-white py-2 px-2 rounded-lg w-20 h-10'
-                                    onClick={handleOkClick}>
-                                    Ok
+                                    onClick={toggleTheme}
+                                    className="relative w-20 h-8 flex items-center bg-gray-300 rounded-full transition"
+                                >
+                                    {/* Ícone do Sol - lado esquerdo */}
+                                    <div
+                                        className={`absolute left-2 top-1/2 transform -translate-y-1/2 transition ${isDarkMode ? "opacity-100 text-gray-400" : "opacity-0"
+                                            }`}
+                                    >
+                                        <MdSunny size={18} />
+                                    </div>
+
+                                    {/* Ícone da Lua - lado direito */}
+                                    <div
+                                        className={`absolute right-2 top-1/2 transform -translate-y-1/2 transition ${isDarkMode ? "opacity-0" : "opacity-100 text-gray-400"
+                                            }`}
+                                    >
+                                        <FaMoon size={18} />
+                                    </div>
+
+                                    {/* Bolinha Deslizante */}
+                                    <span
+                                        className={`absolute w-6 h-6 bg-white rounded-full shadow-md transform transition ${isDarkMode ? "translate-x-12" : "translate-x-0"
+                                            } flex items-center justify-center z-10`}
+                                    >
+                                        {/* Ícone dentro da Bolinha */}
+                                        {isDarkMode ? (
+                                            <FaMoon size={14} className="text-orange-400" />
+                                        ) : (
+                                            <MdSunny size={14} className="text-orange-400" />
+                                        )}
+                                    </span>
                                 </button>
-                                {/** Modal de erro */}
-                                {isErrorModalOpen && errorMessage && (
-                                    <ErrorRegistrationForm
-                                        modalHeader="Attention"
-                                        errorMessage={errorMessage}
-                                        onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
+
+                                <div className='flex flex-row gap-4 justify-end px-4 buttons-style items-center'>
+                                    {/** Botão de cancelar */}
+                                    <CancelPIN
+                                        buttonName={"Cancel"}
+                                        buttonColor={"transparent"}
+                                        modalHeader={"Insert PIN"}
+                                        formTypeModal={11}
+                                        editor={"teste"}
                                     />
-                                )}
+
+                                    {/** Botão de aceitar */}
+                                    <button
+                                        className='bg-primary font-semibold text-white py-2 px-2 rounded-lg w-20 h-10'
+                                        onClick={handleOkClick}>
+                                        Ok
+                                    </button>
+                                    {/** Modal de erro */}
+                                    {isErrorModalOpen && errorMessage && (
+                                        <ErrorRegistrationForm
+                                            modalHeader="Attention"
+                                            errorMessage={errorMessage}
+                                            onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
+                                        />
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 </>
-        )}
+            )}
         </div>
     );
 }

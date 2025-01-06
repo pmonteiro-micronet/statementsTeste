@@ -172,7 +172,7 @@ export default function Sidebar({ children, setExpanded }) {
       >
         <nav className="h-full flex flex-col">
           <div className="p-4 pb-2 flex justify-between items-center">
-            <div className="flex flex-row gap-4 items-center">
+            <div className="flex flex-row gap-4 !items-center">
               {/* Imagem */}
               <img
                 src="/icon/extensionsLogoWeb.png"
@@ -183,7 +183,7 @@ export default function Sidebar({ children, setExpanded }) {
 
               {/* Texto "Extensions myPMS" */}
               <p
-                className={`font-semibold text-sm overflow-hidden transition-all text-textPrimaryColor ${expanded ? "w-64" : "w-0"}`}
+                className={`font-semibold text-sm overflow-hidden transition-all text-textPrimaryColor mt-1 ${expanded ? "w-64" : "w-0"}`}
               >
                 Extensions myPMS
               </p>
@@ -192,7 +192,7 @@ export default function Sidebar({ children, setExpanded }) {
               onClick={handleToggle}
               className="p-1.5 rounded-lg bg-primaryBackground hover:primaryBackground"
             >
-              <TbLayoutSidebarLeftExpand className="text-textPrimaryColor" />
+              <TbLayoutSidebarLeftExpand className="text-textPrimaryColor"/>
             </button>
           </div>
 
