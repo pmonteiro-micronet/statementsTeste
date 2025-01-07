@@ -29,6 +29,8 @@ export default function Page() {
     const [contacts, setContacts] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [propertyID, setPropertyID] = useState(null);
+    const [profileID, setProfileID] = useState(null);
+
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [isOkPINVisible, setIsOkPINVisible] = useState(false);
@@ -95,8 +97,9 @@ export default function Page() {
         const requestID = queryParams.get("requestID");
         const resNo = queryParams.get("resNo");
         const propertyID = queryParams.get("propertyID");
+        const profileID = queryParams.get("profileID");
         setPropertyID(propertyID);
-
+        setProfileID(profileID);
         const fetchPropertyDetails = async () => {
             if (!propertyID) {
                 console.warn("Parâmetro ausente na URL: propertyID");
@@ -322,7 +325,7 @@ export default function Page() {
                 const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
                     email: emailToSend,
                     vatNo: vatNoToSend,
-                    registerID: reserva.ProfileID,
+                    requestID: profileID,
                     propertyID: propertyID
                 });
                 console.log('Alterações salvas com sucesso:', response.data);
