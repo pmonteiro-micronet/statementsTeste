@@ -322,11 +322,13 @@ export default function Page() {
                 const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
                     email: emailToSend,
                     vatNo: vatNoToSend,
+                    registerID: reserva.ProfileID,
                     propertyID: propertyID
                 });
                 console.log('Alterações salvas com sucesso:', response.data);
             } catch (error) {
                 console.error('Erro ao salvar alterações:', error);
+                console.log(reserva.ProfileID);
                 errors.push("There was an issue saving your changes. Please contact support.");
                 setErrorMessage(errors.join("\n"));
                 setIsErrorModalOpen(true);
