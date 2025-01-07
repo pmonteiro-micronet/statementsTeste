@@ -51,10 +51,10 @@ export async function POST(request) {
       registerID: body.registerID !== undefined ? body.registerID : null
     };
 
-    // Verifica se pelo menos um dos campos (email ou vatNo) está presente
-    if (!dataToSend.email && !dataToSend.vatNo) {
+    // Verifica se pelo menos um dos campos (editedEmail, editedVAT ou registerID) está presente
+    if (!dataToSend.editedEmail && !dataToSend.editedVAT && !dataToSend.registerID) {
       return new NextResponse(
-        JSON.stringify({ error: "Faltam dados: email ou vatNo" }),
+        JSON.stringify({ error: "Faltam dados: editedEmail, editedVAT ou registerID" }),
         { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
       );
     }
