@@ -464,9 +464,9 @@ export default function Page() {
     };
 
     const handleSuccessModalClose = () => {
-        setIsSuccessModalOpen(false);
-        setIsOkPINVisible(true); // Exibe o próximo componente
-    };
+        setIsSuccessModalOpen(false); // Fecha o modal de sucesso
+        setIsOkPINVisible(true); // Exibe o modal OkPIN
+    };    
 
     return (
         <div className='bg-background main-page min-h-screen'>
