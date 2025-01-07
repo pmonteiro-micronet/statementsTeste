@@ -22,16 +22,17 @@ const OkPIN = ({
     isOpen, // Receber o estado de visibilidade como prop
     onClose, // Receber a função para fechar como prop
 }) => {
-    const [pin, setPin] = useState(""); // Estado para o PIN
+    const [pin, setPin] = useState(""); // Estado para o pin
     const [isPinError, setIsPinError] = useState(false);
-    const [userPinHash, setUserPinHash] = useState(""); // Estado para o hash do PIN do usuário logado
-
+    const [userPinHash, setUserPinHash] = useState(""); // Estado para o hash do pin do usuário logado
     const router = useRouter();
     const { data: session, status } = useSession();
-    const [setPropertyID] = useState("");
+    const [propertyID, setPropertyID] = useState("");
+    console.log(propertyID);
     const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
 
     useEffect(() => {
+        // Verifica se é desktop no carregamento da página
         setAutoFocusEnabled(isDesktop());
     }, []);
 
@@ -43,9 +44,10 @@ const OkPIN = ({
                 router.push("/auth");
             } else {
                 const userPropertyID = localStorage.getItem("recordPropertyID");
-                const userPinHash = session?.user?.pin; // Supondo que o PIN armazenado é o hash
+                console.log(session.user);
+                const userPinHash = session?.user?.pin; // Supondo que o pin armazenado é o hash
                 setPropertyID(userPropertyID);
-                setUserPinHash(userPinHash);
+                setUserPinHash(userPinHash); // Armazena o hash do pin
             }
         };
 
@@ -54,6 +56,10 @@ const OkPIN = ({
 
     const handlePinSubmit = async (e) => {
         if (e) e.preventDefault();
+        // Captura os parâmetros da URL
+        const queryParams = new URLSearchParams(window.location.search);
+        const recordID = queryParams.get("recordID");
+        console.log(recordID);
 
         try {
             const isPinCorrect = await bcrypt.compare(pin, userPinHash);
