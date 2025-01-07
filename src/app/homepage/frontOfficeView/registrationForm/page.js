@@ -5,7 +5,8 @@ import InputFieldControlled from "@/components/input/page";
 // import CountryAutocomplete from "@/components/autocompletes/country/page";
 import { IoIosArrowForward } from "react-icons/io";
 import CancelPIN from "@/components/modals/pin/cancel/page";
-import OkPIN from "@/components/modals/pin/ok/page";
+import OkPIN from "@/components/modals/arrivals/reservationForm/okPin/page";
+
 import { generatePDFTemplate } from "@/components/pdfTemplate/page";
 import './styles.css';
 import { FaPencilAlt } from "react-icons/fa";
@@ -313,8 +314,8 @@ export default function Page() {
         setErrorMessage('');
         setIsErrorModalOpen(false);
 
-        let emailToSend = email !== initialEmail ? email : undefined; // Envia undefined se não houver alteração
-        let vatNoToSend = vatNo !== initialVatNo ? vatNo : undefined; // Envia undefined se não houver alteração
+        let emailToSend = email !== initialEmail ? email : initialEmail; // Envia undefined se não houver alteração
+        let vatNoToSend = vatNo !== initialVatNo ? vatNo : initialVatNo; // Envia undefined se não houver alteração
         
         console.log("Email a ser enviado:", emailToSend);
         console.log("VAT No a ser enviado:", vatNoToSend);
@@ -1191,8 +1192,6 @@ export default function Page() {
                                     {/** Componente OkPIN */}
                                     {isOkPINVisible && (
                                         <OkPIN
-                                            buttonName={"Ok"}
-                                            buttonColor={"transparent"}
                                             modalHeader={"Insert PIN"}
                                             formTypeModal={11}
                                             editor={"teste"}
