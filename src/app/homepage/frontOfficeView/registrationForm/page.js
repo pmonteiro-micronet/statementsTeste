@@ -98,7 +98,7 @@ export default function Page() {
         const resNo = queryParams.get("resNo");
         const propertyID = queryParams.get("propertyID");
         const profileID = queryParams.get("profileID");
-        
+
         setPropertyID(propertyID);
         setProfileID(profileID);
         const fetchPropertyDetails = async () => {
@@ -315,7 +315,7 @@ export default function Page() {
 
         let emailToSend = email !== initialEmail ? email : undefined; // Envia undefined se não houver alteração
         let vatNoToSend = vatNo !== initialVatNo ? vatNo : undefined; // Envia undefined se não houver alteração
-
+        
         console.log("Email a ser enviado:", emailToSend);
         console.log("VAT No a ser enviado:", vatNoToSend);
 
@@ -326,7 +326,7 @@ export default function Page() {
                 const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
                     email: emailToSend,
                     vatNo: vatNoToSend,
-                    requestID: profileID,
+                    registerID: profileID,
                     propertyID: propertyID
                 });
                 console.log('Alterações salvas com sucesso:', response.data);
