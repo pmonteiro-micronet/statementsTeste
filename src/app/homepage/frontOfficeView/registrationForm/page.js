@@ -98,6 +98,7 @@ export default function Page() {
         const resNo = queryParams.get("resNo");
         const propertyID = queryParams.get("propertyID");
         const profileID = queryParams.get("profileID");
+        
         setPropertyID(propertyID);
         setProfileID(profileID);
         const fetchPropertyDetails = async () => {

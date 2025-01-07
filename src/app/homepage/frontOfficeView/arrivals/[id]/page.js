@@ -117,6 +117,7 @@ export default function Arrivals({ params }) {
                   return {
                     requestID: item.requestID,
                     propertyID: item.propertyID, // Adiciona o requestID
+                    profileID: guestDetails.ProfileID,
                     DateCI: reserva.DateCI,
                     Booker: reserva.Booker,
                     Company: reserva.Company,
@@ -326,7 +327,7 @@ export default function Arrivals({ params }) {
                               <DropdownItem
                                 key="show"
                                 onClick={() =>
-                                  router.push(`/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.ProfileID}`)
+                                  router.push(`/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}`)
                                 }
                               >
                                 Registration Form
