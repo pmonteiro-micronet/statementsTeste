@@ -316,7 +316,7 @@ export default function Page() {
 
         let emailToSend = email !== initialEmail ? email : initialEmail; // Envia undefined se não houver alteração
         let vatNoToSend = vatNo !== initialVatNo ? vatNo : initialVatNo; // Envia undefined se não houver alteração
-        
+
         console.log("Email a ser enviado:", emailToSend);
         console.log("VAT No a ser enviado:", vatNoToSend);
 
@@ -410,7 +410,6 @@ export default function Page() {
         }
     };
 
-
     const clearSignature = () => {
         const canvas = canvasRef.current;
         if (canvas) {
@@ -466,7 +465,7 @@ export default function Page() {
     const handleSuccessModalClose = () => {
         setIsSuccessModalOpen(false); // Fecha o modal de sucesso
         setIsOkPINVisible(true); // Exibe o modal OkPIN
-    };    
+    };
 
     return (
         <div className='bg-background main-page min-h-screen'>
@@ -1193,10 +1192,11 @@ export default function Page() {
                                     {isOkPINVisible && (
                                         <OkPIN
                                             modalHeader={"Insert PIN"}
-                                            formTypeModal={11}
-                                            editor={"teste"}
+                                            isOpen={isOkPINVisible} // Passa a visibilidade
+                                            onClose={() => setIsOkPINVisible(false)} // Função para fechar
                                         />
                                     )}
+
                                 </div>
                             </div>
                         </div>
