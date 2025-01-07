@@ -46,8 +46,9 @@ export async function POST(request) {
 
     // Prepara os dados para enviar ao servidor externo
     const dataToSend = {
-      email: body.email !== undefined ? body.email : null,
-      vatNo: body.vatNo !== undefined ? body.vatNo : null
+      editedEmail: body.email !== undefined ? body.email : null,
+      editedVAT: body.vatNo !== undefined ? body.vatNo : null,
+      registerID: body.registerID !== undefined ? body.registerID : null
     };
 
     // Verifica se pelo menos um dos campos (email ou vatNo) está presente
