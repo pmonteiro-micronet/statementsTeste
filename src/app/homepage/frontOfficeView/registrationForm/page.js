@@ -5,6 +5,7 @@ import InputFieldControlled from "@/components/input/page";
 // import CountryAutocomplete from "@/components/autocompletes/country/page";
 import { IoIosArrowForward } from "react-icons/io";
 import CancelPIN from "@/components/modals/pin/cancel/page";
+import OkPIN from "@/components/modals/pin/ok/page";
 import { generatePDFTemplate } from "@/components/pdfTemplate/page";
 import './styles.css';
 import { FaPencilAlt } from "react-icons/fa";
@@ -14,6 +15,7 @@ import TermsConditionsForm from "@/components/terms&conditions/page";
 import ProtectionPolicyForm from "@/components/protectionPolicy/page";
 import EditRegistrationForm from "@/components/modals/arrivals/reservationForm/edit/page";
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
+import SuccessRegistrationForm from "@/components/modals/arrivals/reservationForm/success/page";
 import LoadingBackdrop from "@/components/Loader/page";
 
 import { MdSunny } from "react-icons/md";
@@ -28,7 +30,11 @@ export default function Page() {
     const [isLoading, setIsLoading] = useState(false);
     const [propertyID, setPropertyID] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const [isOkPINVisible, setIsOkPINVisible] = useState(false);
 
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
+    const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // Controle do modal de erro
     // Estados para armazenar as informações do hotel
     const [hotelName, setHotelName] = useState('');
     const [hotelMiniTerms, setHotelMiniTerms] = useState('');
@@ -283,8 +289,6 @@ export default function Page() {
     const [signatureDataUrl] = useState(null); // Para armazenar a base64 da assinatura
 
     console.log(signatureDataUrl);
-    // Função para capturar a assinatura e gerar o PDF
-    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
 
     const handleOkClick = async () => {
         let errors = [];
@@ -387,6 +391,8 @@ export default function Page() {
             );
 
             console.log('Resposta da API:', response.data);
+            setSuccessMessage("Registration sent successfully"); // Atualiza a mensagem de erro
+            setIsSuccessModalOpen(true); // Exibe o modal de erro
         } catch (error) {
             console.error('Erro ao gerar ou enviar o PDF:', error);
 
@@ -450,28 +456,10 @@ export default function Page() {
         setIsModalOpen(false);
     };
 
-
-    // const openModalForField = (field) => {
-    //     setModalField(field); // Define qual campo será editado
-    //     setIsModalOpen(true);
-    // };
-
-    // Salvar o novo email
-    // const handleSaveClick = () => {
-    //     // Atualiza o estado de contacts com o novo email
-    //     setContacts((prevContacts) => ({
-    //         ...prevContacts,
-    //         Email: email,
-    //     }));
-    //     console.log("Novo email salvo:", email);
-    //     setIsEditable(false); // Desativa a edição
-    // };
-
-    // // Cancelar a edição e restaurar o valor salvo
-    // const handleCancelClick = () => {
-    //     setIsEditable(false);
-    //     setEmail(contacts.Email); // Restaura o valor salvo
-    // };
+    const handleSuccessModalClose = () => {
+        setIsSuccessModalOpen(false);
+        setIsOkPINVisible(true); // Exibe o próximo componente
+    };
 
     return (
         <div className='bg-background main-page min-h-screen'>
@@ -1183,6 +1171,25 @@ export default function Page() {
                                             modalHeader="Attention"
                                             errorMessage={errorMessage}
                                             onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
+                                        />
+                                    )}
+                                    {/** Modal de sucesso */}
+                                    {isSuccessModalOpen && successMessage && (
+                                        <SuccessRegistrationForm
+                                            modalHeader="Attention"
+                                            successMessage={successMessage}
+                                            onClose={handleSuccessModalClose} // Fecha o modal e exibe o próximo componente
+                                        />
+                                    )}
+
+                                    {/** Componente OkPIN */}
+                                    {isOkPINVisible && (
+                                        <OkPIN
+                                            buttonName={"Ok"}
+                                            buttonColor={"transparent"}
+                                            modalHeader={"Insert PIN"}
+                                            formTypeModal={11}
+                                            editor={"teste"}
                                         />
                                     )}
                                 </div>
