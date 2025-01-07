@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, Button, useDisclosure } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@nextui-org/react";
 import { MdClose } from "react-icons/md";
 import axios from "axios";
 import { useSession } from "next-auth/react";
@@ -28,7 +28,7 @@ const OkPIN = ({
 
     const router = useRouter();
     const { data: session, status } = useSession();
-    const [propertyID, setPropertyID] = useState("");
+    const [setPropertyID] = useState("");
     const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
 
     useEffect(() => {
