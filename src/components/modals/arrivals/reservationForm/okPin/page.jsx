@@ -75,11 +75,17 @@ const OkPIN = ({
         }
     };
 
+    const handleModalOpenChange = (isOpen) => {
+        onOpenChange(isOpen);
+        setPin("");
+        setIsPinError(false);
+    };
+
     return (
         <Modal
-            isOpen={isOpen} // Controlado externamente
+            isOpen={isOpen}
             hideCloseButton={true}
-            onOpenChange={onClose} // Fechar quando o modal for encerrado
+            onOpenChange={handleModalOpenChange}
             isDismissable={true}
             isKeyboardDismissDisabled={false}
             className="z-50"
