@@ -5,7 +5,6 @@ import InputFieldControlled from "@/components/input/page";
 // import CountryAutocomplete from "@/components/autocompletes/country/page";
 import { IoIosArrowForward } from "react-icons/io";
 import CancelPIN from "@/components/modals/pin/cancel/page";
-import OkPIN from "@/components/modals/arrivals/reservationForm/okPin/page";
 
 import { generatePDFTemplate } from "@/components/pdfTemplate/page";
 import './styles.css';
@@ -34,7 +33,6 @@ export default function Page() {
 
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const [isOkPINVisible, setIsOkPINVisible] = useState(false);
 
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // Controle do modal de erro
@@ -460,11 +458,6 @@ export default function Page() {
 
         // Fechar o modal após salvar
         setIsModalOpen(false);
-    };
-
-    const handleSuccessModalClose = () => {
-        setIsSuccessModalOpen(false); // Fecha o modal de sucesso
-        setIsOkPINVisible(true); // Exibe o modal OkPIN
     };
 
     return (
@@ -1184,19 +1177,8 @@ export default function Page() {
                                         <SuccessRegistrationForm
                                             modalHeader="Attention"
                                             successMessage={successMessage}
-                                            onClose={handleSuccessModalClose} // Fecha o modal e exibe o próximo componente
                                         />
                                     )}
-
-                                    {/** Componente OkPIN */}
-                                    {isOkPINVisible && (
-                                        <OkPIN
-                                            modalHeader={"Insert PIN"}
-                                            isOpen={isOkPINVisible} // Passa a visibilidade
-                                            onClose={() => setIsOkPINVisible(false)} // Função para fechar
-                                        />
-                                    )}
-
                                 </div>
                             </div>
                         </div>
