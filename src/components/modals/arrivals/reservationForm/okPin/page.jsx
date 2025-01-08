@@ -104,12 +104,17 @@ const OkPIN = ({
                             autoFocus={autoFocusEnabled}
                             onChange={(e) => {
                                 setPin(e.target.value);
-                                setIsPinError(false);
+                                setIsPinError(false); // Reseta o erro ao digitar
                             }}
                             className="border border-gray-300 p-2 w-full text-center mb-4 text-textPrimaryColor"
                             placeholder="• • • •"
                         />
-                        {isPinError && <p className="text-red-500 -mt-4">PIN incorreto. Tente novamente.</p>}
+                        {isPinError && (
+                            <p className="text-red-500 -mt-4">
+                                PIN incorreto. Tente novamente.
+                            </p>
+                        )}
+
                         <div className="grid grid-cols-3 gap-2">
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "OK"].map((key) => (
                                 <button
@@ -126,13 +131,8 @@ const OkPIN = ({
                                             setIsPinError(false);
                                         }
                                     }}
-                                    className={`p-4 rounded ${
-                                        key === "C"
-                                            ? "bg-mediumGray text-textPrimaryColor"
-                                            : key === "OK"
-                                            ? "bg-primary text-white"
-                                            : "bg-lightGray text-textPrimaryColor"
-                                    } text-center font-bold`}
+                                    className={`p-4 rounded ${key === "C" ? "bg-mediumGray text-textPrimaryColor" : key === "OK" ? "bg-primary text-white" : "bg-lightGray text-textPrimaryColor"
+                                        } text-center font-bold`}
                                 >
                                     {key}
                                 </button>
