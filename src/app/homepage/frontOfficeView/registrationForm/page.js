@@ -57,18 +57,19 @@ export default function Page() {
 
     useEffect(() => {
         const preventBackNavigation = () => {
+            // Impede a navegação para trás
             window.history.pushState(null, null, window.location.href);
         };
 
-        // Adiciona evento para prevenir retrocesso
-        window.addEventListener('popstate', preventBackNavigation);
+        // Adiciona evento para interceptar o botão "voltar"
+        window.addEventListener("popstate", preventBackNavigation);
 
         // Configura o estado inicial do histórico
-        window.history.pushState(null, null, window.location.href);
+        preventBackNavigation();
 
         return () => {
-            // Remove o evento quando o componente é desmontado
-            window.removeEventListener('popstate', preventBackNavigation);
+            // Remove o evento ao desmontar o componente
+            window.removeEventListener("popstate", preventBackNavigation);
         };
     }, []);
 
