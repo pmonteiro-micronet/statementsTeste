@@ -8,7 +8,7 @@ export async function GET(request) {
   const PropertyID = searchParams.get("propertyID");  // Parâmetro correto
 
   // Verifica se os parâmetros estão presentes
-  if (!PropertyID || !HotelID) {  
+  if (!PropertyID || !HotelID) {
     return new NextResponse(
       JSON.stringify({ error: "Faltam parâmetros: HotelID ou PropertyID" }),
       { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
@@ -58,10 +58,17 @@ export async function GET(request) {
 
     // Verifica se a resposta contém dados
     if (response.data && Array.isArray(response.data)) {
+      // Apagar todos os registros da tabela requestRecordsDepartures antes de inserir novos dados
+      await prisma.requestRecordsDepartures.deleteMany({
+        where: {
+          propertyID: propertyIDInt,  // Apaga os registros relacionados ao PropertyID
+        },
+      });
+
       // Salva o array de dados (reservas) como um único registro na tabela
       const newRequest = await prisma.requestRecordsDepartures.create({
         data: {
-          requestBody: JSON.stringify(response.data), // Armazena o array completo como JSON
+          requestBody: JSON.stringify(response.data), // Aqui, o mesmo JSON do responseBody
           requestType: "GET", // Tipo da requisição
           requestDateTime: new Date(), // Data e hora atual
           responseStatus: "200", // Supondo sucesso inicialmente
@@ -69,6 +76,7 @@ export async function GET(request) {
           propertyID: propertyIDInt, // Usar o propertyID extraído da query
         },
       });
+
 
       console.log("Data saved to DB:", newRequest);
     }

@@ -55,13 +55,13 @@
         "dashboard":{
             "title": "Front Office",
             "cardArrivals": "Arrivals",
-            "cardInHouses": "In Houses",
+            "cardInHouses": "InHouses",
             "cardDepartures": "Departures"
         },
         "departures": {
             "today": "Today",
             "tomorrow": "Tomorrow",
-            "departureList": "Departure List",
+            "departureList": "Departure",
             "room": "Room",
             "lastName": "Last Name",
             "firstName": "First Name",

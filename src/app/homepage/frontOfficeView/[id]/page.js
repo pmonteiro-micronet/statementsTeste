@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import "./styles.css";
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -16,9 +16,11 @@ const FrontOffice = () => {
   const locale = "en";
   const t = translations[locale];
 
+  const router = useRouter(); // Instancia o hook useRouter
+
   // Pegando o selectedHotelID da URL
   const selectedHotelID = pathname.split('/').pop(); // Extrai o último valor da URL, que deve ser o hotelID
-  
+
   // Estados para armazenar os valores de "arrivals", "inhouses" e "departures"
   const [arrivals, setArrivals] = useState(null);
   const [inhouses, setInhouses] = useState(null);
@@ -72,22 +74,22 @@ const FrontOffice = () => {
     }
   }, [session?.user?.propertyIDs, selectedHotelID]); // Dependência para recarregar quando a sessão ou selectedHotelID mudar
 
-   // Função para redirecionar, aceitando o tipo de contagem como parâmetro
-const handleRedirect = (type) => {
-  if (selectedHotelID) {
-    router.push(`/homepage/frontOfficeView/${type}/${selectedHotelID}`);
-  }
-};
+  // Função para redirecionar, aceitando o tipo de contagem como parâmetro
+  const handleRedirect = (type) => {
+    if (selectedHotelID) {
+      router.push(`/homepage/frontOfficeView/${type}/${selectedHotelID}`);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-primaryBackground">
       <main className="flex-1 min-h-screen p-8 overflow-y-auto">
         <h2 className="font-semibold text-textPrimaryColor text-2xl mb-4">{t.frontOffice.dashboard.title}</h2>
 
         <div className="flex flex-row gap-5">
-          <div 
-          className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2"
-          onClick={() => handleRedirect("arrivals")}>
+          <div
+            className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer"
+            onClick={() => handleRedirect("arrivals")}>
             <div className="flex flex-col">
               <h3 className="text-5xl text-primary">
                 {arrivals !== null ? arrivals : `${t.errors.loading}...`}
@@ -95,9 +97,9 @@ const handleRedirect = (type) => {
               <p className="text-gray-400 mt-1 uppercase">{t.frontOffice.dashboard.cardArrivals}</p>
             </div>
           </div>
-          <div 
-          className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2"
-          onClick={() => handleRedirect("inhouses")}>
+          <div
+            className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer"
+            onClick={() => handleRedirect("inhouses")}>
             <div className="flex flex-col">
               <h3 className="text-5xl text-primary">
                 {inhouses !== null ? inhouses : `${t.errors.loading}...`}
@@ -105,9 +107,9 @@ const handleRedirect = (type) => {
               <p className="text-gray-400 mt-1 uppercase">{t.frontOffice.dashboard.cardInHouses}</p>
             </div>
           </div>
-          <div 
-          className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2"
-          onClick={() => handleRedirect("departures")}>
+          <div
+            className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer"
+            onClick={() => handleRedirect("departures")}>
             <div className="flex flex-col">
               <h3 className="text-5xl text-primary">
                 {departures !== null ? departures : `${t.errors.loading}...`}

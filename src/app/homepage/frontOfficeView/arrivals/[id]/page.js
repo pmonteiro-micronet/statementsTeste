@@ -80,6 +80,11 @@ export default function Arrivals({ params }) {
     }
   };
 
+  // Chama a função sendDataToAPI ao carregar a página
+  useEffect(() => {
+    sendDataToAPI();
+  }, [propertyID]);
+
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
@@ -88,114 +93,100 @@ export default function Arrivals({ params }) {
     setIsModalOpen(false);
   };
 
-    // Usando useState para armazenar a última resposta
-    const [lastResponse, setLastResponse] = useState(null);
-    useEffect(() => {
-      let timeoutId = null;
-      let timeoutThresholdId = null; // Controle de tempo limite para exibir loading após 3 segundos
-    
-      const fetchReservas = async (isInitialCall = false) => {
-        const isDataChanged = lastResponse !== null && lastResponse !== JSON.stringify(response.data.response);
-    
-        // Exibe o loading se for uma nova chamada ou se os dados mudaram
-        if (isInitialCall || isDataChanged) {
-          setIsLoading(true);
-        } else {
-          // Exibe o loading após 3 segundos se os dados não mudaram (timeout de 2 segundos)
-          timeoutThresholdId = setTimeout(() => setIsLoading(true), 2000);
+
+  // Função para pegar as reservas
+  useEffect(() => {
+    const fetchReservas = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
+        console.log("Response completo:", response);
+
+        const reservasArray = response.data.response.flatMap(item => {
+          try {
+            // Parsear o `requestBody` como JSON se estiver stringificado
+            const parsedRequestBody = JSON.parse(item.requestBody);
+
+            // Extrair as informações do formato correto
+            const reservations = Array.isArray(parsedRequestBody)
+              ? parsedRequestBody.flatMap(data =>
+                data.ReservationInfo?.map(reserva => {
+                  const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
+                  const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
+
+                  return {
+                    requestID: item.requestID,
+                    propertyID: item.propertyID, // Adiciona o requestID
+                    profileID: guestDetails.ProfileID,
+                    DateCI: reserva.DateCI,
+                    Booker: reserva.Booker,
+                    Company: reserva.Company,
+                    Group: reserva.Group,
+                    Room: reserva.Room,
+                    ResNo: reserva.ResNo,
+                    Notes: reserva.Notes,
+                    RoomStatus: reserva.RoomStatus,
+                    RoomType: reserva.RoomType,
+                    TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
+                    Price: reserva.Price,
+                    CityTax: reserva.CityTax,
+                    Total: reserva.Total,
+                    Salutation: guestDetails.Salution,
+                    LastName: guestDetails.LastName,
+                    FirstName: guestDetails.FirstName,
+                    Country: addressDetails.Country,
+                    Street: addressDetails.Street,
+                    PostalCode: addressDetails.PostalCode,
+                    City: addressDetails.City,
+                    Region: addressDetails.Region,
+                  };
+                }) || []
+              )
+              : [];
+
+            return reservations;
+          } catch (err) {
+            console.error("Erro ao processar requestBody ou reservas:", err);
+            return [];
+          }
+        });
+
+        console.log("Reservas após parse:", reservasArray);
+
+        if (reservasArray.length === 0) {
+          console.warn("Nenhuma reserva encontrada após parse.");
+          return;
         }
-    
-        try {
-          const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
-          console.log("Response completo:", response);
-    
-          const reservasArray = response.data.response.flatMap(item => {
-            try {
-              const parsedRequestBody = JSON.parse(item.requestBody);
-    
-              const reservations = Array.isArray(parsedRequestBody)
-                ? parsedRequestBody.flatMap(data =>
-                    data.ReservationInfo?.map(reserva => {
-                      const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
-                      const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
-    
-                      return {
-                        requestID: item.requestID,
-                        propertyID: item.propertyID,
-                        DateCI: reserva.DateCI,
-                        Booker: reserva.Booker,
-                        Company: reserva.Company,
-                        Group: reserva.Group,
-                        Room: reserva.Room,
-                        ResNo: reserva.ResNo,
-                        Notes: reserva.Notes,
-                        RoomStatus: reserva.RoomStatus,
-                        RoomType: reserva.RoomType,
-                        TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
-                        Price: reserva.Price,
-                        CityTax: reserva.CityTax,
-                        Total: reserva.Total,
-                        Salutation: guestDetails.Salution,
-                        LastName: guestDetails.LastName,
-                        FirstName: guestDetails.FirstName,
-                        Country: addressDetails.Country,
-                        Street: addressDetails.Street,
-                        PostalCode: addressDetails.PostalCode,
-                        City: addressDetails.City,
-                        Region: addressDetails.Region,
-                      };
-                    }) || []
-                  )
-                : [];
-    
-              return reservations;
-            } catch (err) {
-              console.error("Erro ao processar requestBody ou reservas:", err);
-              return [];
-            }
-          });
-    
-          const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
-          const reservasFiltradas = reservasArray.filter(reserva => {
-            if (!reserva.DateCI) {
-              console.warn("DateCI está indefinido ou vazio para esta reserva:", reserva);
-              return false;
-            }
-            const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
-            return formattedDateCI === formattedCurrentDate;
-          });
-    
-          const reservasUnicas = Array.from(
-            new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
-          );
-    
-          setReservas(reservasUnicas);
-    
-          // Armazena a última resposta para comparação nas próximas chamadas
-          setLastResponse(JSON.stringify(response.data.response));  // Atualizando o estado de lastResponse
-        } catch (error) {
-          console.error("Erro ao buscar reservas:", error.message);
-        } finally {
-          clearTimeout(timeoutId); // Cancela o timeout para iniciar o loading
-          clearTimeout(timeoutThresholdId); // Cancela o timeout de 3 segundos se a requisição for rápida
-          setIsLoading(false); // Remove o carregamento
-        }
-      };
-    
-      // Faz o fetch inicial
-      fetchReservas(true);
-    
-      // Configura o polling para buscar dados a cada 5 segundos (5000ms)
-      const intervalId = setInterval(() => fetchReservas(false), 5000);
-    
-      // Limpa o intervalo e timeout quando o componente é desmontado
-      return () => {
-        clearInterval(intervalId);
-        clearTimeout(timeoutId);
-        clearTimeout(timeoutThresholdId);
-      };
-    }, [currentDate, propertyID]); // Dependências    
-  
+
+        const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
+        const reservasFiltradas = reservasArray.filter(reserva => {
+          if (!reserva.DateCI) {
+            console.warn("DateCI está indefinido ou vazio para esta reserva:", reserva);
+            return false;
+          }
+          const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
+          return formattedDateCI === formattedCurrentDate;
+        });
+
+        console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
+
+        const reservasUnicas = Array.from(
+          new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
+        );
+
+        console.log("Reservas únicas para a data atual:", reservasUnicas);
+        setReservas(reservasUnicas);
+      } catch (error) {
+        console.error("Erro ao buscar reservas:", error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReservas();
+  }, [currentDate, propertyID]);
+
+
   useEffect(() => {
     const fetchHotelName = async () => {
       try {
@@ -237,16 +228,13 @@ export default function Arrivals({ params }) {
   };
 
   // Função chamada quando o botão de refresh é clicado
-  // const handleRefreshClick = () => {
-  //   sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
-  // };
+  const handleRefreshClick = () => {
+    sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
+  };
 
-  useEffect(() => {
-    sendDataToAPI(); // Chama a função automaticamente ao carregar a página
-  }, []); // O array de dependências vazio garante que seja executado apenas uma vez
-  
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
+      {isLoading && <LoadingBackdrop open={isLoading} />}
       <div className="flex-grow overflow-y-auto p-4">
         <div className="flex justify-between items-center w-full">
           <div className="header-container flex items-center justify-between w-full">
@@ -278,13 +266,13 @@ export default function Arrivals({ params }) {
               )}
 
               {/* Título "Arrivals List" separado do título dinâmico */}
-              <h2 className="text-xl text-textPrimaryColor">{propertyName} : Arrivals List</h2>
+              <h2 className="text-xl text-textPrimaryColor">{propertyName} : Arrivals</h2>
             </div>
 
             {/* Botão de refresh alinhado à direita */}
             <div className="flex items-center">
               <button
-                // onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
+                onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
                 className="text-white bg-primary rounded-lg cursor-pointer p-2"
               >
                 <MdOutlineRefresh size={20} />
@@ -294,97 +282,95 @@ export default function Arrivals({ params }) {
         </div>
 
         <div className="mt-5">
-          {reservas.length > 0 ? (
+          {isLoading ? (
+            <LoadingBackdrop open={isLoading} /> // Exibe o carregamento enquanto os dados estão sendo carregados
+          ) : reservas.length > 0 ? (
             <div className="overflow-auto md:overflow-visible">
-              <LoadingBackdrop open={isLoading} />
-              {!isLoading && (
-                <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
-                  <thead>
-                    <tr className="bg-primary text-white h-12">
-                      <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ROOM</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ROOM STATUS</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">LAST NAME</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">FIRST NAME</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">TRAVEL AGENCY</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">COMPANY</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">GROUP</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">NOTES</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">RES. NO.</td>
-                      <td className="pl-2">ARRIVAL</td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.map((reserva, index) => {
-                      // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
-                      return (
-                        <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
-                          <td className="pl-1 flex items-start border-r border-[#e6e6e6] relative z-10">
-                            <Dropdown>
-                              <DropdownTrigger>
-                                <Button
-                                  variant="light"
-                                  className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
-                                >
-                                  <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
-                                </Button>
-                              </DropdownTrigger>
-                              <DropdownMenu
-                                aria-label="Static Actions"
-                                closeOnSelect={true}
-                                className="relative z-10 text-textPrimaryColor"
+              <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
+                <thead>
+                  <tr className="bg-primary text-white h-12">
+                    <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ROOM</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ROOM STATUS</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">LAST NAME</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">FIRST NAME</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">TRAVEL AGENCY</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">COMPANY</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">GROUP</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">NOTES</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">RES. NO.</td>
+                    <td className="pl-2">ARRIVAL</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((reserva, index) => {
+                    return (
+                      <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
+                        <td className="pl-1 flex items-start border-r border-[#e6e6e6] relative z-10">
+                          <Dropdown>
+                            <DropdownTrigger>
+                              <Button
+                                variant="light"
+                                className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
                               >
-                                <DropdownItem key="edit" onClick={() => handleOpenModal()}>
-                                  Info
-                                </DropdownItem>
-                                <DropdownItem
-                                  key="show"
-                                  onClick={() =>
-                                    router.push(`/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}`)
-                                  }
-                                >
-                                  Registration Form
-                                </DropdownItem>
-                              </DropdownMenu>
-                            </Dropdown>
+                                <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
+                              </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu
+                              aria-label="Static Actions"
+                              closeOnSelect={true}
+                              className="relative z-10 text-textPrimaryColor"
+                            >
+                              <DropdownItem key="edit" onClick={() => handleOpenModal()}>
+                                Info
+                              </DropdownItem>
+                              <DropdownItem
+                                key="show"
+                                onClick={() =>
+                                  router.push(`/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}`)
+                                }
+                              >
+                                Registration Form
+                              </DropdownItem>
+                            </DropdownMenu>
+                          </Dropdown>
 
-                            <DepartureInfoForm
-                              buttonName={"Info"}
-                              buttonColor={"transparent"}
-                              modalHeader={"Reservation"}
-                              formTypeModal={11}
-                              roomNumber={reserva.Room}  // Passando o roomNumber
-                              dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
-                              booker={reserva.Booker}
-                              salutation={reserva.Salutation}
-                              lastName={reserva.LastName}
-                              firstName={reserva.FirstName}
-                              roomType={reserva.RoomType}
-                              resStatus={reserva.ResStatus}
-                              totalPax={reserva.TotalPax}
-                              balance={reserva.Balance}
-                              country={reserva.Country}
-                              isBackdropVisible={false}
-                              isOpen={isModalOpen}
-                              onClose={handleCloseModal}
-                            />
-                          </td>
-                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.Room}</td>
-                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.RoomStatus}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-52 max-w-xs truncate">{reserva.Notes}</td>
-                          <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
-                          <td className="text-right pr-2 w-28">{reserva.DateCI}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )}
+                          <DepartureInfoForm
+                            buttonName={"Info"}
+                            buttonColor={"transparent"}
+                            modalHeader={"Reservation"}
+                            formTypeModal={11}
+                            roomNumber={reserva.Room}  // Passando o roomNumber
+                            dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
+                            booker={reserva.Booker}
+                            salutation={reserva.Salutation}
+                            lastName={reserva.LastName}
+                            firstName={reserva.FirstName}
+                            roomType={reserva.RoomType}
+                            resStatus={reserva.ResStatus}
+                            totalPax={reserva.TotalPax}
+                            balance={reserva.Balance}
+                            country={reserva.Country}
+                            isBackdropVisible={true}
+                            isOpen={isModalOpen}
+                            onClose={handleCloseModal}
+                          />
+                        </td>
+                        <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.Room}</td>
+                        <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.RoomStatus}</td>
+                        <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
+                        <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
+                        <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
+                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
+                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
+                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-52 max-w-xs truncate">{reserva.Notes}</td>
+                        <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
+                        <td className="text-right pr-2 w-28">{reserva.DateCI}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           ) : (
             <p className="text-textLabelColor">No reservations found.</p>

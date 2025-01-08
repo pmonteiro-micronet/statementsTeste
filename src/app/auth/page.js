@@ -1,8 +1,7 @@
-// src/app/auth/signin.js
 "use client"; // Importante para usar hooks no Next.js
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Adicionando useEffect
 import { useRouter } from "next/navigation";
 import "./styles.css";
 import en from "../../../public/locales/english/common.json";
@@ -16,9 +15,20 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-
+  const [selectedHotelID, setSelectedHotelID] = useState(""); // Estado do Hotel ID
+  console.log(router);
   const locale = "en"; // Substitua pelo valor dinâmico do idioma (e.g., router.locale)
   const t = translations[locale];
+
+  // Recupera o Hotel ID do localStorage ao carregar a página
+  useEffect(() => {
+    const savedHotelID = localStorage.getItem("selectedHotelID"); // Busca o ID salvo
+    if (savedHotelID) {
+      setSelectedHotelID(savedHotelID); // Define o ID no estado
+    } else {
+      setSelectedHotelID("defaultHotelID"); // ID padrão, caso não haja nenhum salvo
+    }
+  }, []); // Executa apenas uma vez no carregamento
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,8 +43,7 @@ const SignIn = () => {
     if (result?.error) {
       setError(result.error);
     } else {
-      // Redireciona após o login bem-sucedido
-      router.push("/homepage");
+      window.location.href = `/homepage/frontOfficeView/${selectedHotelID}`; // Força a atualização completa da página
     }
   };
 
@@ -52,9 +61,7 @@ const SignIn = () => {
             </span>{" "}
             myPMS | <span className="font-semibold">{t.auth.login}</span>
           </p>
-          <p className="text-sm">
-            {t.auth.instruction1}
-          </p>
+          <p className="text-sm">{t.auth.instruction1}</p>
           <form onSubmit={handleSubmit} className="w-full">
             <div className="flex flex-col gap-4 mt-10 mb-5">
               <div>
@@ -64,7 +71,6 @@ const SignIn = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  
                 />
               </div>
               <div>
@@ -86,12 +92,8 @@ const SignIn = () => {
             </button>
             {error && <p style={{ color: "red" }}>{error}</p>}
             <div className="mt-10 flex flex-col gap-4 text-sm text-gray-400">
-              <p>
-                {t.auth.instruction2}
-              </p>
-              <p>
-                {t.auth.instruction3}
-              </p>
+              <p>{t.auth.instruction2}</p>
+              <p>{t.auth.instruction3}</p>
             </div>
           </form>
         </div>

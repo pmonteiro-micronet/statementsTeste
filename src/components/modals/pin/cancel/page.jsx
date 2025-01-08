@@ -71,6 +71,18 @@ const CancelPIN = ({
     //     }
     // };
 
+    const [selectedHotelID, setSelectedHotelID] = useState(""); // Estado do Hotel ID
+
+    // Recupera o Hotel ID do localStorage ao carregar a página
+    useEffect(() => {
+      const savedHotelID = localStorage.getItem("selectedHotelID"); // Busca o ID salvo
+      if (savedHotelID) {
+        setSelectedHotelID(savedHotelID); // Define o ID no estado
+      } else {
+        setSelectedHotelID("defaultHotelID"); // ID padrão, caso não haja nenhum salvo
+      }
+    }, []); // Executa apenas uma vez no carregamento
+    
     const handleCancelPinSubmit = async (e) => {
         if (e) e.preventDefault();
         const recordID = localStorage.getItem("recordID");
@@ -79,7 +91,7 @@ const CancelPIN = ({
         try {
             const isPinCorrect = await bcrypt.compare(pin, userPinHash);
             if (isPinCorrect) {
-                router.push("/homepage");
+                router.push(`/homepage/frontOfficeView/${selectedHotelID}`);
             } else {
                 setPin("");
                 setIsPinError(true);
@@ -124,23 +136,23 @@ const CancelPIN = ({
                                         </div>
                                     </ModalHeader>
                                     <ModalBody className="flex flex-col mx-5 my-2">
-                                    <input
-    type="password"
-    value={pin}
-    autoFocus={autoFocusEnabled}
-    onChange={(e) => {
-        setPin(e.target.value);
-        setIsPinError(false); // Reseta o erro ao digitar
-    }}
-    className="border border-gray-300 p-2 w-full text-center mb-4"
-    placeholder="• • • •"
-/>
+                                        <input
+                                            type="password"
+                                            value={pin}
+                                            autoFocus={autoFocusEnabled}
+                                            onChange={(e) => {
+                                                setPin(e.target.value);
+                                                setIsPinError(false); // Reseta o erro ao digitar
+                                            }}
+                                            className="border border-gray-300 p-2 w-full text-center mb-4 text-textPrimaryColor"
+                                            placeholder="• • • •"
+                                        />
                                         {isPinError && (
                                             <p className="text-red-500 -mt-4">
                                                 PIN incorreto. Tente novamente.
                                             </p>
                                         )}
-                                        
+
                                         <div className="grid grid-cols-3 gap-2">
                                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "OK"].map((key) => (
                                                 <button
@@ -157,9 +169,8 @@ const CancelPIN = ({
                                                             setIsPinError(false);
                                                         }
                                                     }}
-                                                    className={`p-4 rounded ${
-                                                        key === "C" ? "bg-gray-300" : key === "OK" ? "bg-primary text-white" : "bg-gray-100"
-                                                    } text-center font-bold`}
+                                                    className={`p-4 rounded ${key === "C" ? "bg-mediumGray text-textPrimaryColor" : key === "OK" ? "bg-primary text-white" : "bg-lightGray text-textPrimaryColor"
+                                                        } text-center font-bold`}
                                                 >
                                                     {key}
                                                 </button>

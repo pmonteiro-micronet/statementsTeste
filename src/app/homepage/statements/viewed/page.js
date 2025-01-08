@@ -4,7 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import "../styles.css";
-import LoadingBackdrop from "@/components/Loader/page"; // Certifique-se de ter o componente de carregamento
+import LoadingBackdrop from "@/components/Loader/page"; 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../public/locales/espanol/common.json";
@@ -26,7 +26,6 @@ const VistosPage = () => {
 
   useEffect(() => {
     if (status === "loading") return;
-
     if (!session) {
       router.push("/auth");
     } else {

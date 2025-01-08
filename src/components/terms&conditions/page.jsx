@@ -41,7 +41,7 @@ const TermsConditionsForm = ({
                                                 <Button color="transparent" variant="light" className={"w-auto min-w-0 p-0 m-0 -pr-4"} onClick={() => { onClose() }}><MdClose size={30} /></Button>
                                             </div>
                                         </ModalHeader>
-                                        <ModalBody className="flex flex-col mx-5 my-5 space-y-8 max-h-96 overflow-y-auto">
+                                        <ModalBody className="flex flex-col mx-5 my-5 space-y-8 max-h-96 overflow-y-auto bg-background text-textPrimaryColor">
                                             <p>
                                                 A Quinta da Vacaria 1616 – Vinhos, S.A (adiante designada “QV”), com sede sita na Quinta da Vacaria, 5050-364 Vilarinho dos Freires, Peso da Régua, Portugal e NIPC 50035988, é a responsável pelo tratamento.
                                                 Os dados pessoais recolhidos serão utilizados unicamente para registo na newsletter da QV após obtermos o seu consentimento prévio e expresso, e para que possamos enviar-lhe outras publicações que nos pediu e/ou que possam ser do seu interesse, nomeadamente, ofertas especiais ou informar sobre atualizações do website.

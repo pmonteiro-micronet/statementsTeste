@@ -127,6 +127,10 @@ export default function Sidebar({ children, setExpanded }) {
     }
   };
 
+  const [isLanguageDropdownOpen, setLanguageDropdownOpen] = useState(false); // Controle do dropdown de idiomas
+
+  const toggleLanguageDropdown = () => setLanguageDropdownOpen(!isLanguageDropdownOpen);
+
   const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
@@ -167,19 +171,30 @@ export default function Sidebar({ children, setExpanded }) {
         }}
       >
         <nav className="h-full flex flex-col">
-          <div className="p-4 pb-2 flex justify-between items-center">
-            <p
-              className={`font-semibold text-sm overflow-hidden transition-all text-textPrimaryColor ${expanded ? "w-64" : "w-0"
-                }`}
-            >
-              Extensions myPMS
-            </p>
+          <div className="p-4 pb-2 flex !justify-between items-center">
+            <div className="flex flex-row gap-4 !items-center">
+              {/* Imagem */}
+              <img
+                src="/icon/extensionsLogoWeb.png"
+                alt="extensions"
+                width={20}
+                height={20}
+              />
+
+              {/* Texto "Extensions myPMS" */}
+              <p
+                className={`font-semibold text-sm overflow-hidden transition-all text-textPrimaryColor mt-1 ${expanded ? "w-64" : "w-0"}`}
+              >
+                Extensions myPMS
+              </p>
+            </div>
             <button
               onClick={handleToggle}
-              className="p-1.5 rounded-lg bg-primaryBackground hover:primaryBackground"
+              className="p-1.5 rounded-lg bg-primaryBackground hover:bg-primaryBackground absolute top-0 right-1 z-20 transform translate-x-1 translate-y-1"
             >
-              <TbLayoutSidebarLeftExpand className="text-textPrimaryColor"/>
+              <TbLayoutSidebarLeftExpand className="text-textPrimaryColor" />
             </button>
+
           </div>
 
           <SidebarContext.Provider value={{ expanded }}>
@@ -258,18 +273,52 @@ export default function Sidebar({ children, setExpanded }) {
                   <li className="py-2 px-3 rounded-md flex flex-row justify-between">
                     <span className="flex items-center">
                       <FaGlobe className="mr-2" />
-                      Idioma
+                      Language
                     </span>
-                    <select
-                      className="ml-2 bg-transparent outline-none cursor-pointer"
-                      value={language}
-                      onChange={(e) => handleLanguageChange(e.target.value)}
-                    >
-                      <option value="pt">Pt</option>
-                      <option value="en">En</option>
-                      <option value="es">Es</option>
-                    </select>
+                    <div className="relative">
+                      {/* Botão de seleção */}
+                      <button
+                        onClick={toggleLanguageDropdown} // Alterna o dropdown de idiomas
+                        className="ml-2 bg-transparent outline-none cursor-pointer flex items-center"
+                      >
+                        {/* Exibe a bandeira ativa */}
+                        <img
+                          src={`/flags/${language}.png`}
+                          alt={language}
+                          className="w-6 h-6 object-cover"
+                        />
+                        {/* Botão de seta para abrir o dropdown */}
+                        <button onClick={toggleLanguageDropdown} className="ml-2 text-gray-600">
+                          {isLanguageDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
+                        </button>
+                      </button>
+
+                      {/* Dropdown customizado */}
+                      {isLanguageDropdownOpen && (
+                        <ul className="absolute top-10 left-0 bg-white shadow-md rounded-md w-32 z-50">
+                          <li
+                            onClick={() => handleLanguageChange('pt')}
+                            className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
+                          >
+                            <img src="/flags/pt.png" alt="portuguese" className="w-4 h-4 object-cover mr-4" />
+                          </li>
+                          <li
+                            onClick={() => handleLanguageChange('uk')}
+                            className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
+                          >
+                            <img src="/flags/uk.png" alt="english" className="w-4 h-4 object-cover mr-4" />
+                          </li>
+                          <li
+                            onClick={() => handleLanguageChange('sp')}
+                            className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
+                          >
+                            <img src="/flags/sp.png" alt="spanish" className="w-4 h-4 object-cover mr-4" />
+                          </li>
+                        </ul>
+                      )}
+                    </div>
                   </li>
+
 
                   {/* Logout */}
                   <li

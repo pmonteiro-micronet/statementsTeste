@@ -1,28 +1,28 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import prisma from "@/lib/db";  // Certifique-se de que a importação está correta
+import prisma from "@/lib/db"; // Certifique-se de que a importação está correta
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const HotelID = searchParams.get("mpehotel");  // Parâmetro HotelID para enviar na query
-  const PropertyID = searchParams.get("propertyID");  // Parâmetro correto
+  const HotelID = searchParams.get("mpehotel"); // Parâmetro HotelID para enviar na query
+  const PropertyID = searchParams.get("propertyID"); // Parâmetro correto
 
   // Verifica se os parâmetros estão presentes
-  if (!PropertyID || !HotelID) {  
+  if (!PropertyID || !HotelID) {
     return new NextResponse(
       JSON.stringify({ error: "Faltam parâmetros: HotelID ou PropertyID" }),
-      { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
+      { status: 400, headers: { "Content-Type": "application/json; charset=utf-8" } }
     );
   }
 
   // Garantir que PropertyID seja um número inteiro
-  const propertyIDInt = parseInt(PropertyID, 10);  // Converte para inteiro, base 10
+  const propertyIDInt = parseInt(PropertyID, 10); // Converte para inteiro, base 10
 
   // Verificar se a conversão foi bem-sucedida
   if (isNaN(propertyIDInt)) {
     return new NextResponse(
       JSON.stringify({ error: "PropertyID inválido, deve ser um número" }),
-      { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
+      { status: 400, headers: { "Content-Type": "application/json; charset=utf-8" } }
     );
   }
 
@@ -30,7 +30,7 @@ export async function GET(request) {
     // Consulta o banco de dados para encontrar o propertyServer e propertyPort com base no PropertyID
     const property = await prisma.properties.findUnique({
       where: {
-        propertyID: propertyIDInt,  // Passa o propertyID como número inteiro
+        propertyID: propertyIDInt, // Passa o propertyID como número inteiro
       },
       select: {
         propertyServer: true,
@@ -41,7 +41,7 @@ export async function GET(request) {
     if (!property) {
       return new NextResponse(
         JSON.stringify({ error: "PropertyID não encontrado no banco de dados" }),
-        { status: 404, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
+        { status: 404, headers: { "Content-Type": "application/json; charset=utf-8" } }
       );
     }
 
@@ -53,37 +53,67 @@ export async function GET(request) {
 
     // Enviar os dados como parâmetros na query string
     const response = await axios.get(url, {
-      params: { HotelID },  // Usando HotelID na requisição
+      params: { HotelID }, // Usando HotelID na requisição
     });
 
     // Verifica se a resposta contém dados
     if (response.data && Array.isArray(response.data)) {
-      // Salva o array de dados (reservas) como um único registro na tabela
-      const newRequest = await prisma.requestRecordsArrivals.create({
-        data: {
-          requestBody: JSON.stringify(response.data), // Armazena o array completo como JSON
-          requestType: "GET", // Tipo da requisição
-          requestDateTime: new Date(), // Data e hora atual
-          responseStatus: "200", // Supondo sucesso inicialmente
-          responseBody: JSON.stringify(response.data), // Armazena a resposta completa
-          propertyID: propertyIDInt, // Usar o propertyID extraído da query
-        },
+      // Busca o último registro existente na tabela com o mesmo PropertyID
+      const existingRecord = await prisma.requestRecordsArrivals.findFirst({
+        where: { propertyID: propertyIDInt },
+        orderBy: { requestDateTime: "desc" },  // Ordena por data mais recente
       });
 
-      console.log("Data saved to DB:", newRequest);
+      if (existingRecord) {
+        // Caso o registro exista, você pode atualizar
+        const updatedRecord = await prisma.requestRecordsArrivals.update({
+          where: {
+            requestID: existingRecord.requestID,  // Usa o requestID do registro existente
+          },
+          data: {
+            requestBody: JSON.stringify(response.data),  // Atualiza o corpo da requisição
+            requestType: "GET",  // Tipo da requisição
+            requestDateTime: new Date(),  // Data e hora da atualização
+            responseStatus: "200",  // Status de resposta
+            responseBody: JSON.stringify(response.data),  // Resposta completa
+            propertyID: propertyIDInt,  // Atualiza o propertyID
+          },
+        });
+        console.log("Registro atualizado:", updatedRecord);
+      } else {
+        // Caso o registro não exista, você pode inserir um novo
+        const newRequest = await prisma.requestRecordsArrivals.create({
+          data: {
+            requestBody: JSON.stringify(response.data),  // Corpo da requisição
+            requestType: "GET",  // Tipo da requisição
+            requestDateTime: new Date(),  // Data e hora atual
+            responseStatus: "200",  // Status de resposta
+            responseBody: JSON.stringify(response.data),  // Resposta completa
+            propertyID: propertyIDInt,  // Propriedade associada
+          },
+        });
+        console.log("Novo registro inserido:", newRequest);
+      }
     }
 
     // Retorna a resposta do Mock Server para o cliente
     console.log("OK: ", response);
-    return new NextResponse(
-      JSON.stringify(response.data),
-      { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
-    );
+    return new NextResponse(JSON.stringify(response.data), {
+      status: 200,
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+    });
   } catch (error) {
-    console.error("Erro ao enviar dados para a API:", error.response ? error.response.data : error.message);
+    console.error(
+      "Erro ao enviar dados para a API:",
+      error.response ? error.response.data : error.message
+    );
     return new NextResponse(
-      JSON.stringify({ error: error.response ? error.response.data : "Erro ao enviar dados para a API" }),
-      { status: 500, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
+      JSON.stringify({
+        error: error.response
+          ? error.response.data
+          : "Erro ao enviar dados para a API",
+      }),
+      { status: 500, headers: { "Content-Type": "application/json; charset=utf-8" } }
     );
   }
 }

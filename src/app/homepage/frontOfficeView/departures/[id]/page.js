@@ -90,6 +90,11 @@ export default function Page({ params }) {
     }
   };
 
+  // Chama a função sendDataToAPI ao carregar a página
+  useEffect(() => {
+    sendDataToAPI();
+  }, [propertyID]);
+
   const sendResToAPI = async (ResNo) => {
     console.log("Enviando ResNumber para a API:", ResNo);
     const windowValue = 0;
@@ -153,31 +158,17 @@ export default function Page({ params }) {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-    // Usando useState para armazenar a última resposta
-    const [lastResponse, setLastResponse] = useState(null);
+
 
   // Função para pegar as reservas
   useEffect(() => {
-    let timeoutId = null;
-    let timeoutThresholdId = null; // Controle do tempo limite para exibir o loading após 3 segundos
-  
-    const fetchReservas = async (isInitialCall = false) => {
-      // Verifica se os dados mudaram em comparação com a última resposta
-      const isDataChanged = lastResponse !== null && lastResponse !== JSON.stringify(response.data.response);
-  
-      // Exibe o loading se for uma nova chamada ou se os dados mudaram
-      if (isInitialCall || isDataChanged) {
-        setIsLoading(true);
-      } else {
-        // Exibe o loading após 3 segundos se os dados não mudaram (timeout de 2 segundos)
-        timeoutThresholdId = setTimeout(() => setIsLoading(true), 2000);
-      }
-  
+    const fetchReservas = async () => {
+      setIsLoading(true);
       try {
         const response = await axios.get(`/api/reservations/checkouts/${propertyID}`);
         console.log("Response completo:", response);
-  
-        // Combina todos os requestBody dentro de response.data.response
+
+        // Combinar todos os requestBody dentro de response.data.response
         const reservasArray = response.data.response.flatMap(item => {
           try {
             return JSON.parse(item.requestBody);
@@ -186,15 +177,15 @@ export default function Page({ params }) {
             return [];
           }
         });
-  
+
         console.log("Reservas após parse (todas as linhas):", reservasArray);
-  
+
         // Se nenhuma reserva for encontrada
         if (reservasArray.length === 0) {
           console.warn("Nenhuma reserva encontrada após parse.");
           return;
         }
-  
+
         // Filtrar reservas pela data atual
         const formattedCurrentDate = dayjs(currentDate).format('YYYY-MM-DD');
         const reservasFiltradas = reservasArray.filter(reserva => {
@@ -202,47 +193,31 @@ export default function Page({ params }) {
             console.warn("DateCO está indefinido ou vazio para esta reserva:", reserva);
             return false;
           }
-  
+
           const formattedDateCO = dayjs(reserva.DateCO).format('YYYY-MM-DD');
           return formattedDateCO === formattedCurrentDate;
         });
-  
+
         console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
-  
+
         // Remover duplicatas com base no número da reserva (ResNo)
         const reservasUnicas = Array.from(
           new Map(reservasFiltradas.map(reserva => [reserva.ResNo, reserva])).values()
         );
-  
+
         console.log("Reservas únicas para a data atual:", reservasUnicas);
         setReservas(reservasUnicas);
-  
-        // Armazena a última resposta para comparação nas próximas chamadas
-        setLastResponse(JSON.stringify(response.data.response));  // Atualiza o estado de lastResponse
-  
       } catch (error) {
         console.error("Erro ao buscar reservas:", error.message);
       } finally {
-        clearTimeout(timeoutId); // Cancela o timeout caso a chamada seja concluída antes dos 3 segundos
-        clearTimeout(timeoutThresholdId); // Cancela o timeout de 3 segundos se a requisição for rápida
-        setIsLoading(false); // Remove o carregamento
+        setIsLoading(false);
       }
     };
-  
-    // Faz o fetch inicial
-    fetchReservas(true);
-  
-    // Configura o polling para buscar dados a cada 5 segundos (5000ms)
-    const intervalId = setInterval(() => fetchReservas(false), 5000);
-  
-    // Limpa o intervalo e timeout quando o componente é desmontado
-    return () => {
-      clearInterval(intervalId);
-      clearTimeout(timeoutId);
-      clearTimeout(timeoutThresholdId);
-    };
-  }, [currentDate, propertyID]); // Dependências  
-  
+
+    fetchReservas();
+  }, [currentDate, propertyID]);
+
+
   useEffect(() => {
     const fetchHotelName = async () => {
       try {
@@ -290,6 +265,7 @@ export default function Page({ params }) {
 
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
+      {isLoading && <LoadingBackdrop open={isLoading} />}
       <div className="flex-grow overflow-y-auto p-4">
         <div className="flex justify-between items-center w-full">
           <div className="header-container flex items-center justify-between w-full">
@@ -337,10 +313,9 @@ export default function Page({ params }) {
         </div>
 
         <div className="mt-5">
-          {reservas.length > 0 ? (
-            <div className="overflow-auto md:overflow-visible">
-              <LoadingBackdrop open={isLoading} />
-              {!isLoading && (
+        {isLoading ? (
+            <LoadingBackdrop open={isLoading} /> // Exibe o carregamento enquanto os dados estão sendo carregados
+          ) : reservas.length > 0 ? (
                 <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
                   <thead>
                     <tr className="bg-primary text-white h-12">
@@ -368,7 +343,7 @@ export default function Page({ params }) {
                                   variant="light"
                                   className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
                                 >
-                                  <BsThreeDotsVertical size={20} className="text-black" />
+                                  <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
                                 </Button>
                               </DropdownTrigger>
                               <DropdownMenu
@@ -410,7 +385,7 @@ export default function Page({ params }) {
                               totalPax={reserva.TotalPax}
                               balance={reserva.Balance}
                               country={reserva.Country}
-                              isBackdropVisible={false}
+                              isBackdropVisible={true}
                               isOpen={isModalOpen}
                               onClose={handleCloseModal}
                             />
@@ -425,15 +400,13 @@ export default function Page({ params }) {
                           <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
                           <td className="text-right pr-2">{reserva.DateCO}</td>
                         </tr>
-                      );
-                    })}
+                       );
+                      })}
                   </tbody>
                 </table>
-              )}
-            </div>
-          ) : (
-            <p className="text-textLabelColor">{t.frontOffice.departures.noReservations}</p>
-          )}
+                  ) : (
+                    <p className="text-textLabelColor">{t.frontOffice.departures.noReservations}</p>
+                  )}
         </div>
 
       </div>

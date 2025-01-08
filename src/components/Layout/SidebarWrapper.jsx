@@ -94,19 +94,19 @@ export default function SidebarWrapper({ children }) {
             },
             ...(isAdmin
               ? [
-                  {
-                    ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
-                    label: "Arrivals",
-                    onClick: () =>
-                      router.push(`/homepage/frontOfficeView/arrivals/${selectedHotelID}`),
-                  },
-                  {
-                    ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
-                    label: "In Houses",
-                    onClick: () =>
-                      router.push(`/homepage/frontOfficeView/inhouses/${selectedHotelID}`),
-                  },
-                ]
+                {
+                  ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
+                  label: "Arrivals",
+                  onClick: () =>
+                    router.push(`/homepage/frontOfficeView/arrivals/${selectedHotelID}`),
+                },
+                {
+                  ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
+                  label: "InHouses",
+                  onClick: () =>
+                    router.push(`/homepage/frontOfficeView/inhouses/${selectedHotelID}`),
+                },
+              ]
               : []),
             {
               ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
@@ -134,26 +134,26 @@ export default function SidebarWrapper({ children }) {
     router.push("/auth/logout");
   };
 
-  const resetHotelSelection = () => {
-    setSelectedHotelID("");
-    setIsHotelConfirmed(false);
-    setShowSelectionButtons(false);
-    localStorage.removeItem("selectedHotelID");
-    localStorage.removeItem("isHotelConfirmed");
-  };
+  // const resetHotelSelection = () => {
+  //   setSelectedHotelID("");
+  //   setIsHotelConfirmed(false);
+  //   setShowSelectionButtons(false);
+  //   localStorage.removeItem("selectedHotelID");
+  //   localStorage.removeItem("isHotelConfirmed");
+  // };
 
   const confirmHotelSelection = () => {
     const selectedHotel = hotels.find((hotel) => String(hotel.propertyID) === String(selectedHotelID));
-    
+
     if (selectedHotel) {
       setIsHotelConfirmed(true);
       localStorage.setItem("isHotelConfirmed", 'true');
-      
+
       // Verificar se a URL está no contexto do Front Office
       if (pathname.includes("/frontOfficeView")) {
         const currentPath = pathname.split('/'); // Divide a URL em partes
         const isSubsection = currentPath.length === 5; // URL com subseção terá exatamente 5 partes
-        
+
         if (isSubsection) {
           // Atualiza apenas o hotelID mantendo a subseção
           const basePath = currentPath.slice(0, 3).join('/'); // Exemplo: /homepage/frontOfficeView
@@ -166,11 +166,11 @@ export default function SidebarWrapper({ children }) {
         }
       }
     }
-    
+
     setShowSelectionButtons(false); // Esconde os botões após a confirmação
   };
-  
-  
+
+
   const showConfirmationModal = selectedHotelID && !isHotelConfirmed;
   const showSidebar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth") && !pathname.includes("/homepage/frontOfficeView/registrationForm");
   const showNavBar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth") && !pathname.includes("/homepage/frontOfficeView/registrationForm");
@@ -221,16 +221,10 @@ export default function SidebarWrapper({ children }) {
                     Logout
                   </button>
                   <button
-                    onClick={resetHotelSelection}
-                    className="bg-gray-200 text-black text-sm py-1 px-2 rounded hover:bg-gray-300"
-                  >
-                    Select
-                  </button>
-                  <button
                     onClick={confirmHotelSelection}
                     className="bg-primary text-white text-sm py-1 px-2 rounded hover:bg-[#E87A18]"
                   >
-                    Continue
+                    Select
                   </button>
                 </div>
               </div>
@@ -256,7 +250,7 @@ export default function SidebarWrapper({ children }) {
 
       <main
         className={`flex-1 min-h-screen overflow-y-auto transition-all duration-300 bg-background ${isMobile || !showSidebar ? "p-0" : "ml-16"
-          }`}
+          } ${showNavBar ? "" : ""} `}
         style={{
           marginLeft: isMobile || !showSidebar ? "0" : expanded ? "16rem" : "4rem",
         }}
