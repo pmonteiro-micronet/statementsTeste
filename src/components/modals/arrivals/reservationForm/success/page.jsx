@@ -2,6 +2,7 @@
 import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@nextui-org/react";
 import { MdClose } from "react-icons/md";
+import CancelPIN from "@/components/modals/pin/cancel/page";
 
 const SuccessRegistrationForm = ({
     modalHeader,
@@ -35,6 +36,18 @@ const SuccessRegistrationForm = ({
                             <li key={index}>{msg}</li>
                         ))}
                     </ul>
+
+                    <div
+                        className="flex flex-row justify-end"
+                    >
+                        <CancelPIN
+                            buttonName={"Ok"}
+                            buttonColor={"transparent"}
+                            modalHeader={"Insert PIN"}
+                            formTypeModal={11}
+                            editor={"teste"}
+                        />
+                    </div>
                 </ModalBody>
             </ModalContent>
         </Modal>
