@@ -30,7 +30,7 @@ const CancelPIN = ({
     const { data: session, status } = useSession();
     const [propertyID, setPropertyID] = useState("");
     console.log(propertyID)
-    const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
+    const [setAutoFocusEnabled] = useState(false);
 
     useEffect(() => {
         const checkSession = async () => {
