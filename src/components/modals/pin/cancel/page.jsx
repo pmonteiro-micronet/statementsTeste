@@ -32,6 +32,7 @@ const CancelPIN = ({
     console.log(propertyID)
     const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
 
+    console.log(autoFocusEnabled);
     useEffect(() => {
         const checkSession = async () => {
             if (status === "loading") return;
@@ -136,10 +137,11 @@ const CancelPIN = ({
                                         </div>
                                     </ModalHeader>
                                     <ModalBody className="flex flex-col mx-5 my-2">
-                                    <input
+                                        <input
                                             type="password"
                                             value={pin}
-                                            autoFocus={autoFocusEnabled}
+                                            readOnly // Impede o teclado virtual nativo
+                                            onFocus={(e) => e.target.blur()} // Remove o foco caso o usuário clique no campo
                                             onChange={(e) => {
                                                 setPin(e.target.value);
                                                 setIsPinError(false); // Reseta o erro ao digitar
@@ -147,6 +149,7 @@ const CancelPIN = ({
                                             className="border border-gray-300 p-2 w-full text-center mb-4 text-textPrimaryColor"
                                             placeholder="• • • •"
                                         />
+
                                         {isPinError && (
                                             <p className="text-red-500 -mt-4">
                                                 Incorrect PIN. Try again.

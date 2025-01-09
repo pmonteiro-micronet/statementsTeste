@@ -31,6 +31,7 @@ const OkPIN = ({
     console.log(propertyID);
     const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
 
+    console.log(autoFocusEnabled);
     useEffect(() => {
         // Verifica se é desktop no carregamento da página
         setAutoFocusEnabled(isDesktop());
@@ -107,7 +108,8 @@ const OkPIN = ({
                         <input
                             type="password"
                             value={pin}
-                            autoFocus={autoFocusEnabled}
+                            readOnly // Impede o teclado virtual nativo
+                            onFocus={(e) => e.target.blur()} // Remove o foco caso o usuário clique no campo
                             onChange={(e) => {
                                 setPin(e.target.value);
                                 setIsPinError(false); // Reseta o erro ao digitar

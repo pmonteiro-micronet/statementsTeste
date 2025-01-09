@@ -33,6 +33,7 @@ const OkPIN = ({
     console.log(propertyID);
     const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
 
+    console.log(autoFocusEnabled);
     useEffect(() => {
         // Verifica se é desktop no carregamento da página
         setAutoFocusEnabled(isDesktop());
@@ -129,10 +130,11 @@ const OkPIN = ({
                                         </div>
                                     </ModalHeader>
                                     <ModalBody className="flex flex-col mx-5 my-2">
-                                    <input
+                                        <input
                                             type="password"
                                             value={pin}
-                                            autoFocus={autoFocusEnabled}
+                                            readOnly // Impede o teclado virtual nativo
+                                            onFocus={(e) => e.target.blur()} // Remove o foco caso o usuário clique no campo
                                             onChange={(e) => {
                                                 setPin(e.target.value);
                                                 setIsPinError(false); // Reseta o erro ao digitar
