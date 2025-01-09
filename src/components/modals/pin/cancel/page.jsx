@@ -30,7 +30,7 @@ const CancelPIN = ({
     const { data: session, status } = useSession();
     const [propertyID, setPropertyID] = useState("");
     console.log(propertyID)
-    const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
+    const [setAutoFocusEnabled] = useState(false);
 
     useEffect(() => {
         const checkSession = async () => {
@@ -75,14 +75,14 @@ const CancelPIN = ({
 
     // Recupera o Hotel ID do localStorage ao carregar a página
     useEffect(() => {
-      const savedHotelID = localStorage.getItem("selectedHotelID"); // Busca o ID salvo
-      if (savedHotelID) {
-        setSelectedHotelID(savedHotelID); // Define o ID no estado
-      } else {
-        setSelectedHotelID("defaultHotelID"); // ID padrão, caso não haja nenhum salvo
-      }
+        const savedHotelID = localStorage.getItem("selectedHotelID"); // Busca o ID salvo
+        if (savedHotelID) {
+            setSelectedHotelID(savedHotelID); // Define o ID no estado
+        } else {
+            setSelectedHotelID("defaultHotelID"); // ID padrão, caso não haja nenhum salvo
+        }
     }, []); // Executa apenas uma vez no carregamento
-    
+
     const handleCancelPinSubmit = async (e) => {
         if (e) e.preventDefault();
         const recordID = localStorage.getItem("recordID");
@@ -139,7 +139,8 @@ const CancelPIN = ({
                                         <input
                                             type="password"
                                             value={pin}
-                                            autoFocus={autoFocusEnabled}
+                                            readOnly // Impede o teclado virtual nativo
+                                            onFocus={(e) => e.target.blur()} // Remove o foco caso o usuário clique no campo
                                             onChange={(e) => {
                                                 setPin(e.target.value);
                                                 setIsPinError(false); // Reseta o erro ao digitar
@@ -147,9 +148,10 @@ const CancelPIN = ({
                                             className="border border-gray-300 p-2 w-full text-center mb-4 text-textPrimaryColor"
                                             placeholder="• • • •"
                                         />
+
                                         {isPinError && (
                                             <p className="text-red-500 -mt-4">
-                                                PIN incorreto. Tente novamente.
+                                                Incorrect PIN. Try again.
                                             </p>
                                         )}
 
