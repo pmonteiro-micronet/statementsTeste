@@ -16,6 +16,8 @@ const isDesktop = () => {
 const CancelPIN = ({
     buttonName,
     buttonIcon,
+    buttonColor,
+    buttonStyle,
     modalHeader,
     editIcon,
     modalEditArrow,
@@ -111,7 +113,13 @@ const CancelPIN = ({
         <>
             {formTypeModal === 11 && (
                 <>
-                    <Button fullWidth={true} size="ms" onPress={onOpen} color="primary" className="bg-gray-300 font-semibold p-2 rounded-lg w-2 text-black">
+                    <Button
+                        fullWidth={true}
+                        color={buttonColor}
+                        size="ms"
+                        onPress={onOpen}
+                        className={`font-semibold p-2 rounded-lg w-2 text-black ${buttonColor || "bg-gray-300"} ${buttonStyle}`}
+                    >
                         {buttonName} {buttonIcon}
                     </Button>
                     <Modal

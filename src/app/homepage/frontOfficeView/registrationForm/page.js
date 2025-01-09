@@ -1153,7 +1153,6 @@ export default function Page() {
                                     {/** Botão de cancelar */}
                                     <CancelPIN
                                         buttonName={"Cancel"}
-                                        buttonColor={"transparent"}
                                         modalHeader={"Insert PIN"}
                                         formTypeModal={11}
                                         editor={"teste"}
