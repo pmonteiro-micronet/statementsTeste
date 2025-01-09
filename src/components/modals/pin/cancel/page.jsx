@@ -30,8 +30,9 @@ const CancelPIN = ({
     const { data: session, status } = useSession();
     const [propertyID, setPropertyID] = useState("");
     console.log(propertyID)
-    const [setAutoFocusEnabled] = useState(false);
+    const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
 
+    console.log(autoFocusEnabled);
     useEffect(() => {
         const checkSession = async () => {
             if (status === "loading") return;
