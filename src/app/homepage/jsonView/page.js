@@ -85,7 +85,7 @@ const JsonViewPage = () => {
       console.log("Checking image for propertyID:", propertyID);
       const img = new Image();
       img.src = `/logos/${propertyID}.png`;
-  
+
       img.onload = () => {
         console.log("Image exists for propertyID:", propertyID);
         setImageExists(true);
@@ -95,12 +95,12 @@ const JsonViewPage = () => {
         setImageExists(false);
       };
     };
-  
+
     if (propertyID) {
       checkImage();
     }
   }, [propertyID]);
-  
+
   const handleOkClick = () => {
     setShowModal(true);
   };
@@ -239,7 +239,7 @@ const JsonViewPage = () => {
                         <td className="border border-gray-300 p-2 h-20 text-lg contentTable">
                           <div className={`flex flex-col gap-2 ${!item.Description2 ? "justify-center text-left" : "text-left"}`}>
                             <span>{item.Description}</span>
-                            {item.Description2 && <span>{item.Description2}</span>}
+                            {item.Description2 && !item.Description2.startsWith("IN") && <span>{item.Description2}</span>}
                           </div>
                         </td>
 
