@@ -31,8 +31,9 @@ const OkPIN = ({
     const { data: session, status } = useSession();
     const [propertyID, setPropertyID] = useState("");
     console.log(propertyID);
-    const [setAutoFocusEnabled] = useState(false);
+    const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
 
+    console.log(autoFocusEnabled);
     useEffect(() => {
         // Verifica se é desktop no carregamento da página
         setAutoFocusEnabled(isDesktop());
