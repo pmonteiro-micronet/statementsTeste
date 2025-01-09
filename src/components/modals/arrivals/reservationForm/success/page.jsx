@@ -42,10 +42,11 @@ const SuccessRegistrationForm = ({
                     >
                         <CancelPIN
                             buttonName={"Ok"}
-                            buttonColor={"transparent"}
+                            buttonColor={"primary"}
                             modalHeader={"Insert PIN"}
                             formTypeModal={11}
                             editor={"teste"}
+                            buttonStyle={"!text-white !-mt-8"}
                         />
                     </div>
                 </ModalBody>
