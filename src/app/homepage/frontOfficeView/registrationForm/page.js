@@ -392,7 +392,7 @@ export default function Page() {
                 {
                     PropertyID: propertyID,
                     pdfBase64: pdfBase64,
-                    fileName: `RegistrationForm_ProfileID_${guestInfo.ProfileID}.pdf`,
+                    fileName: `RegistrationForm_ResNo_${reserva.ResNo}_ProfileID_${guestInfo.ProfileID}.pdf`,
                 }
             );
 
