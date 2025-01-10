@@ -95,7 +95,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     const lineHeight = 8; // Espaçamento entre linhas
 
     // Definir o deslocamento adicional para valores
-    const titleValueSpacing = 24; // Espaçamento entre título e valor
+    const titleValueSpacing = 27; // Espaçamento entre título e valor
 
     // Ajuste o texto das descrições (títulos) para a cor cinza
     doc.setTextColor(...grayColor); // Define a cor do texto para cinza
