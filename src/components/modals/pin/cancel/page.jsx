@@ -34,7 +34,6 @@ const CancelPIN = ({
     console.log(propertyID)
     const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
 
-    console.log(autoFocusEnabled);
     useEffect(() => {
         const checkSession = async () => {
             if (status === "loading") return;
@@ -148,8 +147,7 @@ const CancelPIN = ({
                                         <input
                                             type="password"
                                             value={pin}
-                                            readOnly // Impede o teclado virtual nativo
-                                            onFocus={(e) => e.target.blur()} // Remove o foco caso o usuário clique no campo
+                                            autoFocus={autoFocusEnabled}
                                             onChange={(e) => {
                                                 setPin(e.target.value);
                                                 setIsPinError(false); // Reseta o erro ao digitar

@@ -10,7 +10,7 @@ import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
-import DepartureInfoForm from "@/components/modals/departures/info/page";
+import ArrivalInfoForm from "@/components/modals/arrivals/info/page";
 import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 
@@ -335,7 +335,7 @@ export default function Arrivals({ params }) {
                             </DropdownMenu>
                           </Dropdown>
 
-                          <DepartureInfoForm
+                          <ArrivalInfoForm
                             buttonName={"Info"}
                             buttonColor={"transparent"}
                             modalHeader={"Reservation"}
