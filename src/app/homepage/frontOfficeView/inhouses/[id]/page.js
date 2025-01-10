@@ -375,8 +375,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                           onClose={handleCloseModal}
                         />
                       </td>
-                      <td className="text-right pr-2 w-28">{reserva.DateCO}</td>
-                      <td className="text-right pr-2 w-28">{reserva.DateCO}</td>
+                      <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCI}</td>
+                      <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCO}</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.LastName}</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.FirstName}</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-32">{reserva.Company}</td>
