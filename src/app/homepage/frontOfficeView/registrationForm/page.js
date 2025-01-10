@@ -21,6 +21,8 @@ import LoadingBackdrop from "@/components/Loader/page";
 import { MdSunny } from "react-icons/md";
 import { FaMoon } from "react-icons/fa";
 
+import pako from 'pako'; // Adicione pako para compressão gzip
+
 export default function Page() {
     const [reserva, setReserva] = useState(null);
     const [guestInfo, setGuestInfo] = useState(null);
@@ -296,7 +298,7 @@ export default function Page() {
 
     const handleOkClick = async () => {
         let errors = [];
-
+    
         // Validações de formulário
         if (isCanvasEmpty()) {
             errors.push("Please fill in all required fields to submit the form.");
@@ -309,19 +311,15 @@ export default function Page() {
             setIsErrorModalOpen(true);
             return;
         }
-
+    
         setErrorMessage('');
         setIsErrorModalOpen(false);
-
+    
         let emailToSend = email !== initialEmail ? email : initialEmail; // Envia undefined se não houver alteração
         let vatNoToSend = vatNo !== initialVatNo ? vatNo : initialVatNo; // Envia undefined se não houver alteração
-
-        console.log("Email a ser enviado:", emailToSend);
-        console.log("VAT No a ser enviado:", vatNoToSend);
-
+    
         // Se houver alterações (ou valores a serem enviados), envia para a API
-        if (emailToSend || vatNoToSend) {  // Verifica se algum dos campos tem valor para ser enviado
-            console.log("Alterações detectadas, enviando dados:", { email: emailToSend, vatNo: vatNoToSend });
+        if (emailToSend || vatNoToSend) {
             try {
                 const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
                     email: emailToSend,
@@ -332,23 +330,20 @@ export default function Page() {
                 console.log('Alterações salvas com sucesso:', response.data);
             } catch (error) {
                 console.error('Erro ao salvar alterações:', error);
-                console.log(reserva.ProfileID);
                 errors.push("There was an issue saving your changes. Please contact support.");
                 setErrorMessage(errors.join("\n"));
                 setIsErrorModalOpen(true);
                 return;
             }
-        } else {
-            console.log("Nenhuma alteração detectada, nada será enviado.");
         }
-
+    
         // Captura a assinatura e gera o PDF
         try {
             const canvas = canvasRef.current;
             if (!canvas) return;
-
+    
             const signatureBase64 = canvas.toDataURL().split(',')[1]; // Remove prefixo "data:..."
-
+    
             const reservaDetails = {
                 // Detalhes da reserva
                 PropertyID: propertyID,
@@ -381,31 +376,37 @@ export default function Page() {
                 HotelNIF: hotelNIF,
                 HotelRNET: hotelRNET,
             };
-
+    
             // Geração do PDF
             const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
-            const pdfBase64 = pdfDoc.output('datauristring').split(',')[1]; // Remove prefixo
-
+            const pdfBlob = pdfDoc.output('blob'); // Gerar o PDF como um Blob
+    
+            // Compressão do PDF com pako (gzip)
+            const pdfArrayBuffer = await pdfBlob.arrayBuffer();
+            const compressedPdf = pako.gzip(new Uint8Array(pdfArrayBuffer)); // Comprime usando gzip
+    
+            // Codificação do PDF comprimido em Base64
+            const pdfBase64 = btoa(String.fromCharCode(...compressedPdf));
+    
             // Envia os dados via Axios
             const response = await axios.post(
                 "/api/reservations/checkins/registration_form_base64",
                 {
                     PropertyID: propertyID,
-                    pdfBase64: pdfBase64,
+                    pdfBase64: pdfBase64, // Envia o PDF comprimido em Base64
                     fileName: `RegistrationForm_ResNo_${reserva.ResNo}_ProfileID_${guestInfo.ProfileID}.pdf`,
                 }
             );
-
+    
             console.log('Resposta da API:', response.data);
-            setSuccessMessage("Registration sent successfully"); // Atualiza a mensagem de erro
-            setIsSuccessModalOpen(true); // Exibe o modal de erro
+            setSuccessMessage("Registration sent successfully");
+            setIsSuccessModalOpen(true);
         } catch (error) {
             console.error('Erro ao gerar ou enviar o PDF:', error);
-
-            // Adiciona uma mensagem de erro genérica para o suporte
-            errors.push("There was an issue generating or sending the form. Please contact support. Error: ", error);
-            setErrorMessage(errors.join("\n")); // Atualiza a mensagem de erro
-            setIsErrorModalOpen(true); // Exibe o modal de erro
+    
+            errors.push("There was an issue generating or sending the form. Please contact support.");
+            setErrorMessage(errors.join("\n"));
+            setIsErrorModalOpen(true);
         }
     };
 
