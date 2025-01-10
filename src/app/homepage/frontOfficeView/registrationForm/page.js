@@ -357,7 +357,7 @@ export default function Page() {
                 FirstName: guestInfo.FirstName,
                 Street: address.Street,
                 Country: address.Country,
-                IdDoc: personalID.IdDoc,
+                IdDoc: personalID.IDDoc,
                 NrDoc: personalID.NrDoc,
                 Phone: contacts.PhoneNumber,
                 ExpDate: personalID.ExpDate,
@@ -375,6 +375,7 @@ export default function Page() {
                 HotelPostalCode: hotelPostalCode,
                 HotelNIF: hotelNIF,
                 HotelRNET: hotelRNET,
+                RateCode: reserva.RateCode,
             };
     
             // Geração do PDF
