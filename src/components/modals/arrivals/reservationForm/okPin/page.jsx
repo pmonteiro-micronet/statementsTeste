@@ -17,6 +17,7 @@ const isDesktop = () => {
 const OkPIN = ({
     modalHeader,
     editIcon,
+    buttonColor,
     modalEditArrow,
     modalEdit,
     isOpen, // Receber o estado de visibilidade como prop
@@ -31,6 +32,7 @@ const OkPIN = ({
     console.log(propertyID);
     const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
 
+    console.log(autoFocusEnabled);
     useEffect(() => {
         // Verifica se é desktop no carregamento da página
         setAutoFocusEnabled(isDesktop());
@@ -93,7 +95,7 @@ const OkPIN = ({
         >
             <ModalContent>
                 <form onSubmit={handlePinSubmit}>
-                    <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white p-2">
+                    <ModalHeader color={buttonColor} className="flex flex-row justify-between items-center gap-1 text-white p-2">
                         <div className="flex flex-row justify-start gap-4 pl-4">
                             {editIcon} {modalHeader} {modalEditArrow} {modalEdit}
                         </div>
@@ -107,7 +109,8 @@ const OkPIN = ({
                         <input
                             type="password"
                             value={pin}
-                            autoFocus={autoFocusEnabled}
+                            readOnly // Impede o teclado virtual nativo
+                            onFocus={(e) => e.target.blur()} // Remove o foco caso o usuário clique no campo
                             onChange={(e) => {
                                 setPin(e.target.value);
                                 setIsPinError(false); // Reseta o erro ao digitar
@@ -117,7 +120,7 @@ const OkPIN = ({
                         />
                         {isPinError && (
                             <p className="text-red-500 -mt-4">
-                                PIN incorreto. Tente novamente.
+                                Incorrect PIN. Try again.
                             </p>
                         )}
 

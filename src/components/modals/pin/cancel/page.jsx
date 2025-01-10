@@ -16,6 +16,8 @@ const isDesktop = () => {
 const CancelPIN = ({
     buttonName,
     buttonIcon,
+    buttonColor,
+    buttonStyle,
     modalHeader,
     editIcon,
     modalEditArrow,
@@ -32,6 +34,7 @@ const CancelPIN = ({
     console.log(propertyID)
     const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
 
+    console.log(autoFocusEnabled);
     useEffect(() => {
         const checkSession = async () => {
             if (status === "loading") return;
@@ -75,14 +78,14 @@ const CancelPIN = ({
 
     // Recupera o Hotel ID do localStorage ao carregar a página
     useEffect(() => {
-      const savedHotelID = localStorage.getItem("selectedHotelID"); // Busca o ID salvo
-      if (savedHotelID) {
-        setSelectedHotelID(savedHotelID); // Define o ID no estado
-      } else {
-        setSelectedHotelID("defaultHotelID"); // ID padrão, caso não haja nenhum salvo
-      }
+        const savedHotelID = localStorage.getItem("selectedHotelID"); // Busca o ID salvo
+        if (savedHotelID) {
+            setSelectedHotelID(savedHotelID); // Define o ID no estado
+        } else {
+            setSelectedHotelID("defaultHotelID"); // ID padrão, caso não haja nenhum salvo
+        }
     }, []); // Executa apenas uma vez no carregamento
-    
+
     const handleCancelPinSubmit = async (e) => {
         if (e) e.preventDefault();
         const recordID = localStorage.getItem("recordID");
@@ -110,7 +113,13 @@ const CancelPIN = ({
         <>
             {formTypeModal === 11 && (
                 <>
-                    <Button fullWidth={true} size="ms" onPress={onOpen} color="primary" className="bg-gray-300 font-semibold p-2 rounded-lg w-2 text-black">
+                    <Button
+                        fullWidth={true}
+                        color={buttonColor}
+                        size="ms"
+                        onPress={onOpen}
+                        className={`font-semibold p-2 rounded-lg w-2 text-black ${buttonColor || "bg-gray-300"} ${buttonStyle}`}
+                    >
                         {buttonName} {buttonIcon}
                     </Button>
                     <Modal
@@ -139,7 +148,8 @@ const CancelPIN = ({
                                         <input
                                             type="password"
                                             value={pin}
-                                            autoFocus={autoFocusEnabled}
+                                            readOnly // Impede o teclado virtual nativo
+                                            onFocus={(e) => e.target.blur()} // Remove o foco caso o usuário clique no campo
                                             onChange={(e) => {
                                                 setPin(e.target.value);
                                                 setIsPinError(false); // Reseta o erro ao digitar
@@ -147,9 +157,10 @@ const CancelPIN = ({
                                             className="border border-gray-300 p-2 w-full text-center mb-4 text-textPrimaryColor"
                                             placeholder="• • • •"
                                         />
+
                                         {isPinError && (
                                             <p className="text-red-500 -mt-4">
-                                                PIN incorreto. Tente novamente.
+                                                Incorrect PIN. Try again.
                                             </p>
                                         )}
 
