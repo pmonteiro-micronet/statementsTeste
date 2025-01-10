@@ -159,7 +159,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     doc.text(`${reserva.DateCI || ""}`, stayColumn1X + 40, stayTextY + lineHeight);
     doc.text(`${reserva.DateCO || ""}`, stayColumn2X + 40, stayTextY + lineHeight);
     doc.text(`${reserva.Adults || ""} / ${reserva.Childs || "0"}`, stayColumn1X + 40, stayTextY + 2 * lineHeight);
-    doc.text(`${reserva.Price || ""}`, stayColumn2X + 40, stayTextY + 2 * lineHeight);
+    doc.text(`${reserva.RateCode || ""}`, stayColumn2X + 40, stayTextY + 2 * lineHeight);
     doc.text(`${reserva.Notes || ""}`, stayColumn1X + 40, stayTextY + 3 * lineHeight, { maxWidth: stayguestRectWidth - 50 });
 
 
