@@ -19,7 +19,7 @@
     display: none;
   }
 /* Responsividade para dispositivos móveis */
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     .language-combobox{
         display: block;
       }

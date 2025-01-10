@@ -403,7 +403,7 @@ export default function Page() {
             console.error('Erro ao gerar ou enviar o PDF:', error);
 
             // Adiciona uma mensagem de erro genérica para o suporte
-            errors.push("There was an issue generating or sending the form. Please contact support.");
+            errors.push("There was an issue generating or sending the form. Please contact support. Error: ", error);
             setErrorMessage(errors.join("\n")); // Atualiza a mensagem de erro
             setIsErrorModalOpen(true); // Exibe o modal de erro
         }
@@ -485,8 +485,8 @@ export default function Page() {
                                 />
                             </div>
                             <div
-                                className={`flag ${activeFlag === 'pt-br' ? 'active' : 'inactive'}`}
-                                onClick={() => handleFlagClick('pt-br')}
+                                className={`flag ${activeFlag === 'pt' ? 'active' : 'inactive'}`}
+                                onClick={() => handleFlagClick('pt')}
                             >
                                 <img
                                     src="/flags/pt.png"
@@ -513,7 +513,7 @@ export default function Page() {
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
                             >
                                 <img
-                                    src={`/flags/${activeFlag === 'usa-uk' ? 'uk.png' : activeFlag === 'pt-br' ? 'pt.webp' : 'sp.png'}`}
+                                    src={`/flags/${activeFlag === 'usa-uk' ? 'uk.png' : activeFlag === 'pt' ? 'pt.png' : 'sp.png'}`}
                                     alt={activeFlag}
                                     className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
                                 />
@@ -550,10 +550,10 @@ export default function Page() {
                                     </div>
                                     <div
                                         className="flex items-center justify-center gap-2 p-2 cursor-pointer"
-                                        onClick={() => handleFlagClick('pt-br')}
+                                        onClick={() => handleFlagClick('pt')}
                                     >
                                         <img
-                                            src="/flags/pt.webp"
+                                            src="/flags/pt.png"
                                             alt="portuguese"
                                             className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
                                         />
@@ -866,11 +866,11 @@ export default function Page() {
                                 /> */}
                                         <InputFieldControlled
                                             type={"text"}
-                                            id={"Nacionality"}
-                                            name={"Nacionality"}
-                                            label={"Nacionality"}
-                                            ariaLabel={"Nacionality:"}
-                                            value={personalID.Nacionality}
+                                            id={"Nationality"}
+                                            name={"Nationality"}
+                                            label={"Nationality"}
+                                            ariaLabel={"Nationality:"}
+                                            value={personalID.Nationality}
                                             style={`${inputStyleFullWithLine}`}
                                         />
                                         <div className='flex flex-row justify-between items-center gap-4 mt-4'>
@@ -885,7 +885,7 @@ export default function Page() {
                                                 name={"ID Doc"}
                                                 label={"ID Doc"}
                                                 ariaLabel={"ID Doc:"}
-                                                value={""}
+                                                value={personalID.IDDoc}
                                                 style={`${inputStyleFullWithLine}`}
                                             />
                                             <InputFieldControlled
