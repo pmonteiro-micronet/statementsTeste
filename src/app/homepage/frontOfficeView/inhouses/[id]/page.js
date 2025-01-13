@@ -84,7 +84,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
     try {
       // Faz a requisição para enviar os dados do statement
-      const saveResponse = await axios.get("/api/reservations/inHouses/reservations_4_tat", {
+      const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
         params: {
           ResNo,
           window: windowValue,

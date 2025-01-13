@@ -95,7 +95,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     const lineHeight = 8; // Espaçamento entre linhas
 
     // Definir o deslocamento adicional para valores
-    const titleValueSpacing = 27; // Espaçamento entre título e valor
+    const titleValueSpacing = 26; // Espaçamento entre título e valor
 
     // Ajuste o texto das descrições (títulos) para a cor cinza
     doc.setTextColor(...grayColor); // Define a cor do texto para cinza
@@ -114,6 +114,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
 
     // Agora, definimos a cor preta para as variáveis (valores)
     doc.setTextColor(...blackColor); // Define a cor do texto para preto
+    doc.setFontSize(10);
     doc.text(`${reserva.LastName || ""}, ${reserva.FirstName || ""}`, guestColumn1X + titleValueSpacing, guestTextY);
     doc.text(`${reserva.Street || ""}`, guestColumn1X + titleValueSpacing, guestTextY + lineHeight);
     doc.text(`${reserva.Country || ""}`, guestColumn1X + titleValueSpacing, guestTextY + 2 * lineHeight);
@@ -126,8 +127,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     doc.text(`${reserva.Issue || ""}`, guestColumn2X + titleValueSpacing, guestTextY + 5 * lineHeight);
     doc.text(`${reserva.CountryOfBirth || ""}`, guestColumn1X + titleValueSpacing, guestTextY + 6 * lineHeight);
     doc.text(`${reserva.VatNo || ""}`, guestColumn2X + titleValueSpacing, guestTextY + 6 * lineHeight);
-
-
+    doc.setFontSize(12);
 
     // Adiciona título e detalhes da estadia
     doc.setFont('helvetica', 'bold');
@@ -158,6 +158,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
 
     // Agora, definimos a cor preta para as variáveis (valores)
     doc.setTextColor(...blackColor); // Define a cor do texto para preto
+    doc.setFontSize(10);
     doc.text(`${reserva.ResNo || ""}`, stayColumn1X + 40, stayTextY); // Aproxima a variável do título
     doc.text(`${reserva.Room || ""}`, stayColumn2X + 40, stayTextY);
     doc.text(`${reserva.DateCI || ""}`, stayColumn1X + 40, stayTextY + lineHeight);
@@ -165,7 +166,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     doc.text(`${reserva.Adults || ""} / ${reserva.Childs || "0"}`, stayColumn1X + 40, stayTextY + 2 * lineHeight);
     doc.text(`${reserva.RateCode || ""}`, stayColumn2X + 40, stayTextY + 2 * lineHeight);
     doc.text(`${reserva.Notes || ""}`, stayColumn1X + 40, stayTextY + 3 * lineHeight, { maxWidth: stayguestRectWidth - 50 });
-
+    doc.setFontSize(12);
 
     // Adiciona título e detalhes da estadia
     doc.setFont('helvetica', 'bold');
@@ -203,13 +204,14 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
 
     // Definir o tamanho da fonte menor apenas para o texto de justificação
     doc.setFontSize(9); // Ajuste o tamanho da fonte para ser menor
+    doc.setFont('helvetica', 'normal');
 
     // Texto justificado dentro do retângulo
     const justificationText = `
-${reserva.HotelMiniTerms}
-`;
+    ${reserva.HotelMiniTerms}
+    `;
 
-    doc.text(justificationText, termsColumn1X, termsTextY, { maxWidth: termsRectWidth - 10, align: 'justify' });
+    doc.text(justificationText, termsColumn1X, termsTextY, { maxWidth: termsRectWidth - 10 });
 
     // Se precisar de voltar ao tamanho de fonte padrão para outros textos, faça assim:
     doc.setFontSize(12); // Retorna ao tamanho normal da fonte
