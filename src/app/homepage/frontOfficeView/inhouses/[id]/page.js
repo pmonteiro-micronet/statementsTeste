@@ -9,7 +9,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
 
-import DepartureInfoForm from "@/components/modals/departures/info/page";
+import InHousesInfoForm from "@/components/modals/inhouses/info/page";
 import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 
@@ -78,67 +78,67 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     sendDataToAPI();
   }, [propertyID]);
 
-  // const sendResToAPI = async (ResNo) => {
-  //   console.log("Enviando ResNumber para a API:", ResNo);
-  //   const windowValue = 0;
+  const sendResToAPI = async (ResNo) => {
+    console.log("Enviando ResNumber para a API:", ResNo);
+    const windowValue = 0;
 
-  //   try {
-  //     // Faz a requisição para enviar os dados do statement
-  //     const saveResponse = await axios.get("/api/reservations/inHouses/reservations_4_tat", {
-  //       params: {
-  //         ResNo,
-  //         window: windowValue,
-  //         propertyID,
-  //       },
-  //     });
+    try {
+      // Faz a requisição para enviar os dados do statement
+      const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
+        params: {
+          ResNo,
+          window: windowValue,
+          propertyID,
+        },
+      });
 
-  //     console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
-  //     console.log("Resposta da API ao salvar statement:", saveResponse.data);
+      console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
+      console.log("Resposta da API ao salvar statement:", saveResponse.data);
 
-  //     // Aguarda brevemente para dar tempo à base de dados sincronizar o novo registro
-  //     await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms de atraso opcional
+      // Aguarda brevemente para dar tempo à base de dados sincronizar o novo registro
+      await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms de atraso opcional
 
-  //     // Após o envio, busca o recordID do último registro
-  //     const response = await axios.get("/api/get_jsons");
-  //     console.log("Resposta da API ao buscar registros:", response.data);
+      // Após o envio, busca o recordID do último registro
+      const response = await axios.get("/api/get_jsons");
+      console.log("Resposta da API ao buscar registros:", response.data);
 
-  //     // Buscar o último `requestID` na lista de respostas
-  //     const lastRecord = response.data.response.sort((a, b) => b.requestID - a.requestID)[0]; // Ordena por requestID desc
-  //     if (lastRecord && lastRecord.requestID) {
-  //       const lastRecordID = lastRecord.requestID;
+      // Buscar o último `requestID` na lista de respostas
+      const lastRecord = response.data.response.sort((a, b) => b.requestID - a.requestID)[0]; // Ordena por requestID desc
+      if (lastRecord && lastRecord.requestID) {
+        const lastRecordID = lastRecord.requestID;
 
-  //       // Redireciona para a página jsonView com os parâmetros na URL
-  //       router.push(`/homepage/jsonView?recordID=${lastRecordID}&propertyID=${propertyID}`);
-  //     } else {
-  //       console.warn("RecordID não encontrado na resposta da API.");
-  //     }
-  //   } catch (error) {
-  //     if (error.response && error.response.status === 409) {
-  //       // O status 409 indica conflito, ou seja, o registro já existe
-  //       console.warn("Registro já existente, buscando o requestID do registro existente.");
+        // Redireciona para a página jsonView com os parâmetros na URL
+        router.push(`/homepage/jsonView?recordID=${lastRecordID}&propertyID=${propertyID}`);
+      } else {
+        console.warn("RecordID não encontrado na resposta da API.");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        // O status 409 indica conflito, ou seja, o registro já existe
+        console.warn("Registro já existente, buscando o requestID do registro existente.");
 
-  //       // Extraia o requestID do erro, se a API o fornecer
-  //       const existingRequestID = error.response.data?.existingRequestID;
+        // Extraia o requestID do erro, se a API o fornecer
+        const existingRequestID = error.response.data?.existingRequestID;
 
-  //       if (existingRequestID) {
-  //         console.log("Registro existente encontrado com requestID:", existingRequestID);
+        if (existingRequestID) {
+          console.log("Registro existente encontrado com requestID:", existingRequestID);
 
-  //         // Redireciona para a página jsonView com o requestID do registro existente
-  //         router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
-  //       } else {
-  //         console.error(
-  //           "Não foi possível encontrar o requestID do registro existente.",
-  //           error.response.data
-  //         );
-  //       }
-  //     } else {
-  //       console.error(
-  //         "Erro ao enviar os dados ou buscar o recordID:",
-  //         error.response ? error.response.data : error.message
-  //       );
-  //     }
-  //   }
-  // };
+          // Redireciona para a página jsonView com o requestID do registro existente
+          router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
+        } else {
+          console.error(
+            "Não foi possível encontrar o requestID do registro existente.",
+            error.response.data
+          );
+        }
+      } else {
+        console.error(
+          "Erro ao enviar os dados ou buscar o recordID:",
+          error.response ? error.response.data : error.message
+        );
+      }
+    }
+  };
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -339,14 +339,22 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                             <DropdownItem key="edit" onClick={() => handleOpenModal()}>
                               Info
                             </DropdownItem>
-                            {/* <DropdownItem
+                            <DropdownItem
                               key="show"
+                              onClick={() => {
+                                if (reserva.ResNo) {
+                                  sendResToAPI(reserva.ResNo);
+                                } else {
+                                  console.warn("ReservationNumber não encontrado.");
+                                }
+                              }}
                             >
                               Statement
-                            </DropdownItem> */}
+                            </DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
-                        <DepartureInfoForm
+
+                        <InHousesInfoForm
                           buttonName={"Info"}
                           buttonColor={"transparent"}
                           modalHeader={"Reservation"}
@@ -367,8 +375,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                           onClose={handleCloseModal}
                         />
                       </td>
-                      <td className="text-right pr-2 w-28">{reserva.DateCO}</td>
-                      <td className="text-right pr-2 w-28">{reserva.DateCO}</td>
+                      <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCI}</td>
+                      <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCO}</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.LastName}</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.FirstName}</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-32">{reserva.Company}</td>

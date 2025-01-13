@@ -398,7 +398,7 @@ export default function Page({ params }) {
                           <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
                           <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-64 max-w-xs truncate">{reserva.Notes}</td>
                           <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
-                          <td className="text-right pr-2">{reserva.DateCO}</td>
+                          <td className="text-right pr-2 whitespace-nowrap">{reserva.DateCO}</td>
                         </tr>
                        );
                       })}

@@ -5,7 +5,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@nextui-org
 import { MdClose } from "react-icons/md";
 import { Tabs, Tab } from "@nextui-org/react";
 
-const ArrivalInfoForm = ({
+const InHousesInfoForm = ({
     modalHeader,
     editIcon,
     modalEditArrow,
@@ -115,4 +115,4 @@ const ArrivalInfoForm = ({
     );
 };
 
-export default ArrivalInfoForm;
+export default InHousesInfoForm;

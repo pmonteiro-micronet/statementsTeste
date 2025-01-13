@@ -10,7 +10,7 @@ import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
-import DepartureInfoForm from "@/components/modals/departures/info/page";
+import ArrivalInfoForm from "@/components/modals/arrivals/info/page";
 import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 
@@ -335,7 +335,7 @@ export default function Arrivals({ params }) {
                             </DropdownMenu>
                           </Dropdown>
 
-                          <DepartureInfoForm
+                          <ArrivalInfoForm
                             buttonName={"Info"}
                             buttonColor={"transparent"}
                             modalHeader={"Reservation"}
@@ -365,7 +365,7 @@ export default function Arrivals({ params }) {
                         <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
                         <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-52 max-w-xs truncate">{reserva.Notes}</td>
                         <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
-                        <td className="text-right pr-2 w-28">{reserva.DateCI}</td>
+                        <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCI}</td>
                       </tr>
                     );
                   })}
