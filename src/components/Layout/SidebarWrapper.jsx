@@ -9,6 +9,13 @@ import { IoDocumentOutline } from "react-icons/io5";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { RiHotelLine } from "react-icons/ri";
 
+import { TbLayoutDashboardFilled } from "react-icons/tb";
+import { MdOutlinePendingActions } from "react-icons/md";
+import { AiOutlineFileDone } from "react-icons/ai";
+import { LiaPlaneDepartureSolid } from "react-icons/lia";
+import { LiaPlaneArrivalSolid } from "react-icons/lia";
+import { LuMapPinHouse } from "react-icons/lu";
+
 export default function SidebarWrapper({ children }) {
   const { data: session } = useSession();
   const pathname = usePathname();
@@ -79,9 +86,9 @@ export default function SidebarWrapper({ children }) {
         Statements: {
           icon: <IoDocumentOutline size={20} />,
           items: [
-            { ref: "/homepage/statements", label: "Dashboard" },
-            { ref: "/homepage/statements/pending", label: "Pendings", count: pendingCount },
-            { ref: "/homepage/statements/viewed", label: "Viewed" },
+            { ref: "/homepage/statements", label: "Dashboard", icon: <TbLayoutDashboardFilled  /> },
+            { ref: "/homepage/statements/pending", label: "Pendings",icon: <MdOutlinePendingActions  />,  count: pendingCount },
+            { ref: "/homepage/statements/viewed", label: "Viewed", icon: <AiOutlineFileDone  /> },
           ],
         },
         Front_Office: {
@@ -91,6 +98,7 @@ export default function SidebarWrapper({ children }) {
               ref: `/homepage/frontOfficeView/${selectedHotelID}`,
               label: "Dashboard",
               onClick: () => router.push(`/homepage/frontOfficeView/${selectedHotelID}`),
+              icon: <TbLayoutDashboardFilled  />
             },
             ...(isAdmin
               ? [
@@ -99,12 +107,14 @@ export default function SidebarWrapper({ children }) {
                   label: "Arrivals",
                   onClick: () =>
                     router.push(`/homepage/frontOfficeView/arrivals/${selectedHotelID}`),
+                  icon: <LiaPlaneArrivalSolid /> 
                 },
                 {
                   ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
                   label: "InHouses",
                   onClick: () =>
                     router.push(`/homepage/frontOfficeView/inhouses/${selectedHotelID}`),
+                  icon: <LuMapPinHouse /> 
                 },
               ]
               : []),
@@ -113,6 +123,7 @@ export default function SidebarWrapper({ children }) {
               label: "Departures",
               onClick: () =>
                 router.push(`/homepage/frontOfficeView/departures/${selectedHotelID}`),
+              icon: <LiaPlaneDepartureSolid /> 
             },
           ],
         },
@@ -237,6 +248,7 @@ export default function SidebarWrapper({ children }) {
                     key={index}
                     text={item.label}
                     href={item.ref}
+                    icon={item.icon} // Adicione o ícone ao submenu
                     active={item.active}
                     count={item.count}
                     onClick={item.onClick}

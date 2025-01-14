@@ -392,17 +392,24 @@ export function SidebarItem({ icon, text, active, alert, children }) {
   );
 }
 
+
+
 // SubMenuItem Component
-export function SubMenuItem({ text, href, count }) {
+export function SubMenuItem({ text, href, count, icon }) {
   const { expanded } = useContext(SidebarContext);
 
   return (
     <Link href={href}>
       <li
-        className="flex items-center py-2 pl-3 my-1 rounded-md hover:bg-[#FAE7D6] text-gray-600 cursor-pointer"
+        className={`flex items-center py-2 px-3 my-1 rounded-md text-gray-600 cursor-pointer transition-all ${expanded ? "justify-start hover:bg-[#FAE7D6]" : "justify-center"}`} // Justifica no centro quando compactada
       >
+        {icon && (
+          <span className={`mr-2 -ml-3 ${expanded ? "" : "hover:bg-[#FAE7D6] py-2 px-3 -mt-2 -mb-2 rounded-md"} `}>
+            {icon}
+          </span>
+        )}
         <span
-          className={`overflow-hidden transition-all ${expanded ? "w-40" : "w-0"}`}
+          className={`overflow-hidden transition-all ${expanded ? "w-40" : "hidden"}`}
         >
           {text}
         </span>
@@ -415,4 +422,6 @@ export function SubMenuItem({ text, href, count }) {
     </Link>
   );
 }
+
+
 
