@@ -67,7 +67,7 @@ const OkPIN = ({
             const isPinCorrect = await bcrypt.compare(pin, userPinHash);
             if (isPinCorrect) {
                 await axios.patch(`/api/get_jsons/${recordID}`);
-                router.push("/homepage");
+                router.push(`/homepage/frontOfficeView/${selectedHotelID}`);
             } else {
                 setPin("");
                 setIsPinError(true);

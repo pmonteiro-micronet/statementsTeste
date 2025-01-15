@@ -10,6 +10,8 @@ import { FaUser } from "react-icons/fa";
 import { MdSunny } from "react-icons/md";
 import { FaMoon, FaGlobe, FaChevronDown, FaChevronUp } from "react-icons/fa"; // Novos ícones adicionados
 
+import ProfileModalForm from "@/components/modals/user/profileModal";
+
 const SidebarContext = createContext();
 let inactivityTimeout;
 let warningTimeout;
@@ -232,6 +234,15 @@ export default function Sidebar({ children, setExpanded }) {
             {isDropdownOpen && (
               <div className="absolute bottom-14 right-0 bg-background shadow-lg rounded-md p-3 w-56 z-50 text-textPrimaryColor">
                 <ul>
+                  <li className="">
+                    <ProfileModalForm 
+                    formTypeModal={11}
+                    buttonName={"Profile Settings"}
+                    buttonIcon={<FaUser />}
+                    modalHeader={"Profile Settings"}
+                    buttonColor={"transparent"}
+                    />
+                  </li>
                   {/* Tema Escuro */}
                   <li className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-background">
                     <span>View Mode</span>
