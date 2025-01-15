@@ -997,34 +997,37 @@ export default function Page() {
                                     </div>
 
                                     {/** Dados de faturação */}
-                                    <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card">
-                                        <div className="flex flex-row justify-between">
-                                            <p className="text-[#f7ba83] mb-1">{t.frontOffice.registrationForm.invoiceData}</p>
-                                            <FaPencilAlt
-                                                size={15}
-                                                color="orange"
-                                                onClick={() => {
-                                                    setModalField("VatNo"); // Define o campo em edição
-                                                    setIsModalOpen(true); // Abre o modal
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="mt-2">
-                                            <p className="!text-textLabelColor text-lg">{guestInfo.LastName}, {guestInfo.FirstName}</p>
-                                            <div className="mt-4">
-                                                <InputFieldControlled
-                                                    type="text"
-                                                    id="VAT Nr."
-                                                    name="VAT Nr."
-                                                    label={t.frontOffice.registrationForm.vatNr}
-                                                    ariaLabel="VAT Nr.:"
-                                                    value={vatNo}
-                                                    style={inputStyleFull}
-                                                    disabled
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
+<div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card">
+    <div className="flex flex-row justify-between">
+        <p className="text-[#f7ba83] mb-1">{t.frontOffice.registrationForm.invoiceData}</p>
+        <FaPencilAlt
+            size={15}
+            color={reserva.BlockedVatNO === 1 ? "gray" : "#FC9D25"}
+            style={{ cursor: reserva.BlockedVatNO === 1 ? "not-allowed" : "pointer" }}
+            onClick={() => {
+                if (reserva.BlockedVatNO === 0) {
+                    setModalField("VatNo"); // Define o campo em edição
+                    setIsModalOpen(true); // Abre o modal
+                }
+            }}
+        />
+    </div>
+    <div className="mt-2">
+        <p className="!text-textLabelColor text-lg">{guestInfo.LastName}, {guestInfo.FirstName}</p>
+        <div className="mt-4">
+            <InputFieldControlled
+                type="text"
+                id="VAT Nr."
+                name="VAT Nr."
+                label="{t.frontOffice.registrationForm.vatNr}"
+                ariaLabel="VAT Nr.:"
+                value={vatNo}
+                style={inputStyleFull}
+                disabled
+            />
+        </div>
+    </div>
+</div>
 
                                     {/** Modal Dinâmico */}
                                     {isModalOpen && (

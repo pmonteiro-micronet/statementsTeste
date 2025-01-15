@@ -89,7 +89,7 @@ export async function GET(request) {
           requestType: "GET",  // Tipo da requisição
           requestDateTime: new Date(),  // Data e hora atual
           responseStatus: "200",  // Status de resposta
-          responseBody: responseData,  // Resposta completa
+          responseBody: JSON.stringify(responseData),  // Resposta completa
           propertyID: propertyIDInt,  // Propriedade associada
         },
       });

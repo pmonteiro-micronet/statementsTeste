@@ -72,7 +72,7 @@ export async function GET(request) {
           requestType: "GET", // Tipo da requisição
           requestDateTime: new Date(), // Data e hora atual
           responseStatus: "200", // Supondo sucesso inicialmente
-          responseBody: response.data, // Armazena a resposta completa
+          responseBody: JSON.stringify(response.data), // Armazena a resposta completa
           propertyID: propertyIDInt, // Usar o propertyID extraído da query
         },
       });
