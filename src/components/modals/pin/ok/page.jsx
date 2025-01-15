@@ -9,7 +9,7 @@ import bcrypt from "bcryptjs";
 
 const isDesktop = () => {
     if (typeof window !== "undefined") {
-        return window.innerWidth >= 1024; // Define dispositivos desktop como largura maior ou igual a 1024px
+        return window.innerWidth >= 2000; // Define dispositivos desktop como largura maior ou igual a 1024px
     }
     return false;
 };
@@ -67,7 +67,7 @@ const OkPIN = ({
             const isPinCorrect = await bcrypt.compare(pin, userPinHash);
             if (isPinCorrect) {
                 await axios.patch(`/api/get_jsons/${recordID}`);
-                router.push("/homepage");
+                router.push(`/homepage/frontOfficeView/${selectedHotelID}`);
             } else {
                 setPin("");
                 setIsPinError(true);

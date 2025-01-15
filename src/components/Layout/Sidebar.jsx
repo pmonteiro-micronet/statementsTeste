@@ -14,6 +14,8 @@ import es from "../../../public/locales/espanol/common.json";
 import { MdSunny } from "react-icons/md";
 import { FaMoon, FaGlobe, FaChevronDown, FaChevronUp } from "react-icons/fa"; // Novos ícones adicionados
 
+import ProfileModalForm from "@/components/modals/user/profileModal";
+
 const SidebarContext = createContext();
 let inactivityTimeout;
 let warningTimeout;
@@ -247,6 +249,15 @@ export default function Sidebar({ children, setExpanded }) {
             {isDropdownOpen && (
               <div className="absolute bottom-14 right-0 bg-background shadow-lg rounded-md p-3 w-56 z-50 text-textPrimaryColor">
                 <ul>
+                  <li className="">
+                    <ProfileModalForm 
+                    formTypeModal={11}
+                    buttonName={"Profile Settings"}
+                    buttonIcon={<FaUser />}
+                    modalHeader={"Profile Settings"}
+                    buttonColor={"transparent"}
+                    />
+                  </li>
                   {/* Tema Escuro */}
                   <li className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-background">
                     <span>{t.navbar.text.viewMode}</span>
@@ -373,17 +384,24 @@ export function SidebarItem({ icon, text, active, alert, children }) {
   );
 }
 
+
+
 // SubMenuItem Component
-export function SubMenuItem({ text, href, count }) {
+export function SubMenuItem({ text, href, count, icon }) {
   const { expanded } = useContext(SidebarContext);
 
   return (
     <Link href={href}>
       <li
-        className="flex items-center py-2 pl-3 my-1 rounded-md hover:bg-[#FAE7D6] text-gray-600 cursor-pointer"
+        className={`flex items-center py-2 px-3 my-1 rounded-md text-gray-600 cursor-pointer transition-all ${expanded ? "justify-start hover:bg-[#FAE7D6]" : "justify-center"}`} // Justifica no centro quando compactada
       >
+        {icon && (
+          <span className={`mr-2 -ml-3 ${expanded ? "" : "hover:bg-[#FAE7D6] py-2 px-3 -mt-2 -mb-2 rounded-md"} `}>
+            {icon}
+          </span>
+        )}
         <span
-          className={`overflow-hidden transition-all ${expanded ? "w-40" : "w-0"}`}
+          className={`overflow-hidden transition-all ${expanded ? "w-40" : "hidden"}`}
         >
           {text}
         </span>
@@ -396,4 +414,6 @@ export function SubMenuItem({ text, href, count }) {
     </Link>
   );
 }
+
+
 
