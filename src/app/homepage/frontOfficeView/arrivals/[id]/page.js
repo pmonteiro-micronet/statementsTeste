@@ -10,9 +10,9 @@ import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
-import en from "../../../../../public/locales/english/common.json";
-import pt from "../../../../../public/locales/portuguesPortugal/common.json";
-import es from "../../../../../public/locales/espanol/common.json";
+import en from "../../../../../../public/locales/english/common.json";
+import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../../public/locales/espanol/common.json";
 
 import ArrivalInfoForm from "@/components/modals/arrivals/info/page";
 import "../../table.css";
