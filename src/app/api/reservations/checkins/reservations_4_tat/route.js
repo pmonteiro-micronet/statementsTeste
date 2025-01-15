@@ -85,7 +85,7 @@ export async function GET(request) {
       // Caso o registro não exista, insere um novo com os dados retornados (seja vazio ou não)
       const newRequest = await prisma.requestRecordsArrivals.create({
         data: {
-          requestBody: JSON.stringify(responseData),  // Corpo da requisição (array vazio ou com dados)
+          requestBody: responseData,  // Corpo da requisição (array vazio ou com dados)
           requestType: "GET",  // Tipo da requisição
           requestDateTime: new Date(),  // Data e hora atual
           responseStatus: "200",  // Status de resposta
