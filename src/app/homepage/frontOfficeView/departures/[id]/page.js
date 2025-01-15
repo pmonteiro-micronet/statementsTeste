@@ -18,14 +18,27 @@ import { useRouter } from "next/navigation";
 import dayjs from 'dayjs';
 
 import en from "../../../../../../public/locales/english/common.json";
+import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../../public/locales/espanol/common.json";
 
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
 
-const translations = { en };
+const translations = { en, pt, es };
 
 export default function Page({ params }) {
-  const locale = "en";
-  const t = translations[locale];
+  const [locale, setLocale] = useState("pt");
+  
+  useEffect(() => {
+    // Carregar o idioma do localStorage
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
+
+  // Carregar as traduções com base no idioma atual
+  const t = translations[locale] || translations["pt"]; // fallback para "pt"
+
 
   const { id } = params;
   const propertyID = id;
@@ -432,7 +445,7 @@ export default function Page({ params }) {
       {/** Modal de erro */}
       {isErrorModalOpen && errorMessage && (
         <ErrorRegistrationForm
-          modalHeader="Attention"
+          modalHeader={t.frontOffice.departures.attention}
           errorMessage={errorMessage}
           onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
         />

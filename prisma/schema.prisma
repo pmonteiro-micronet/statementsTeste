@@ -73,7 +73,7 @@ model counter {
 
 model requestRecordsArrivals {
   requestID       Int      @id @default(autoincrement())
-  requestBody     String   @db.Text
+  requestBody     Json
   requestType     String   @db.VarChar(20)
   requestDateTime DateTime @db.DateTime(0)
   responseStatus  String?  @db.VarChar(20)
@@ -83,7 +83,7 @@ model requestRecordsArrivals {
 
 model requestRecordsDepartures {
   requestID       Int      @id @default(autoincrement())
-  requestBody     String   @db.Text
+  requestBody     Json
   requestType     String   @db.VarChar(8192)
   requestDateTime DateTime @db.DateTime(0)
   responseStatus  String?  @db.VarChar(20)
@@ -93,7 +93,7 @@ model requestRecordsDepartures {
 
 model requestRecordsInHouses {
   requestID       Int      @id @default(autoincrement())
-  requestBody     String   @db.Text
+  requestBody     Json
   requestType     String   @db.VarChar(8192)
   requestDateTime DateTime @db.DateTime(0)
   responseStatus  String?  @db.VarChar(20)
