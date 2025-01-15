@@ -18,9 +18,9 @@ import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/
 import SuccessRegistrationForm from "@/components/modals/arrivals/reservationForm/success/page";
 import LoadingBackdrop from "@/components/Loader/page";
 
-import en from "../../../../../../public/locales/english/common.json";
-import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
-import es from "../../../../../../public/locales/espanol/common.json";
+import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
 
 const translations = { en, pt, es };
 
