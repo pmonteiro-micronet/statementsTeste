@@ -68,11 +68,11 @@ export async function GET(request) {
       // Salva o array de dados (reservas) como um único registro na tabela
       const newRequest = await prisma.requestRecordsDepartures.create({
         data: {
-          requestBody: response.data, // Aqui, o mesmo JSON do responseBody
+          requestBody: JSON.stringify(response.data), // Aqui, o mesmo JSON do responseBody
           requestType: "GET", // Tipo da requisição
           requestDateTime: new Date(), // Data e hora atual
           responseStatus: "200", // Supondo sucesso inicialmente
-          responseBody: response.data, // Armazena a resposta completa
+          responseBody: JSON.stringify(response.data), // Armazena a resposta completa
           propertyID: propertyIDInt, // Usar o propertyID extraído da query
         },
       });
