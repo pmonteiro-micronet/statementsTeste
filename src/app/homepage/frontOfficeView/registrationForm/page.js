@@ -18,6 +18,12 @@ import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/
 import SuccessRegistrationForm from "@/components/modals/arrivals/reservationForm/success/page";
 import LoadingBackdrop from "@/components/Loader/page";
 
+import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
+
 import { MdSunny } from "react-icons/md";
 import { FaMoon } from "react-icons/fa";
 
@@ -50,6 +56,19 @@ export default function Page() {
 
     const canvasRef = useRef(null);
     const signaturePadRef = useRef(null);
+
+    const [locale, setLocale] = useState("pt");
+  
+  useEffect(() => {
+    // Carregar o idioma do localStorage
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
+
+  // Carregar as traduções com base no idioma atual
+  const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
     // const searchParams = useSearchParams();  // Usando useSearchParams diretamente
     // const requestID = searchParams.get("requestID");  // Acessando parâmetro de URL
@@ -473,7 +492,7 @@ export default function Page() {
                     <div className="pt-2 px-4 flex justify-between flag-position items-center">
                         <div className='text-textPrimaryColor'>{hotelName}</div>
                         <div className='text-textPrimaryColor'>
-                            <p>Registration Form</p>
+                            <p>{t.frontOffice.registrationForm.title}</p>
                         </div>
                         <div className="flex flex-row gap-2 items-center language-row">
                             <div
@@ -585,9 +604,9 @@ export default function Page() {
                                     {/** Dados de Morada */}
                                     <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
                                         <div className='flex flex-row items-center'>
-                                            <h3 className='text-[#f7ba83]'>Stay Details</h3>
+                                            <h3 className='text-[#f7ba83]'>{t.frontOffice.registrationForm.stayDetails}</h3>
                                             <IoIosArrowForward size={20} color='#f7ba83' />
-                                            <h3 className='text-[#f7ba83]'>Res. Nr.: {reserva.ResNo}</h3>
+                                            <h3 className='text-[#f7ba83]'>{t.frontOffice.registrationForm.resNo}: {reserva.ResNo}</h3>
                                         </div>
                                         {/** Info do quarto */}
                                         <div className='flex flex-row gap-5 mt-2'>
@@ -595,7 +614,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"de"}
                                                 name={"De"}
-                                                label={"Room"}
+                                                label={t.frontOffice.registrationForm.room}
                                                 ariaLabel={"De:"}
                                                 value={reserva.Room}
                                                 style={inputStyle}
@@ -604,7 +623,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"roomType"}
                                                 name={"roomType"}
-                                                label={"Room Type"}
+                                                label={t.frontOffice.registrationForm.roomType}
                                                 ariaLabel={"Room Type:"}
                                                 value={reserva.RoomType}
                                                 style={inputStyleFull}
@@ -614,7 +633,7 @@ export default function Page() {
                                                     type={"text"}
                                                     id={"Adults"}
                                                     name={"Adults"}
-                                                    label={"Adults"}
+                                                    label={t.frontOffice.registrationForm.adults}
                                                     ariaLabel={"Adults:"}
                                                     value={reserva.Adults}
                                                     style={`${halfInputStyle}`}
@@ -623,7 +642,7 @@ export default function Page() {
                                                     type={"text"}
                                                     id={"Childs"}
                                                     name={"Childs"}
-                                                    label={"Childs"}
+                                                    label={t.frontOffice.registrationForm.childs}
                                                     ariaLabel={"Childs:"}
                                                     value={reserva.Childs}
                                                     style={halfInputStyle}
@@ -635,7 +654,7 @@ export default function Page() {
                                                 type={"date"}
                                                 id={"Arrival"}
                                                 name={"Arrival"}
-                                                label={"Arrival"}
+                                                label={t.frontOffice.registrationForm.arrival}
                                                 ariaLabel={"Arrival:"}
                                                 value={reserva.DateCI}
                                                 style={inputStyle}
@@ -644,7 +663,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"Nights"}
                                                 name={"Nights"}
-                                                label={"Nights"}
+                                                label={t.frontOffice.registrationForm.nights}
                                                 ariaLabel={"Nights:"}
                                                 value={nights}
                                                 style={halfInputStyle}
@@ -653,7 +672,7 @@ export default function Page() {
                                                 type={"date"}
                                                 id={"Departure"}
                                                 name={"Departure"}
-                                                label={"Departure"}
+                                                label={t.frontOffice.registrationForm.departure}
                                                 ariaLabel={"Departure:"}
                                                 value={reserva.DateCO}
                                                 style={inputStyle}
@@ -663,13 +682,13 @@ export default function Page() {
 
                                     {/** Dados de Info pessoal */}
                                     <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 px-4 details-on-screen-card'>
-                                        <p className='text-[#f7ba83] mb-1'>Price Info</p>
+                                        <p className='text-[#f7ba83] mb-1'>{t.frontOffice.registrationForm.priceInfo}</p>
                                         <div className='flex flex-row justify-between items-center gap-4 mt-2'>
                                             <InputFieldControlled
                                                 type={"text"}
                                                 id={"Rate Code"}
                                                 name={"Rate Code"}
-                                                label={"Rate Code"}
+                                                label={t.frontOffice.registrationForm.rateCode}
                                                 ariaLabel={"Rate Code:"}
                                                 value={reserva.RateCode}
                                                 style={inputStyleFull}
@@ -678,7 +697,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"City Tax"}
                                                 name={"City Tax"}
-                                                label={"City Tax"}
+                                                label={t.frontOffice.registrationForm.cityTax}
                                                 ariaLabel={"City Tax:"}
                                                 value={reserva.CityTax}
                                                 style={inputStyleFull}
@@ -691,7 +710,7 @@ export default function Page() {
                                                         type={"text"}
                                                         id={"Price"}
                                                         name={"Price"}
-                                                        label={"Price\\Night"}
+                                                        label={t.frontOffice.registrationForm.priceNight}
                                                         ariaLabel={"Price:"}
                                                         value={reserva.Price === 0 ? "" : `${reserva.Price.toFixed(2)} €`} // Se Price for 0, exibe como vazio
                                                         style={inputStyleFull}
@@ -701,7 +720,7 @@ export default function Page() {
                                                         type={"text"}
                                                         id={"Total"}
                                                         name={"Total"}
-                                                        label={"Total"}
+                                                        label={t.frontOffice.registrationForm.total}
                                                         ariaLabel={"Total:"}
                                                         value={reserva.Total === 0 ? "" : `${reserva.Total.toFixed(2)} €`} // Se Total for 0, exibe como vazio
                                                         style={inputStyleFull}
@@ -713,7 +732,7 @@ export default function Page() {
                                                         type={"text"}
                                                         id={"Price"}
                                                         name={"Price"}
-                                                        label={"Price\\Night"}
+                                                        label={t.frontOffice.registrationForm.priceNight}
                                                         ariaLabel={"Price:"}
                                                         value={""} // Campos vazios
                                                         style={inputStyleFull}
@@ -723,7 +742,7 @@ export default function Page() {
                                                         type={"text"}
                                                         id={"Total"}
                                                         name={"Total"}
-                                                        label={"Total"}
+                                                        label={t.frontOffice.registrationForm.total}
                                                         ariaLabel={"Total:"}
                                                         value={""} // Campos vazios
                                                         style={inputStyleFull}
@@ -736,14 +755,14 @@ export default function Page() {
 
                                 {/** Dados de cliente */}
                                 <div className='bg-cardColor py-2 px-2 rounded-lg mt-1'>
-                                    <p className='text-[#f7ba83] mb-1'>Guest Details</p>
+                                    <p className='text-[#f7ba83] mb-1'>{t.frontOffice.registrationForm.guestDetails}</p>
                                     <div className='flex flex-row w-full mt-2'>
                                         <div className='mr-4'>
                                             <InputFieldControlled
                                                 type={"text"}
                                                 id={"Salutation"}
                                                 name={"Salutation"}
-                                                label={"Salutation"}
+                                                label={t.frontOffice.registrationForm.salutation}
                                                 ariaLabel={"Salutation:"}
                                                 value={guestInfo.Salution}
                                                 style={"w-10 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
@@ -755,7 +774,7 @@ export default function Page() {
                                                     type={"text"}
                                                     id={"Last Name"}
                                                     name={"Last Name"}
-                                                    label={"Last Name"}
+                                                    label={t.frontOffice.registrationForm.lastName}
                                                     ariaLabel={"Last Name:"}
                                                     value={guestInfo.LastName}
                                                     style={"w-72 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
@@ -766,7 +785,7 @@ export default function Page() {
                                                     type={"text"}
                                                     id={"First Name"}
                                                     name={"First Name"}
-                                                    label={"First Name"}
+                                                    label={t.frontOffice.registrationForm.firstName}
                                                     ariaLabel={"First Name:"}
                                                     value={guestInfo.FirstName}
                                                     style={"w-full h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
@@ -779,13 +798,13 @@ export default function Page() {
                                 <div className='flex flex-row details-on-screen'>
                                     {/** Dados de Morada */}
                                     <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
-                                        <p className='text-[#f7ba83] mb-1'>Address</p>
+                                        <p className='text-[#f7ba83] mb-1'>{t.frontOffice.registrationForm.address}</p>
                                         <div className='flex flex-col w-full mt-2'>
                                             <InputFieldControlled
                                                 type={"text"}
                                                 id={"Country"}
                                                 name={"Country"}
-                                                label={"Country"}
+                                                label={t.frontOffice.registrationForm.country}
                                                 ariaLabel={"Country:"}
                                                 value={address.Country}
                                                 style={inputStyleFull}
@@ -794,7 +813,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"Street Address"}
                                                 name={"Street Address"}
-                                                label={"Street Address"}
+                                                label={t.frontOffice.registrationForm.streetAddress}
                                                 ariaLabel={"Street Address:"}
                                                 value={address.Street}
                                                 style={inputStyleFull}
@@ -803,7 +822,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"ZIP / Postal Code"}
                                                 name={"ZIP / Postal Code"}
-                                                label={"ZIP / Postal Code"}
+                                                label={t.frontOffice.registrationForm.zipPostalCode}
                                                 ariaLabel={"ZIP / Postal Code:"}
                                                 value={address.PostalCode}
                                                 style={inputStyleFull}
@@ -812,7 +831,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"City"}
                                                 name={"City"}
-                                                label={"City"}
+                                                label={t.frontOffice.registrationForm.city}
                                                 ariaLabel={"City:"}
                                                 value={address.City}
                                                 style={inputStyleFull}
@@ -821,7 +840,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"State / Province / Region"}
                                                 name={"State / Province / Region"}
-                                                label={"State / Province / Region"}
+                                                label={t.frontOffice.registrationForm.stateProvinceRegion}
                                                 ariaLabel={"State / Province / Region:"}
                                                 value={address.Region}
                                                 style={inputStyleFull}
@@ -831,7 +850,7 @@ export default function Page() {
 
                                     {/** Dados de Info pessoal */}
                                     <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 px-4 details-on-screen-card'>
-                                        <p className='text-[#f7ba83] mb-1'>Personal ID</p>
+                                        <p className='text-[#f7ba83] mb-1'>{t.frontOffice.registrationForm.personalId}</p>
                                         <div className='flex flex-row justify-between gap-4 mt-4'>
                                             <InputFieldControlled
                                                 type={
@@ -841,7 +860,7 @@ export default function Page() {
                                                 }
                                                 id={"Date of Birth"}
                                                 name={"Date of Birth"}
-                                                label={"Date of Birth"}
+                                                label={t.frontOffice.registrationForm.dateOfBirth}
                                                 ariaLabel={"Date of Birth:"}
                                                 value={
                                                     personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
@@ -855,7 +874,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"Country of Birth"}
                                                 name={"Country of Birth"}
-                                                label={"Country of Birth"}
+                                                label={t.frontOffice.registrationForm.countryOfBirth}
                                                 ariaLabel={"Country of Birth:"}
                                                 value={personalID.CountryOfBirth}
                                                 style={`${inputStyleFullWithLine}`}
@@ -870,7 +889,7 @@ export default function Page() {
                                             type={"text"}
                                             id={"Nationality"}
                                             name={"Nationality"}
-                                            label={"Nationality"}
+                                            label={t.frontOffice.registrationForm.nationality}
                                             ariaLabel={"Nationality:"}
                                             value={personalID.Nationality}
                                             style={`${inputStyleFullWithLine}`}
@@ -885,7 +904,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"ID Doc"}
                                                 name={"ID Doc"}
-                                                label={"ID Doc"}
+                                                label={t.frontOffice.registrationForm.idDoc}
                                                 ariaLabel={"ID Doc:"}
                                                 value={personalID.IDDoc}
                                                 style={`${inputStyleFullWithLine}`}
@@ -894,7 +913,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"ID Doc Nr."}
                                                 name={"ID Doc Nr."}
-                                                label={"Nr."}
+                                                label={t.frontOffice.registrationForm.idDocNumber}
                                                 ariaLabel={"ID Doc Nr.:"}
                                                 value={personalID.NrDoc}
                                                 style={`${inputStyleFullWithLine}`}
@@ -909,7 +928,7 @@ export default function Page() {
                                                 }
                                                 id={"Exp. Date"}
                                                 name={"Exp. Date"}
-                                                label={"Exp. Date"}
+                                                label={t.frontOffice.registrationForm.expDate}
                                                 ariaLabel={"Exp. Date:"}
                                                 value={
                                                     personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
@@ -922,7 +941,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"Country issue"}
                                                 name={"Country issue"}
-                                                label={"Issue"}
+                                                label={t.frontOffice.registrationForm.issue}
                                                 ariaLabel={"Country issue:"}
                                                 value={personalID.Issue}
                                                 style={inputStyleFullWithLine}
@@ -935,7 +954,7 @@ export default function Page() {
                                     {/** Dados de contacto */}
                                     <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card">
                                         <div className="flex flex-row justify-between">
-                                            <p className="text-[#f7ba83] mb-1">Contacts</p>
+                                            <p className="text-[#f7ba83] mb-1">{t.frontOffice.registrationForm.contacts}</p>
                                             <div className="flex flex-row justify-end gap-4">
                                                 <FaPencilAlt
                                                     size={15}
@@ -955,7 +974,7 @@ export default function Page() {
                                                         type="text"
                                                         id="Email"
                                                         name="Email"
-                                                        label="Personal E-mail"
+                                                        label={t.frontOffice.registrationForm.personalEmail}
                                                         ariaLabel="Email:"
                                                         value={email}
                                                         style={inputStyleFull}
@@ -968,7 +987,7 @@ export default function Page() {
                                                 type="text"
                                                 id="PhoneNumber"
                                                 name="PhoneNumber"
-                                                label="Phone Number"
+                                                label={t.frontOffice.registrationForm.phoneNumber}
                                                 ariaLabel="PhoneNumber:"
                                                 value={contacts.PhoneNumber}
                                                 style={inputStyleFull}
@@ -980,7 +999,7 @@ export default function Page() {
                                     {/** Dados de faturação */}
                                     <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card">
                                         <div className="flex flex-row justify-between">
-                                            <p className="text-[#f7ba83] mb-1">Invoice Data</p>
+                                            <p className="text-[#f7ba83] mb-1">{t.frontOffice.registrationForm.invoiceData}</p>
                                             <FaPencilAlt
                                                 size={15}
                                                 color="orange"
@@ -997,7 +1016,7 @@ export default function Page() {
                                                     type="text"
                                                     id="VAT Nr."
                                                     name="VAT Nr."
-                                                    label="VAT Nr."
+                                                    label={t.frontOffice.registrationForm.vatNr}
                                                     ariaLabel="VAT Nr.:"
                                                     value={vatNo}
                                                     style={inputStyleFull}
@@ -1028,11 +1047,11 @@ export default function Page() {
                         <div className='w-1/2 ml-4 mr-4 half-screen'>
                             {/** Assinatura */}
                             <div className='bg-cardColor py-2 px-2 rounded-lg'>
-                                <p className='text-[#f7ba83] mb-1'>Signature</p>
+                                <p className='text-[#f7ba83] mb-1'>{t.frontOffice.registrationForm.signature}</p>
                                 {/* Termos e condições */}
                                 <div className='flex flex-row mt-2 gap-8 details-on-screen'>
                                     <div className='w-1/2 flex flex-col details-on-screen-card'>
-                                        <p className='text-xs font-semibold text-textPrimaryColor'>I accept the Hotel Terms and Conditions:</p>
+                                        <p className='text-xs font-semibold text-textPrimaryColor'>{t.frontOffice.registrationForm.acceptTerms}:</p>
                                         <div className='flex flex-row justify-between text-sm text-textPrimaryColor'>
                                             <label className="flex items-center">
                                                 <input
@@ -1042,7 +1061,7 @@ export default function Page() {
                                                     checked={termsAccepted === true}
                                                     onChange={() => setTermsAccepted(true)}
                                                 />
-                                                Agree
+                                                {t.frontOffice.registrationForm.agree}
                                             </label>
                                             <label className="flex items-center">
                                                 <input
@@ -1052,18 +1071,18 @@ export default function Page() {
                                                     checked={termsAccepted === false}
                                                     onChange={() => setTermsAccepted(false)}
                                                 />
-                                                Disagree
+                                                {t.frontOffice.registrationForm.disagree}
                                             </label>
                                             <TermsConditionsForm
-                                                buttonName={"Read more"}
-                                                modalHeader={"Hotel Terms and Conditions"}
+                                                buttonName={t.frontOffice.registrationForm.readMode}
+                                                modalHeader={t.frontOffice.registrationForm.termsModalHeader}
                                                 formTypeModal={11}
                                             />
                                         </div>
                                     </div>
 
                                     <div className='w-1/2 flex flex-col details-on-screen-card'>
-                                        <p className='text-xs font-semibold text-textPrimaryColor'>I accept the Hotel Data Protection Policy:</p>
+                                        <p className='text-xs font-semibold text-textPrimaryColor'>{t.frontOffice.registrationForm.acceptHotelDataProtection}:</p>
                                         <div className='flex flex-row justify-between text-sm text-textPrimaryColor'>
                                             <label className="flex items-center">
                                                 <input
@@ -1073,7 +1092,7 @@ export default function Page() {
                                                     checked={policyAccepted === true}
                                                     onChange={() => setPolicyAccepted(true)}
                                                 />
-                                                Agree
+                                                {t.frontOffice.registrationForm.agree}
                                             </label>
                                             <label className="flex items-center">
                                                 <input
@@ -1083,11 +1102,11 @@ export default function Page() {
                                                     checked={policyAccepted === false}
                                                     onChange={() => setPolicyAccepted(false)}
                                                 />
-                                                Disagree
+                                                {t.frontOffice.registrationForm.disagree}
                                             </label>
                                             <ProtectionPolicyForm
-                                                buttonName={"Read more"}
-                                                modalHeader={"Hotel Data Protection Policy"}
+                                                buttonName={t.frontOffice.registrationForm.readMore}
+                                                modalHeader={t.frontOffice.registrationForm.dataModalHeader}
                                                 formTypeModal={11}
                                             />
                                         </div>
@@ -1154,7 +1173,7 @@ export default function Page() {
                                 <div className='flex flex-row gap-4 justify-end px-4 buttons-style items-center'>
                                     {/** Botão de cancelar */}
                                     <CancelPIN
-                                        buttonName={"Cancel"}
+                                        buttonName={t.frontOffice.registrationForm.cancel}
                                         modalHeader={"Insert PIN"}
                                         formTypeModal={11}
                                         editor={"teste"}
@@ -1169,7 +1188,7 @@ export default function Page() {
                                     {/** Modal de erro */}
                                     {isErrorModalOpen && errorMessage && (
                                         <ErrorRegistrationForm
-                                            modalHeader="Attention"
+                                            modalHeader={t.frontOffice.registrationForm.attention}
                                             errorMessage={errorMessage}
                                             onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
                                         />
@@ -1177,7 +1196,7 @@ export default function Page() {
                                     {/** Modal de sucesso */}
                                     {isSuccessModalOpen && successMessage && (
                                         <SuccessRegistrationForm
-                                            modalHeader="Attention"
+                                            modalHeader={t.frontOffice.registrationForm.attention}
                                             successMessage={successMessage}
                                         />
                                     )}

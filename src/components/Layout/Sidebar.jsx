@@ -7,6 +7,10 @@ import { useRouter } from "next/navigation"; // Importando o hook de navegação
 import { FaSignOutAlt } from "react-icons/fa"; // Importa o ícone de logout
 import { FaUser } from "react-icons/fa";
 
+import en from "../../../public/locales/english/common.json";
+import pt from "../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../public/locales/espanol/common.json";
+
 import { MdSunny } from "react-icons/md";
 import { FaMoon, FaGlobe, FaChevronDown, FaChevronUp } from "react-icons/fa"; // Novos ícones adicionados
 
@@ -15,6 +19,7 @@ import ProfileModalForm from "@/components/modals/user/profileModal";
 const SidebarContext = createContext();
 let inactivityTimeout;
 let warningTimeout;
+const translations = { en, pt, es };
 
 export default function Sidebar({ children, setExpanded }) {
   const [expanded, setExpandedInternal] = useState(true);
@@ -22,6 +27,19 @@ export default function Sidebar({ children, setExpanded }) {
   const router = useRouter(); // Obtém o router
   const [warningVisible, setWarningVisible] = useState(false);
   const [countdown, setCountdown] = useState(60);
+
+  const [locale, setLocale] = useState("pt");
+  
+    useEffect(() => {
+      // Carregar o idioma do localStorage
+      const storedLanguage = localStorage.getItem("language");
+      if (storedLanguage) {
+        setLocale(storedLanguage);
+      }
+    }, []);
+  
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
   useEffect(() => {
     // Verifica se a sessão está carregando ou se está ativa
@@ -129,14 +147,22 @@ export default function Sidebar({ children, setExpanded }) {
     }
   };
 
-  const [isLanguageDropdownOpen, setLanguageDropdownOpen] = useState(false); // Controle do dropdown de idiomas
-
-  const toggleLanguageDropdown = () => setLanguageDropdownOpen(!isLanguageDropdownOpen);
-
   const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
+
+
+  useEffect(() => {
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLanguage(storedLanguage);
+    }
+  }, []);
+
+  // Alterar o idioma e armazenar no localStorage
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
-    setDropdownOpen(false); // Fecha o dropdown após selecionar
+    localStorage.setItem("language", lang); // Salvar no localStorage
+    setDropdownOpen(false); // Fechar o dropdown após selecionar
+    window.location.reload(); // Recarregar a página para aplicar o idioma
   };
 
   return (
@@ -144,19 +170,19 @@ export default function Sidebar({ children, setExpanded }) {
       {warningVisible && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50">
           <div className="bg-white p-6 rounded shadow-md w-80 text-center">
-            <h1 className="text-xl font-bold mb-4">You will logout automatically in {countdown} seconds!</h1>
+            <h1 className="text-xl font-bold mb-4">{t.navbar.alert.messagePart1} {countdown} {t.navbar.alert.messagePart2}</h1>
             <div className="flex justify-around mt-4">
               <button
                 onClick={handleContinueSession}
                 className="bg-primary text-white px-4 py-2 rounded hover:bg-green-600"
               >
-                Continuar Sessão
+                {t.navbar.alert.continue}
               </button>
               <button
                 onClick={handleLogout}
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
               >
-                Logout
+                {t.navbar.alert.logout}
               </button>
             </div>
           </div>
@@ -173,30 +199,19 @@ export default function Sidebar({ children, setExpanded }) {
         }}
       >
         <nav className="h-full flex flex-col">
-          <div className="p-4 pb-2 flex !justify-between items-center">
-            <div className="flex flex-row gap-4 !items-center">
-              {/* Imagem */}
-              <img
-                src="/icon/extensionsLogoWeb.png"
-                alt="extensions"
-                width={20}
-                height={20}
-              />
-
-              {/* Texto "Extensions myPMS" */}
-              <p
-                className={`font-semibold text-sm overflow-hidden transition-all text-textPrimaryColor mt-1 ${expanded ? "w-64" : "w-0"}`}
-              >
-                Extensions myPMS
-              </p>
-            </div>
+          <div className="p-4 pb-2 flex justify-between items-center">
+            <p
+              className={`font-semibold text-sm overflow-hidden transition-all text-textPrimaryColor ${expanded ? "w-64" : "w-0"
+                }`}
+            >
+              Extensions myPMS
+            </p>
             <button
               onClick={handleToggle}
-              className="p-1.5 rounded-lg bg-primaryBackground hover:bg-primaryBackground absolute top-0 right-1 z-20 transform translate-x-1 translate-y-1"
+              className="p-1.5 rounded-lg bg-primaryBackground hover:primaryBackground"
             >
-              <TbLayoutSidebarLeftExpand className="text-textPrimaryColor" />
+              <TbLayoutSidebarLeftExpand className="text-textPrimaryColor"/>
             </button>
-
           </div>
 
           <SidebarContext.Provider value={{ expanded }}>
@@ -217,10 +232,10 @@ export default function Sidebar({ children, setExpanded }) {
                 <h4 className="font-semibold">
                   {session
                     ? `${session.user.firstName} ${session.user.secondName}`
-                    : "Usuário Desconhecido"}
+                    : `${t.navbar.errors.unknownUser}`}
                 </h4>
                 <span className="text-xs text-textLabelColor">
-                  {session ? session.user.email : "Email Desconhecido"}
+                  {session ? session.user.email : `${t.navbar.errors.unknownEmail}`}
                 </span>
               </div>
 
@@ -245,7 +260,7 @@ export default function Sidebar({ children, setExpanded }) {
                   </li>
                   {/* Tema Escuro */}
                   <li className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-background">
-                    <span>View Mode</span>
+                    <span>{t.navbar.text.viewMode}</span>
                     <button
                       onClick={toggleTheme}
                       className="relative w-20 h-8 flex items-center bg-gray-300 rounded-full transition"
@@ -284,52 +299,18 @@ export default function Sidebar({ children, setExpanded }) {
                   <li className="py-2 px-3 rounded-md flex flex-row justify-between">
                     <span className="flex items-center">
                       <FaGlobe className="mr-2" />
-                      Language
+                      {t.navbar.text.language}
                     </span>
-                    <div className="relative">
-                      {/* Botão de seleção */}
-                      <button
-                        onClick={toggleLanguageDropdown} // Alterna o dropdown de idiomas
-                        className="ml-2 bg-transparent outline-none cursor-pointer flex items-center"
-                      >
-                        {/* Exibe a bandeira ativa */}
-                        <img
-                          src={`/flags/${language}.png`}
-                          alt={language}
-                          className="w-6 h-6 object-cover"
-                        />
-                        {/* Botão de seta para abrir o dropdown */}
-                        <button onClick={toggleLanguageDropdown} className="ml-2 text-gray-600">
-                          {isLanguageDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
-                        </button>
-                      </button>
-
-                      {/* Dropdown customizado */}
-                      {isLanguageDropdownOpen && (
-                        <ul className="absolute top-10 left-0 bg-white shadow-md rounded-md w-32 z-50">
-                          <li
-                            onClick={() => handleLanguageChange('pt')}
-                            className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
-                          >
-                            <img src="/flags/pt.png" alt="portuguese" className="w-4 h-4 object-cover mr-4" />
-                          </li>
-                          <li
-                            onClick={() => handleLanguageChange('uk')}
-                            className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
-                          >
-                            <img src="/flags/uk.png" alt="english" className="w-4 h-4 object-cover mr-4" />
-                          </li>
-                          <li
-                            onClick={() => handleLanguageChange('sp')}
-                            className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
-                          >
-                            <img src="/flags/sp.png" alt="spanish" className="w-4 h-4 object-cover mr-4" />
-                          </li>
-                        </ul>
-                      )}
-                    </div>
+                    <select
+                      className="ml-2 bg-transparent outline-none cursor-pointer"
+                      value={language}
+                      onChange={(e) => handleLanguageChange(e.target.value)}
+                    >
+                      <option value="pt">Pt</option>
+                      <option value="en">En</option>
+                      <option value="es">Es</option>
+                    </select>
                   </li>
-
 
                   {/* Logout */}
                   <li
@@ -337,7 +318,7 @@ export default function Sidebar({ children, setExpanded }) {
                     onClick={handleLogout}
                   >
                     <FaSignOutAlt className="mr-2" />
-                    Logout
+                    {t.navbar.text.logout}
                   </li>
                 </ul>
               </div>

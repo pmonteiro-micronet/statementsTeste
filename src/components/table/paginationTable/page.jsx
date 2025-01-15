@@ -1,6 +1,13 @@
+"use client";
 import React from "react";
 // import { usePathname } from 'next/navigation';
 import { Pagination } from "@nextui-org/react";
+import { useEffect, useState } from "react";
+import en from "../../../../public/locales/english/common.json";
+import pt from "../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
 
 export default function CustomPagination({
   page,
@@ -15,6 +22,19 @@ export default function CustomPagination({
   // const lastSegment = segments[segments.length - 1];
   // const filename = `${lastSegment}.csv`;
 
+  const [locale, setLocale] = useState("pt");
+  
+  useEffect(() => {
+    // Carregar o idioma do localStorage
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
+
+  // Carregar as traduções com base no idioma atual
+  const t = translations[locale] || translations["pt"]; // fallback para "pt"
+
   return (
     <>
       <div className="bg-tableFooter border border-tableFooterBorder flex flex-col sm:flex-row justify-between items-start sm:items-center lg:pl-72 w-full py-3 px-2">
@@ -25,7 +45,7 @@ export default function CustomPagination({
         </div>
         <div className="flex flex-wrap items-center justify-start sm:justify-end space-y-2 sm:space-y-0">
           <div className="flex items-center">
-            <span className="text-sm text-default-600">Items per Page</span>
+            <span className="text-sm text-default-600">{t.pagination.itemsPerPage}</span>
             <select
               value={rowsPerPage}
               onChange={handleChangeRowsPerPage}
