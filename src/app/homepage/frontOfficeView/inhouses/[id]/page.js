@@ -302,7 +302,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
           <div className="header-container flex items-center justify-between w-full">
             {/* Div para o conteúdo centralizado */}
             <div className="flex items-center space-x-4 mx-auto">
-              <h2 className="text-xl text-textPrimaryColor">{propertyName} : InHouses</h2>
+              <h2 className="text-xl text-textPrimaryColor">{propertyName} : {t.frontOffice.inHouses.title}</h2>
             </div>
 
             {/* Botão de refresh alinhado à direita */}
@@ -325,13 +325,13 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
               <thead>
                 <tr className="bg-primary text-white h-12">
                   <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ARRIVAL</td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">DEPARTURE</td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">LAST NAME</td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">FIRST NAME</td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">COMPANY</td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">NOTES</td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6]">RES. NO.</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.arrival}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.departure}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.lastName}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.firstName}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.company}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.notes}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.resNo}</td>
                 </tr>
               </thead>
               <tbody>
@@ -356,7 +356,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                             className="relative z-10 text-textPrimaryColor"
                           >
                             <DropdownItem key="edit" onClick={() => handleOpenModal()}>
-                              Info
+                            {t.frontOffice.inHouses.info}
                             </DropdownItem>
                             <DropdownItem
                               key="show"
@@ -368,13 +368,13 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                                 }
                               }}
                             >
-                              Statement
+                              {t.frontOffice.inHouses.statement}
                             </DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
 
                         <InHousesInfoForm
-                          buttonName={"Info"}
+                          buttonName={t.frontOffice.inHouses.info}
                           buttonColor={"transparent"}
                           modalHeader={"Reservation"}
                           formTypeModal={11}
@@ -407,7 +407,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
               </tbody>
             </table>
           ) : (
-            <p className="text-textLabelColor">No reservations found.</p>
+            <p className="text-textLabelColor">{t.frontOffice.inHouses.noReservations}</p>
           )}
         </div>
 
