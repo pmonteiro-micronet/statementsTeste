@@ -6,11 +6,16 @@ import { signOut, useSession } from "next-auth/react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { FaGlobe, FaChevronDown, FaChevronUp, FaMoon } from "react-icons/fa"; // Novos ícones adicionados
 
+import en from "../../../public/locales/english/common.json";
+import pt from "../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../public/locales/espanol/common.json";
+
 import { MdSunny } from "react-icons/md";
 
 function replaceUnderscores(text) {
   return text.replace(/_/g, " ");
 }
+const translations = { en, pt, es };
 
 export default function NavBar({ listItems, hotels = [], selectedHotelID, setSelectedHotelID }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,6 +26,19 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
   const { data: session } = useSession();
   let inactivityTimeout;
   let warningTimeout;
+
+  const [locale, setLocale] = useState("pt");
+    
+      useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+          setLocale(storedLanguage);
+        }
+      }, []);
+    
+      // Carregar as traduções com base no idioma atual
+      const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
   const toggleMenu = () => {
     setMenuOpen((prev) => !prev);
@@ -175,7 +193,7 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
               onChange={(e) => handleHotelSelect(e.target.value)}
               className="border p-2 rounded w-full text-textPrimaryColor"
             >
-              <option value="">Select a hotel</option>
+              <option value="">{t.navbar.text.selectHotel}</option>
               {Array.isArray(hotels) &&
                 hotels.map((hotel) => (
                   <option key={hotel.propertyID} value={hotel.propertyID}>
@@ -246,10 +264,10 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
                 </div>
                 <div className="ml-3 text-textPrimaryColor text-center">
                   <p className="font-medium">
-                    {session ? `${session.user.firstName} ${session.user.secondName}` : "Usuário Desconhecido"}
+                    {session ? `${session.user.firstName} ${session.user.secondName}` : `${t.navbar.errors.unknownUser}`}
                   </p>
                   <span className="text-xs text-gray-600 ml-3">
-                    {session ? session.user.email : "Email Desconhecido"}
+                    {session ? session.user.email : `${t.navbar.errors.unknownEmail}`}
                   </span>
                 </div>
                 <div className="relative">
@@ -265,7 +283,7 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
                       <ul className="py-2">
                         <li>
                           <div className="flex items-center justify-between px-4 py-2 text-sm text-textPrimaryColor">
-                            <span>View Mode</span>
+                            <span>{t.navbar.text.viewMode}</span>
                             <button
                               onClick={toggleTheme}
                               className="relative w-20 h-8 flex items-center bg-gray-300 rounded-full transition"
@@ -304,7 +322,7 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
                           <div className="flex justify-between">
                             <span className="flex items-center">
                               <FaGlobe className="mr-2" />
-                              Language
+                              {t.navbar.text.language}
                             </span>
                             {/* Botão de seleção */}
                             <button
@@ -353,7 +371,7 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
                             className="block px-4 py-2 text-sm text-red-600 flex items-center"
                           >
                             <FaSignOutAlt className="mr-2" />
-                            Logout
+                            {t.navbar.text.logout}
                           </button>
                         </li>
                       </ul>
@@ -370,19 +388,19 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
       {warningVisible && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50">
           <div className="bg-white p-6 rounded shadow-md w-80 text-center">
-            <h1 className="text-xl font-bold mb-4">You will logout automatically in {countdown} seconds!</h1>
+            <h1 className="text-xl font-bold mb-4">{t.navbar.alert.messagePart1} {countdown} {t.navbar.alert.messagePart2}</h1>
             <div className="flex justify-around mt-4">
               <button
                 onClick={handleContinueSession}
                 className="bg-primary text-white px-4 py-2 rounded hover:bg-green-600"
               >
-                Continue Session
+                {t.navbar.alert.continue}
               </button>
               <button
                 onClick={handleLogout}
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
               >
-                Logout
+                {t.navbar.alert.logout}
               </button>
             </div>
           </div>

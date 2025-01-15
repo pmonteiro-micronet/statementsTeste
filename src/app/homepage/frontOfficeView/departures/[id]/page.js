@@ -26,8 +26,19 @@ import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/
 const translations = { en, pt, es };
 
 export default function Page({ params }) {
-  const locale = "en";
-  const t = translations[locale];
+  const [locale, setLocale] = useState("pt");
+  
+  useEffect(() => {
+    // Carregar o idioma do localStorage
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
+
+  // Carregar as traduções com base no idioma atual
+  const t = translations[locale] || translations["pt"]; // fallback para "pt"
+
 
   const { id } = params;
   const propertyID = id;
@@ -434,7 +445,7 @@ export default function Page({ params }) {
       {/** Modal de erro */}
       {isErrorModalOpen && errorMessage && (
         <ErrorRegistrationForm
-          modalHeader="Attention"
+          modalHeader={t.frontOffice.departures.attention}
           errorMessage={errorMessage}
           onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
         />

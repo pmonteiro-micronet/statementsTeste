@@ -16,6 +16,12 @@ import LoadingBackdrop from "@/components/Loader/page";
 import { useRouter } from "next/navigation";
 import dayjs from 'dayjs';
 
+import en from "../../../../../../public/locales/english/common.json";
+import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
+
 export default function InHouses({ params }) {  // Renomeado para InHouses
   const { id } = params;
   const propertyID = id;
@@ -31,6 +37,19 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [locale, setLocale] = useState("pt");
+  
+  useEffect(() => {
+    // Carregar o idioma do localStorage
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
+
+  // Carregar as traduções com base no idioma atual
+  const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
   const router = useRouter();
   console.log(router);

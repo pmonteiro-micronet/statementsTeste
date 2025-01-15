@@ -10,8 +10,18 @@ import es from "../../../../public/locales/espanol/common.json";
 const translations = { en, pt, es };
 
 const Homepage = () => {
-  const locale = "en";
-  const t = translations[locale];
+  const [locale, setLocale] = useState("pt");
+
+  useEffect(() => {
+    // Carregar o idioma do localStorage
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
+
+  // Carregar as traduções com base no idioma atual
+  const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
   const { data: session } = useSession();
 

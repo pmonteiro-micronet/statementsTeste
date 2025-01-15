@@ -8,6 +8,11 @@ import axios from "axios";
 import { IoDocumentOutline } from "react-icons/io5";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { RiHotelLine } from "react-icons/ri";
+import en from "../../../public/locales/english/common.json";
+import pt from "../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
 
 export default function SidebarWrapper({ children }) {
   const { data: session } = useSession();
@@ -21,6 +26,20 @@ export default function SidebarWrapper({ children }) {
   const [hotels, setHotels] = useState([]);
   const [showSelectionButtons, setShowSelectionButtons] = useState(false);
   const [isHotelConfirmed, setIsHotelConfirmed] = useState(false);
+
+    const [locale, setLocale] = useState("pt");
+    
+      useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+          setLocale(storedLanguage);
+        }
+      }, []);
+    
+      // Carregar as traduções com base no idioma atual
+      const t = translations[locale] || translations["pt"]; // fallback para "pt"
+  
 
   console.log(showSelectionButtons);
   useEffect(() => {
@@ -76,12 +95,12 @@ export default function SidebarWrapper({ children }) {
       const isAdmin = session?.user?.permission === 1;
 
       setListItems({
-        Statements: {
+        [t.navbar.text.statements]: {
           icon: <IoDocumentOutline size={20} />,
           items: [
-            { ref: "/homepage/statements", label: "Dashboard" },
-            { ref: "/homepage/statements/pending", label: "Pendings", count: pendingCount },
-            { ref: "/homepage/statements/viewed", label: "Viewed" },
+            { ref: "/homepage/statements", label: `${t.navbar.text.dashboard}` },
+            { ref: "/homepage/statements/pending", label: `${t.navbar.text.pendings}`, count: pendingCount },
+            { ref: "/homepage/statements/viewed", label: `${t.navbar.text.viewed}` },
           ],
         },
         Front_Office: {
@@ -89,20 +108,20 @@ export default function SidebarWrapper({ children }) {
           items: [
             {
               ref: `/homepage/frontOfficeView/${selectedHotelID}`,
-              label: "Dashboard",
+              label: `${t.navbar.text.dashboard}`,
               onClick: () => router.push(`/homepage/frontOfficeView/${selectedHotelID}`),
             },
             ...(isAdmin
               ? [
                 {
                   ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
-                  label: "Arrivals",
+                  label: `${t.navbar.text.arrivals}`,
                   onClick: () =>
                     router.push(`/homepage/frontOfficeView/arrivals/${selectedHotelID}`),
                 },
                 {
                   ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
-                  label: "InHouses",
+                  label: `${t.navbar.text.inHouses}`,
                   onClick: () =>
                     router.push(`/homepage/frontOfficeView/inhouses/${selectedHotelID}`),
                 },
@@ -110,7 +129,7 @@ export default function SidebarWrapper({ children }) {
               : []),
             {
               ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
-              label: "Departures",
+              label: `${t.navbar.text.departures}`,
               onClick: () =>
                 router.push(`/homepage/frontOfficeView/departures/${selectedHotelID}`),
             },
@@ -193,7 +212,7 @@ export default function SidebarWrapper({ children }) {
                 onChange={(e) => handleHotelSelect(e.target.value)}
                 className="border p-2 rounded w-full mb-4 text-textPrimaryColor"
               >
-                <option value="" className="text-textPrimaryColor">Select a hotel</option>
+                <option value="" className="text-textPrimaryColor">{t.navbar.text.selectHotel}</option>
                 {hotels.map((hotel) => (
                   <option className="text-textPrimaryColor" key={hotel.propertyID} value={hotel.propertyID}>
                     {hotel.propertyName}
@@ -202,7 +221,7 @@ export default function SidebarWrapper({ children }) {
               </select>
               {!selectedHotelID && (
                 <div className="text-sm text-gray-500 mt-2">
-                  Please select a hotel to access the menus.
+                  {t.navbar.text.selectHotelInfo}
                 </div>
               )}
             </div>
@@ -218,13 +237,13 @@ export default function SidebarWrapper({ children }) {
                     onClick={handleLogout}
                     className="bg-gray-200 text-black text-sm py-1 px-2 rounded hover:bg-gray-300"
                   >
-                    Logout
+                    {t.navbar.text.logout}
                   </button>
                   <button
                     onClick={confirmHotelSelection}
                     className="bg-primary text-white text-sm py-1 px-2 rounded hover:bg-[#E87A18]"
                   >
-                    Select
+                    {t.navbar.text.select}
                   </button>
                 </div>
               </div>

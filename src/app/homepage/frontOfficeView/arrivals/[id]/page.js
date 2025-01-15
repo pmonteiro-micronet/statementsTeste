@@ -10,6 +10,10 @@ import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
+import en from "../../../public/locales/english/common.json";
+import pt from "../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../public/locales/espanol/common.json";
+
 import ArrivalInfoForm from "@/components/modals/arrivals/info/page";
 import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
@@ -18,6 +22,8 @@ import { useRouter } from "next/navigation";
 import dayjs from 'dayjs';
 
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
+
+const translations = { en, pt, es };
 
 export default function Arrivals({ params }) {
   const { id } = params;
@@ -79,6 +85,19 @@ export default function Arrivals({ params }) {
       setIsLoading(false);
     }
   };
+
+  const [locale, setLocale] = useState("pt");
+  
+    useEffect(() => {
+      // Carregar o idioma do localStorage
+      const storedLanguage = localStorage.getItem("language");
+      if (storedLanguage) {
+        setLocale(storedLanguage);
+      }
+    }, []);
+  
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
   // Chama a função sendDataToAPI ao carregar a página
   useEffect(() => {
@@ -252,7 +271,7 @@ export default function Arrivals({ params }) {
 
               {/* Título dinâmico com a data atual */}
               <h2 className="text-xl text-textPrimaryColor">
-                {currentDate === today ? `Today: ${today}` : `Tomorrow: ${currentDate}`}
+                {currentDate === today ? `${t.frontOffice.arrivals.today}: ${today}` : `${t.frontOffice.arrivals.tomorrow}: ${currentDate}`}
               </h2>
 
               {/* Seta para avançar para o próximo dia */}
@@ -266,7 +285,7 @@ export default function Arrivals({ params }) {
               )}
 
               {/* Título "Arrivals List" separado do título dinâmico */}
-              <h2 className="text-xl text-textPrimaryColor">{propertyName} : Arrivals</h2>
+              <h2 className="text-xl text-textPrimaryColor">{propertyName} : {t.frontOffice.arrivals.arrivalList}</h2>
             </div>
 
             {/* Botão de refresh alinhado à direita */}
@@ -289,17 +308,17 @@ export default function Arrivals({ params }) {
               <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
                 <thead>
                   <tr className="bg-primary text-white h-12">
-                    <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ROOM</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">ROOM STATUS</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">LAST NAME</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">FIRST NAME</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">TRAVEL AGENCY</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">COMPANY</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">GROUP</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">NOTES</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6]">RES. NO.</td>
-                    <td className="pl-2">ARRIVAL</td>
+                    <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6] uppercase"><FaGear size={18} color="white" /></td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.room}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.roomStatus}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.lastName}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.firstName}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.travelAgency}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.company}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.group}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.notes}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.resNo}</td>
+                    <td className="pl-2 uppercase">{t.frontOffice.arrivals.arrival}</td>
                   </tr>
                 </thead>
                 <tbody>
@@ -322,7 +341,7 @@ export default function Arrivals({ params }) {
                               className="relative z-10 text-textPrimaryColor"
                             >
                               <DropdownItem key="edit" onClick={() => handleOpenModal()}>
-                                Info
+                              {t.frontOffice.arrivals.info}
                               </DropdownItem>
                               <DropdownItem
                                 key="show"
@@ -330,7 +349,7 @@ export default function Arrivals({ params }) {
                                   router.push(`/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}`)
                                 }
                               >
-                                Registration Form
+                                {t.frontOffice.arrivals.registrationForm}
                               </DropdownItem>
                             </DropdownMenu>
                           </Dropdown>
@@ -373,7 +392,7 @@ export default function Arrivals({ params }) {
               </table>
             </div>
           ) : (
-            <p className="text-textLabelColor">No reservations found.</p>
+            <p className="text-textLabelColor">{t.frontOffice.arrivals.noReservations}</p>
           )}
         </div>
 
@@ -402,7 +421,7 @@ export default function Arrivals({ params }) {
       {/** Modal de erro */}
       {isErrorModalOpen && errorMessage && (
         <ErrorRegistrationForm
-          modalHeader="Attention"
+          modalHeader={t.frontOffice.arrivals.attention}
           errorMessage={errorMessage}
           onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
         />

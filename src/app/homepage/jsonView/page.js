@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation";
 import OkPIN from "@/components/modals/pin/ok/page";
 import CancelPIN from "@/components/modals/pin/cancel/page";
 import "./styles.css";
+import en from "../../../../public/locales/english/common.json";
+import pt from "../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
 
 const JsonViewPage = () => {
   const [reservationData, setReservationData] = useState(null);
@@ -36,6 +41,19 @@ const JsonViewPage = () => {
       window.removeEventListener('popstate', preventBackNavigation);
     };
   }, []);
+
+      const [locale, setLocale] = useState("pt");
+    
+    useEffect(() => {
+      // Carregar o idioma do localStorage
+      const storedLanguage = localStorage.getItem("language");
+      if (storedLanguage) {
+        setLocale(storedLanguage);
+      }
+    }, []);
+  
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
 
   useEffect(() => {
@@ -106,13 +124,13 @@ const JsonViewPage = () => {
   };
 
   if (status === "loading") {
-    return <p>Carregando sessão...</p>;
+    return <p>{t.errors.loading}</p>;
   }
 
   return (
     <main className="overflow-y-auto pb-10 bodyContainer">
       {loading ? (
-        <p>Carregando dados...</p>
+        <p>{t.errors.loading}</p>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : reservationData ? (
@@ -140,25 +158,25 @@ const JsonViewPage = () => {
                       (reservation, index) => (
                         <div key={index} className="text-textPrimaryColor">
                           <p className="font-bold text-3xl text-primary roomInfo">
-                            Room:{" "}
+                          {t.jsonView.room}:{" "}
                             <span className="font-bold">
                               {reservation.RoomNumber}
                             </span>
                           </p>
                           <p className="textInfo">
-                            Reservation Number:{" "}
+                          {t.jsonView.reservationNumber}:{" "}
                             <span className="font-bold">
                               {reservation.ReservationNumber}
                             </span>
                           </p>
                           <p className="textInfo">
-                            Check-In:{" "}
+                          {t.jsonView.checkIn}:{" "}
                             <span className="font-bold ml-6">
                               {new Date(reservation.DateCI).toLocaleDateString()}
                             </span>
                           </p>
                           <p className="textInfo">
-                            Check-Out:{" "}
+                          {t.jsonView.checkOut}:{" "}
                             <span className="font-bold ml-3">
                               {new Date(reservation.DateCO).toLocaleDateString()}
                             </span>
@@ -167,10 +185,10 @@ const JsonViewPage = () => {
                       )
                     )
                   ) : (
-                    <p>No reservation details available</p>
+                    <p>{t.jsonView.noReservationDetails}</p>
                   )
                 ) : (
-                  <p>Loading reservation data...</p>
+                  <p>{t.errors.loading}</p>
                 )}
               </div>
 
@@ -192,15 +210,15 @@ const JsonViewPage = () => {
                               {guest.Country ? ` ${guest.Country}` : ""}
                             </p>
                           )}
-                          {guest.VatNo && <p className="textInfo">NIF: {guest.VatNo}</p>}
+                          {guest.VatNo && <p className="textInfo">{t.jsonView.nif}: {guest.VatNo}</p>}
                         </div>
                       )
                     )
                   ) : (
-                    <p>No guest information available</p>
+                    <p>{t.jsonView.noGuestInformation}</p>
                   )
                 ) : (
-                  <p>Loading guest information...</p>
+                  <p>{t.errors.loading}</p>
                 )}
               </div>
 
@@ -210,17 +228,17 @@ const JsonViewPage = () => {
             <table className="w-[80%] border-collapse border border-gray-300 mb-4 mx-auto containerTable">
               <thead>
                 <tr className="text-white bg-primary">
-                  <th className="border border-gray-300 p-2 text-xl h-20 headerTable">
-                    DATE
+                  <th className="border border-gray-300 p-2 text-xl h-20 headerTable uppercase">
+                  {t.jsonView.date}
                   </th>
-                  <th className="border border-gray-300 p-2 text-xl headerTable">
-                    DESCRIPTION
+                  <th className="border border-gray-300 p-2 text-xl headerTable uppercase">
+                  {t.jsonView.description}
                   </th>
-                  <th className="border border-gray-300 p-2 text-xl headerTable">QTY</th>
-                  <th className="border border-gray-300 p-2 text-xl headerTable">
-                    UNIT PRICE
+                  <th className="border border-gray-300 p-2 text-xl headerTable uppercase">{t.jsonView.quantity}</th>
+                  <th className="border border-gray-300 p-2 text-xl headerTable uppercase">
+                  {t.jsonView.unitPrice}
                   </th>
-                  <th className="border border-gray-300 p-2 text-xl headerTable">TOTAL</th>
+                  <th className="border border-gray-300 p-2 text-xl headerTable uppercase">{t.jsonView.total}</th>
                 </tr>
               </thead>
               <tbody>
@@ -258,14 +276,14 @@ const JsonViewPage = () => {
                   ) : (
                     <tr>
                       <td colSpan="5" className="text-center p-2">
-                        No items found.
+                      {t.jsonView.noItems}
                       </td>
                     </tr>
                   )
                 ) : (
                   <tr>
                     <td colSpan="5" className="text-center p-2">
-                      Loading reservation data...
+                    {t.errors.loading}
                     </td>
                   </tr>
                 )}
@@ -283,7 +301,7 @@ const JsonViewPage = () => {
                     return documentTotals.map((total) => (
                       <div key={total.ID} className="w-full">
                         <p className="mt-4 text-5xl flex font-bold gap-20 justify-end tableTotal text-textPrimaryColor">
-                          <span>TOTAL BALANCE</span>
+                          <span>{t.jsonView.totalBalance}</span>
                           <span>{isNaN(total.Balance) ? 'N/A' : total.Balance.toFixed(2)}€</span>
                         </p>
 
@@ -293,7 +311,7 @@ const JsonViewPage = () => {
                     return (
                       <div className="w-full">
                         <p className="mt-4 text-5xl flex font-bold gap-20 justify-end text-gray-500">
-                          Nenhum total disponível.
+                        {t.jsonView.noTotalBalance}
                         </p>
                       </div>
                     );
@@ -302,7 +320,7 @@ const JsonViewPage = () => {
               ) : (
                 <div className="w-full">
                   <p className="mt-4 text-5xl flex font-bold gap-20 justify-end text-gray-500">
-                    Nenhum total disponível.
+                  {t.jsonView.noTotalBalance}
                   </p>
                 </div>
               )}
@@ -315,10 +333,10 @@ const JsonViewPage = () => {
               {/* Mantém a margem alinhada à esquerda */}
               <thead>
                 <tr>
-                  <th className="p-2 text-left">VAT</th>
-                  <th className="p-2 text-right">Gross</th>
-                  <th className="p-2 text-right">Net</th>
-                  <th className="p-2 text-right">Tax</th>
+                  <th className="p-2 text-left">{t.jsonView.vat}</th>
+                  <th className="p-2 text-right">{t.jsonView.gross}</th>
+                  <th className="p-2 text-right">{t.jsonView.net}</th>
+                  <th className="p-2 text-right">{t.jsonView.tax}</th>
                 </tr>
               </thead>
               <tbody>
@@ -341,7 +359,7 @@ const JsonViewPage = () => {
                       return (
                         <tr>
                           <td colSpan={4} className="p-2 text-center text-gray-500">
-                            Nenhum imposto disponível.
+                          {t.jsonView.noTax}
                           </td>
                         </tr>
                       );
@@ -350,7 +368,7 @@ const JsonViewPage = () => {
                 ) : (
                   <tr>
                     <td colSpan={4} className="p-2 text-center text-gray-500">
-                      Carregando dados...
+                    {t.errors.loading}
                     </td>
                   </tr>
                 )}
@@ -377,19 +395,19 @@ const JsonViewPage = () => {
                         <p key={index}>{hotelInfo.HotelName}</p>
                       ))
                     ) : (
-                      <p>Hotel information not available</p> // Exibe mensagem caso HotelInfo esteja ausente
+                      <p>{t.jsonView.noHotelInformation}</p> // Exibe mensagem caso HotelInfo esteja ausente
                     );
                   })()
                 ) : (
-                  <p>No reservation data available</p> // Exibe mensagem caso reservationData ou requestBody estejam ausentes
+                  <p>{t.jsonView.noReservationDetails}</p> // Exibe mensagem caso reservationData ou requestBody estejam ausentes
                 )}
               </div>
               {/* Botões de Ação */}
               <div className="flex gap-3">
                 <CancelPIN
-                  buttonName={"Cancel"}
+                  buttonName={t.jsonView.cancel}
                   buttonColor={"transparent"}
-                  modalHeader={"Insert PIN"}
+                  modalHeader={t.jsonView.insertPin}
                   formTypeModal={11}
                   editor={"teste"}
                 />
@@ -400,7 +418,7 @@ const JsonViewPage = () => {
                   <OkPIN
                     buttonName={"Ok"}
                     buttonColor={"transparent"}
-                    modalHeader={"Insert PIN"}
+                    modalHeader={t.jsonView.insertPin}
                     formTypeModal={11}
                     editor={"teste"}
                   />
@@ -410,7 +428,7 @@ const JsonViewPage = () => {
           </div>
         </>
       ) : (
-        <p>Nenhum dado encontrado.</p>
+        <p>{t.jsonView.noData}</p>
       )}
     </main>
   );

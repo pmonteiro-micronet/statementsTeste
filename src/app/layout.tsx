@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import SidebarWrapper from "@/components/Layout/SidebarWrapper";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper/page"; // Componente cliente para o SessionProvider
+import {LanguageProvider} from "@/context/LanguageContext/page"; // Componente cliente para o LanguageProvider
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,7 +38,7 @@ export default function RootLayout({
           <SidebarWrapper>
             {/* Main Content Area */}
             <div className="flex-grow overflow-x-hidden h-full h-screen">
-              {children}
+            <LanguageProvider>{children}</LanguageProvider>
             </div>
           </SidebarWrapper>
         </SessionProviderWrapper>
