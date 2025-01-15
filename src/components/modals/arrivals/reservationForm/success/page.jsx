@@ -23,7 +23,7 @@ const SuccessRegistrationForm = ({
             className="z-50"
         >
             <ModalContent>
-                <ModalHeader className="flex flex-row justify-between items-center bg-primary text-white gap-1 text-lg py-1 ">
+                <ModalHeader className="flex flex-row !justify-between items-center bg-primary text-white gap-1 text-lg py-1 ">
                     {modalHeader}
                     <Button color="transparent" variant="light" className={"w-auto min-w-0 p-0 m-0 -pr-4"} onClick={onClose}>
                         <MdClose size={25} />

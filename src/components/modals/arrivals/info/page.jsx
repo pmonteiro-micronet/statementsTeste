@@ -45,7 +45,7 @@ const ArrivalInfoForm = ({
                             {(onClose) => (
                                 <>
                                     <form>
-                                        <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white p-2">
+                                        <ModalHeader className="flex flex-row !justify-between items-center gap-1 bg-primary text-white p-2">
                                             <div className="flex flex-row justify-start gap-4 pl-4">
                                                 {editIcon} {modalHeader} {modalEditArrow} {modalEdit}
                                             </div>

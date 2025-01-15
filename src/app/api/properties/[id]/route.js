@@ -26,3 +26,43 @@ export async function GET(request, context) {
     });
   }
 }
+
+// Função PATCH para atualizar a propriedade
+export async function PATCH(request, context) {
+  const { id } = context.params;
+  const { propertyName, propertyTag, propertyServer } = await request.json();
+
+  try {
+    // Verifique se todos os campos obrigatórios foram fornecidos
+    if (!propertyName || !propertyTag || !propertyServer) {
+      return new NextResponse(
+        JSON.stringify({ error: "All fields are required" }),
+        { status: 400 }
+      );
+    }
+
+    // Atualize a propriedade no banco de dados
+    const updatedProperty = await prisma.properties.update({
+      where: {
+        propertyID: parseInt(id),
+      },
+      data: {
+        propertyName,
+        propertyTag,
+        propertyServer,
+        propertyPort,
+        mpeHotel
+      },
+    });
+
+    return new NextResponse(JSON.stringify({ updatedProperty }), {
+      status: 200,
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar a propriedade:", error);
+    return new NextResponse(
+      JSON.stringify({ error: error.message || "Failed to update property" }),
+      { status: 500 }
+    );
+  }
+}

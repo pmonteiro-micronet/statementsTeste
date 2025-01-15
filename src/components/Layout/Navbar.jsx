@@ -188,11 +188,15 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
           <ul>
             {Object.entries(listItems).map(([key, section]) => (
               <li key={key} className="mb-4">
+                {/* Cabeçalho da seção com ícone */}
                 <div
-                  className="flex items-center justify-between cursor-pointer font-bold text-indigo-800 mb-2"
+                  className="flex items-center justify-between cursor-pointer font-bold text-textPrimaryColor mb-2"
                   onClick={() => toggleSubmenu(key)}
                 >
-                  {replaceUnderscores(key)}
+                  <div className="flex items-center gap-2">
+                    {section.icon}
+                    {replaceUnderscores(key)}
+                  </div>
                   {section.items && (
                     <span className="text-sm text-gray-600">
                       {openMenus.has(key) ? <IoIosArrowUp size={15} /> : <IoIosArrowDown size={15} />}
@@ -200,44 +204,26 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
                   )}
                 </div>
 
+                {/* Submenus */}
                 {openMenus.has(key) && (
                   <ul className="pl-4">
-                    {section.items.map((item, index) =>
-                      item.items ? (
-                        <li key={index} className="mb-2">
-                          <span className="font-semibold text-gray-800">{replaceUnderscores(item.label)}</span>
-                          <ul className="pl-4">
-                            {item.items.map((subItem, subIndex) => (
-                              <li key={subIndex} className="mb-1">
-                                <Link
-                                  href={subItem.ref}
-                                  className="block py-1 text-textPrimaryColor"
-                                  onClick={toggleMenu}
-                                >
-                                  {replaceUnderscores(subItem.label)}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        </li>
-                      ) : (
-                        <li key={index} className="mb-1">
-                          <Link
-                            href={item.ref}
-                            className="block py-2 text-indigo-600"
-                            onClick={toggleMenu}
-                          >
-                            {replaceUnderscores(item.label)}
-                          </Link>
-                        </li>
-                      )
-                    )}
+                    {section.items.map((item, index) => (
+                      <li key={index} className="mb-2">
+                        <Link
+                          href={item.ref}
+                          className="flex items-center gap-2 py-2 !text-textPrimaryColor"
+                          onClick={toggleMenu}
+                        >
+                          {item.icon} {/* Ícone do submenu */}
+                          {replaceUnderscores(item.label)}
+                        </Link>
+                      </li>
+                    ))}
                   </ul>
                 )}
               </li>
             ))}
           </ul>
-
           <div className="mt-auto flex flex-col">
             <div className="flex flex-row justify-between">
               <div className="flex items-center mb-4">

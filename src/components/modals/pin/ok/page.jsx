@@ -9,7 +9,7 @@ import bcrypt from "bcryptjs";
 
 const isDesktop = () => {
     if (typeof window !== "undefined") {
-        return window.innerWidth >= 1024; // Define dispositivos desktop como largura maior ou igual a 1024px
+        return window.innerWidth >= 2000; // Define dispositivos desktop como largura maior ou igual a 1024px
     }
     return false;
 };
