@@ -27,7 +27,7 @@
             "selectHotel": "Selecione um Hotel",
             "selectHotelInfo": "Por favor, selecione um hotel para aceder aos menus.",
             "statements": "Declarações",
-            "dashboard": "Painel de Controlo",
+            "dashboard": "Dashboard",
             "pendings": "Pendentes",
             "viewed": "Visualizados",
             "frontOffice": "Receção",
@@ -47,7 +47,7 @@
     },
     "statements": {
         "dashboard": {
-            "title": "Painel de Controlo",
+            "title": "Dashboard",
             "cardPending": "Pendente",
             "cardViewed": "Visualizado"
         },
