@@ -30,7 +30,22 @@ export async function GET(request, context) {
 // Função PATCH para atualizar a propriedade
 export async function PATCH(request, context) {
   const { id } = context.params;
-  const { propertyName, propertyTag, propertyServer } = await request.json();
+  const {
+    propertyName,
+    propertyTag,
+    propertyServer,
+    propertyPort,
+    mpehotel,
+    hotelName,
+    hotelMiniTerms,
+    hotelPhone,
+    hotelEmail,
+    hotelAddress,
+    hotelPostalCode,
+    hotelRNET,
+    hotelNIF
+
+  } = await request.json();
 
   try {
     // Verifique se todos os campos obrigatórios foram fornecidos
@@ -51,7 +66,15 @@ export async function PATCH(request, context) {
         propertyTag,
         propertyServer,
         propertyPort,
-        mpeHotel
+        mpehotel,
+        hotelName,
+        hotelMiniTerms,
+        hotelPhone,
+        hotelEmail,
+        hotelAddress,
+        hotelPostalCode,
+        hotelRNET,
+        hotelNIF
       },
     });
 
