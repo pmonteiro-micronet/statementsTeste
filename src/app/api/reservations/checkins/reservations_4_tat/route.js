@@ -72,7 +72,7 @@ export async function GET(request) {
           requestID: existingRecord.requestID,  // Usa o requestID do registro existente
         },
         data: {
-          requestBody: JSON.stringify(responseData),  // Atualiza o corpo com os dados retornados
+          requestBody: responseData,  // Atualiza o corpo com os dados retornados
           requestType: "GET",  // Tipo da requisição
           requestDateTime: new Date(),  // Data e hora da atualização
           responseStatus: "200",  // Status de resposta
