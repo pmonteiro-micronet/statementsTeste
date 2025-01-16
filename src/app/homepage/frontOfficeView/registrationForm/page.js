@@ -58,17 +58,17 @@ export default function Page() {
     const signaturePadRef = useRef(null);
 
     const [locale, setLocale] = useState("pt");
-  
-  useEffect(() => {
-    // Carregar o idioma do localStorage
-    const storedLanguage = localStorage.getItem("language");
-    if (storedLanguage) {
-      setLocale(storedLanguage);
-    }
-  }, []);
 
-  // Carregar as traduções com base no idioma atual
-  const t = translations[locale] || translations["pt"]; // fallback para "pt"
+    useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+        }
+    }, []);
+
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
     // const searchParams = useSearchParams();  // Usando useSearchParams diretamente
     // const requestID = searchParams.get("requestID");  // Acessando parâmetro de URL
@@ -317,7 +317,7 @@ export default function Page() {
 
     const handleOkClick = async () => {
         let errors = [];
-    
+
         // Validações de formulário
         if (isCanvasEmpty()) {
             errors.push("Please fill in all required fields to submit the form.");
@@ -330,13 +330,13 @@ export default function Page() {
             setIsErrorModalOpen(true);
             return;
         }
-    
+
         setErrorMessage('');
         setIsErrorModalOpen(false);
-    
+
         let emailToSend = email !== initialEmail ? email : initialEmail; // Envia undefined se não houver alteração
         let vatNoToSend = vatNo !== initialVatNo ? vatNo : initialVatNo; // Envia undefined se não houver alteração
-    
+
         // Se houver alterações (ou valores a serem enviados), envia para a API
         if (emailToSend || vatNoToSend) {
             try {
@@ -355,14 +355,14 @@ export default function Page() {
                 return;
             }
         }
-    
+
         // Captura a assinatura e gera o PDF
         try {
             const canvas = canvasRef.current;
             if (!canvas) return;
-    
+
             const signatureBase64 = canvas.toDataURL().split(',')[1]; // Remove prefixo "data:..."
-    
+
             const reservaDetails = {
                 // Detalhes da reserva
                 PropertyID: propertyID,
@@ -396,18 +396,18 @@ export default function Page() {
                 HotelRNET: hotelRNET,
                 RateCode: reserva.RateCode,
             };
-    
+
             // Geração do PDF
             const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
             const pdfBlob = pdfDoc.output('blob'); // Gerar o PDF como um Blob
-    
+
             // Compressão do PDF com pako (gzip)
             const pdfArrayBuffer = await pdfBlob.arrayBuffer();
             const compressedPdf = pako.gzip(new Uint8Array(pdfArrayBuffer)); // Comprime usando gzip
-    
+
             // Codificação do PDF comprimido em Base64
             const pdfBase64 = btoa(String.fromCharCode(...compressedPdf));
-    
+
             // Envia os dados via Axios
             const response = await axios.post(
                 "/api/reservations/checkins/registration_form_base64",
@@ -417,13 +417,13 @@ export default function Page() {
                     fileName: `RegistrationForm_ResNo_${reserva.ResNo}_ProfileID_${guestInfo.ProfileID}.pdf`,
                 }
             );
-    
+
             console.log('Resposta da API:', response.data);
             setSuccessMessage("Registration sent successfully");
             setIsSuccessModalOpen(true);
         } catch (error) {
             console.error('Erro ao gerar ou enviar o PDF:', error);
-    
+
             errors.push("There was an issue generating or sending the form. Please contact support.");
             setErrorMessage(errors.join("\n"));
             setIsErrorModalOpen(true);
@@ -997,37 +997,37 @@ export default function Page() {
                                     </div>
 
                                     {/** Dados de faturação */}
-<div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card">
-    <div className="flex flex-row justify-between">
-        <p className="text-[#f7ba83] mb-1">{t.frontOffice.registrationForm.invoiceData}</p>
-        <FaPencilAlt
-            size={15}
-            color={reserva.BlockedVatNO === 1 ? "gray" : "#FC9D25"}
-            style={{ cursor: reserva.BlockedVatNO === 1 ? "not-allowed" : "pointer" }}
-            onClick={() => {
-                if (reserva.BlockedVatNO === 0) {
-                    setModalField("VatNo"); // Define o campo em edição
-                    setIsModalOpen(true); // Abre o modal
-                }
-            }}
-        />
-    </div>
-    <div className="mt-2">
-        <p className="!text-textLabelColor text-lg">{guestInfo.LastName}, {guestInfo.FirstName}</p>
-        <div className="mt-4">
-            <InputFieldControlled
-                type="text"
-                id="VAT Nr."
-                name="VAT Nr."
-                label="{t.frontOffice.registrationForm.vatNr}"
-                ariaLabel="VAT Nr.:"
-                value={vatNo}
-                style={inputStyleFull}
-                disabled
-            />
-        </div>
-    </div>
-</div>
+                                    <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card">
+                                        <div className="flex flex-row justify-between">
+                                            <p className="text-[#f7ba83] mb-1">{t.frontOffice.registrationForm.invoiceData}</p>
+                                            <FaPencilAlt
+                                                size={15}
+                                                color={reserva.BlockedVatNO === 1 ? "gray" : "#FC9D25"}
+                                                style={{ cursor: reserva.BlockedVatNO === 1 ? "not-allowed" : "pointer" }}
+                                                onClick={() => {
+                                                    if (reserva.BlockedVatNO === 0) {
+                                                        setModalField("VatNo"); // Define o campo em edição
+                                                        setIsModalOpen(true); // Abre o modal
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="mt-2">
+                                            <p className="!text-textLabelColor text-lg">{guestInfo.LastName}, {guestInfo.FirstName}</p>
+                                            <div className="mt-4">
+                                                <InputFieldControlled
+                                                    type="text"
+                                                    id="VAT Nr."
+                                                    name="VAT Nr."
+                                                    label={t.frontOffice.registrationForm.vatNr}
+                                                    ariaLabel="VAT Nr.:"
+                                                    value={vatNo}
+                                                    style={inputStyleFull}
+                                                    disabled
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     {/** Modal Dinâmico */}
                                     {isModalOpen && (
@@ -1077,7 +1077,7 @@ export default function Page() {
                                                 {t.frontOffice.registrationForm.disagree}
                                             </label>
                                             <TermsConditionsForm
-                                                buttonName={t.frontOffice.registrationForm.readMode}
+                                                buttonName={t.frontOffice.registrationForm.readMore}
                                                 modalHeader={t.frontOffice.registrationForm.termsModalHeader}
                                                 formTypeModal={11}
                                             />
