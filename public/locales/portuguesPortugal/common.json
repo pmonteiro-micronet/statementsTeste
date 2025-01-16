@@ -30,10 +30,10 @@
             "dashboard": "Dashboard",
             "pendings": "Pendentes",
             "viewed": "Visualizados",
-            "frontOffice": "Receção",
+            "frontOffice": "Front Office",
             "departures": "Partidas",
             "arrivals": "Chegadas",
-            "inHouses": "Hóspedes",
+            "inHouses": "InHouses",
             "viewMode": "Modo de Visualização",
             "language": "Idioma",
             "logout": "Sair",
@@ -72,9 +72,9 @@
     },
     "frontOffice": {
         "dashboard":{
-            "title": "Receção",
+            "title": "Front Office",
             "cardArrivals": "Chegadas",
-            "cardInHouses": "Hóspedes",
+            "cardInHouses": "InHouses",
             "cardDepartures": "Partidas"
         },
         "departures": {
@@ -115,7 +115,7 @@
             "attention": "Atenção"
         },
         "inHouses": {
-            "title": "Hóspedes",
+            "title": "InHouses",
             "room": "Quarto",
             "lastName": "Apelido",
             "firstName": "Primeiro Nome",
@@ -131,7 +131,7 @@
         },
         "registrationForm": {
             "title": "Formulário de Registo",
-            "stayDetails": "Detalhes da Estadia",
+            "stayDetails": "Detalhes",
             "resNo": "N.º Res.",
             "room": "Quarto",
             "roomType": "Tipo de Quarto",
@@ -140,7 +140,7 @@
             "arrival": "Chegada",
             "nights": "Noites",
             "departure": "Partida",
-            "priceInfo": "Informação de Preços",
+            "priceInfo": "Info. de Preços",
             "rateCode": "Código de Tarifa",
             "cityTax": "Taxa Municipal",
             "priceNight": "Preço/Noite",
@@ -183,7 +183,7 @@
     },
     "jsonView": {
         "room": "Quarto",
-        "reservationNumber": "Número de Reserva",
+        "reservationNumber": "Número de Res.",
         "checkIn": "Check-In",
         "checkOut": "Check-Out",
         "noReservationDetails": "Sem detalhes de reserva disponíveis.",
