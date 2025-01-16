@@ -14,6 +14,7 @@ import axios from "axios";
 import { Tabs, Tab } from "@nextui-org/react";
 import { FaPencilAlt } from "react-icons/fa";
 import PropertiesEditForm from "@/components/modals/user/propertiesEdit/page";
+import ChangePIN from "@/components/modals/user/changePin/page";
 
 const ProfileModalForm = ({
     buttonName,
@@ -29,10 +30,16 @@ const ProfileModalForm = ({
     const { data: session } = useSession();
     const [hotels, setHotels] = useState([]);
     const [selectedHotel, setSelectedHotel] = useState(null); // Estado para armazenar a propriedade selecionada
-    const [showPasswordFields, setShowPasswordFields] = useState(false); // Para exibir os campos de redefinição de senha
+    const [showPasswordFields, setShowPasswordFields] = useState(false);
+    const [showPinFields, setShowPinFields] = useState(false);
+    const [isPasswordUpdate, setIsPasswordUpdate] = useState(false);
+    const [isPinUpdate, setIsPinUpdate] = useState(false);
     const [oldPassword, setOldPassword] = useState("");
+    const [oldPin, setOldPin] = useState("");
     const [newPassword, setNewPassword] = useState("");
+    const [newPin, setNewPin] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
+    const [confirmNewPin, setConfirmNewPin] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -70,36 +77,67 @@ const ProfileModalForm = ({
         }
     };
 
-    const handlePasswordUpdate = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault(); // Impede o comportamento padrão do formulário
         setErrorMessage("");
         setSuccessMessage("");
 
-        if (!oldPassword || !newPassword || !confirmNewPassword) {
-            setErrorMessage("Please fill in all fields.");
-            return;
-        }
-
-        if (newPassword !== confirmNewPassword) {
-            setErrorMessage("New passwords do not match.");
-            return;
-        }
-
-        try {
-            const response = await axios.patch(`/api/user/${user.id}`, {
-                oldPassword,
-                newPassword,
-            });
-
-            if (response.status === 200) {
-                setSuccessMessage("Password updated successfully.");
-                resetForm();
-            } else {
-                setErrorMessage("Failed to update password. Please try again.");
+        if (isPasswordUpdate) {
+            if (!oldPassword || !newPassword || !confirmNewPassword) {
+                setErrorMessage("Please fill in all fields.");
+                return;
             }
-        } catch (error) {
-            console.error("Error updating password:", error);
-            setErrorMessage(error.response?.data?.message || "An error occurred.");
+
+            if (newPassword !== confirmNewPassword) {
+                setErrorMessage("New passwords do not match.");
+                return;
+            }
+
+            try {
+                const response = await axios.patch(`/api/user/changePassword/${user.id}`, {
+                    oldPassword,
+                    newPassword,
+                });
+
+                if (response.status === 200) {
+                    setSuccessMessage("Password updated successfully.");
+                    resetForm();
+                } else {
+                    setErrorMessage("Failed to update password. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error updating password:", error);
+                setErrorMessage(error.response?.data?.message || "An error occurred.");
+            }
+        }
+
+        if (isPinUpdate) {
+            if (!oldPin || !newPin || !confirmNewPin) {
+                setErrorMessage("Please fill in all fields.");
+                return;
+            }
+
+            if (newPin !== confirmNewPin) {
+                setErrorMessage("New pins do not match.");
+                return;
+            }
+
+            try {
+                const response = await axios.patch(`/api/user/changePin/${user.id}`, {
+                    oldPin,
+                    newPin,
+                });
+
+                if (response.status === 200) {
+                    setSuccessMessage("Pin updated successfully.");
+                    resetForm();
+                } else {
+                    setErrorMessage("Failed to update pin. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error updating pin:", error);
+                setErrorMessage(error.response?.data?.message || "An error occurred.");
+            }
         }
     };
 
@@ -108,6 +146,10 @@ const ProfileModalForm = ({
         setOldPassword("");
         setNewPassword("");
         setConfirmNewPassword("");
+        setShowPinFields(false);
+        setOldPin("");
+        setNewPin("");
+        setConfirmNewPin("");
         setErrorMessage("");
         setSuccessMessage("");
     };
@@ -135,7 +177,7 @@ const ProfileModalForm = ({
                         size="sm"
                     >
                         <ModalContent>
-                            <form onSubmit={handlePasswordUpdate}>
+                            <form onSubmit={handleSubmit}>
                                 <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white p-2">
                                     <div className="flex flex-row justify-start gap-4 pl-4">
                                         {editIcon} {modalHeader} {modalEditArrow} {modalEdit}
@@ -186,10 +228,32 @@ const ProfileModalForm = ({
                                                 {!showPasswordFields && (
                                                     <button
                                                         className="bg-primary text-white p-2 rounded-lg w-32 text-xs cursor-pointer"
-                                                        onClick={() => setShowPasswordFields(true)}
+                                                        onClick={() => {
+                                                            setShowPasswordFields(true);
+                                                            setIsPasswordUpdate(true);
+                                                        }}
                                                     >
                                                         Change Password
                                                     </button>
+                                                )}
+                                                {!showPinFields && (
+                                                    // <button
+                                                    //     className="bg-primary text-white p-2 rounded-lg w-32 text-xs cursor-pointer"
+                                                    //     onClick={() => {
+                                                    //         setShowPinFields(true);
+                                                    //         setIsPinUpdate(true);
+                                                    //     }}
+                                                    // >
+                                                    //     Change Pin
+                                                    // </button>
+
+                                                    <div className="w-32 ">
+                                                        <ChangePIN
+                                                            buttonName={"Change Pin"}
+                                                            modalHeader={"Change Pin"}
+                                                            userID={user.id}
+                                                        />
+                                                    </div>
                                                 )}
 
                                                 {/* Campos de Redefinição de Senha */}
@@ -235,7 +299,10 @@ const ProfileModalForm = ({
                                                             <Button
                                                                 type="button"
                                                                 className="w-32 text-xs bg-gray-300"
-                                                                onClick={() => setShowPasswordFields(false)} // Fecha os campos de senha
+                                                                onClick={() => {
+                                                                    setShowPasswordFields(false);
+                                                                    setIsPasswordUpdate(false);
+                                                                }}
                                                             >
                                                                 Cancel
                                                             </Button>
@@ -247,6 +314,15 @@ const ProfileModalForm = ({
                                                                 Update Password
                                                             </Button>
                                                         </div>
+                                                    </>
+                                                )}
+
+                                                {showPinFields && (
+                                                    <>
+                                                        <ChangePIN
+                                                            buttonName={"teste"}
+
+                                                        />
                                                     </>
                                                 )}
                                             </div>
@@ -266,7 +342,7 @@ const ProfileModalForm = ({
                                                                         className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
                                                                     />
                                                                     <FaPencilAlt
-                                                                        className={`ml-2 cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`} 
+                                                                        className={`ml-2 cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`}
                                                                         onClick={() => handleEditClick(hotel)} // Passa a propriedade clicada
                                                                         style={{ pointerEvents: isAdmin ? "auto" : "none" }}
                                                                     />
