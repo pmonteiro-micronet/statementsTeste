@@ -124,7 +124,7 @@ export default function Arrivals({ params }) {
         const reservasArray = response.data.response.flatMap(item => {
           try {
             // Parsear o `requestBody` como JSON se estiver stringificado
-            const parsedRequestBody = JSON.parse(item.requestBody);
+            const parsedRequestBody = JSON.parse(item.responseBody);
 
             // Extrair as informações do formato correto
             const reservations = Array.isArray(parsedRequestBody)

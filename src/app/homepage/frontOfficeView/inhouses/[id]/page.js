@@ -178,9 +178,9 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
         // Parse das reservas
         const reservasArray = response.data.response.flatMap(item => {
           try {
-            return JSON.parse(item.requestBody);
+            return JSON.parse(item.responseBody);
           } catch (err) {
-            console.error("Erro ao fazer parse de requestBody:", item.requestBody, err);
+            console.error("Erro ao fazer parse de requestBody:", item.responseBody, err);
             return [];
           }
         });
