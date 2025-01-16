@@ -31,15 +31,10 @@ const ProfileModalForm = ({
     const [hotels, setHotels] = useState([]);
     const [selectedHotel, setSelectedHotel] = useState(null); // Estado para armazenar a propriedade selecionada
     const [showPasswordFields, setShowPasswordFields] = useState(false);
-    const [showPinFields, setShowPinFields] = useState(false);
     const [isPasswordUpdate, setIsPasswordUpdate] = useState(false);
-    const [isPinUpdate, setIsPinUpdate] = useState(false);
     const [oldPassword, setOldPassword] = useState("");
-    const [oldPin, setOldPin] = useState("");
     const [newPassword, setNewPassword] = useState("");
-    const [newPin, setNewPin] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
-    const [confirmNewPin, setConfirmNewPin] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -111,34 +106,6 @@ const ProfileModalForm = ({
             }
         }
 
-        if (isPinUpdate) {
-            if (!oldPin || !newPin || !confirmNewPin) {
-                setErrorMessage("Please fill in all fields.");
-                return;
-            }
-
-            if (newPin !== confirmNewPin) {
-                setErrorMessage("New pins do not match.");
-                return;
-            }
-
-            try {
-                const response = await axios.patch(`/api/user/changePin/${user.id}`, {
-                    oldPin,
-                    newPin,
-                });
-
-                if (response.status === 200) {
-                    setSuccessMessage("Pin updated successfully.");
-                    resetForm();
-                } else {
-                    setErrorMessage("Failed to update pin. Please try again.");
-                }
-            } catch (error) {
-                console.error("Error updating pin:", error);
-                setErrorMessage(error.response?.data?.message || "An error occurred.");
-            }
-        }
     };
 
     const resetForm = () => {
@@ -146,10 +113,6 @@ const ProfileModalForm = ({
         setOldPassword("");
         setNewPassword("");
         setConfirmNewPassword("");
-        setShowPinFields(false);
-        setOldPin("");
-        setNewPin("");
-        setConfirmNewPin("");
         setErrorMessage("");
         setSuccessMessage("");
     };
@@ -236,17 +199,7 @@ const ProfileModalForm = ({
                                                         Change Password
                                                     </button>
                                                 )}
-                                                {!showPinFields && (
-                                                    // <button
-                                                    //     className="bg-primary text-white p-2 rounded-lg w-32 text-xs cursor-pointer"
-                                                    //     onClick={() => {
-                                                    //         setShowPinFields(true);
-                                                    //         setIsPinUpdate(true);
-                                                    //     }}
-                                                    // >
-                                                    //     Change Pin
-                                                    // </button>
-
+                                               
                                                     <div className="w-32 ">
                                                         <ChangePIN
                                                             buttonName={"Change Pin"}
@@ -254,7 +207,7 @@ const ProfileModalForm = ({
                                                             userID={user.id}
                                                         />
                                                     </div>
-                                                )}
+                                                
 
                                                 {/* Campos de Redefinição de Senha */}
                                                 {showPasswordFields && (
@@ -314,15 +267,6 @@ const ProfileModalForm = ({
                                                                 Update Password
                                                             </Button>
                                                         </div>
-                                                    </>
-                                                )}
-
-                                                {showPinFields && (
-                                                    <>
-                                                        <ChangePIN
-                                                            buttonName={"teste"}
-
-                                                        />
                                                     </>
                                                 )}
                                             </div>
