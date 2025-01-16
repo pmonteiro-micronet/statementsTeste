@@ -28,8 +28,13 @@ const OkPIN = ({ buttonName, buttonIcon, modalHeader, userID }) => {
             return;
         }
 
+        if (newPin.length !== 4 || oldPin.length !== 4 || confirmNewPin.length !== 4) {
+            setErrorMessage("PINs must be exactly 4 digits.");
+            return;
+        }
+
         if (newPin !== confirmNewPin) {
-            setErrorMessage("New pins do not match.");
+            setErrorMessage("New PINs do not match.");
             return;
         }
 
@@ -40,14 +45,14 @@ const OkPIN = ({ buttonName, buttonIcon, modalHeader, userID }) => {
             });
 
             if (response.status === 200) {
-                setSuccessMessage("Pin updated successfully.");
+                setSuccessMessage("PIN updated successfully.");
                 resetForm();
                 onOpenChange(false); // Fecha o modal após o sucesso
             } else {
-                setErrorMessage("Failed to update pin. Please try again.");
+                setErrorMessage("Failed to update PIN. Please try again.");
             }
         } catch (error) {
-            console.error("Error updating pin:", error);
+            console.error("Error updating PIN:", error);
             setErrorMessage(error.response?.data?.message || "An error occurred.");
         }
     };
@@ -59,10 +64,10 @@ const OkPIN = ({ buttonName, buttonIcon, modalHeader, userID }) => {
             if (activeField === "confirm") setConfirmNewPin("");
         } else if (key === "OK") {
             handleSubmit(); // Chama o envio ao clicar em "OK"
-        } else {
-            if (activeField === "old") setOldPin((prev) => prev + key);
-            if (activeField === "new") setNewPin((prev) => prev + key);
-            if (activeField === "confirm") setConfirmNewPin((prev) => prev + key);
+        } else if (!isNaN(key)) { // Apenas números são permitidos
+            if (activeField === "old" && oldPin.length < 4) setOldPin((prev) => prev + key);
+            if (activeField === "new" && newPin.length < 4) setNewPin((prev) => prev + key);
+            if (activeField === "confirm" && confirmNewPin.length < 4) setConfirmNewPin((prev) => prev + key);
         }
     };
 
@@ -106,7 +111,9 @@ const OkPIN = ({ buttonName, buttonIcon, modalHeader, userID }) => {
                                 value={oldPin}
                                 onClick={() => setActiveField("old")}
                                 readOnly
-                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none text-center"
+                                className={`w-full border rounded-md px-2 py-1 focus:outline-none text-center ${
+                                    activeField === "old" ? "border-primary ring-1 ring-primary" : "border-gray-300"
+                                }`}
                             />
                         </div>
                         <div>
@@ -116,7 +123,9 @@ const OkPIN = ({ buttonName, buttonIcon, modalHeader, userID }) => {
                                 value={newPin}
                                 onClick={() => setActiveField("new")}
                                 readOnly
-                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none text-center"
+                                className={`w-full border rounded-md px-2 py-1 focus:outline-none text-center ${
+                                    activeField === "new" ? "border-primary ring-1 ring-primary" : "border-gray-300"
+                                }`}
                             />
                         </div>
                         <div>
@@ -126,7 +135,9 @@ const OkPIN = ({ buttonName, buttonIcon, modalHeader, userID }) => {
                                 value={confirmNewPin}
                                 onClick={() => setActiveField("confirm")}
                                 readOnly
-                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none text-center"
+                                className={`w-full border rounded-md px-2 py-1 focus:outline-none text-center ${
+                                    activeField === "confirm" ? "border-primary ring-1 ring-primary" : "border-gray-300"
+                                }`}
                             />
                         </div>
                         <div className="grid grid-cols-3 gap-2 mt-4">
