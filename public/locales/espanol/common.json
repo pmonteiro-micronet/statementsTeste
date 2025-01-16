@@ -27,13 +27,13 @@
             "selectHotel": "Seleccione un Hotel",
             "selectHotelInfo": "Por favor, seleccione un hotel para acceder a los menús.",
             "statements": "Declaraciones",
-            "dashboard": "Panel de control",
+            "dashboard": "Dashboard",
             "pendings": "Pendientes",
             "viewed": "Vistos",
             "frontOffice": "Recepción",
             "departures": "Salidas",
             "arrivals": "Llegadas",
-            "inHouses": "Huéspedes",
+            "inHouses": "InHouses",
             "viewMode": "Modo de visualización",
             "language": "Idioma",
             "logout": "Cerrar sesión",
@@ -47,7 +47,7 @@
     },
     "statements": {
         "dashboard": {
-            "title": "Panel de control",
+            "title": "Dashboard",
             "cardPending": "Pendiente",
             "cardViewed": "Visto"
         },
@@ -74,7 +74,7 @@
         "dashboard":{
             "title": "Recepción",
             "cardArrivals": "Llegadas",
-            "cardInHouses": "Huéspedes",
+            "cardInHouses": "InHouses",
             "cardDepartures": "Salidas"
         },
         "departures": {
@@ -115,7 +115,7 @@
             "attention": "Atención"
         },
         "inHouses": {
-            "title": "Huéspedes",
+            "title": "InHouses",
             "room": "Habitación",
             "lastName": "Apellido",
             "firstName": "Nombre",
@@ -183,7 +183,7 @@
     },
     "jsonView": {
         "room": "Habitación",
-        "reservationNumber": "Número de Reserva",
+        "reservationNumber": "Número de Res.",
         "checkIn": "Check-In",
         "checkOut": "Check-Out",
         "noReservationDetails": "No hay detalles de reserva disponibles.",
