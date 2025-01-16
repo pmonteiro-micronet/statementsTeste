@@ -182,9 +182,9 @@ export default function Page({ params }) {
         // Combinar todos os requestBody dentro de response.data.response
         const reservasArray = response.data.response.flatMap(item => {
           try {
-            return JSON.parse(item.requestBody);
+            return JSON.parse(item.responseBody);
           } catch (err) {
-            console.error("Erro ao fazer parse de requestBody:", item.requestBody, err);
+            console.error("Erro ao fazer parse de requestBody:", item.responseBody, err);
             return [];
           }
         });
