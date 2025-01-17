@@ -11,6 +11,20 @@ const generateUniqueKey = (HotelInfo, Reservation, GuestInfo = {}) => {
   return `${Tag}-${RoomNumber}-${ReservationNumber}-${DateCI}-${DateCO}-${FirstName}-${LastName}`;
 };
 
+// Função para formatar a resposta recebida para o formato desejado
+const formatResponse = (data) => {
+  return [
+    {
+      HotelInfo: data.HotelInfo || [],
+      Reservation: data.Reservation || [],
+      GuestInfo: data.GuestInfo || [],
+      Items: data.Items || [],
+      Taxes: data.Taxes || [],
+      DocumentTotals: data.DocumentTotals || [],
+    },
+  ];
+};
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const ResNumber = searchParams.get("ResNo");
@@ -54,8 +68,10 @@ export async function GET(request) {
 
     const response = await axios.get(url, { params: { ResNumber, window } });
 
-    // Formata a resposta recebida
-    const formattedResponse = JSON.stringify(response.data, null, 2);
+    // Formatar a resposta no formato esperado
+    const formattedData = formatResponse(response.data[0]); // Transforma a resposta para o formato esperado
+    const formattedResponse = JSON.stringify(formattedData, null, 2); // Converte para JSON formatado
+
     console.log("Resposta formatada recebida do endpoint:", formattedResponse);
 
     const data = response.data[0];
@@ -85,7 +101,7 @@ export async function GET(request) {
       newRequest = await prisma.requestRecords.update({
         where: { requestID: existingRequest.requestID },
         data: {
-          requestBody: formattedResponse,
+          requestBody: formattedResponse, // Use os dados formatados aqui
           requestDateTime: new Date(),
           responseStatus: "200",
           responseBody: formattedResponse,
@@ -98,7 +114,7 @@ export async function GET(request) {
 
       newRequest = await prisma.requestRecords.create({
         data: {
-          requestBody: formattedResponse,
+          requestBody: formattedResponse, // Use os dados formatados aqui
           requestType: "GET",
           requestDateTime: new Date(),
           responseStatus: "200",
