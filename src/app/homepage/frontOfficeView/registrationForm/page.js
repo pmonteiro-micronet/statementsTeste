@@ -414,7 +414,7 @@ export default function Page() {
                 {
                     PropertyID: propertyID,
                     pdfBase64: pdfBase64, // Envia o PDF comprimido em Base64
-                    fileName: `RegistrationForm_ResNo_${reserva.ResNo}_ProfileID_${guestInfo.ProfileID}.pdf`,
+                    fileName: `RegistrationForm_ResNo_${reserva.ResNo}_TC_${termsAccepted ? 0 : 1}_DPP_${policyAccepted ? 0 : 1}_ProfileID_${guestInfo.ProfileID}.pdf`,
                 }
             );
 

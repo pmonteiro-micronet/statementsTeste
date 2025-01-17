@@ -188,6 +188,7 @@ const ProfileModalForm = ({
                                                     />
                                                 </div>
                                                 {/* Botão para exibir os campos de senha */}
+                                                <div className="flex flex-row justify-between">
                                                 {!showPasswordFields && (
                                                     <button
                                                         className="bg-primary text-white p-2 rounded-lg w-32 text-xs cursor-pointer"
@@ -200,13 +201,14 @@ const ProfileModalForm = ({
                                                     </button>
                                                 )}
                                                
-                                                    <div className="w-32 ">
+                                                    <div className="">
                                                         <ChangePIN
                                                             buttonName={"Change Pin"}
                                                             modalHeader={"Change Pin"}
                                                             userID={user.id}
                                                         />
                                                     </div>
+                                                </div>
                                                 
 
                                                 {/* Campos de Redefinição de Senha */}
