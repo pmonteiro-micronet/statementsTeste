@@ -114,29 +114,27 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
       console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
       console.log("Resposta da API ao salvar statement:", saveResponse.data);
 
-      // Aguarda brevemente para dar tempo à base de dados sincronizar o novo registro
-      await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms de atraso opcional
+      // Se a resposta de salvar o statement foi bem-sucedida, agora verificamos
+      // se o statement foi atualizado ou criado, e pegamos o requestID
+      if (saveResponse.data && saveResponse.data.data && saveResponse.data.data.requestID) {
+        const updatedRecord = saveResponse.data.data;
+        const updatedRequestID = updatedRecord.requestID;
 
-      // Após o envio, busca o recordID do último registro
-      const response = await axios.get("/api/get_jsons");
-      console.log("Resposta da API ao buscar registros:", response.data);
-
-      // Buscar o último `requestID` na lista de respostas
-      const lastRecord = response.data.response.sort((a, b) => b.requestID - a.requestID)[0]; // Ordena por requestID desc
-      if (lastRecord && lastRecord.requestID) {
-        const lastRecordID = lastRecord.requestID;
-
-        // Redireciona para a página jsonView com os parâmetros na URL
-        router.push(`/homepage/jsonView?recordID=${lastRecordID}&propertyID=${propertyID}`);
+        // Redireciona para a página jsonView com o requestID do registro atualizado
+        console.log("Statement atualizado com requestID:", updatedRequestID);
+        router.push(`/homepage/jsonView?recordID=${updatedRequestID}&propertyID=${propertyID}`);
       } else {
-        console.warn("RecordID não encontrado na resposta da API.");
+        console.warn("Resposta da API não contém requestID.");
       }
+
     } catch (error) {
+      console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
+
       if (error.response && error.response.status === 409) {
-        // O status 409 indica conflito, ou seja, o registro já existe
+        // O status 409 indica que já existe um registro com a mesma uniqueKey
         console.warn("Registro já existente, buscando o requestID do registro existente.");
 
-        // Extraia o requestID do erro, se a API o fornecer
+        // Extraia o requestID do erro, caso a API o forneça
         const existingRequestID = error.response.data?.existingRequestID;
 
         if (existingRequestID) {
@@ -145,16 +143,10 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
           // Redireciona para a página jsonView com o requestID do registro existente
           router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
         } else {
-          console.error(
-            "Não foi possível encontrar o requestID do registro existente.",
-            error.response.data
-          );
+          console.error("Não foi possível encontrar o requestID do registro existente.");
         }
       } else {
-        console.error(
-          "Erro ao enviar os dados ou buscar o recordID:",
-          error.response ? error.response.data : error.message
-        );
+        console.error("Erro inesperado:", error.response ? error.response.data : error.message);
       }
     }
   };

@@ -38,7 +38,6 @@ export default function Page() {
     const [isLoading, setIsLoading] = useState(false);
     const [propertyID, setPropertyID] = useState(null);
     const [profileID, setProfileID] = useState(null);
-
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
@@ -407,7 +406,7 @@ export default function Page() {
 
             // Codificação do PDF comprimido em Base64
             const pdfBase64 = btoa(String.fromCharCode(...compressedPdf));
-
+            console.log(pdfBase64);
             // Envia os dados via Axios
             const response = await axios.post(
                 "/api/reservations/checkins/registration_form_base64",
