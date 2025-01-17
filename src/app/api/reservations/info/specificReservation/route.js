@@ -4,8 +4,9 @@ import prisma from "@/lib/db";
 
 // Função para gerar a `uniqueKey`
 const generateUniqueKey = (HotelInfo, Reservation, GuestInfo = {}) => {
-  const { Tag } = HotelInfo || {};
-  const { RoomNumber, ReservationNumber, DateCI, DateCO } = Reservation || {};
+  const { Tag = "Unknown" } = HotelInfo || {};
+  const { RoomNumber = "Unknown", ReservationNumber = "Unknown", DateCI = "Unknown", DateCO = "Unknown" } =
+    Reservation || {};
   const { FirstName = "Unknown", LastName = "Unknown" } = GuestInfo || {};
 
   return `${Tag}-${RoomNumber}-${ReservationNumber}-${DateCI}-${DateCO}-${FirstName}-${LastName}`;
@@ -74,19 +75,13 @@ export async function GET(request) {
 
     console.log("Resposta formatada recebida do endpoint:", formattedResponse);
 
-    const data = response.data[0];
+    // Gerar a uniqueKey mesmo que algumas informações estejam ausentes
+    const data = response.data[0] || {};
     const hotelInfo = data.HotelInfo?.[0] || {};
     const reservation = data.Reservation?.[0] || {};
     const guestInfo = data.GuestInfo?.[0] || {};
-
-    if (!hotelInfo || !reservation) {
-      return NextResponse.json(
-        { error: "Dados obrigatórios ausentes na resposta do endpoint." },
-        { status: 400 }
-      );
-    }
-
     const uniqueKey = generateUniqueKey(hotelInfo, reservation, guestInfo);
+
     console.log("Generated uniqueKey:", uniqueKey);
 
     // Verificar se já existe um registro com o mesmo uniqueKey
@@ -120,7 +115,7 @@ export async function GET(request) {
           responseStatus: "200",
           responseBody: formattedResponse,
           propertyID: propertyIDInt,
-          seen: false,
+          seen: true,
           uniqueKey,
         },
       });
