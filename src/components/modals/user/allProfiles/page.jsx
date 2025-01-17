@@ -9,7 +9,6 @@ import {
     useDisclosure,
 } from "@nextui-org/react";
 import { MdClose } from "react-icons/md";
-import { useSession } from "next-auth/react";
 import axios from "axios";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
@@ -26,7 +25,6 @@ const AllProfilesForm = ({
     formTypeModal,
 }) => {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const { data: session } = useSession();
     const [users, setUsers] = useState([]); // Estado para armazenar os usuários
 
     useEffect(() => {
