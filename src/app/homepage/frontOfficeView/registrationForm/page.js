@@ -337,24 +337,24 @@ export default function Page() {
         let emailToSend = email !== initialEmail ? email : initialEmail; // Envia undefined se não houver alteração
         let vatNoToSend = vatNo !== initialVatNo ? vatNo : initialVatNo; // Envia undefined se não houver alteração
 
-        // Se houver alterações (ou valores a serem enviados), envia para a API
-        if (emailToSend || vatNoToSend) {
-            try {
-                const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
-                    email: emailToSend,
-                    vatNo: vatNoToSend,
-                    registerID: profileID,
-                    propertyID: propertyID
-                });
-                console.log('Alterações salvas com sucesso:', response.data);
-            } catch (error) {
-                console.error('Erro ao salvar alterações:', error);
-                errors.push("There was an issue saving your changes. Please contact support.");
-                setErrorMessage(errors.join("\n"));
-                setIsErrorModalOpen(true);
-                return;
-            }
-        }
+        // // Se houver alterações (ou valores a serem enviados), envia para a API
+        // if (emailToSend || vatNoToSend) {
+        //     try {
+        //         const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
+        //             email: emailToSend,
+        //             vatNo: vatNoToSend,
+        //             registerID: profileID,
+        //             propertyID: propertyID
+        //         });
+        //         console.log('Alterações salvas com sucesso:', response.data);
+        //     } catch (error) {
+        //         console.error('Erro ao salvar alterações:', error);
+        //         errors.push("There was an issue saving your changes. Please contact support.");
+        //         setErrorMessage(errors.join("\n"));
+        //         setIsErrorModalOpen(true);
+        //         return;
+        //     }
+        // }
 
         // Captura a assinatura e gera o PDF
         try {
@@ -407,7 +407,7 @@ export default function Page() {
 
             // Codificação do PDF comprimido em Base64
             const pdfBase64 = btoa(String.fromCharCode(...compressedPdf));
-
+            console.log(pdfBase64);
             // Envia os dados via Axios
             const response = await axios.post(
                 "/api/reservations/checkins/registration_form_base64",

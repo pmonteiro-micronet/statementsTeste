@@ -15,7 +15,7 @@ import { MdSunny } from "react-icons/md";
 import { FaMoon, FaGlobe, FaChevronDown, FaChevronUp } from "react-icons/fa"; // Novos ícones adicionados
 
 import ProfileModalForm from "@/components/modals/user/profileModal";
-
+import AllProfilesForm from "@/components/modals/user/allProfiles/page";
 const SidebarContext = createContext();
 let inactivityTimeout;
 let warningTimeout;
@@ -29,17 +29,17 @@ export default function Sidebar({ children, setExpanded }) {
   const [countdown, setCountdown] = useState(60);
 
   const [locale, setLocale] = useState("pt");
-  
-    useEffect(() => {
-      // Carregar o idioma do localStorage
-      const storedLanguage = localStorage.getItem("language");
-      if (storedLanguage) {
-        setLocale(storedLanguage);
-      }
-    }, []);
-  
-    // Carregar as traduções com base no idioma atual
-    const t = translations[locale] || translations["pt"]; // fallback para "pt"
+
+  useEffect(() => {
+    // Carregar o idioma do localStorage
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
+
+  // Carregar as traduções com base no idioma atual
+  const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
   useEffect(() => {
     // Verifica se a sessão está carregando ou se está ativa
@@ -164,6 +164,8 @@ export default function Sidebar({ children, setExpanded }) {
     setDropdownOpen(false); // Fechar o dropdown após selecionar
     window.location.reload(); // Recarregar a página para aplicar o idioma
   };
+  const user = session?.user || {};
+  const isAdmin = user?.permission === 1; // Verifica se o usuário é admin
 
   return (
     <>
@@ -210,7 +212,7 @@ export default function Sidebar({ children, setExpanded }) {
               onClick={handleToggle}
               className="p-1.5 rounded-lg bg-primaryBackground hover:primaryBackground"
             >
-              <TbLayoutSidebarLeftExpand className="text-textPrimaryColor"/>
+              <TbLayoutSidebarLeftExpand className="text-textPrimaryColor" />
             </button>
           </div>
 
@@ -249,13 +251,28 @@ export default function Sidebar({ children, setExpanded }) {
             {isDropdownOpen && (
               <div className="absolute bottom-14 right-0 bg-background shadow-lg rounded-md p-3 w-56 z-50 text-textPrimaryColor">
                 <ul>
+                  <li
+                    className={isAdmin ? "" : "disabled"} // Aplica uma classe de estilo "disabled" se não for admin
+                    style={{
+                      pointerEvents: isAdmin ? "auto" : "none", // Desativa a interação do mouse se não for admin
+                      opacity: isAdmin ? 1 : 0.5, // Reduz a opacidade para criar efeito visual de desabilitado
+                    }}
+                  >
+                    <AllProfilesForm
+                      formTypeModal={11}
+                      buttonName={"All Profiles"}
+                      buttonIcon={<FaUser />}
+                      modalHeader={"All Profiles"}
+                      buttonColor={isAdmin ? "transparent" : "gray"} // Muda a cor do botão para cinza se não for admin
+                    />
+                  </li>
                   <li className="">
-                    <ProfileModalForm 
-                    formTypeModal={11}
-                    buttonName={"Profile Settings"}
-                    buttonIcon={<FaUser />}
-                    modalHeader={"Profile Settings"}
-                    buttonColor={"transparent"}
+                    <ProfileModalForm
+                      formTypeModal={11}
+                      buttonName={"Profile Settings"}
+                      buttonIcon={<FaUser />}
+                      modalHeader={"Profile Settings"}
+                      buttonColor={"transparent"}
                     />
                   </li>
                   {/* Tema Escuro */}
