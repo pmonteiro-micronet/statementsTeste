@@ -26,7 +26,7 @@
         "text":{
             "selectHotel": "Seleccione un Hotel",
             "selectHotelInfo": "Por favor, seleccione un hotel para acceder a los menús.",
-            "statements": "Declaraciones",
+            "statements": "Statements",
             "dashboard": "Dashboard",
             "pendings": "Pendientes",
             "viewed": "Vistos",
@@ -57,8 +57,8 @@
             "reservationNumber": "Número de Reserva",
             "checkIn": "Check-In",
             "checkOut": "Check-Out",
-            "viewStatement": "Ver Declaración",
-            "noStatement": "No hay declaraciones pendientes."
+            "viewStatement": "Ver Statement",
+            "noStatement": "No hay statements pendientes."
         },
         "view": {
             "title": "Vistos",
@@ -66,8 +66,8 @@
             "reservationNumber": "Número de Reserva",
             "checkIn": "Check-In",
             "checkOut": "Check-Out",
-            "checkedStatement": "Declaración Verificada",
-            "noStatement": "No hay declaraciones vistas."
+            "checkedStatement": "Statement Verificada",
+            "noStatement": "No hay statements vistas."
         }
     },
     "frontOffice": {
@@ -91,7 +91,7 @@
             "resNo": "N.º Res.",
             "departure": "Salida",
             "info": "Información",
-            "statement": "Declaración",
+            "statement": "Statement",
             "noReservations": "No se encontraron reservas.",
             "attention": "Atención"
         },
@@ -126,7 +126,7 @@
             "resNo": "N.º Res.",
             "departure": "Salida",
             "info": "Información",
-            "statement": "Declaración",
+            "statement": "Statement",
             "noReservations": "No se encontraron reservas."
         },
         "registrationForm": {
