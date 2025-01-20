@@ -41,6 +41,8 @@ const ProfileModalForm = ({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [statusMap, setStatusMap] = useState({});
 
+    const [activeKey, setActiveKey] = useState("idInfo");
+    
     const user = session?.user || {};
     const { firstName, secondName, email } = user;
 
@@ -120,36 +122,29 @@ const ProfileModalForm = ({
     };
 
     // Função para verificar propriedades
-
-    // Função para verificar propriedades
     const verifyProperties = async () => {
-        const newStatusMap = { ...statusMap }; // Cria uma cópia para garantir a imutabilidade
-    
+        const newStatusMap = { ...statusMap };
         for (const hotel of hotels) {
-            try {
-                const hotelData = {
-                    propertyServer: hotel.propertyServer,
-                    propertyPort: hotel.propertyPort,
-                    propertyName: hotel.propertyName,
-                };
-    
-                const response = await axios.post("/api/verifyProperty", hotelData); // Mudando para POST e enviando os dados no corpo
-    
-                newStatusMap[hotel.propertyID] = response.data.success;
-            } catch (error) {
-                console.error(`Erro ao verificar propriedade ${hotel.propertyName}:`, error);
-                newStatusMap[hotel.propertyID] = false; // Marca como off em caso de erro
-            }
+          try {
+            const hotelData = {
+              propertyServer: hotel.propertyServer,
+              propertyPort: hotel.propertyPort,
+            };
+            const response = await axios.post("/api/verifyProperty", hotelData);
+            newStatusMap[hotel.propertyID] = response.data.success;
+          } catch (error) {
+            console.error(`Erro ao verificar propriedade ${hotel.propertyName}:`, error);
+            newStatusMap[hotel.propertyID] = false;
+          }
         }
-    
         setStatusMap(newStatusMap);
-    };
-
-    useEffect(() => {
+      };
+    
+      useEffect(() => {
         if (activeKey === "properties" && hotels.length > 0) {
-            verifyProperties(); // Verifica as propriedades ao abrir a aba
+          verifyProperties();
         }
-    }, [activeKey, hotels]);
+      }, [activeKey, hotels]);
 
     return (
         <>
@@ -191,7 +186,7 @@ const ProfileModalForm = ({
                                     </div>
                                 </ModalHeader>
                                 <ModalBody className="flex flex-col space-y-8 bg-background">
-                                    <Tabs aria-label="Options" className="flex justify-center">
+                                <Tabs aria-label="Profile Settings" activeKey={activeKey} onChange={(key) => setActiveKey(key)} className="flex justify-center">
                                         <Tab key="idInfo" title="ID Info">
                                             <div className="-mt-10 flex flex-col gap-4">
                                                 <div>
