@@ -12,7 +12,6 @@ import {
 import { MdClose } from "react-icons/md";
 import { useSession } from "next-auth/react";
 import axios from "axios";
-import { Tabs, Tab } from "@nextui-org/react";
 import { FaPencilAlt } from "react-icons/fa";
 import PropertiesEditForm from "@/components/modals/user/propertiesEdit/page";
 import ChangePIN from "@/components/modals/user/changePin/page";
@@ -41,7 +40,7 @@ const ProfileModalForm = ({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [statusMap, setStatusMap] = useState({});
 
-    const [activeKey, setActiveKey] = useState("idInfo");
+    const [activeKey, setActiveKey] = useState("idInfo"); // Estado de controle da aba ativa
     
     const user = session?.user || {};
     const { firstName, secondName, email } = user;
@@ -109,7 +108,6 @@ const ProfileModalForm = ({
                 setErrorMessage(error.response?.data?.message || "An error occurred.");
             }
         }
-
     };
 
     const resetForm = () => {
@@ -125,26 +123,26 @@ const ProfileModalForm = ({
     const verifyProperties = async () => {
         const newStatusMap = { ...statusMap };
         for (const hotel of hotels) {
-          try {
-            const hotelData = {
-              propertyServer: hotel.propertyServer,
-              propertyPort: hotel.propertyPort,
-            };
-            const response = await axios.post("/api/verifyProperty", hotelData);
-            newStatusMap[hotel.propertyID] = response.data.success;
-          } catch (error) {
-            console.error(`Erro ao verificar propriedade ${hotel.propertyName}:`, error);
-            newStatusMap[hotel.propertyID] = false;
-          }
+            try {
+                const hotelData = {
+                    propertyServer: hotel.propertyServer,
+                    propertyPort: hotel.propertyPort,
+                };
+                const response = await axios.post("/api/verifyProperty", hotelData);
+                newStatusMap[hotel.propertyID] = response.data.success;
+            } catch (error) {
+                console.error(`Erro ao verificar propriedade ${hotel.propertyName}:`, error);
+                newStatusMap[hotel.propertyID] = false;
+            }
         }
         setStatusMap(newStatusMap);
-      };
-    
-      useEffect(() => {
+    };
+
+    useEffect(() => {
         if (activeKey === "properties" && hotels.length > 0) {
-          verifyProperties();
+            verifyProperties();
         }
-      }, [activeKey, hotels]);
+    }, [activeKey, hotels]);
 
     return (
         <>
@@ -186,8 +184,27 @@ const ProfileModalForm = ({
                                     </div>
                                 </ModalHeader>
                                 <ModalBody className="flex flex-col space-y-8 bg-background">
-                                <Tabs aria-label="Profile Settings" activeKey={activeKey} onChange={(key) => setActiveKey(key)} className="flex justify-center">
-                                        <Tab key="idInfo" title="ID Info">
+                                    {/* Abas feitas com divs */}
+                                    <div className="flex justify-center">
+                                        <div className="flex flex-row justify-center bg-gray-100 w-40 h-10 rounded-xl">
+                                        <div
+                                            onClick={() => setActiveKey("idInfo")}
+                                            className={`cursor-pointer p-2 ${activeKey === "idInfo" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
+                                        >
+                                            ID Info
+                                        </div>
+                                        <div
+                                            onClick={() => setActiveKey("properties")}
+                                            className={`cursor-pointer p-2 ${activeKey === "properties" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
+                                        >
+                                            Properties
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Conteúdo das abas */}
+                                    <div>
+                                        {activeKey === "idInfo" && (
                                             <div className="-mt-10 flex flex-col gap-4">
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-400">{`Name:`}</label>
@@ -238,7 +255,6 @@ const ProfileModalForm = ({
                                                         />
                                                     </div>
                                                 </div>
-
 
                                                 {/* Campos de Redefinição de Senha */}
                                                 {showPasswordFields && (
@@ -301,8 +317,8 @@ const ProfileModalForm = ({
                                                     </>
                                                 )}
                                             </div>
-                                        </Tab>
-                                        <Tab key="properties" title="Properties">
+                                        )}
+                                        {activeKey === "properties" && (
                                             <div>
                                                 {hotels.length > 0 ? (
                                                     hotels.map((hotel) => (
@@ -335,10 +351,8 @@ const ProfileModalForm = ({
                                                                         : "text-gray-400"
                                                                         }`}
                                                                     onClick={() => handleEditClick(hotel)}
-                                                                    style={{
-                                                                        pointerEvents: isAdmin
-                                                                            ? "auto"
-                                                                            : "none",
+                                                                    style={ {
+                                                                        pointerEvents: isAdmin ? "auto" : "none"
                                                                     }}
                                                                 />
                                                             </div>
@@ -348,8 +362,8 @@ const ProfileModalForm = ({
                                                     <p>No properties found.</p>
                                                 )}
                                             </div>
-                                        </Tab>
-                                    </Tabs>
+                                        )}
+                                    </div>
                                 </ModalBody>
                             </form>
                         </ModalContent>
