@@ -3,7 +3,7 @@ import axios from "axios";
 
 export async function POST(request) {
     try {
-        const { propertyServer, propertyPort, propertyName } = await request.json(); // Extraindo dados do corpo da requisição
+        const { propertyServer, propertyPort } = await request.json(); // Extraindo dados do corpo da requisição
 
         if (!propertyServer || !propertyPort) {
             return new NextResponse(
