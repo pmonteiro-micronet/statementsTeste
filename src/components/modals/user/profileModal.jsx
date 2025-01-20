@@ -41,7 +41,8 @@ const ProfileModalForm = ({
     const [statusMap, setStatusMap] = useState({});
 
     const [activeKey, setActiveKey] = useState("idInfo"); // Estado de controle da aba ativa
-    
+    const [loading, setLoading] = useState(true); // Estado de carregamento
+
     const user = session?.user || {};
     const { firstName, secondName, email } = user;
 
@@ -120,7 +121,8 @@ const ProfileModalForm = ({
     };
 
     // Função para verificar propriedades
-    const verifyProperties = async () => {
+   const verifyProperties = async () => {
+        setLoading(true); // Começa o carregamento
         const newStatusMap = { ...statusMap };
         for (const hotel of hotels) {
             try {
@@ -136,6 +138,7 @@ const ProfileModalForm = ({
             }
         }
         setStatusMap(newStatusMap);
+        setLoading(false); // Finaliza o carregamento
     };
 
     useEffect(() => {
@@ -318,7 +321,7 @@ const ProfileModalForm = ({
                                                 )}
                                             </div>
                                         )}
-                                        {activeKey === "properties" && (
+                                         {activeKey === "properties" && (
                                             <div>
                                                 {hotels.length > 0 ? (
                                                     hotels.map((hotel) => (
@@ -336,24 +339,19 @@ const ProfileModalForm = ({
                                                                     readOnly
                                                                     className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
                                                                 />
-                                                                <Switch
-                                                                    size="sm"
-                                                                    isSelected={statusMap[hotel.propertyID]}
-                                                                    onChange={() =>
-                                                                        console.log(
-                                                                            `Switch ${hotel.propertyID} toggled`
-                                                                        )
-                                                                    }
-                                                                />
+                                                                {loading ? (
+                                                                    <div className="text-gray-400">Loading...</div>
+                                                                ) : (
+                                                                    <Switch
+                                                                        size="sm"
+                                                                        isSelected={statusMap[hotel.propertyID]}
+                                                                        onChange={() => console.log(`Switch ${hotel.propertyID} toggled`)}
+                                                                    />
+                                                                )}
                                                                 <FaPencilAlt
-                                                                    className={`cursor-pointer ${isAdmin
-                                                                        ? "text-primary"
-                                                                        : "text-gray-400"
-                                                                        }`}
+                                                                    className={`cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`}
                                                                     onClick={() => handleEditClick(hotel)}
-                                                                    style={ {
-                                                                        pointerEvents: isAdmin ? "auto" : "none"
-                                                                    }}
+                                                                    style={{ pointerEvents: isAdmin ? "auto" : "none" }}
                                                                 />
                                                             </div>
                                                         </div>
