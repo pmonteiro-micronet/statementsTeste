@@ -120,6 +120,8 @@ const ProfileModalForm = ({
     };
 
     // Função para verificar propriedades
+
+    // Função para verificar propriedades
     const verifyProperties = async () => {
         const newStatusMap = { ...statusMap }; // Cria uma cópia para garantir a imutabilidade
     
@@ -128,12 +130,11 @@ const ProfileModalForm = ({
                 const hotelData = {
                     propertyServer: hotel.propertyServer,
                     propertyPort: hotel.propertyPort,
-                    propertyName: hotel.propertyName, // Adicionando mais dados, se necessário
+                    propertyName: hotel.propertyName,
                 };
     
                 const response = await axios.post("/api/verifyProperty", hotelData); // Mudando para POST e enviando os dados no corpo
     
-                // Atualizar o status do hotel na cópia do statusMap
                 newStatusMap[hotel.propertyID] = response.data.success;
             } catch (error) {
                 console.error(`Erro ao verificar propriedade ${hotel.propertyName}:`, error);
@@ -141,15 +142,14 @@ const ProfileModalForm = ({
             }
         }
     
-        // Atualizar o estado de statusMap com a nova cópia
         setStatusMap(newStatusMap);
-    };       
+    };
 
     useEffect(() => {
-        if (hotels.length > 0) {
+        if (activeKey === "properties" && hotels.length > 0) {
             verifyProperties(); // Verifica as propriedades ao abrir a aba
         }
-    }, [hotels]);
+    }, [activeKey, hotels]);
 
     return (
         <>
@@ -336,8 +336,8 @@ const ProfileModalForm = ({
                                                                 />
                                                                 <FaPencilAlt
                                                                     className={`cursor-pointer ${isAdmin
-                                                                            ? "text-primary"
-                                                                            : "text-gray-400"
+                                                                        ? "text-primary"
+                                                                        : "text-gray-400"
                                                                         }`}
                                                                     onClick={() => handleEditClick(hotel)}
                                                                     style={{
