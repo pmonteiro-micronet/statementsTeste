@@ -13,7 +13,7 @@ export async function POST(request) {
         }
 
         const url = `http://${propertyServer}:${propertyPort}/healthcheck`;
-
+        console.log("URL:", url);
         try {
             const response = await axios.get(url);
 
