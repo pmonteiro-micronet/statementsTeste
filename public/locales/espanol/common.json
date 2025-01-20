@@ -124,6 +124,7 @@
             "group": "Grupo",
             "notes": "Notas",
             "resNo": "N.º Res.",
+            "arrival": "Llegada",
             "departure": "Salida",
             "info": "Información",
             "statement": "Statement",
