@@ -7,6 +7,7 @@ import {
     ModalBody,
     Button,
     useDisclosure,
+    Switch,
 } from "@nextui-org/react";
 import { MdClose } from "react-icons/md";
 import { useSession } from "next-auth/react";
@@ -38,6 +39,7 @@ const ProfileModalForm = ({
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [statusMap, setStatusMap] = useState({});
 
     const user = session?.user || {};
     const { firstName, secondName, email } = user;
@@ -117,6 +119,36 @@ const ProfileModalForm = ({
         setSuccessMessage("");
     };
 
+    // Função para verificar propriedades
+    const verifyProperties = async () => {
+        const newStatusMap = { ...statusMap };
+
+        for (const hotel of hotels) {
+            try {
+                const response = await axios.get("/api/verifyProperty", {
+                    params: {
+                        propertyServer: hotel.propertyServer,
+                        propertyPort: hotel.propertyPort,
+                    },
+                });
+
+                // Atualizar status com base na resposta da API
+                newStatusMap[hotel.propertyID] = response.data.success;
+            } catch (error) {
+                console.error(`Erro ao verificar propriedade ${hotel.propertyName}:`, error);
+                newStatusMap[hotel.propertyID] = false; // Marca como off em caso de erro
+            }
+        }
+
+        setStatusMap(newStatusMap); // Atualiza os switches na interface
+    };
+
+    useEffect(() => {
+        if (hotels.length > 0) {
+            verifyProperties(); // Verifica as propriedades ao abrir a aba
+        }
+    }, [hotels]);
+
     return (
         <>
             {formTypeModal === 11 && (
@@ -189,18 +221,18 @@ const ProfileModalForm = ({
                                                 </div>
                                                 {/* Botão para exibir os campos de senha */}
                                                 <div className="flex flex-row justify-between">
-                                                {!showPasswordFields && (
-                                                    <button
-                                                        className="bg-primary text-white p-2 rounded-lg w-32 text-xs cursor-pointer"
-                                                        onClick={() => {
-                                                            setShowPasswordFields(true);
-                                                            setIsPasswordUpdate(true);
-                                                        }}
-                                                    >
-                                                        Change Password
-                                                    </button>
-                                                )}
-                                               
+                                                    {!showPasswordFields && (
+                                                        <button
+                                                            className="bg-primary text-white p-2 rounded-lg w-32 text-xs cursor-pointer"
+                                                            onClick={() => {
+                                                                setShowPasswordFields(true);
+                                                                setIsPasswordUpdate(true);
+                                                            }}
+                                                        >
+                                                            Change Password
+                                                        </button>
+                                                    )}
+
                                                     <div className="">
                                                         <ChangePIN
                                                             buttonName={"Change Pin"}
@@ -209,7 +241,7 @@ const ProfileModalForm = ({
                                                         />
                                                     </div>
                                                 </div>
-                                                
+
 
                                                 {/* Campos de Redefinição de Senha */}
                                                 {showPasswordFields && (
@@ -276,26 +308,45 @@ const ProfileModalForm = ({
                                         <Tab key="properties" title="Properties">
                                             <div>
                                                 {hotels.length > 0 ? (
-                                                    <div>
-                                                        {hotels.map((hotel, index) => (
-                                                            <div key={index} className="mb-4 flex flex-col items-left">
-                                                                <label className="block text-sm font-medium text-gray-400">{`Property ${index + 1}`}</label>
-                                                                <div className="flex flex-row items-center w-full">
-                                                                    <input
-                                                                        type="text"
-                                                                        value={hotel.propertyName || ""}
-                                                                        readOnly
-                                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
-                                                                    />
-                                                                    <FaPencilAlt
-                                                                        className={`ml-2 cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`}
-                                                                        onClick={() => handleEditClick(hotel)} // Passa a propriedade clicada
-                                                                        style={{ pointerEvents: isAdmin ? "auto" : "none" }}
-                                                                    />
-                                                                </div>
+                                                    hotels.map((hotel) => (
+                                                        <div
+                                                            key={hotel.propertyID}
+                                                            className="mb-4 flex flex-col items-left"
+                                                        >
+                                                            <label className="block text-sm font-medium text-gray-400">
+                                                                {hotel.propertyName}
+                                                            </label>
+                                                            <div className="flex items-center gap-4">
+                                                                <input
+                                                                    type="text"
+                                                                    value={hotel.propertyName || ""}
+                                                                    readOnly
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
+                                                                />
+                                                                <Switch
+                                                                    size="sm"
+                                                                    isSelected={statusMap[hotel.propertyID]}
+                                                                    onChange={() =>
+                                                                        console.log(
+                                                                            `Switch ${hotel.propertyID} toggled`
+                                                                        )
+                                                                    }
+                                                                />
+                                                                <FaPencilAlt
+                                                                    className={`cursor-pointer ${isAdmin
+                                                                            ? "text-primary"
+                                                                            : "text-gray-400"
+                                                                        }`}
+                                                                    onClick={() => handleEditClick(hotel)}
+                                                                    style={{
+                                                                        pointerEvents: isAdmin
+                                                                            ? "auto"
+                                                                            : "none",
+                                                                    }}
+                                                                />
                                                             </div>
-                                                        ))}
-                                                    </div>
+                                                        </div>
+                                                    ))
                                                 ) : (
                                                     <p>No properties found.</p>
                                                 )}
@@ -309,10 +360,9 @@ const ProfileModalForm = ({
                 </>
             )}
 
-            {/* Modal dinâmico para edição da propriedade */}
             {isModalOpen && selectedHotel && (
                 <PropertiesEditForm
-                    hotel={selectedHotel} // Passa a propriedade selecionada para o modal
+                    hotel={selectedHotel}
                     onClose={() => setIsModalOpen(false)}
                 />
             )}

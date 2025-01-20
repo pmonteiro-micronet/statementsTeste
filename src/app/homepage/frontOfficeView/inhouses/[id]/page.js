@@ -319,6 +319,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                   <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.arrival}</td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.departure}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.room}</td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.lastName}</td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.firstName}</td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.company}</td>
@@ -388,6 +389,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                       </td>
                       <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCI}</td>
                       <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCO}</td>
+                      <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.Room}</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.LastName}</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.FirstName}</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-32">{reserva.Company}</td>
