@@ -1,14 +1,10 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 
-export async function GET(request) {
+export async function POST(request) {
     try {
-        // Obtém os parâmetros da query string
-        const { searchParams } = new URL(request.url);
-        const propertyServer = searchParams.get("propertyServer");
-        const propertyPort = searchParams.get("propertyPort");
+        const { propertyServer, propertyPort } = await request.json(); // Extraindo dados do corpo da requisição
 
-        // Validação dos parâmetros
         if (!propertyServer || !propertyPort) {
             return new NextResponse(
                 JSON.stringify({ success: false, message: "propertyServer and propertyPort are required." }),
@@ -19,24 +15,20 @@ export async function GET(request) {
         const url = `http://${propertyServer}:${propertyPort}/healthcheck`;
 
         try {
-            // Realiza a verificação enviando um GET para o healthcheck
             const response = await axios.get(url);
 
-            // Se a resposta for 200, a propriedade está ativa
-            if (response.status === 200) {
+            if (response.status === 200 && response.data.Status === "Running") {
                 return new NextResponse(
-                    JSON.stringify({ success: true, message: "Property is online." }),
+                    JSON.stringify({ success: true, message: "Property is online.", timestamp: response.data.Timestamp }),
                     { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
                 );
             }
 
-            // Caso a propriedade não esteja disponível
             return new NextResponse(
                 JSON.stringify({ success: false, message: "Property returned an unexpected status." }),
                 { status: response.status, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
             );
         } catch (error) {
-            // Em caso de erro, propriedade é considerada offline
             console.error(`Error connecting to ${url}:`, error.message);
             return new NextResponse(
                 JSON.stringify({ success: false, message: "Property is offline or unreachable." }),

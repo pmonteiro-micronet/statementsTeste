@@ -121,27 +121,29 @@ const ProfileModalForm = ({
 
     // Função para verificar propriedades
     const verifyProperties = async () => {
-        const newStatusMap = { ...statusMap };
-
+        const newStatusMap = { ...statusMap }; // Cria uma cópia para garantir a imutabilidade
+    
         for (const hotel of hotels) {
             try {
-                const response = await axios.get("/api/verifyProperty", {
-                    params: {
-                        propertyServer: hotel.propertyServer,
-                        propertyPort: hotel.propertyPort,
-                    },
-                });
-
-                // Atualizar status com base na resposta da API
+                const hotelData = {
+                    propertyServer: hotel.propertyServer,
+                    propertyPort: hotel.propertyPort,
+                    propertyName: hotel.propertyName, // Adicionando mais dados, se necessário
+                };
+    
+                const response = await axios.post("/api/verifyProperty", hotelData); // Mudando para POST e enviando os dados no corpo
+    
+                // Atualizar o status do hotel na cópia do statusMap
                 newStatusMap[hotel.propertyID] = response.data.success;
             } catch (error) {
                 console.error(`Erro ao verificar propriedade ${hotel.propertyName}:`, error);
                 newStatusMap[hotel.propertyID] = false; // Marca como off em caso de erro
             }
         }
-
-        setStatusMap(newStatusMap); // Atualiza os switches na interface
-    };
+    
+        // Atualizar o estado de statusMap com a nova cópia
+        setStatusMap(newStatusMap);
+    };       
 
     useEffect(() => {
         if (hotels.length > 0) {
