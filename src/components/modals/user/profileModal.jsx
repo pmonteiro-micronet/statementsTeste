@@ -26,7 +26,6 @@ const ProfileModalForm = ({
     modalEditArrow,
     modalEdit,
     formTypeModal,
-    activeKey
 }) => {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const { data: session } = useSession();
