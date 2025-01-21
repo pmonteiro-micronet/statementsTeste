@@ -4,7 +4,7 @@ import { IoMenu } from "react-icons/io5";
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { FaGlobe, FaChevronDown, FaChevronUp, FaMoon } from "react-icons/fa"; // Novos ícones adicionados
+import { FaGlobe, FaMoon } from "react-icons/fa"; // Novos ícones adicionados
 
 import en from "../../../public/locales/english/common.json";
 import pt from "../../../public/locales/portuguesPortugal/common.json";
@@ -29,16 +29,16 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
 
   const [locale, setLocale] = useState("pt");
     
-      useEffect(() => {
-        // Carregar o idioma do localStorage
-        const storedLanguage = localStorage.getItem("language");
-        if (storedLanguage) {
-          setLocale(storedLanguage);
-        }
-      }, []);
+  useEffect(() => {
+    // Carregar o idioma do localStorage
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
     
-      // Carregar as traduções com base no idioma atual
-      const t = translations[locale] || translations["pt"]; // fallback para "pt"
+  // Carregar as traduções com base no idioma atual
+  const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
   const toggleMenu = () => {
     setMenuOpen((prev) => !prev);
@@ -127,9 +127,7 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
     };
   }, []);
 
-  const [setDropdownOpen] = useState(false); // Controle do dropdown
   const [isDarkMode, setIsDarkMode] = useState(false); // Controle do tema
-  const [language, setLanguage] = useState("pt"); // Idioma padrão
 
   // Alternar o tema
   const toggleTheme = () => {
@@ -141,14 +139,11 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
     }
   };
 
-  const [isLanguageDropdownOpen, setLanguageDropdownOpen] = useState(false); // Controle do dropdown de idiomas
-
-  const toggleLanguageDropdown = () => setLanguageDropdownOpen(!isLanguageDropdownOpen);
-
-  // const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
+  // Alterar o idioma e armazenar no localStorage
   const handleLanguageChange = (lang) => {
-    setLanguage(lang);
-    setDropdownOpen(false); // Fecha o dropdown após selecionar
+    setLocale(lang);
+    localStorage.setItem("language", lang); // Salvar no localStorage
+    window.location.reload(); // Recarregar a página para aplicar o idioma
   };
 
   return (
@@ -304,52 +299,20 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
                             </button>
                           </div>
                         </li>
-                        <li className="py-2 px-3 rounded-md flex flex-row">
-                          <div className="flex justify-between">
-                            <span className="flex items-center">
-                              <FaGlobe className="mr-2" />
-                              {t.navbar.text.language}
-                            </span>
-                            {/* Botão de seleção */}
-                            <button
-                              onClick={toggleLanguageDropdown} // Alterna o dropdown de idiomas
-                              className="ml-2 bg-transparent outline-none cursor-pointer flex items-center"
-                            >
-                              {/* Exibe a bandeira ativa */}
-                              <img
-                                src={`/flags/${language}.png`}
-                                alt={language}
-                                className="w-4 h-4 object-cover"
-                              />
-                              {/* Botão de seta para abrir o dropdown */}
-                              <button onClick={toggleLanguageDropdown} className="ml-2 text-gray-600">
-                                {isLanguageDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
-                              </button>
-                            </button>
-                            {/* Dropdown customizado */}
-                            {isLanguageDropdownOpen && (
-                              <ul className="absolute top-20 right-4 bg-background shadow-md rounded-md w-12 z-50">
-                                <li
-                                  onClick={() => handleLanguageChange('pt')}
-                                  className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
-                                >
-                                  <img src="/flags/pt.png" alt="portuguese" className="w-6 h-6 object-cover mr-4" />
-                                </li>
-                                <li
-                                  onClick={() => handleLanguageChange('uk')}
-                                  className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
-                                >
-                                  <img src="/flags/uk.png" alt="english" className="w-6 h-6 object-cover mr-4" />
-                                </li>
-                                <li
-                                  onClick={() => handleLanguageChange('sp')}
-                                  className="flex items-center py-2 px-3 cursor-pointer hover:bg-gray-100"
-                                >
-                                  <img src="/flags/sp.png" alt="spanish" className="w-6 h-6 object-cover mr-4" />
-                                </li>
-                              </ul>
-                            )}
-                          </div>
+                        <li className="py-2 px-3 rounded-md flex flex-row justify-between">
+                          <span className="flex items-center">
+                            <FaGlobe className="mr-2" />
+                            {t.navbar.text.language}
+                          </span>
+                          <select
+                            className="ml-2 bg-transparent outline-none cursor-pointer"
+                            value={locale}
+                            onChange={(e) => handleLanguageChange(e.target.value)}
+                          >
+                            <option value="pt">Pt</option>
+                            <option value="en">En</option>
+                            <option value="es">Es</option>
+                          </select>
                         </li>
                         <li>
                           <button
