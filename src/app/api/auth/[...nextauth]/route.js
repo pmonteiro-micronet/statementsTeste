@@ -36,6 +36,7 @@ const handler = NextAuth({
             propertyIDs, // Adicionar os propertyIDs associados
             pin: user.pin,
             permission: user.permissions, // Adicionar o campo `permissions`
+            expirationDate: user.expirationDate
           };
         } else {
           return null;
@@ -60,6 +61,7 @@ const handler = NextAuth({
         token.propertyIDs = user.propertyIDs; // Adicionar os propertyIDs ao token
         token.pin = user.pin;
         token.permission = user.permission; // Adicionar o campo permissions ao token
+        token.expirationDate = user.expirationDate;
       }
       return token;
     },
@@ -71,6 +73,7 @@ const handler = NextAuth({
       session.user.propertyIDs = token.propertyIDs; // Adicionar os propertyIDs à sessão
       session.user.pin = token.pin;
       session.user.permission = token.permission; // Adicionar o campo permissions à sessão
+      session.user.expirationDate = token.expirationDate;
       return session;
     },
   },

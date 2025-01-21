@@ -3,6 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useState, useEffect } from "react"; // Adicionando useEffect
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import "./styles.css";
 import en from "../../../public/locales/english/common.json";
 import pt from "../../../public/locales/portuguesPortugal/common.json";
@@ -15,20 +16,25 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const { data: session } = useSession(); // Acessa a sessão do usuário
   const [selectedHotelID, setSelectedHotelID] = useState(""); // Estado do Hotel ID
   console.log(router);
   const locale = "en"; // Substitua pelo valor dinâmico do idioma (e.g., router.locale)
   const t = translations[locale];
 
-  // Recupera o Hotel ID do localStorage ao carregar a página
+  // Recupera o Hotel ID do localStorage ou usa o ID da primeira propriedade do usuário
   useEffect(() => {
-    const savedHotelID = localStorage.getItem("selectedHotelID"); // Busca o ID salvo
+    // Tenta obter o ID do hotel do localStorage
+    const savedHotelID = localStorage.getItem("selectedHotelID");
+
     if (savedHotelID) {
-      setSelectedHotelID(savedHotelID); // Define o ID no estado
-    } else {
-      setSelectedHotelID("defaultHotelID"); // ID padrão, caso não haja nenhum salvo
+      // Se o ID estiver no localStorage, define ele no estado
+      setSelectedHotelID(savedHotelID);
+    } else if (session?.user?.propertyIDs && session.user.propertyIDs.length > 0) {
+      // Caso contrário, usa o primeiro propertyID da sessão do usuário
+      setSelectedHotelID(session.user.propertyIDs[0]);
     }
-  }, []); // Executa apenas uma vez no carregamento
+  }, [session]); // Dependência para executar a lógica quando a sessão for carregada
 
   const handleSubmit = async (e) => {
     e.preventDefault();

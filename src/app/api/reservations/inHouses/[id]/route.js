@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from "@/lib/db"; // Certifique-se de que o Prisma está configurado
 
 export async function GET(request, { params }) {
-  const { id } = params; // Extraímos o parâmetro `id` da URL
+  const { id } = await params; // Extraímos o parâmetro `id` da URL
 
   try {
     // Verifica se o `id` foi fornecido

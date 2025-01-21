@@ -44,7 +44,7 @@ const ProfileModalForm = ({
     const [loading, setLoading] = useState(true); // Estado de carregamento
 
     const user = session?.user || {};
-    const { firstName, secondName, email } = user;
+    const { firstName, secondName, email, expirationDate } = user;
 
     const isAdmin = user?.permission === 1; // Verifica se o usuário é admin
 
@@ -121,7 +121,7 @@ const ProfileModalForm = ({
     };
 
     // Função para verificar propriedades
-   const verifyProperties = async () => {
+    const verifyProperties = async () => {
         setLoading(true); // Começa o carregamento
         const newStatusMap = { ...statusMap };
         for (const hotel of hotels) {
@@ -190,18 +190,18 @@ const ProfileModalForm = ({
                                     {/* Abas feitas com divs */}
                                     <div className="flex justify-center">
                                         <div className="flex flex-row justify-center bg-gray-100 w-40 h-10 rounded-xl">
-                                        <div
-                                            onClick={() => setActiveKey("idInfo")}
-                                            className={`cursor-pointer p-2 ${activeKey === "idInfo" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
-                                        >
-                                            ID Info
-                                        </div>
-                                        <div
-                                            onClick={() => setActiveKey("properties")}
-                                            className={`cursor-pointer p-2 ${activeKey === "properties" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
-                                        >
-                                            Properties
-                                        </div>
+                                            <div
+                                                onClick={() => setActiveKey("idInfo")}
+                                                className={`cursor-pointer p-2 ${activeKey === "idInfo" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
+                                            >
+                                                ID Info
+                                            </div>
+                                            <div
+                                                onClick={() => setActiveKey("properties")}
+                                                className={`cursor-pointer p-2 ${activeKey === "properties" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
+                                            >
+                                                Properties
+                                            </div>
                                         </div>
                                     </div>
 
@@ -228,10 +228,19 @@ const ProfileModalForm = ({
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-400">{`Email:`}</label>
+                                                    <label className="block text-sm font-medium text-gray-400">{`E-mail:`}</label>
                                                     <input
                                                         type="text"
                                                         value={email || ""}
+                                                        readOnly
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-400">{`Expiration Date:`}</label>
+                                                    <input
+                                                        type="text"
+                                                        value={expirationDate ? new Date(expirationDate).toLocaleDateString('en-GB') : ""}
                                                         readOnly
                                                         className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
                                                     />
@@ -321,7 +330,7 @@ const ProfileModalForm = ({
                                                 )}
                                             </div>
                                         )}
-                                         {activeKey === "properties" && (
+                                        {activeKey === "properties" && (
                                             <div>
                                                 {hotels.length > 0 ? (
                                                     hotels.map((hotel) => (

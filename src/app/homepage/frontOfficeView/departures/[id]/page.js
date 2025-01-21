@@ -40,7 +40,8 @@ export default function Page({ params }) {
   const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
 
-  const { id } = params;
+  const resolvedParams = React.use(params); // Resolve the promise
+  const { id } = resolvedParams;
   const propertyID = id;
   const today = new Date().toISOString().split("T")[0];
   const tomorrow = new Date();

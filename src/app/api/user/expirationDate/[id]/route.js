@@ -1,20 +1,19 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
-import bcrypt from "bcrypt";
 
 export async function PATCH(request, { params }) {
-    const { id } = params; // No need for `await` directly here
-    const { oldPassword, newPassword } = await request.json(); // Extract data from the request body
+    const { id } = await params; // Não precisa do `await` aqui
+    const { expirationDate } = await request.json(); // Extrai os dados da requisição
 
-    if (!oldPassword || !newPassword) {
+    if (!expirationDate) {
         return NextResponse.json(
-            { message: "Missing old password or new password." },
+            { message: "Missing expiration date." },
             { status: 400 }
         );
     }
 
     try {
-        // Verify if the user exists
+        // Verifica se o usuário existe
         const user = await prisma.users.findUnique({
             where: { userID: parseInt(id) },
         });
@@ -26,30 +25,31 @@ export async function PATCH(request, { params }) {
             );
         }
 
-        // Check if the old password is correct
-        const passwordMatch = await bcrypt.compare(oldPassword, user.password);
-        if (!passwordMatch) {
+        // Converte expirationDate para um objeto Date
+        const formattedExpirationDate = new Date(expirationDate);
+
+        // Verifica se a data é válida
+        if (isNaN(formattedExpirationDate)) {
             return NextResponse.json(
-                { message: "Incorrect old password." },
+                { message: "Invalid expiration date format." },
                 { status: 400 }
             );
         }
 
-        // Update the password with the new password
-        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        // Atualiza o usuário com a nova data de expiração
         const updatedUser = await prisma.users.update({
             where: { userID: parseInt(id) },
-            data: { password: hashedNewPassword },
+            data: { expirationDate: formattedExpirationDate },
         });
 
         console.log(updatedUser);
 
         return NextResponse.json(
-            { message: "Password updated successfully." },
+            { message: "Expiration date updated successfully." },
             { status: 200 }
         );
     } catch (error) {
-        console.error("Error updating password:", error);
+        console.error("Error updating expiration date:", error);
         return NextResponse.json(
             { message: "An error occurred." },
             { status: 500 }

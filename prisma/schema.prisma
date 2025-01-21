@@ -50,6 +50,7 @@ model users {
   propertyID      Int?
   pin             String?           @db.VarChar(255)
   permissions     Int               @default(0)
+  expirationDate  DateTime?         @default(dbgenerated("'2222-01-01'")) @db.Date
   usersProperties usersProperties[]
 }
 
