@@ -4,7 +4,7 @@ import { IoMenu } from "react-icons/io5";
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { FaGlobe, FaChevronDown, FaChevronUp, FaMoon } from "react-icons/fa"; // Novos ícones adicionados
+import { FaGlobe, FaMoon } from "react-icons/fa"; // Novos ícones adicionados
 
 import en from "../../../public/locales/english/common.json";
 import pt from "../../../public/locales/portuguesPortugal/common.json";

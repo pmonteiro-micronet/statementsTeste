@@ -298,11 +298,6 @@ export default function Page() {
     // Estado para controlar a bandeira ativa
     const [activeFlag, setActiveFlag] = useState(locale === "en" ? "usa-uk" : locale === "pt" ? "pt" : "es"); // Bandeira padrão
 
-    // Função para mudar a bandeira ativa
-    const handleFlagClick = (flag) => {
-        setActiveFlag(flag);
-        setDropdownOpen(false); // Fecha o dropdown após a seleção
-    };
     const [termsAccepted, setTermsAccepted] = useState(true); // "Agree" por padrão
     const [policyAccepted, setPolicyAccepted] = useState(true); // "Agree" por padrão
     const [error] = useState('');
