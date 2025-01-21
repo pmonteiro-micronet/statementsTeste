@@ -58,13 +58,22 @@ export default function Page() {
 
     const [locale, setLocale] = useState("pt");
 
-    useEffect(() => {
+    const handleLanguageChange = (lang) => {
+        setLocale(lang);
+        setActiveFlag(lang === "en" ? "usa-uk" : lang === "pt" ? "pt" : "es");
+        localStorage.setItem("language", lang); // Salvar no localStorage
+        window.location.reload(); // Recarregar a página para aplicar o idioma
+      };
+    
+
+      useEffect(() => {
         // Carregar o idioma do localStorage
         const storedLanguage = localStorage.getItem("language");
         if (storedLanguage) {
-            setLocale(storedLanguage);
+          setLocale(storedLanguage);
+          setActiveFlag(storedLanguage === "en" ? "usa-uk" : storedLanguage === "pt" ? "pt" : "es");
         }
-    }, []);
+      }, []);
 
     // Carregar as traduções com base no idioma atual
     const t = translations[locale] || translations["pt"]; // fallback para "pt"
@@ -287,7 +296,7 @@ export default function Page() {
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
     // Estado para controlar a bandeira ativa
-    const [activeFlag, setActiveFlag] = useState('usa-uk'); // Bandeira padrão
+    const [activeFlag, setActiveFlag] = useState(locale === "en" ? "usa-uk" : locale === "pt" ? "pt" : "es"); // Bandeira padrão
 
     // Função para mudar a bandeira ativa
     const handleFlagClick = (flag) => {
@@ -494,102 +503,87 @@ export default function Page() {
                             <p>{t.frontOffice.registrationForm.title}</p>
                         </div>
                         <div className="flex flex-row gap-2 items-center language-row">
-                            <div
-                                className={`flag ${activeFlag === 'usa-uk' ? 'active' : 'inactive'}`}
-                                onClick={() => handleFlagClick('usa-uk')}
-                            >
-                                <img
-                                    src="/flags/uk.png"
-                                    alt="english"
-                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                />
-                            </div>
-                            <div
-                                className={`flag ${activeFlag === 'pt' ? 'active' : 'inactive'}`}
-                                onClick={() => handleFlagClick('pt')}
-                            >
-                                <img
-                                    src="/flags/pt.png"
-                                    alt="portuguese"
-                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                />
-                            </div>
-                            <div
-                                className={`flag ${activeFlag === 'sp' ? 'active' : 'inactive'}`}
-                                onClick={() => handleFlagClick('sp')}
-                            >
-                                <img
-                                    src="/flags/sp.png"
-                                    alt="spanish"
-                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                />
-                            </div>
+                        <div
+          className={`flag ${activeFlag === 'pt' ? 'active' : 'inactive'}`}
+          onClick={() => handleLanguageChange('pt')}
+        >
+          <img
+            src="/flags/pt.png"
+            alt="portuguese"
+            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+          />
+        </div>
+        <div
+          className={`flag ${activeFlag === 'es' ? 'active' : 'inactive'}`}
+          onClick={() => handleLanguageChange('es')}
+        >
+          <img
+            src="/flags/es.png"
+            alt="spanish"
+            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+          />
+        </div>
+        <div
+          className={`flag ${activeFlag === 'usa-uk' ? 'active' : 'inactive'}`}
+          onClick={() => handleLanguageChange('en')}
+        >
+          <img
+            src="/flags/uk.png"
+            alt="english"
+            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+          />
+        </div>
+      </div>
 
-                        </div>
-                        {/* Combo Box with Flag Images */}
-                        <div className="ml-4 relative language-combobox">
-                            <div
-                                className="flex items-center cursor-pointer"
-                                onClick={() => setDropdownOpen(!dropdownOpen)}
-                            >
-                                <img
-                                    src={`/flags/${activeFlag === 'usa-uk' ? 'uk.png' : activeFlag === 'pt' ? 'pt.png' : 'sp.png'}`}
-                                    alt={activeFlag}
-                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                />
-                                {/* Seta indicando o dropdown */}
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="w-4 h-4 ml-2 transition-transform duration-300 transform" // Tamanho e margem da seta
-                                    style={{ transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} // Girar a seta quando aberto
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M19 9l-7 7-7-7"
-                                    />
-                                </svg>
-                            </div>
-
-                            {/* Dropdown Menu */}
-                            {dropdownOpen && (
-                                <div className="absolute top-full right-0 bg-cardColor shadow-md rounded mt-1 z-10 w-14">
-                                    <div
-                                        className="flex items-center justify-center gap-2 p-2 cursor-pointer"
-                                        onClick={() => handleFlagClick('usa-uk')}
-                                    >
-                                        <img
-                                            src="/flags/uk.png"
-                                            alt="english"
-                                            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                        />
-                                    </div>
-                                    <div
-                                        className="flex items-center justify-center gap-2 p-2 cursor-pointer"
-                                        onClick={() => handleFlagClick('pt')}
-                                    >
-                                        <img
-                                            src="/flags/pt.png"
-                                            alt="portuguese"
-                                            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                        />
-                                    </div>
-                                    <div
-                                        className="flex items-center justify-center gap-2 p-2 cursor-pointer"
-                                        onClick={() => handleFlagClick('sp')}
-                                    >
-                                        <img
-                                            src="/flags/sp.png"
-                                            alt="spanish"
-                                            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                        />
-                                    </div>
-                                </div>
-                            )}
+      {/* Combo Box with Flag Images */}
+      <div className="ml-4 relative language-combobox">
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+        >
+          <img
+            src={`/flags/${activeFlag === 'usa-uk' ? 'uk.png' : activeFlag === 'pt' ? 'pt.png' : 'es.png'}`}
+            alt={activeFlag}
+            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+          />
+        </div>
+        {dropdownOpen && (
+          <div className="absolute mt-2 bg-white border rounded shadow-lg">
+            <div
+              className="flex items-center p-2 cursor-pointer"
+              onClick={() => handleLanguageChange('pt')}
+            >
+              <img
+                src="/flags/pt.png"
+                alt="portuguese"
+                className="w-8 h-8 object-cover rounded-full"
+              />
+              <span className="ml-2">Portuguese</span>
+            </div>
+            <div
+              className="flex items-center p-2 cursor-pointer"
+              onClick={() => handleLanguageChange('es')}
+            >
+              <img
+                src="/flags/es.png"
+                alt="spanish"
+                className="w-8 h-8 object-cover rounded-full"
+              />
+              <span className="ml-2">Spanish</span>
+            </div>
+            <div
+              className="flex items-center p-2 cursor-pointer"
+              onClick={() => handleLanguageChange('en')}
+            >
+              <img
+                src="/flags/uk.png"
+                alt="english"
+                className="w-8 h-8 object-cover rounded-full"
+              />
+              <span className="ml-2">English</span>
+            </div>
+          </div>
+        )}
                         </div>
                     </div>
 
