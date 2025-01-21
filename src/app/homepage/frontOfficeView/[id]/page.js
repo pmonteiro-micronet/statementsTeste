@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
+import axios from "axios"; // Assuming axios is imported
 import "./styles.css";
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -14,80 +15,108 @@ const FrontOffice = () => {
   const pathname = usePathname();
 
   const [locale, setLocale] = useState("pt");
-  
-    useEffect(() => {
-      // Carregar o idioma do localStorage
-      const storedLanguage = localStorage.getItem("language");
-      if (storedLanguage) {
-        setLocale(storedLanguage);
-      }
-    }, []);
-  
-    // Carregar as traduções com base no idioma atual
-    const t = translations[locale] || translations["pt"]; // fallback para "pt"
-
-  const router = useRouter(); // Instancia o hook useRouter
-
-  // Pegando o selectedHotelID da URL
-  const selectedHotelID = pathname.split('/').pop(); // Extrai o último valor da URL, que deve ser o hotelID
-
-  // Estados para armazenar os valores de "arrivals", "inhouses" e "departures"
   const [arrivals, setArrivals] = useState(null);
   const [inhouses, setInhouses] = useState(null);
   const [departures, setDepartures] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+console.log(isLoading);
+  useEffect(() => {
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
+
+  const t = translations[locale] || translations["pt"];
+  const router = useRouter();
+  const selectedHotelID = pathname.split('/').pop();
 
   useEffect(() => {
     if (session?.user?.propertyIDs && selectedHotelID) {
-      console.log("IDs", session?.user?.propertyIDs); // Verificando os propertyIDs da sessão
-
-      // Função para buscar os dados dos contadores
-      const fetchCounters = async () => {
-        try {
-          // Realizando a chamada para a API
-          const response = await fetch("/api/counter");
-          const data = await response.json();
-          console.log("dados", data);
-
-          if (response.ok) {
-            // Filtra os dados pela ID do hotel e pega apenas os dados para o selectedHotelID
-            const arrivalsData = data.response.filter(
-              (item) =>
-                item.counterName === "arrivals" &&
-                String(item.propertyID) === String(selectedHotelID)
-            );
-
-            const inhousesData = data.response.filter(
-              (item) =>
-                item.counterName === "inhouses" &&
-                String(item.propertyID) === String(selectedHotelID)
-            );
-
-            const departuresData = data.response.filter(
-              (item) =>
-                item.counterName === "departures" &&
-                String(item.propertyID) === String(selectedHotelID)
-            );
-
-            // Verifica se há algum dado para o selectedHotelID, caso contrário retorna 0
-            setArrivals(arrivalsData.length > 0 ? arrivalsData[0].count : 0);
-            setInhouses(inhousesData.length > 0 ? inhousesData[0].count : 0);
-            setDepartures(departuresData.length > 0 ? departuresData[0].count : 0);
-          } else {
-            console.error("Erro ao buscar dados:", data.error);
-          }
-        } catch (error) {
-          console.error("Erro ao buscar dados da API:", error);
-        }
-      };
-
       fetchCounters();
     }
-  }, [session?.user?.propertyIDs, selectedHotelID]); // Dependência para recarregar quando a sessão ou selectedHotelID mudar
+  }, [session?.user?.propertyIDs, selectedHotelID]);
 
-  // Função para redirecionar, aceitando o tipo de contagem como parâmetro
-  const handleRedirect = (type) => {
+  const fetchCounters = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/counter");
+      const data = await response.json();
+
+      if (response.ok) {
+        const arrivalsData = data.response.filter(
+          (item) => item.counterName === "arrivals" && String(item.propertyID) === String(selectedHotelID)
+        );
+        const inhousesData = data.response.filter(
+          (item) => item.counterName === "inhouses" && String(item.propertyID) === String(selectedHotelID)
+        );
+        const departuresData = data.response.filter(
+          (item) => item.counterName === "departures" && String(item.propertyID) === String(selectedHotelID)
+        );
+
+        setArrivals(arrivalsData.length > 0 ? arrivalsData[0].count : 0);
+        setInhouses(inhousesData.length > 0 ? inhousesData[0].count : 0);
+        setDepartures(departuresData.length > 0 ? departuresData[0].count : 0);
+      } else {
+        console.error("Erro ao buscar dados:", data.error);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar dados da API:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRedirect = async (type) => {
     if (selectedHotelID) {
-      router.push(`/homepage/frontOfficeView/${type}/${selectedHotelID}`);
+      setIsLoading(true);
+      try {
+        // Fetch mpehotel from properties API before making other requests
+        const propertyResponse = await axios.get(`/api/properties/${selectedHotelID}`);
+        const mpehotel = propertyResponse.data.response?.[0]?.mpehotel;
+
+        if (mpehotel) {
+          // Call all APIs (arrivals, inhouses, departures)
+          await Promise.all([
+            sendDataToAPI("arrivals", mpehotel),
+            sendDataToAPI("inhouses", mpehotel),
+            sendDataToAPI("departures", mpehotel),
+          ]);
+
+          // Redirect after all API calls have been made
+          router.push(`/homepage/frontOfficeView/${type}/${selectedHotelID}`);
+        } else {
+          console.error("Mpehotel not found for the selected hotel.");
+        }
+      } catch (error) {
+        console.error("Erro durante as requisições", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const sendDataToAPI = async (type, mpehotel) => {
+    try {
+      const propertyID = selectedHotelID;
+
+      if (mpehotel && propertyID) {
+        if (type === "arrivals") {
+          await axios.get("/api/reservations/checkins/reservations_4_tat", {
+            params: { mpehotel, propertyID },
+          });
+        } else if (type === "inhouses") {
+          await axios.get("/api/reservations/inHouses/reservations_4_tat", {
+            params: { mpehotel, propertyID },
+          });
+        } else if (type === "departures") {
+          await axios.get("/api/reservations/info", {
+            params: { mpehotel, propertyID },
+          });
+        }
+      }
+    } catch (error) {
+      console.error(`Erro ao enviar os dados para ${type}:`, error);
     }
   };
 

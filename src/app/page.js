@@ -3,18 +3,34 @@
 
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react"; // Adicionando useEffect
-export default function Home() {
-  const [selectedHotelID, setSelectedHotelID] = useState(""); // Estado do Hotel ID
+import { useSession } from "next-auth/react";
 
-  // Recupera o Hotel ID do localStorage ao carregar a página
+export default function Home() {
+  const { data: session } = useSession(); // Acessa a sessão do usuário
+  const [selectedHotelID, setSelectedHotelID] = useState(""); // Estado para armazenar o ID do hotel
+
+  // Recupera o Hotel ID do localStorage ou usa o ID da primeira propriedade do usuário
   useEffect(() => {
-    const savedHotelID = localStorage.getItem("selectedHotelID"); // Busca o ID salvo
+    // Tenta obter o ID do hotel do localStorage
+    const savedHotelID = localStorage.getItem("selectedHotelID");
+
     if (savedHotelID) {
-      setSelectedHotelID(savedHotelID); // Define o ID no estado
-    } else {
-      setSelectedHotelID("defaultHotelID"); // ID padrão, caso não haja nenhum salvo
+      // Se o ID estiver no localStorage, define ele no estado
+      setSelectedHotelID(savedHotelID);
+    } else if (session?.user?.propertyIDs && session.user.propertyIDs.length > 0) {
+      // Caso contrário, usa o primeiro propertyID da sessão do usuário
+      setSelectedHotelID(session.user.propertyIDs[0]);
     }
-  }, []); // Executa apenas uma vez no carregamento
+  }, [session]); // Dependência para executar a lógica quando a sessão for carregada
+
+  // Redireciona para a página do hotel com o ID selecionado
+  useEffect(() => {
+    if (selectedHotelID) {
+      redirect(`/homepage/frontOfficeView/${selectedHotelID}`);
+    }
+  }, [selectedHotelID]); // Executa o redirecionamento quando o selectedHotelID mudar
+
   // Redireciona para a página desejada
   redirect(`/homepage/frontOfficeView/${selectedHotelID}`);
+
 }

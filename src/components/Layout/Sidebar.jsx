@@ -15,7 +15,7 @@ import { MdSunny } from "react-icons/md";
 import { FaMoon, FaGlobe, FaChevronDown, FaChevronUp } from "react-icons/fa"; // Novos ícones adicionados
 
 import ProfileModalForm from "@/components/modals/user/profileModal";
-import AllProfilesForm from "@/components/modals/user/allProfiles/page";
+
 const SidebarContext = createContext();
 let inactivityTimeout;
 let warningTimeout;
@@ -201,7 +201,8 @@ export default function Sidebar({ children, setExpanded }) {
         }}
       >
         <nav className="h-full flex flex-col">
-          <div className="p-4 pb-2 flex justify-between items-center">
+          <div className="p-4 pb-2 flex !justify-between items-center gap-2">
+            <img src="/icon/extensionsLogo.png" alt="logo" width={20}/>
             <p
               className={`font-semibold text-sm overflow-hidden transition-all text-textPrimaryColor ${expanded ? "w-64" : "w-0"
                 }`}
@@ -251,20 +252,17 @@ export default function Sidebar({ children, setExpanded }) {
             {isDropdownOpen && (
               <div className="absolute bottom-14 right-0 bg-background shadow-lg rounded-md p-3 w-56 z-50 text-textPrimaryColor">
                 <ul>
-                  <li
+                <li
                     className={isAdmin ? "" : "disabled"} // Aplica uma classe de estilo "disabled" se não for admin
                     style={{
                       pointerEvents: isAdmin ? "auto" : "none", // Desativa a interação do mouse se não for admin
                       opacity: isAdmin ? 1 : 0.5, // Reduz a opacidade para criar efeito visual de desabilitado
                     }}
                   >
-                    <AllProfilesForm
-                      formTypeModal={11}
-                      buttonName={"All Profiles"}
-                      buttonIcon={<FaUser />}
-                      modalHeader={"All Profiles"}
-                      buttonColor={isAdmin ? "transparent" : "gray"} // Muda a cor do botão para cinza se não for admin
-                    />
+                    <div className="flex flex-row gap-4 px-3 text-sm mb-1">
+                    <FaUser />
+                    <Link href="/homepage/allProfiles">All Profiles</Link>
+                    </div>
                   </li>
                   <li className="">
                     <ProfileModalForm

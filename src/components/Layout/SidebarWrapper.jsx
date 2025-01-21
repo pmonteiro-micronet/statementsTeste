@@ -97,6 +97,59 @@ export default function SidebarWrapper({ children }) {
     }
   }, []);
 
+  const handleRedirect = async (type) => {
+    if (selectedHotelID) {
+      setIsLoading(true);
+      try {
+        // Fetch mpehotel from properties API before making other requests
+        const propertyResponse = await axios.get(`/api/properties/${selectedHotelID}`);
+        const mpehotel = propertyResponse.data.response?.[0]?.mpehotel;
+  
+        if (mpehotel) {
+          // Call all APIs (arrivals, inhouses, departures)
+          await Promise.all([
+            sendDataToAPI("arrivals", mpehotel),
+            sendDataToAPI("inhouses", mpehotel),
+            sendDataToAPI("departures", mpehotel),
+          ]);
+  
+          // Redirect after all API calls have been made
+          router.push(`/homepage/frontOfficeView/${type}/${selectedHotelID}`);
+        } else {
+          console.error("Mpehotel not found for the selected hotel.");
+        }
+      } catch (error) {
+        console.error("Erro durante as requisições", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+  
+  const sendDataToAPI = async (type, mpehotel) => {
+    try {
+      const propertyID = selectedHotelID;
+  
+      if (mpehotel && propertyID) {
+        if (type === "arrivals") {
+          await axios.get("/api/reservations/checkins/reservations_4_tat", {
+            params: { mpehotel, propertyID },
+          });
+        } else if (type === "inhouses") {
+          await axios.get("/api/reservations/inHouses/reservations_4_tat", {
+            params: { mpehotel, propertyID },
+          });
+        } else if (type === "departures") {
+          await axios.get("/api/reservations/info", {
+            params: { mpehotel, propertyID },
+          });
+        }
+      }
+    } catch (error) {
+      console.error(`Erro ao enviar os dados para ${type}:`, error);
+    }
+  };
+  
   useEffect(() => {
     if (selectedHotelID && session?.user) {
       const isAdmin = session?.user?.permission === 1;
@@ -124,26 +177,23 @@ export default function SidebarWrapper({ children }) {
                 {
                   ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
                   label: `${t.navbar.text.arrivals}`,
-                  onClick: () =>
-                    router.push(`/homepage/frontOfficeView/arrivals/${selectedHotelID}`),
-                  icon: <LiaPlaneArrivalSolid /> 
+                  onClick: () => handleRedirect("arrivals"),
+                  icon: <LiaPlaneArrivalSolid />,
                 },
                 {
                   ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
                   label: `${t.navbar.text.inHouses}`,
-                  onClick: () =>
-                    router.push(`/homepage/frontOfficeView/inhouses/${selectedHotelID}`),
-                  icon: <LuMapPinHouse /> 
+                  onClick: () => handleRedirect("inhouses"),
+                  icon: <LuMapPinHouse />,
                 },
               ]
               : []),
-            {
-              ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
-              label: `${t.navbar.text.departures}`,
-              onClick: () =>
-                router.push(`/homepage/frontOfficeView/departures/${selectedHotelID}`),
-              icon: <LiaPlaneDepartureSolid /> 
-            },
+              {
+                ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
+                label: `${t.navbar.text.departures}`,
+                onClick: () => handleRedirect("departures"),
+                icon: <LiaPlaneDepartureSolid />,
+              },
           ],
         },
       });

@@ -23,7 +23,8 @@ import es from "../../../../../../public/locales/espanol/common.json";
 const translations = { en, pt, es };
 
 export default function InHouses({ params }) {  // Renomeado para InHouses
-  const { id } = params;
+  const resolvedParams = React.use(params); // Resolve the promise
+  const { id } = resolvedParams;
   const propertyID = id;
   const today = new Date().toISOString().split("T")[0];
   const tomorrow = new Date();

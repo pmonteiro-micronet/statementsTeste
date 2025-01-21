@@ -26,7 +26,8 @@ import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/
 const translations = { en, pt, es };
 
 export default function Arrivals({ params }) {
-  const { id } = params;
+  const resolvedParams = React.use(params); // Resolve the promise
+  const { id } = resolvedParams;
   const propertyID = id;
   const today = new Date().toISOString().split("T")[0];
   const tomorrow = new Date();
