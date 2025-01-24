@@ -48,7 +48,9 @@ export default function Arrivals({ params }) {
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
 
   const [propertyName, setPropertyName] = useState([]);
+
   console.log(postSuccessful);
+
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
     try {
@@ -65,7 +67,7 @@ export default function Arrivals({ params }) {
         await axios.get("/api/reservations/checkins/reservations_4_tat", {
           params: {
             mpehotel,
-            propertyID
+            propertyID,
           },
         });
 
@@ -75,11 +77,13 @@ export default function Arrivals({ params }) {
         setPostSuccessful(false);
       }
     } catch (error) {
-      console.error(
-        "Erro ao enviar os dados:",
-        error.response ? error.response.data : error.message
-      );
-      setErrorMessage("We were unable to fulfill your order. Please contact support.");
+      if (error.response && error.response.status === 500) {
+        console.log("Erro 500: Não conseguimos comunicar com o serviço PMS.");
+        setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
+      } else {
+        console.log("Erro inesperado:", error.response ? error.response.data : error.message);
+        setErrorMessage("We were unable to fulfill your order. Please contact support.");
+      }
       setIsErrorModalOpen(true);
       setPostSuccessful(false);
     } finally {
@@ -88,17 +92,17 @@ export default function Arrivals({ params }) {
   };
 
   const [locale, setLocale] = useState("pt");
-  
-    useEffect(() => {
-      // Carregar o idioma do localStorage
-      const storedLanguage = localStorage.getItem("language");
-      if (storedLanguage) {
-        setLocale(storedLanguage);
-      }
-    }, []);
-  
-    // Carregar as traduções com base no idioma atual
-    const t = translations[locale] || translations["pt"]; // fallback para "pt"
+
+  useEffect(() => {
+    // Carregar o idioma do localStorage
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
+
+  // Carregar as traduções com base no idioma atual
+  const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
   // Chama a função sendDataToAPI ao carregar a página
   useEffect(() => {
@@ -252,6 +256,34 @@ export default function Arrivals({ params }) {
     sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
   };
 
+  const fetchPropertyDetails = async (propertyID) => {
+    try {
+      const response = await axios.get(`/api/properties?propertyID=${propertyID}`);
+      if (response.data && response.data.response) {
+        return response.data.response[0]; // Supondo que o resultado é uma lista e pegamos o primeiro item
+      }
+      throw new Error("Nenhuma propriedade encontrada.");
+    } catch (error) {
+      console.error("Erro ao buscar detalhes da propriedade:", error);
+      return null;
+    }
+  };
+
+  const verifyProperty = async (propertyDetails) => {
+    const { propertyServer, propertyPort } = propertyDetails;
+  
+    for (let attempts = 0; attempts < 3; attempts++) {
+      try {
+        const response = await axios.post("/api/verifyProperty", { propertyServer, propertyPort });
+        if (response.data.success) return true;
+      } catch (error) {
+        console.error(`Tentativa ${attempts + 1} falhou para a propriedade ${propertyDetails.propertyName}:`, error);
+      }
+    }
+  
+    return false;
+  };
+  
   return (
     <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       {isLoading && <LoadingBackdrop open={isLoading} />}
@@ -342,16 +374,36 @@ export default function Arrivals({ params }) {
                               className="relative z-10 text-textPrimaryColor"
                             >
                               <DropdownItem key="edit" onClick={() => handleOpenModal()}>
-                              {t.frontOffice.arrivals.info}
+                                {t.frontOffice.arrivals.info}
                               </DropdownItem>
-                              <DropdownItem
-                                key="show"
-                                onClick={() =>
-                                  router.push(`/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}`)
-                                }
-                              >
-                                {t.frontOffice.arrivals.registrationForm}
-                              </DropdownItem>
+                             <DropdownItem
+  key="show"
+  onClick={async () => {
+    // Busca os detalhes da propriedade
+    const propertyDetails = await fetchPropertyDetails(reserva.propertyID);
+
+    if (!propertyDetails) {
+      console.error("Não foi possível encontrar os detalhes da propriedade.");
+      return;
+    }
+
+    // Verifica se a propriedade está acessível
+    const isVerified = await verifyProperty(propertyDetails);
+
+    if (isVerified) {
+      // Redireciona caso seja verificado com sucesso
+      router.push(
+        `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}`
+      );
+    } else {
+      // Exibe mensagem de erro no modal
+      setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
+      setIsErrorModalOpen(true);
+    }
+  }}
+>
+  {t.frontOffice.arrivals.registrationForm}
+</DropdownItem>
                             </DropdownMenu>
                           </Dropdown>
 

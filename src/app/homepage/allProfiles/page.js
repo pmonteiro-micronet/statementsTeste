@@ -3,35 +3,29 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
-import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "@nextui-org/react";
+import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem } from "@nextui-org/react";
 
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { FaGear } from "react-icons/fa6";
-// import { MdOutlineRefresh } from "react-icons/md";
-// import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-
-// import ArrivalInfoForm from "@/components/modals/arrivals/info/page";
-// import LoadingBackdrop from "@/components/Loader/page";
-
-// import { useRouter } from "next/navigation";
-// import dayjs from 'dayjs';
-
-// import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
+import { FaGear, FaPlus } from "react-icons/fa6";
 import ProfileModalEditForm from "@/components/modals/user/allProfiles/page";
+import CreateUserModal from "@/components/modals/user/createUser/page";
 
 export default function AllProfiles({ }) {
     const [users, setUsers] = useState([]); // Estado para armazenar os usuários
+    const [filteredUsers, setFilteredUsers] = useState([]); // Estado para usuários filtrados
+    const [searchQuery, setSearchQuery] = useState(""); // Estado para a barra de pesquisa
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(25);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
 
-   useEffect(() => {
+    useEffect(() => {
         const fetchUsers = async () => {
             try {
                 const response = await axios.get(`/api/user`);
                 if (Array.isArray(response.data.response)) {
                     setUsers(response.data.response);
+                    setFilteredUsers(response.data.response); // Inicializa usuários filtrados
                 } else {
                     console.error("Estrutura de resposta inesperada da API", response.data);
                 }
@@ -43,13 +37,23 @@ export default function AllProfiles({ }) {
         fetchUsers();
     }, []);
 
+    useEffect(() => {
+        const lowerCaseQuery = searchQuery.toLowerCase();
+        const filtered = users.filter(user =>
+            user.userID.toString().includes(lowerCaseQuery) ||
+            user.firstName.toLowerCase().includes(lowerCaseQuery) ||
+            user.secondName.toLowerCase().includes(lowerCaseQuery)
+        );
+        setFilteredUsers(filtered);
+    }, [searchQuery, users]);
+
     const items = React.useMemo(() => {
         const start = (page - 1) * rowsPerPage;
         const end = start + rowsPerPage;
-        return users.slice(start, end);
-    }, [page, rowsPerPage, users]);
+        return filteredUsers.slice(start, end);
+    }, [page, rowsPerPage, filteredUsers]);
 
-    const pages = Math.ceil(users.length / rowsPerPage);
+    const pages = Math.ceil(filteredUsers.length / rowsPerPage);
 
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
@@ -70,11 +74,25 @@ export default function AllProfiles({ }) {
         <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
             <div className="flex-grow overflow-y-auto p-4">
                 <div className="flex justify-between items-center w-full">
-                    <div className="header-container flex items-center justify-between w-full">
-                        <div className="flex items-center space-x-4 mx-auto">
-                            <h2 className="text-xl text-textPrimaryColor">All Profiles</h2>
-                        </div>
+                    <div className="header-container flex items-center !justify-between w-full">
+                        <h2 className="text-xl text-textPrimaryColor">All Profiles</h2>
+                        <CreateUserModal 
+                            buttonIcon={<FaPlus color="white"/>}
+                            buttonColor={"primary"}
+                            formTypeModal={11}
+                            modalHeader={"Create User"}
+                        />
                     </div>
+                </div>
+
+                <div className="mt-4">
+                    <input
+                        type="text"
+                        placeholder="Search by ID, First Name, or Last Name"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="border border-gray-300 rounded-md px-4 py-2 w-full"
+                    />
                 </div>
 
                 <div className="mt-5">
@@ -92,7 +110,7 @@ export default function AllProfiles({ }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.map((user, index) => (
+                                {items.map((user, index) => (
                                     <tr
                                         key={index}
                                         className="h-10 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50"

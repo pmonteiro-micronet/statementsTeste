@@ -20,6 +20,8 @@ import en from "../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../../public/locales/espanol/common.json";
 
+import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
+
 const translations = { en, pt, es };
 
 export default function InHouses({ params }) {  // Renomeado para InHouses
@@ -38,6 +40,9 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
 
   const [locale, setLocale] = useState("pt");
   
@@ -61,37 +66,44 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const sendDataToAPI = async () => {
     try {
       setIsLoading(true); // Inicia o carregamento
-
+  
       // Faz a requisição GET à API de properties com o propertyID passado
       const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
-
+  
       // Verifica se a resposta contém o 'mpehotel' e executa o que for necessário
       if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
         const mpehotel = propertyResponse.data.response[0].mpehotel;
         console.log('Mpehotel encontrado:', mpehotel);
-
+  
         await axios.get("/api/reservations/inHouses/reservations_4_tat", {
           params: {
             mpehotel,
             propertyID
           },
         });
-
+  
         setPostSuccessful(true);
       } else {
         console.error('Mpehotel não encontrado para o propertyID:', propertyID);
         setPostSuccessful(false);
       }
     } catch (error) {
-      console.error(
-        "Erro ao enviar os dados:",
-        error.response ? error.response.data : error.message
-      );
+      if (error.response && error.response.status === 500) {
+        // Trata o erro 500
+        console.log("Erro 500: Não conseguimos comunicar com o serviço PMS.");
+        setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
+      } else {
+        // Trata outros erros
+        console.log("Erro inesperado:", error.response ? error.response.data : error.message);
+        setErrorMessage("We were unable to fulfill your order. Please contact support.");
+      }
+      setIsErrorModalOpen(true);
       setPostSuccessful(false);
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   // Chama a função sendDataToAPI ao carregar a página
   useEffect(() => {
@@ -101,7 +113,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const sendResToAPI = async (ResNo) => {
     console.log("Enviando ResNumber para a API:", ResNo);
     const windowValue = 0;
-
+  
     try {
       // Faz a requisição para enviar os dados do statement
       const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
@@ -111,46 +123,61 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
           propertyID,
         },
       });
-
+  
       console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
       console.log("Resposta da API ao salvar statement:", saveResponse.data);
-
+  
       // Se a resposta de salvar o statement foi bem-sucedida, agora verificamos
       // se o statement foi atualizado ou criado, e pegamos o requestID
       if (saveResponse.data && saveResponse.data.data && saveResponse.data.data.requestID) {
         const updatedRecord = saveResponse.data.data;
         const updatedRequestID = updatedRecord.requestID;
-
+  
         // Redireciona para a página jsonView com o requestID do registro atualizado
         console.log("Statement atualizado com requestID:", updatedRequestID);
         router.push(`/homepage/jsonView?recordID=${updatedRequestID}&propertyID=${propertyID}`);
       } else {
         console.warn("Resposta da API não contém requestID.");
       }
-
+  
     } catch (error) {
       console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
-
-      if (error.response && error.response.status === 409) {
-        // O status 409 indica que já existe um registro com a mesma uniqueKey
-        console.warn("Registro já existente, buscando o requestID do registro existente.");
-
-        // Extraia o requestID do erro, caso a API o forneça
-        const existingRequestID = error.response.data?.existingRequestID;
-
-        if (existingRequestID) {
-          console.log("Registro existente encontrado com requestID:", existingRequestID);
-
-          // Redireciona para a página jsonView com o requestID do registro existente
-          router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
+  
+      if (error.response) {
+        if (error.response.status === 409) {
+          // O status 409 indica que já existe um registro com a mesma uniqueKey
+          console.warn("Registro já existente, buscando o requestID do registro existente.");
+  
+          // Extraia o requestID do erro, caso a API o forneça
+          const existingRequestID = error.response.data?.existingRequestID;
+  
+          if (existingRequestID) {
+            console.log("Registro existente encontrado com requestID:", existingRequestID);
+  
+            // Redireciona para a página jsonView com o requestID do registro existente
+            router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
+          } else {
+            console.error("Não foi possível encontrar o requestID do registro existente.");
+          }
+        } else if (error.response.status === 500) {
+          // Trata o erro 500
+          setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
+          setIsErrorModalOpen(true);
         } else {
-          console.error("Não foi possível encontrar o requestID do registro existente.");
+          // Outros erros
+          console.log("Erro inesperado:", error.response.data);
+          setErrorMessage("We were unable to fulfill your order. Please contact support.");
+          setIsErrorModalOpen(true);
         }
       } else {
-        console.error("Erro inesperado:", error.response ? error.response.data : error.message);
+        // Erros que não possuem uma resposta da API (ex: problemas de rede)
+        console.log("Erro inesperado:", error.message);
+        setErrorMessage("We were unable to fulfill your order. Please contact support.");
+        setIsErrorModalOpen(true);
       }
     }
   };
+  
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -428,6 +455,14 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
           }))}
         />
       </div>
+       {/** Modal de erro */}
+       {isErrorModalOpen && errorMessage && (
+        <ErrorRegistrationForm
+          modalHeader={t.frontOffice.arrivals.attention}
+          errorMessage={errorMessage}
+          onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
+        />
+      )}
     </main>
   );
 }

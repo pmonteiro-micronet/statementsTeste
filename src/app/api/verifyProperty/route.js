@@ -15,7 +15,11 @@ export async function POST(request) {
         const url = `http://${propertyServer}:${propertyPort}/healthcheck`;
         console.log("URL:", url);
         try {
-            const response = await axios.get(url);
+            const response = await axios.get(url, {
+                headers: {
+                    Authorization: "q4vf9p8n4907895f7m8d24m75c2q947m2398c574q9586c490q756c98q4m705imtugcfecvrhym04capwz3e2ewqaefwegfiuoamv4ros2nuyp0sjc3iutow924bn5ry943utrjmi",
+                },
+            });
 
             if (response.status === 200 && response.data.Status === "Running") {
                 return new NextResponse(

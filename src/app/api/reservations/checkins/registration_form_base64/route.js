@@ -49,18 +49,15 @@ export async function POST(request) {
     const url = `http://${propertyServer}:${propertyPort}/registration_form_base64`;
     console.log("URL da requisição:", url);
 
-    // Prepara o cabeçalho com o nome do arquivo
+    // Prepara o cabeçalho com o nome do arquivo e o token de autorização
     const headers = {
       "FileName": fileName, // Cabeçalho com o nome do arquivo
+      Authorization: "q4vf9p8n4907895f7m8d24m75c2q947m2398c574q9586c490q756c98q4m705imtugcfecvrhym04capwz3e2ewqaefwegfiuoamv4ros2nuyp0sjc3iutow924bn5ry943utrjmi",
+      "Content-Type": "text/plain", // Define o tipo do conteúdo como texto
     };
 
     // Envia a requisição POST com o corpo contendo apenas o pdfBase64
-    const response = await axios.post(url, pdfBase64, {
-      headers: {
-        ...headers,
-        "Content-Type": "text/plain", // Define o tipo do conteúdo como texto
-      },
-    });
+    const response = await axios.post(url, pdfBase64, { headers });
 
     // Retorna o resultado ao cliente
     return new NextResponse(
