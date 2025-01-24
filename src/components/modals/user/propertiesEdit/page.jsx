@@ -7,11 +7,12 @@ import { Tabs, Tab } from "@nextui-org/react";
 
 const PropertiesEditForm = ({ hotel, onClose }) => {
     const [propertyName, setPropertyName] = useState(hotel.propertyName || "");
-    const [propertyConnectionString, setPropertyConnectionString] = useState(hotel.propertyConnectionString || "");
     const [propertyTag, setPropertyTag] = useState(hotel.propertyTag || "");
     const [propertyServer, setPropertyServer] = useState(hotel.propertyServer || "");
     const [propertyPort, setPropertyPort] = useState(hotel.propertyPort || "");
     const [mpehotel, setmpehotel] = useState(hotel.mpehotel || "");
+    const [pdfFilePath, setPdfFilePath] = useState(hotel.pdfFilePath || "");
+    const [passeIni, setPasseIni] = useState(hotel.passeIni || "");
 
     const [hotelName, setHotelName] = useState(hotel.hotelName || "");
     const [hotelMiniTerms, setHotelMiniTerms] = useState(hotel.hotelMiniTerms || "");
@@ -49,7 +50,9 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                 hotelAddress,
                 hotelPostalCode,
                 hotelRNET,
-                hotelNIF
+                hotelNIF,
+                passeIni,
+                pdfFilePath
             });
 
             if (response.status === 200) {
@@ -147,7 +150,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         disabled={!isEditing} // Desabilita o campo quando não está em edição
                                     />
                                 </div>
-                                <div>
+                                {/* <div>
                                     <label className="block text-sm font-medium text-gray-400">{"Connection String:"}</label>
                                     <input
                                         type="text"
@@ -156,7 +159,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                         disabled={!isEditing} // Desabilita o campo quando não está em edição
                                     />
-                                </div>
+                                </div> */}
                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
                                         <label className="block text-sm font-medium text-gray-400">{"Property Tag:"}</label>
@@ -196,6 +199,28 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                             type="text"
                                             value={propertyPort}
                                             onChange={(e) => setPropertyPort(e.target.value)}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                        <label className="block text-sm font-medium text-gray-400">{"Passe Ini:"}</label>
+                                        <input
+                                            type="text"
+                                            value={passeIni}
+                                            onChange={(e) => setPasseIni(e.target.value)}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                        />
+                                    </div>
+                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                        <label className="block text-sm font-medium text-gray-400">{"PDF File Path:"}</label>
+                                        <input
+                                            type="text"
+                                            value={pdfFilePath}
+                                            onChange={(e) => setPdfFilePath(e.target.value)}
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                             disabled={!isEditing} // Desabilita o campo quando não está em edição
                                         />

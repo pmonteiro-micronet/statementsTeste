@@ -43,7 +43,9 @@ export async function PATCH(request, context) {
     hotelAddress,
     hotelPostalCode,
     hotelRNET,
-    hotelNIF
+    hotelNIF,
+    passeIni,
+    pdfFilePath
 
   } = await request.json();
 
@@ -74,7 +76,9 @@ export async function PATCH(request, context) {
         hotelAddress,
         hotelPostalCode,
         hotelRNET,
-        hotelNIF
+        hotelNIF,
+        passeIni,
+        pdfFilePath
       },
     });
 
