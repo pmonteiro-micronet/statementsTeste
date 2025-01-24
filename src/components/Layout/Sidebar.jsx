@@ -6,6 +6,7 @@ import { signOut, useSession } from "next-auth/react"; // Importando a função 
 import { useRouter } from "next/navigation"; // Importando o hook de navegação
 import { FaSignOutAlt } from "react-icons/fa"; // Importa o ícone de logout
 import { FaUser } from "react-icons/fa";
+import { RiHotelFill } from "react-icons/ri";
 
 import en from "../../../public/locales/english/common.json";
 import pt from "../../../public/locales/portuguesPortugal/common.json";
@@ -202,7 +203,7 @@ export default function Sidebar({ children, setExpanded }) {
       >
         <nav className="h-full flex flex-col">
           <div className="p-4 pb-2 flex !justify-between items-center gap-2">
-            <img src="/icon/extensionsLogo.png" alt="logo" width={20}/>
+            <img src="/icon/extensionsLogo.png" alt="logo" width={20} />
             <p
               className={`font-semibold text-sm overflow-hidden transition-all text-textPrimaryColor ${expanded ? "w-64" : "w-0"
                 }`}
@@ -252,7 +253,19 @@ export default function Sidebar({ children, setExpanded }) {
             {isDropdownOpen && (
               <div className="absolute bottom-14 right-0 bg-background shadow-lg rounded-md p-3 w-56 z-50 text-textPrimaryColor">
                 <ul>
-                <li
+                  <li
+                    className={isAdmin ? "" : "disabled"} // Aplica uma classe de estilo "disabled" se não for admin
+                    style={{
+                      pointerEvents: isAdmin ? "auto" : "none", // Desativa a interação do mouse se não for admin
+                      opacity: isAdmin ? 1 : 0.5, // Reduz a opacidade para criar efeito visual de desabilitado
+                    }}
+                  >
+                    <div className="flex flex-row gap-4 px-3 text-sm mb-3">
+                      <RiHotelFill size={15}/>
+                      <Link href="/homepage/allProperties">All Properties</Link>
+                    </div>
+                  </li>
+                  <li
                     className={isAdmin ? "" : "disabled"} // Aplica uma classe de estilo "disabled" se não for admin
                     style={{
                       pointerEvents: isAdmin ? "auto" : "none", // Desativa a interação do mouse se não for admin
@@ -260,8 +273,8 @@ export default function Sidebar({ children, setExpanded }) {
                     }}
                   >
                     <div className="flex flex-row gap-4 px-3 text-sm mb-1">
-                    <FaUser />
-                    <Link href="/homepage/allProfiles">All Profiles</Link>
+                      <FaUser />
+                      <Link href="/homepage/allProfiles">All Profiles</Link>
                     </div>
                   </li>
                   <li className="">
