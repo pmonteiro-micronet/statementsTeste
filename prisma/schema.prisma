@@ -24,6 +24,8 @@ model properties {
   hotelPostalCode          String?           @db.VarChar(255)
   hotelRNET                String?           @db.VarChar(50)
   hotelNIF                 String?           @db.VarChar(50)
+  passeIni                 String?           @db.VarChar(255)
+  pdfFilePath              String?           @db.VarChar(255)
   usersProperties          usersProperties[]
 }
 
