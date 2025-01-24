@@ -41,7 +41,6 @@ const ProfileModalForm = ({
     const [statusMap, setStatusMap] = useState({});
 
     const [activeKey, setActiveKey] = useState("idInfo"); // Estado de controle da aba ativa
-    const [loading, setLoading] = useState(true); // Estado de carregamento
 
     const user = session?.user || {};
     const { firstName, secondName, email, expirationDate } = user;

@@ -49,15 +49,12 @@ export default function Arrivals({ params }) {
 
   const [propertyName, setPropertyName] = useState([]);
 
-  const [isApiError, setIsApiError] = useState(false);
-
   console.log(postSuccessful);
 
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
     try {
       setIsLoading(true); // Inicia o carregamento
-      setIsApiError(false); // Reset do estado de erro
 
       // Faz a requisição GET à API de properties com o propertyID passado
       const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
@@ -78,7 +75,6 @@ export default function Arrivals({ params }) {
       } else {
         console.error('Mpehotel não encontrado para o propertyID:', propertyID);
         setPostSuccessful(false);
-        setIsApiError(true); // Marca como erro
       }
     } catch (error) {
       if (error.response && error.response.status === 500) {
@@ -88,7 +84,6 @@ export default function Arrivals({ params }) {
         console.log("Erro inesperado:", error.response ? error.response.data : error.message);
         setErrorMessage("We were unable to fulfill your order. Please contact support.");
       }
-      setIsApiError(true); // Marca como erro
       setIsErrorModalOpen(true);
       setPostSuccessful(false);
     } finally {
