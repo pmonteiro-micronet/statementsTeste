@@ -64,6 +64,54 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
         }
     };
 
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imageUrl, setImageUrl] = useState(hotel.imageUrl); // Estado para armazenar a URL da imagem
+
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        // Limpa o estado de erro antes de verificar o tipo de arquivo
+        setError(null);
+
+        if (file) {
+            // Verifica se o arquivo é um PNG
+            if (file.type !== "image/png") {
+                setError("Please upload a PNG image.");
+                setSelectedImage(null); // Limpa a seleção se o tipo for inválido
+                return;
+            }
+            setSelectedImage(file); // Atualiza o estado com a nova imagem
+        }
+    };
+
+    const handleImageUpload = async () => {
+        if (!selectedImage) {
+            setError("Please select an image to upload.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", selectedImage); // Adiciona a nova imagem
+        formData.append("hotelId", hotel.propertyID); // Passa o ID do hotel
+        formData.append("existingImage", hotel.imageUrl); // Passa o caminho da imagem antiga
+
+        try {
+            setLoading(true);
+            const response = await axios.post("/api/upload-image", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            if (response.status === 200) {
+                setImageUrl(response.data.imageUrl); // Atualiza a URL da imagem
+                setSelectedImage(null); // Limpa a seleção após o upload
+            }
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            setError("Failed to upload image. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <Modal
             isOpen={true}
@@ -153,6 +201,41 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         />
                                     </div>
                                 </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Image:"}</label>
+                                    <div className="flex flex-col gap-2">
+                                        <input
+                                            type="file"
+                                            accept="image/png" // Aceita apenas arquivos PNG
+                                            onChange={handleImageChange}
+                                            className="block w-full text-sm text-gray-500
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-primary file:text-white
+                                            hover:file:bg-primary-dark"
+                                        />
+                                        {selectedImage && (
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-sm text-gray-700">Selected: {selectedImage.name}</p>
+                                                <Button
+                                                    color="primary"
+                                                    onClick={handleImageUpload}
+                                                    disabled={loading}
+                                                >
+                                                    {loading ? "Uploading..." : "Upload"}
+                                                </Button>
+                                            </div>
+                                        )}
+                                        {imageUrl && (
+                                            <img
+                                                src={imageUrl}
+                                                alt="Current Hotel"
+                                                className="mt-4 w-20 h-20 rounded shadow -mb-8"
+                                            />
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </Tab>
                         <Tab key="hotelDetails" title="Hotel Details">
@@ -233,16 +316,16 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         />
                                     </div>
                                 </div>
-                            
+
                                 <div>
-    <label className="block text-sm font-medium text-gray-400">{"Hotel Terms:"}</label>
-    <textarea
-        value={hotelMiniTerms}
-        onChange={(e) => setHotelMiniTerms(e.target.value)}
-        className="w-full h-32 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-        disabled={!isEditing} // Desabilita o campo quando não está em edição
-    />
-</div>
+                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Terms:"}</label>
+                                    <textarea
+                                        value={hotelMiniTerms}
+                                        onChange={(e) => setHotelMiniTerms(e.target.value)}
+                                        className="w-full h-32 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                    />
+                                </div>
                             </div>
                         </Tab>
                     </Tabs>

@@ -111,6 +111,8 @@ const ProfileModalForm = ({
         }
     };
 
+    const [loadingMap, setLoadingMap] = useState({});
+
     const resetForm = () => {
         setShowPasswordFields(false);
         setOldPassword("");
@@ -120,27 +122,59 @@ const ProfileModalForm = ({
         setSuccessMessage("");
     };
 
-    // Função para verificar propriedades
     const verifyProperties = async () => {
-        setLoading(true); // Começa o carregamento
-        const newStatusMap = { ...statusMap };
+        // Inicializa o estado de carregamento para todos os hotéis como 'true'
+        const initialLoadingMap = hotels.reduce((acc, hotel) => {
+            acc[hotel.propertyID] = true; // Todos os hotéis começam em "carregando"
+            return acc;
+        }, {});
+        setLoadingMap(initialLoadingMap);
+    
         for (const hotel of hotels) {
-            try {
-                const hotelData = {
-                    propertyServer: hotel.propertyServer,
-                    propertyPort: hotel.propertyPort,
-                };
-                const response = await axios.post("/api/verifyProperty", hotelData);
-                newStatusMap[hotel.propertyID] = response.data.success;
-            } catch (error) {
-                console.error(`Erro ao verificar propriedade ${hotel.propertyName}:`, error);
-                newStatusMap[hotel.propertyID] = false;
+            let attempts = 0;
+            let success = false;
+    
+            while (attempts < 3 && !success) {
+                try {
+                    const hotelData = {
+                        propertyServer: hotel.propertyServer,
+                        propertyPort: hotel.propertyPort,
+                    };
+                    const response = await axios.post("/api/verifyProperty", hotelData);
+    
+                    success = response.data.success;
+                    setStatusMap((prevStatusMap) => ({
+                        ...prevStatusMap,
+                        [hotel.propertyID]: success, // Atualiza o status do hotel
+                    }));
+                } catch (error) {
+                    console.error(`Erro ao verificar propriedade ${hotel.propertyName}:`, error);
+                    setStatusMap((prevStatusMap) => ({
+                        ...prevStatusMap,
+                        [hotel.propertyID]: false, // Marca o status como 'false' em caso de erro
+                    }));
+                }
+    
+                attempts++;
             }
+    
+            if (!success) {
+                setStatusMap((prevStatusMap) => ({
+                    ...prevStatusMap,
+                    [hotel.propertyID]: false,
+                }));
+            }
+    
+            // Marca o hotel atual como "não carregando"
+            setLoadingMap((prev) => ({
+                ...prev,
+                [hotel.propertyID]: false,
+            }));
+    
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 segundo de atraso
         }
-        setStatusMap(newStatusMap);
-        setLoading(false); // Finaliza o carregamento
     };
-
+    
     useEffect(() => {
         if (activeKey === "properties" && hotels.length > 0) {
             verifyProperties();
@@ -333,41 +367,44 @@ const ProfileModalForm = ({
                                         {activeKey === "properties" && (
                                             <div>
                                                 {hotels.length > 0 ? (
-                                                    hotels.map((hotel) => (
-                                                        <div
-                                                            key={hotel.propertyID}
-                                                            className="mb-4 flex flex-col items-left"
-                                                        >
-                                                            <label className="block text-sm font-medium text-gray-400">
-                                                                {hotel.propertyName}
-                                                            </label>
-                                                            <div className="flex items-center gap-4">
-                                                                <input
-                                                                    type="text"
-                                                                    value={hotel.propertyName || ""}
-                                                                    readOnly
-                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
-                                                                />
-                                                                {loading ? (
-                                                                    <div className="text-gray-400">Loading...</div>
-                                                                ) : (
-                                                                    <Switch
-                                                                        size="sm"
-                                                                        isSelected={statusMap[hotel.propertyID]}
-                                                                        onChange={() => console.log(`Switch ${hotel.propertyID} toggled`)}
-                                                                    />
-                                                                )}
-                                                                <FaPencilAlt
-                                                                    className={`cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`}
-                                                                    onClick={() => handleEditClick(hotel)}
-                                                                    style={{ pointerEvents: isAdmin ? "auto" : "none" }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                                ) : (
-                                                    <p>No properties found.</p>
-                                                )}
+    hotels.map((hotel) => (
+        <div
+            key={hotel.propertyID}
+            className="mb-4 flex flex-col items-left"
+        >
+            <label className="block text-sm font-medium text-gray-400">
+                {hotel.propertyName}
+            </label>
+            <div className="flex items-center gap-4">
+                <input
+                    type="text"
+                    value={hotel.propertyName || ""}
+                    readOnly
+                    className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
+                />
+                {loadingMap[hotel.propertyID] ? (
+                    <div className="text-gray-400">Loading...</div>
+                ) : (
+                    <div className="flex flex-col items-center">
+                        <span className="text-xs text-gray-500">PMS Service</span>
+                        <Switch
+                            size="sm"
+                            isSelected={statusMap[hotel.propertyID]}
+                            onChange={() => console.log(`Switch ${hotel.propertyID} toggled`)}
+                        />
+                    </div>
+                )}
+                <FaPencilAlt
+                    className={`cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`}
+                    onClick={() => handleEditClick(hotel)}
+                    style={{ pointerEvents: isAdmin ? "auto" : "none" }}
+                />
+            </div>
+        </div>
+    ))
+) : (
+    <p>No properties found.</p>
+)}
                                             </div>
                                         )}
                                     </div>

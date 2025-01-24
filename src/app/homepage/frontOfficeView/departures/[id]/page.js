@@ -90,11 +90,16 @@ export default function Page({ params }) {
         setPostSuccessful(false);
       }
     } catch (error) {
-      console.error(
-        "Erro ao enviar os dados:",
-        error.response ? error.response.data : error.message
-      );
-      setErrorMessage("We were unable to fulfill your order. Please contact support.");
+      if (error.response && error.response.status === 500) {
+        // Trata o erro 500
+        console.log("Erro 500: Não conseguimos comunicar com o serviço PMS.");
+        setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
+      } else {
+        // Trata outros erros
+        console.log("Erro inesperado:", error.response ? error.response.data : error.message);
+        setErrorMessage("We were unable to fulfill your order. Please contact support.");
+      }
+      setIsErrorModalOpen(true);
       setIsErrorModalOpen(true);
       setPostSuccessful(false);
     } finally {
@@ -139,24 +144,38 @@ export default function Page({ params }) {
 
     } catch (error) {
       console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
-
-      if (error.response && error.response.status === 409) {
-        // O status 409 indica que já existe um registro com a mesma uniqueKey
-        console.warn("Registro já existente, buscando o requestID do registro existente.");
-
-        // Extraia o requestID do erro, caso a API o forneça
-        const existingRequestID = error.response.data?.existingRequestID;
-
-        if (existingRequestID) {
-          console.log("Registro existente encontrado com requestID:", existingRequestID);
-
-          // Redireciona para a página jsonView com o requestID do registro existente
-          router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
+  
+      if (error.response) {
+        if (error.response.status === 409) {
+          // O status 409 indica que já existe um registro com a mesma uniqueKey
+          console.warn("Registro já existente, buscando o requestID do registro existente.");
+  
+          // Extraia o requestID do erro, caso a API o forneça
+          const existingRequestID = error.response.data?.existingRequestID;
+  
+          if (existingRequestID) {
+            console.log("Registro existente encontrado com requestID:", existingRequestID);
+  
+            // Redireciona para a página jsonView com o requestID do registro existente
+            router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
+          } else {
+            console.error("Não foi possível encontrar o requestID do registro existente.");
+          }
+        } else if (error.response.status === 500) {
+          // Trata o erro 500
+          setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
+          setIsErrorModalOpen(true);
         } else {
-          console.error("Não foi possível encontrar o requestID do registro existente.");
+          // Outros erros
+          console.log("Erro inesperado:", error.response.data);
+          setErrorMessage("We were unable to fulfill your order. Please contact support.");
+          setIsErrorModalOpen(true);
         }
       } else {
-        console.error("Erro inesperado:", error.response ? error.response.data : error.message);
+        // Erros que não possuem uma resposta da API (ex: problemas de rede)
+        console.log("Erro inesperado:", error.message);
+        setErrorMessage("We were unable to fulfill your order. Please contact support.");
+        setIsErrorModalOpen(true);
       }
     }
   };
