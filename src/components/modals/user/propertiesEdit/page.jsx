@@ -138,7 +138,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                 </ModalHeader>
                 <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor">
                     <Tabs aria-label="Options" className="flex justify-center">
-                        <Tab key="propertyDetails" title="Property Details">
+                        <Tab key="propertyDetails" title="Settings">
                             <div className="-mt-4 flex flex-col gap-2">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400">{"Property Name:"}</label>
@@ -204,9 +204,9 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         />
                                     </div>
                                 </div>
-                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
-                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{"Passe Ini:"}</label>
+                               
+                                    <div className="flex flex-col"> {/* Cada campo ocupa metade do espaço */}
+                                        <label className="block text-sm font-medium text-gray-400">{"Ini Path:"}</label>
                                         <input
                                             type="text"
                                             value={passeIni}
@@ -215,7 +215,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                             disabled={!isEditing} // Desabilita o campo quando não está em edição
                                         />
                                     </div>
-                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                    <div className="flex flex-col"> {/* Cada campo ocupa metade do espaço */}
                                         <label className="block text-sm font-medium text-gray-400">{"PDF File Path:"}</label>
                                         <input
                                             type="text"
@@ -225,45 +225,9 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                             disabled={!isEditing} // Desabilita o campo quando não está em edição
                                         />
                                     </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Image:"}</label>
-                                    <div className="flex flex-col gap-2">
-                                        <input
-                                            type="file"
-                                            accept="image/png" // Aceita apenas arquivos PNG
-                                            onChange={handleImageChange}
-                                            className="block w-full text-sm text-gray-500
-                                            file:mr-4 file:py-2 file:px-4
-                                            file:rounded file:border-0
-                                            file:text-sm file:font-semibold
-                                            file:bg-primary file:text-white
-                                            hover:file:bg-primary-dark"
-                                        />
-                                        {selectedImage && (
-                                            <div className="flex items-center gap-2">
-                                                <p className="text-sm text-gray-700">Selected: {selectedImage.name}</p>
-                                                <Button
-                                                    color="primary"
-                                                    onClick={handleImageUpload}
-                                                    disabled={loading}
-                                                >
-                                                    {loading ? "Uploading..." : "Upload"}
-                                                </Button>
-                                            </div>
-                                        )}
-                                        {imageUrl && (
-                                            <img
-                                                src={imageUrl}
-                                                alt="Current Hotel"
-                                                className="mt-4 w-20 h-20 rounded shadow -mb-8"
-                                            />
-                                        )}
-                                    </div>
-                                </div>
                             </div>
                         </Tab>
-                        <Tab key="hotelDetails" title="Hotel Details">
+                        <Tab key="hotelDetails" title="Details">
                             <div className="-mt-4 flex flex-col gap-2 -ml-8 -mr-8">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400">{"Hotel Name:"}</label>
@@ -347,9 +311,45 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                     <textarea
                                         value={hotelMiniTerms}
                                         onChange={(e) => setHotelMiniTerms(e.target.value)}
-                                        className="w-full h-32 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                         disabled={!isEditing} // Desabilita o campo quando não está em edição
                                     />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Image:"}</label>
+                                    <div className="flex flex-col gap-2">
+                                        <input
+                                            type="file"
+                                            accept="image/png" // Aceita apenas arquivos PNG
+                                            onChange={handleImageChange}
+                                            className="block w-full text-sm text-gray-500
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-primary file:text-white
+                                            hover:file:bg-primary-dark"
+                                        />
+                                        {selectedImage && (
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-sm text-gray-700">Selected: {selectedImage.name}</p>
+                                                <Button
+                                                    color="primary"
+                                                    onClick={handleImageUpload}
+                                                    disabled={loading}
+                                                >
+                                                    {loading ? "Uploading..." : "Upload"}
+                                                </Button>
+                                            </div>
+                                        )}
+                                        {imageUrl && (
+                                            <img
+                                                src={imageUrl}
+                                                alt="Current Hotel"
+                                                className="mt-4 w-20 h-20 rounded shadow -mb-8"
+                                            />
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </Tab>

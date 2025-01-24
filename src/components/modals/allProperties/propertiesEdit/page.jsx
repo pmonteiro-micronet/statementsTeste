@@ -1,0 +1,442 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@nextui-org/react";
+import { MdClose } from "react-icons/md";
+import axios from "axios";
+import { Tabs, Tab } from "@nextui-org/react";
+
+const PropertiesEditForm = ({
+    hotel,
+    propertyID,
+    onClose,
+    formTypeModal
+}) => {
+    // Estados individuais para cada campo
+    const [propertyName, setPropertyName] = useState("");
+    const [propertyTag, setPropertyTag] = useState("");
+    const [propertyServer, setPropertyServer] = useState("");
+    const [propertyPort, setPropertyPort] = useState("");
+    const [mpehotel, setmpehotel] = useState("");
+    const [pdfFilePath, setPdfFilePath] = useState("");
+    const [passeIni, setPasseIni] = useState("");
+
+    const [hotelName, setHotelName] = useState("");
+    const [hotelMiniTerms, setHotelMiniTerms] = useState("");
+    const [hotelPhone, setHotelPhone] = useState("");
+    const [hotelEmail, setHotelEmail] = useState("");
+    const [hotelAddress, setHotelAddress] = useState("");
+    const [hotelPostalCode, setHotelPostalCode] = useState("");
+    const [hotelRNET, setHotelRNET] = useState("");
+    const [hotelNIF, setHotelNIF] = useState("");
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [isEditing, setIsEditing] = useState(false); // Novo estado para controlar se estamos no modo de edição
+
+    // Função para buscar os dados de uma propriedade pelo ID
+    const fetchPropertyData = async (propertyID) => {
+        try {
+            setLoading(true);
+            const response = await axios.get(`/api/properties/${propertyID}`);
+            if (response.status === 200) {
+                const data = response.data;
+                setHotel(data);
+                console.log(response.data);
+                // Atualizar estados individuais com os dados retornados
+                setPropertyName(data.propertyName || "");
+                setPropertyTag(data.propertyTag || "");
+                setPropertyServer(data.propertyServer || "");
+                setPropertyPort(data.propertyPort || "");
+                setmpehotel(data.mpehotel || "");
+                setPdfFilePath(data.pdfFilePath || "");
+                setPasseIni(data.passeIni || "");
+
+                setHotelName(data.hotelName || "");
+                setHotelMiniTerms(data.hotelMiniTerms || "");
+                setHotelPhone(data.hotelPhone || "");
+                setHotelEmail(data.hotelEmail || "");
+                setHotelAddress(data.hotelAddress || "");
+                setHotelPostalCode(data.hotelPostalCode || "");
+                setHotelRNET(data.hotelRNET || "");
+                setHotelNIF(data.hotelNIF || "");
+            }
+        } catch (error) {
+            console.error("Error fetching property data:", error);
+            setError("Failed to fetch property data. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // useEffect para buscar os dados quando o componente for montado
+    useEffect(() => {
+        if (propertyID) {
+            fetchPropertyData(propertyID);
+        }
+    }, [propertyID]);
+
+    const handleSave = async () => {
+        // Verifica se algum campo foi alterado antes de fazer a requisição
+        if (!propertyName || !propertyTag || !propertyServer) {
+            setError("Please fill in all fields.");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            // Envia a requisição PUT para atualizar a propriedade
+            const response = await axios.patch(`/api/properties/${hotel.propertyID}`, {
+                propertyName,
+                propertyTag,
+                propertyServer,
+                propertyPort,
+                mpehotel,
+                hotelName,
+                hotelMiniTerms,
+                hotelPhone,
+                hotelEmail,
+                hotelAddress,
+                hotelPostalCode,
+                hotelRNET,
+                hotelNIF,
+                passeIni,
+                pdfFilePath
+            });
+
+            if (response.status === 200) {
+                setIsEditing(false); // Desativa o modo de edição após salvar
+                onClose(); // Fecha o modal
+            }
+        } catch (error) {
+            console.error("Error updating property:", error);
+            setError("Failed to update property. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imageUrl, setImageUrl] = useState(); // Estado para armazenar a URL da imagem
+
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        // Limpa o estado de erro antes de verificar o tipo de arquivo
+        setError(null);
+
+        if (file) {
+            // Verifica se o arquivo é um PNG
+            if (file.type !== "image/png") {
+                setError("Please upload a PNG image.");
+                setSelectedImage(null); // Limpa a seleção se o tipo for inválido
+                return;
+            }
+            setSelectedImage(file); // Atualiza o estado com a nova imagem
+        }
+    };
+
+    const handleImageUpload = async () => {
+        if (!selectedImage) {
+            setError("Please select an image to upload.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", selectedImage); // Adiciona a nova imagem
+        formData.append("hotelId", hotel.propertyID); // Passa o ID do hotel
+        formData.append("existingImage", hotel.imageUrl); // Passa o caminho da imagem antiga
+
+        try {
+            setLoading(true);
+            const response = await axios.post("/api/upload-image", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            if (response.status === 200) {
+                setImageUrl(response.data.imageUrl); // Atualiza a URL da imagem
+                setSelectedImage(null); // Limpa a seleção após o upload
+            }
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            setError("Failed to upload image. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <>
+            {formTypeModal === 11 && (
+                <>
+                    <Modal
+                        isOpen={true}
+                        hideCloseButton={true}
+                        onOpenChange={onOpenChange}
+                        isDismissable={true}
+                        isKeyboardDismissDisabled={false}
+                        className="z-50"
+                        size="sm"
+                    >
+                        <ModalContent>
+                            <form onSubmit={handleSubmit}>
+                                <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white p-2">
+                                    <div className="flex flex-row justify-start gap-4 pl-4">
+                                        {editIcon} {modalHeader} {modalEditArrow} {modalEdit}
+                                    </div>
+                                    <div className="flex flex-row items-center justify-end">
+                                        <Button
+                                            color="transparent"
+                                            variant="light"
+                                            className="w-auto min-w-0 p-0 m-0 -pr-4"
+                                            onClick={() => onOpenChange(false)}
+                                        >
+                                            <MdClose size={30} />
+                                        </Button>
+                                    </div>
+                                </ModalHeader>
+                                <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor">
+                                    <Tabs aria-label="Options" className="flex justify-center">
+                                        <Tab key="propertyDetails" title="Property Details">
+                                            <div className="-mt-4 flex flex-col gap-2">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-400">{"Property Name:"}</label>
+                                                    <input
+                                                        type="text"
+                                                        value={propertyName}
+                                                        onChange={(e) => setPropertyName(e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                    />
+                                                </div>
+                                                {/* <div>
+                                    <label className="block text-sm font-medium text-gray-400">{"Connection String:"}</label>
+                                    <input
+                                        type="text"
+                                        value={propertyConnectionString}
+                                        onChange={(e) => setPropertyConnectionString(e.target.value)}
+                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                    />
+                                </div> */}
+                                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                        <label className="block text-sm font-medium text-gray-400">{"Property Tag:"}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={propertyTag}
+                                                            onChange={(e) => setPropertyTag(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                        <label className="block text-sm font-medium text-gray-400">{"MPE Hotel:"}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={mpehotel}
+                                                            onChange={(e) => setmpehotel(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                        <label className="block text-sm font-medium text-gray-400">{"Property Server:"}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={propertyServer}
+                                                            onChange={(e) => setPropertyServer(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                        <label className="block text-sm font-medium text-gray-400">{"Property Port:"}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={propertyPort}
+                                                            onChange={(e) => setPropertyPort(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                        <label className="block text-sm font-medium text-gray-400">{"Passe Ini:"}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={passeIni}
+                                                            onChange={(e) => setPasseIni(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                        <label className="block text-sm font-medium text-gray-400">{"PDF File Path:"}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={pdfFilePath}
+                                                            onChange={(e) => setPdfFilePath(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Image:"}</label>
+                                                    <div className="flex flex-col gap-2">
+                                                        <input
+                                                            type="file"
+                                                            accept="image/png" // Aceita apenas arquivos PNG
+                                                            onChange={handleImageChange}
+                                                            className="block w-full text-sm text-gray-500
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-primary file:text-white
+                                            hover:file:bg-primary-dark"
+                                                        />
+                                                        {selectedImage && (
+                                                            <div className="flex items-center gap-2">
+                                                                <p className="text-sm text-gray-700">Selected: {selectedImage.name}</p>
+                                                                <Button
+                                                                    color="primary"
+                                                                    onClick={handleImageUpload}
+                                                                    disabled={loading}
+                                                                >
+                                                                    {loading ? "Uploading..." : "Upload"}
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                        {imageUrl && (
+                                                            <img
+                                                                src={imageUrl}
+                                                                alt="Current Hotel"
+                                                                className="mt-4 w-20 h-20 rounded shadow -mb-8"
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Tab>
+                                        <Tab key="hotelDetails" title="Hotel Details">
+                                            <div className="-mt-4 flex flex-col gap-2 -ml-8 -mr-8">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Name:"}</label>
+                                                    <input
+                                                        type="text"
+                                                        value={hotelName}
+                                                        onChange={(e) => setHotelName(e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                    />
+                                                </div>
+                                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                                    <div className="flex flex-col w-2/3"> {/* Cada campo ocupa metade do espaço */}
+                                                        <label className="block text-sm font-medium text-gray-400">{"Hotel Email:"}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={hotelEmail}
+                                                            onChange={(e) => setHotelEmail(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col w-1/3"> {/* Cada campo ocupa metade do espaço */}
+                                                        <label className="block text-sm font-medium text-gray-400">{"Hotel Phone:"}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={hotelPhone}
+                                                            onChange={(e) => setHotelPhone(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                                    <div className="flex flex-col w-2/3"> {/* Cada campo ocupa metade do espaço */}
+                                                        <label className="block text-sm font-medium text-gray-400">{"Hotel Address:"}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={hotelAddress}
+                                                            onChange={(e) => setHotelAddress(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col w-1/3"> {/* Cada campo ocupa metade do espaço */}
+                                                        <label className="block text-sm font-medium text-gray-400">{"Hotel Postal-Code:"}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={hotelPostalCode}
+                                                            onChange={(e) => setHotelPostalCode(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                        <label className="block text-sm font-medium text-gray-400">{"Hotel RNET:"}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={hotelRNET}
+                                                            onChange={(e) => setHotelRNET(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                        <label className="block text-sm font-medium text-gray-400">{"Hotel NIF:"}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={hotelNIF}
+                                                            onChange={(e) => setHotelNIF(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Terms:"}</label>
+                                                    <textarea
+                                                        value={hotelMiniTerms}
+                                                        onChange={(e) => setHotelMiniTerms(e.target.value)}
+                                                        className="w-full h-32 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                    />
+                                                </div>
+                                            </div>
+                                        </Tab>
+                                    </Tabs>
+
+                                    {/* Exibição de erro */}
+                                    {error && <p className="text-red-500 text-sm">{error}</p>}
+
+                                    <div className="flex justify-end space-x-2">
+                                        <Button color="error" onClick={onClose}>
+                                            Cancel
+                                        </Button>
+                                        {isEditing ? (
+                                            <Button color="primary" onClick={handleSave} disabled={loading}>
+                                                {loading ? "Saving..." : "Save"}
+                                            </Button>
+                                        ) : (
+                                            <Button color="primary" onClick={() => setIsEditing(true)}>
+                                                Edit
+                                            </Button>
+                                        )}
+                                    </div>
+                                </ModalBody>
+                            </form>
+                        </ModalContent>
+                    </Modal>
+                </>
+            )}
+        </>
+    );
+};
+
+export default PropertiesEditForm;
