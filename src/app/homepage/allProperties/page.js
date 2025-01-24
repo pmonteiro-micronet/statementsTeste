@@ -7,7 +7,7 @@ import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem } from "@
 
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear, FaPlus } from "react-icons/fa6";
-import ProfileModalEditForm from "@/components/modals/user/allProfiles/page";
+
 import CreateUserModal from "@/components/modals/user/createUser/page";
 
 import PropertiesEditForm from "@/components/modals/allProperties/propertiesEdit/page";
