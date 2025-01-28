@@ -8,7 +8,7 @@ import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem } from "@
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear, FaPlus } from "react-icons/fa6";
 
-import CreateUserModal from "@/components/modals/user/createUser/page";
+import CreatePropertyModal from "@/components/modals/allProperties/createProperty/page";
 
 import PropertiesEditForm from "@/components/modals/allProperties/propertiesEdit/page";
 
@@ -78,8 +78,8 @@ export default function AllProfiles({ }) {
                 <div className="flex justify-between items-center w-full">
                     <div className="header-container flex items-center !justify-between w-full">
                         <h2 className="text-xl text-textPrimaryColor">All Properties</h2>
-                        <CreateUserModal 
-                            buttonIcon={<FaPlus color="white"/>}
+                        <CreatePropertyModal
+                            buttonIcon={<FaPlus color="white" />}
                             buttonColor={"primary"}
                             formTypeModal={11}
                             modalHeader={"Create Property"}
@@ -163,16 +163,19 @@ export default function AllProfiles({ }) {
                     }))}
                 />
             </div>
-
             {isModalOpen && selectedProperty && (
-                <PropertiesEditForm
-                    isOpen={isModalOpen}
-                    onClose={handleCloseModal}
-                    modalHeader="User Info"
-                    formTypeModal={11}
-                    propertyID={selectedProperty.propertyID}
-                />
+                <>
+                    <PropertiesEditForm
+                        isOpen={isModalOpen}
+                        onClose={handleCloseModal}
+                        modalHeader="User Info"
+                        formTypeModal={11}
+                        propertyID={selectedProperty.propertyID}
+                        hotel={selectedProperty}
+                    />
+                </>
             )}
+
         </main>
     );
 }
