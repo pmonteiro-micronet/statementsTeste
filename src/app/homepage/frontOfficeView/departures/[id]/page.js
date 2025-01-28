@@ -290,8 +290,20 @@ export default function Page({ params }) {
   };
 
   // Função chamada quando o botão de refresh é clicado
-  const handleRefreshClick = () => {
-    sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
+  // const handleRefreshClick = () => {
+  //   sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
+  // };
+
+  const handleRefreshClick = async () => {
+    try {
+      setIsLoading(true); // Ativa o loading
+      await sendDataToAPI([today, tomorrowDate]); // Faz a requisição de dados
+      router.refresh(); // Recarrega a página sem alterar a URL
+    } catch (error) {
+      console.error("Erro ao tentar fazer refresh:", error);
+    } finally {
+      setIsLoading(false); // Garante que o loading seja desativado
+    }
   };
 
   return (
