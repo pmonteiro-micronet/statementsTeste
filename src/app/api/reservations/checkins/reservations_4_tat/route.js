@@ -2,9 +2,6 @@ import { NextResponse } from "next/server";
 import axios from "axios";
 import prisma from "@/lib/db"; // Certifique-se de que a importação está correta
 
-// Mapa em memória para rastrear chamadas em andamento
-const ongoingRequests = new Map();
-
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const HotelID = searchParams.get("mpehotel"); // Parâmetro HotelID para enviar na query
@@ -19,7 +16,7 @@ export async function GET(request) {
   }
 
   // Garantir que PropertyID seja um número inteiro
-  const propertyIDInt = parseInt(PropertyID, 10);
+  const propertyIDInt = parseInt(PropertyID, 10); // Converte para inteiro, base 10
 
   // Verificar se a conversão foi bem-sucedida
   if (isNaN(propertyIDInt)) {
@@ -29,23 +26,11 @@ export async function GET(request) {
     );
   }
 
-  // Verificar se já existe uma chamada em andamento para o mesmo PropertyID e HotelID
-  const requestKey = `${propertyIDInt}_${HotelID}`;
-  if (ongoingRequests.has(requestKey)) {
-    return new NextResponse(
-      JSON.stringify({ error: "Já existe uma requisição em andamento para este PropertyID e HotelID" }),
-      { status: 429, headers: { "Content-Type": "application/json; charset=utf-8" } }
-    );
-  }
-
   try {
-    // Adiciona a requisição ao mapa de controle
-    ongoingRequests.set(requestKey, true);
-
     // Consulta o banco de dados para encontrar o propertyServer e propertyPort com base no PropertyID
     const property = await prisma.properties.findUnique({
       where: {
-        propertyID: propertyIDInt,
+        propertyID: propertyIDInt, // Passa o propertyID como número inteiro
       },
       select: {
         propertyServer: true,
@@ -68,7 +53,7 @@ export async function GET(request) {
 
     // Enviar os dados como parâmetros na query string
     const response = await axios.get(url, {
-      params: { HotelID },
+      params: { HotelID }, // Usando HotelID na requisição
       headers: {
         Authorization: 'q4vf9p8n4907895f7m8d24m75c2q947m2398c574q9586c490q756c98q4m705imtugcfecvrhym04capwz3e2ewqaefwegfiuoamv4ros2nuyp0sjc3iutow924bn5ry943utrjmi'
       },
@@ -80,38 +65,41 @@ export async function GET(request) {
     // Busca o último registro existente na tabela com o mesmo PropertyID
     const existingRecord = await prisma.requestRecordsArrivals.findFirst({
       where: { propertyID: propertyIDInt },
-      orderBy: { requestDateTime: "desc" },
+      orderBy: { requestDateTime: "desc" },  // Ordena por data mais recente
     });
 
     if (existingRecord) {
+      // Atualiza o registro existente com os dados retornados (seja vazio ou não)
       const updatedRecord = await prisma.requestRecordsArrivals.update({
         where: {
-          requestID: existingRecord.requestID,
+          requestID: existingRecord.requestID,  // Usa o requestID do registro existente
         },
         data: {
-          requestBody: responseData,
-          requestType: "GET",
-          requestDateTime: new Date(),
-          responseStatus: "200",
-          responseBody: JSON.stringify(responseData),
-          propertyID: propertyIDInt,
+          requestBody: responseData,  // Atualiza o corpo com os dados retornados
+          requestType: "GET",  // Tipo da requisição
+          requestDateTime: new Date(),  // Data e hora da atualização
+          responseStatus: "200",  // Status de resposta
+          responseBody: JSON.stringify(responseData),  // Resposta completa (seja um array vazio ou com dados)
+          propertyID: propertyIDInt,  // Atualiza o propertyID
         },
       });
       console.log("Registro atualizado:", updatedRecord);
     } else {
+      // Caso o registro não exista, insere um novo com os dados retornados (seja vazio ou não)
       const newRequest = await prisma.requestRecordsArrivals.create({
         data: {
-          requestBody: responseData,
-          requestType: "GET",
-          requestDateTime: new Date(),
-          responseStatus: "200",
-          responseBody: JSON.stringify(responseData),
-          propertyID: propertyIDInt,
+          requestBody: responseData,  // Corpo da requisição (array vazio ou com dados)
+          requestType: "GET",  // Tipo da requisição
+          requestDateTime: new Date(),  // Data e hora atual
+          responseStatus: "200",  // Status de resposta
+          responseBody: JSON.stringify(responseData),  // Resposta completa
+          propertyID: propertyIDInt,  // Propriedade associada
         },
       });
       console.log("Novo registro inserido:", newRequest);
     }
 
+    // Retorna a resposta do Mock Server para o cliente
     return new NextResponse(JSON.stringify(responseData), {
       status: 200,
       headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -129,8 +117,6 @@ export async function GET(request) {
       }),
       { status: 500, headers: { "Content-Type": "application/json; charset=utf-8" } }
     );
-  } finally {
-    // Remove a requisição do mapa de controle
-    ongoingRequests.delete(requestKey);
   }
 }
+

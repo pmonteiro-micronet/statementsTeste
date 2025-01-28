@@ -40,7 +40,7 @@ const FrontOffice = () => {
 
   const fetchCounters = async () => {
     try {
-      setIsLoading(true); // Ativa o carregamento durante a busca de contadores
+      setIsLoading(true);
       const response = await fetch("/api/counter");
       const data = await response.json();
 
@@ -64,13 +64,15 @@ const FrontOffice = () => {
     } catch (error) {
       console.error("Erro ao buscar dados da API:", error);
     } finally {
-      setIsLoading(false); // Desativa o carregamento
+      setIsLoading(false);
     }
   };
 
   const handleRedirect = async (type) => {
+    if (isLoading) return;
+
     if (selectedHotelID) {
-      setIsLoading(true); // Ativa o carregamento durante o redirecionamento
+      setIsLoading(true);
       try {
         const propertyResponse = await axios.get(`/api/properties/${selectedHotelID}`);
         const mpehotel = propertyResponse.data.response?.[0]?.mpehotel;
@@ -89,7 +91,7 @@ const FrontOffice = () => {
       } catch (error) {
         console.error("Erro durante as requisições", error);
       } finally {
-        setIsLoading(false); // Desativa o carregamento após o redirecionamento
+        setIsLoading(false);
       }
     }
   };
@@ -119,58 +121,54 @@ const FrontOffice = () => {
   };
 
   return (
-    <>
-      {isLoading && <LoadingBackdrop open={isLoading} />}
-      <div className="min-h-screen flex bg-primaryBackground">
-        <main className="flex-1 min-h-screen p-8 overflow-y-auto">
-          <h2 className="font-semibold text-textPrimaryColor text-2xl mb-4">
-            {t.frontOffice.dashboard.title}
-          </h2>
+    <div className="min-h-screen flex bg-primaryBackground">
+      {isLoading && <LoadingBackdrop open={isLoading} />} {/* Indicador de carregamento */}
+      <main className="flex-1 min-h-screen p-8 overflow-y-auto">
+        <h2 className="font-semibold text-textPrimaryColor text-2xl mb-4">{t.frontOffice.dashboard.title}</h2>
 
-          <div className="flex flex-row gap-5">
-            <div
-              className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer"
-              onClick={() => handleRedirect("arrivals")}
-            >
-              <div className="flex flex-col">
-                <h3 className="text-5xl text-primary">
-                  {arrivals !== null ? arrivals : `${t.errors.loading}...`}
-                </h3>
-                <p className="text-gray-400 mt-1 uppercase">
-                  {t.frontOffice.dashboard.cardArrivals}
-                </p>
-              </div>
-            </div>
-            <div
-              className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer"
-              onClick={() => handleRedirect("inhouses")}
-            >
-              <div className="flex flex-col">
-                <h3 className="text-5xl text-primary">
-                  {inhouses !== null ? inhouses : `${t.errors.loading}...`}
-                </h3>
-                <p className="text-gray-400 mt-1 uppercase">
-                  {t.frontOffice.dashboard.cardInHouses}
-                </p>
-              </div>
-            </div>
-            <div
-              className="border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer"
-              onClick={() => handleRedirect("departures")}
-            >
-              <div className="flex flex-col">
-                <h3 className="text-5xl text-primary">
-                  {departures !== null ? departures : `${t.errors.loading}...`}
-                </h3>
-                <p className="text-gray-400 mt-1 uppercase">
-                  {t.frontOffice.dashboard.cardDepartures}
-                </p>
-              </div>
+        <div className="flex flex-row gap-5">
+          <div
+            className={`border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer ${
+              isLoading ? "cursor-not-allowed opacity-50" : ""
+            }`}
+            onClick={() => !isLoading && handleRedirect("arrivals")}
+          >
+            <div className="flex flex-col">
+              <h3 className="text-5xl text-primary">
+                {arrivals !== null ? arrivals : `${t.errors.loading}...`}
+              </h3>
+              <p className="text-gray-400 mt-1 uppercase">{t.frontOffice.dashboard.cardArrivals}</p>
             </div>
           </div>
-        </main>
-      </div>
-    </>
+          <div
+            className={`border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer ${
+              isLoading ? "cursor-not-allowed opacity-50" : ""
+            }`}
+            onClick={() => !isLoading && handleRedirect("inhouses")}
+          >
+            <div className="flex flex-col">
+              <h3 className="text-5xl text-primary">
+                {inhouses !== null ? inhouses : `${t.errors.loading}...`}
+              </h3>
+              <p className="text-gray-400 mt-1 uppercase">{t.frontOffice.dashboard.cardInHouses}</p>
+            </div>
+          </div>
+          <div
+            className={`border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer ${
+              isLoading ? "cursor-not-allowed opacity-50" : ""
+            }`}
+            onClick={() => !isLoading && handleRedirect("departures")}
+          >
+            <div className="flex flex-col">
+              <h3 className="text-5xl text-primary">
+                {departures !== null ? departures : `${t.errors.loading}...`}
+              </h3>
+              <p className="text-gray-400 mt-1 uppercase">{t.frontOffice.dashboard.cardDepartures}</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
   );
 };
 
