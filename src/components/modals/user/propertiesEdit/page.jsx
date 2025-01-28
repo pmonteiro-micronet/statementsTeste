@@ -28,21 +28,31 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
     const [isEditing, setIsEditing] = useState(false); // Novo estado para controlar se estamos no modo de edição
 
     const handleSave = async () => {
-        // Verifica se algum campo foi alterado antes de fazer a requisição
         if (!propertyName || !propertyTag || !propertyServer) {
             setError("Please fill in all fields.");
             return;
         }
-
+    
         try {
             setLoading(true);
-            // Envia a requisição PUT para atualizar a propriedade
+            
+            // Converta campos para inteiros, se necessário
+            const formattedMpehotel = parseInt(mpehotel, 10);
+            const formattedPropertyPort = parseInt(propertyPort, 10);
+    
+            if (isNaN(formattedMpehotel) || isNaN(formattedPropertyPort)) {
+                setError("mpehotel and propertyPort must be valid numbers.");
+                setLoading(false);
+                return;
+            }
+    
+            // Envia a requisição PATCH
             const response = await axios.patch(`/api/properties/${hotel.propertyID}`, {
                 propertyName,
                 propertyTag,
                 propertyServer,
-                propertyPort,
-                mpehotel,
+                propertyPort: formattedPropertyPort,
+                mpehotel: formattedMpehotel,
                 hotelName,
                 hotelMiniTerms,
                 hotelPhone,
@@ -52,12 +62,12 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                 hotelRNET,
                 hotelNIF,
                 passeIni,
-                pdfFilePath
+                pdfFilePath,
             });
-
+    
             if (response.status === 200) {
-                setIsEditing(false); // Desativa o modo de edição após salvar
-                onClose(); // Fecha o modal
+                setIsEditing(false);
+                onClose();
             }
         } catch (error) {
             console.error("Error updating property:", error);
@@ -65,7 +75,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
         } finally {
             setLoading(false);
         }
-    };
+    };    
 
     const [selectedImage, setSelectedImage] = useState(null);
     const [imageUrl, setImageUrl] = useState(hotel.imageUrl); // Estado para armazenar a URL da imagem
