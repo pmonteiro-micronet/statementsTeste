@@ -7,7 +7,7 @@ import {
     ModalBody,
     Button,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { MdClose } from "react-icons/md";
 
 const CreateUserModal = ({

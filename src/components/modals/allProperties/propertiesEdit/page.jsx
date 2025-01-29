@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import axios from "axios";
-import { Tabs, Tab } from "@nextui-org/react";
+import { Tabs, Tab } from "@heroui/react";
 
 const PropertiesEditForm = ({
     hotel,
@@ -257,7 +257,7 @@ const PropertiesEditForm = ({
                                                 </div>
                                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"Passe Ini:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{"Ini Path:"}</label>
                                                         <input
                                                             type="text"
                                                             value={passeIni}

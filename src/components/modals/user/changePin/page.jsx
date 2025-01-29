@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, Button, useDisclosure } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, Button, useDisclosure } from "@heroui/react";
 import axios from "axios";
 import { MdClose } from "react-icons/md";
 

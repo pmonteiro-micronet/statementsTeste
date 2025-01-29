@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
-import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "@nextui-org/react";
+import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "@heroui/react";
 
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
@@ -327,7 +327,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   };
 
   return (
-    <main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
+    (<main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       {isLoading && <LoadingBackdrop open={isLoading} />}
       <div className="flex-grow overflow-y-auto p-4">
         <div className="flex justify-between items-center w-full">
@@ -351,7 +351,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
         <div className="mt-5">
           {isLoading ? (
-            <LoadingBackdrop open={isLoading} /> // Exibe o carregamento enquanto os dados estão sendo carregados
+            (<LoadingBackdrop open={isLoading} />) // Exibe o carregamento enquanto os dados estão sendo carregados
           ) : reservas.length > 0 ? (
             <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
               <thead>
@@ -446,7 +446,6 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
         </div>
 
       </div>
-
       {/* Fixed Pagination Section */}
       <div className="sticky bottom-0 w-full bg-white p-0 m-0 pagination-container">
         <PaginationTable
@@ -467,14 +466,14 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
           }))}
         />
       </div>
-       {/** Modal de erro */}
-       {isErrorModalOpen && errorMessage && (
-        <ErrorRegistrationForm
-          modalHeader={t.frontOffice.arrivals.attention}
-          errorMessage={errorMessage}
-          onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
-        />
-      )}
-    </main>
+      {/** Modal de erro */}
+      {isErrorModalOpen && errorMessage && (
+       <ErrorRegistrationForm
+         modalHeader={t.frontOffice.arrivals.attention}
+         errorMessage={errorMessage}
+         onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
+       />
+     )}
+    </main>)
   );
 }
