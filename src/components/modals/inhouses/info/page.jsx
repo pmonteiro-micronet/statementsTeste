@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 //imports de icons
 import { MdClose } from "react-icons/md";
-import { Tabs, Tab } from "@nextui-org/react";
+import { Tabs, Tab } from "@heroui/react";
 
 const InHousesInfoForm = ({
     modalHeader,

@@ -7,9 +7,9 @@ import {
     ModalBody,
     Button,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { MdClose } from "react-icons/md";
-import { Tabs, Tab } from "@nextui-org/react";
+import { Tabs, Tab } from "@heroui/react";
 
 const CreatePropertyModal = ({
     buttonName,

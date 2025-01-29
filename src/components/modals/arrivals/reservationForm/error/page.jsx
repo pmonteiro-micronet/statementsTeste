@@ -1,6 +1,6 @@
 "use client"
 import React from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 
 const ErrorRegistrationForm = ({

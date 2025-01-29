@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 // import { usePathname } from 'next/navigation';
-import { Pagination } from "@nextui-org/react";
+import { Pagination } from "@heroui/react";
 import { useEffect, useState } from "react";
 import en from "../../../../public/locales/english/common.json";
 import pt from "../../../../public/locales/portuguesPortugal/common.json";

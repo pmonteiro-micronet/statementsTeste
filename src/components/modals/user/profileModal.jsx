@@ -8,7 +8,7 @@ import {
     Button,
     useDisclosure,
     Switch,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import { useSession } from "next-auth/react";
 import axios from "axios";
