@@ -49,7 +49,14 @@ const SignIn = () => {
     if (result?.error) {
       setError(result.error);
     } else {
-      window.location.href = `/homepage/frontOfficeView/${selectedHotelID}`; // Força a atualização completa da página
+      // Após o login bem-sucedido, verifica o ID do hotel
+      if (selectedHotelID) {
+        // Se o Hotel ID estiver disponível, redireciona para a página do hotel
+        router.push(`/homepage/frontOfficeView/${selectedHotelID}`);
+      } else {
+        // Caso contrário, redireciona para a página inicial
+        router.push("/homepage/statements");
+      }
     }
   };
 

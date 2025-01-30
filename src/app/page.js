@@ -1,4 +1,3 @@
-// src/app/page.js
 'use client';
 
 import { redirect } from "next/navigation";
@@ -23,14 +22,14 @@ export default function Home() {
     }
   }, [session]); // Dependência para executar a lógica quando a sessão for carregada
 
-  // Redireciona para a página do hotel com o ID selecionado
+  // Redireciona para a página do hotel com o ID selecionado ou para /homepage se não houver ID
   useEffect(() => {
     if (selectedHotelID) {
       redirect(`/homepage/frontOfficeView/${selectedHotelID}`);
+    } else {
+      redirect("/homepage");
     }
   }, [selectedHotelID]); // Executa o redirecionamento quando o selectedHotelID mudar
 
-  // Redireciona para a página desejada
-  redirect(`/homepage/frontOfficeView/${selectedHotelID}`);
-
+  return null; // Componente não precisa renderizar nada aqui
 }
