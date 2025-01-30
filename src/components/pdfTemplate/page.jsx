@@ -29,7 +29,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     };
 
     // Monta o caminho da imagem com base no propertyID
-    const logoPath = `/uploads/${reserva.PropertyID}.png`;
+    const logoPath = `/logos/${reserva.PropertyID}.png`;
     const logoBase64 = await loadImageAsBase64(logoPath);
 
     // Tamanho da página (A4 padrão)
