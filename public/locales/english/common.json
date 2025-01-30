@@ -125,6 +125,7 @@
             "resNo": "Res. No.",
             "info": "Info",
             "statement": "Statement",
+            "room": "Room",
             "noReservations": "No reservations found."
         },
         "registrationForm": {

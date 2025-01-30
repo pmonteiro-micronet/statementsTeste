@@ -14,6 +14,8 @@ import axios from "axios";
 import { FaPencilAlt, FaSave } from 'react-icons/fa';
 import PropertiesEditForm from "@/components/modals/user/propertiesEdit/page";
 import ChangePIN from "@/components/modals/user/changePin/page";
+import { FaPlus } from "react-icons/fa";
+import UserPropertiesModal from "@/components/modals/user/allProfiles/userProperties/page";
 
 const ProfileModalEditForm = ({
     modalHeader,
@@ -289,28 +291,28 @@ const ProfileModalEditForm = ({
                                                         <div>
                                                             <label className="block text-sm font-medium text-gray-400">{`Expiration Date:`}</label>
                                                             <div className="flex flex-row gap-2 items-center">
-                                                            <input
-                                                                type="text"
-                                                                value={newExpirationDate}
-                                                                onChange={handleExpirationDateChange}  // Atualiza o valor enquanto edita
-                                                                readOnly={!isEditingExpDate}  // Se não estiver editando, o campo é somente leitura
-                                                                className={`w-full border border-gray-300 rounded-md px-2 py-1 ${isEditingExpDate ? 'bg-white' : 'bg-tableFooter text-gray-400'} focus:outline-none`}
-                                                            />
-                                                            {/* Exibição do ícone de lápis ou disquete dependendo do estado de edição */}
-                                                            {isEditingExpDate ? (
-                                                                <FaSave
-                                                                    className={`cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`}
-                                                                    onClick={handleSaveExpirationDate}  // Salva os dados ao clicar no ícone de disquete
-                                                                    style={{ pointerEvents: isAdmin ? "auto" : "none" }}
+                                                                <input
+                                                                    type="text"
+                                                                    value={newExpirationDate}
+                                                                    onChange={handleExpirationDateChange}  // Atualiza o valor enquanto edita
+                                                                    readOnly={!isEditingExpDate}  // Se não estiver editando, o campo é somente leitura
+                                                                    className={`w-full border border-gray-300 rounded-md px-2 py-1 ${isEditingExpDate ? 'bg-white' : 'bg-tableFooter text-gray-400'} focus:outline-none`}
                                                                 />
-                                                            ) : (
-                                                                <FaPencilAlt
-                                                                    className={`cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`}
-                                                                    onClick={handleEditExpirationDateClick}  // Ativa a edição ao clicar no ícone de lápis
-                                                                    style={{ pointerEvents: isAdmin ? "auto" : "none" }}
-                                                                />
-                                                            )}
-                                                        </div>
+                                                                {/* Exibição do ícone de lápis ou disquete dependendo do estado de edição */}
+                                                                {isEditingExpDate ? (
+                                                                    <FaSave
+                                                                        className={`cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`}
+                                                                        onClick={handleSaveExpirationDate}  // Salva os dados ao clicar no ícone de disquete
+                                                                        style={{ pointerEvents: isAdmin ? "auto" : "none" }}
+                                                                    />
+                                                                ) : (
+                                                                    <FaPencilAlt
+                                                                        className={`cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`}
+                                                                        onClick={handleEditExpirationDateClick}  // Ativa a edição ao clicar no ícone de lápis
+                                                                        style={{ pointerEvents: isAdmin ? "auto" : "none" }}
+                                                                    />
+                                                                )}
+                                                            </div>
                                                             {error && <p className="text-red-500 text-sm">{error}</p>}
                                                         </div>
 
@@ -401,6 +403,19 @@ const ProfileModalEditForm = ({
                                                 )}
                                                 {activeKey === "properties" && (
                                                     <div>
+                                                        <div className="flex justify-end">
+                                                        <div className="flex flex-row justify-center -mt-4">
+                                                            <UserPropertiesModal 
+                                                            buttonIcon={<FaPlus
+                                                                className={`cursor-pointer ${isAdmin ? "text-white" : "text-gray-400"}`}
+                                                                style={{ pointerEvents: isAdmin ? "auto" : "none" }}
+                                                            />}
+                                                            formTypeModal={11}
+                                                            modalHeader={"Add user to property"}
+                                                            userID={userID}
+                                                            />
+                                                        </div>
+                                                        </div>
                                                         {hotels.length > 0 ? (
                                                             hotels.map((hotel) => (
                                                                 <div

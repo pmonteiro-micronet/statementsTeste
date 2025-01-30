@@ -27,7 +27,7 @@ const translations = { en, pt, es };
 
 export default function Page({ params }) {
   const [locale, setLocale] = useState("pt");
-  
+
   useEffect(() => {
     // Carregar o idioma do localStorage
     const storedLanguage = localStorage.getItem("language");
@@ -144,18 +144,18 @@ export default function Page({ params }) {
 
     } catch (error) {
       console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
-  
+
       if (error.response) {
         if (error.response.status === 409) {
           // O status 409 indica que já existe um registro com a mesma uniqueKey
           console.warn("Registro já existente, buscando o requestID do registro existente.");
-  
+
           // Extraia o requestID do erro, caso a API o forneça
           const existingRequestID = error.response.data?.existingRequestID;
-  
+
           if (existingRequestID) {
             console.log("Registro existente encontrado com requestID:", existingRequestID);
-  
+
             // Redireciona para a página jsonView com o requestID do registro existente
             router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
           } else {
@@ -180,16 +180,18 @@ export default function Page({ params }) {
     }
   };
 
+  const [selectedReserva, setSelectedReserva] = useState(null);
 
-
-  const handleOpenModal = () => {
+  const handleOpenModal = (reserva) => {
+    setSelectedReserva(reserva); // Armazena os dados da reserva clicada
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setSelectedReserva(null); // Limpa os dados ao fechar a modal
+    window.location.reload(); // Recarrega a página
   };
-
 
   // Função para pegar as reservas
   useEffect(() => {
@@ -356,100 +358,100 @@ export default function Page({ params }) {
         </div>
 
         <div className="mt-5">
-        {isLoading ? (
+          {isLoading ? (
             (<LoadingBackdrop open={isLoading} />) // Exibe o carregamento enquanto os dados estão sendo carregados
           ) : reservas.length > 0 ? (
-                <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
-                  <thead>
-                    <tr className="bg-primary text-white h-12">
-                      <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.room}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.lastName}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.firstName}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.travelAgency}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.company}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.group}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.notes}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.resNo}</td>
-                      <td className="pl-2 uppercase">{t.frontOffice.departures.departure}</td>
+            <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
+              <thead>
+                <tr className="bg-primary text-white h-12">
+                  <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.room}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.lastName}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.firstName}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.travelAgency}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.company}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.group}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.notes}</td>
+                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.resNo}</td>
+                  <td className="pl-2 uppercase">{t.frontOffice.departures.departure}</td>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((reserva, index) => {
+                  // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
+                  return (
+                    <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
+                      <td className="pl-1 flex items-start border-r border-[#e6e6e6] relative z-10">
+                        <Dropdown>
+                          <DropdownTrigger>
+                            <Button
+                              variant="light"
+                              className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
+                            >
+                              <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu
+                            aria-label="Static Actions"
+                            closeOnSelect={true}
+                            isOpen={true}
+                            className="relative z-10 text-textPrimaryColor"
+                          >
+                            <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
+                              {t.frontOffice.departures.info}
+                            </DropdownItem>
+                            <DropdownItem
+                              key="show"
+                              onClick={() => {
+                                if (reserva.ResNo) {
+                                  sendResToAPI(reserva.ResNo);
+                                } else {
+                                  console.warn("ReservationNumber não encontrado.");
+                                }
+                              }}
+                            >
+                              {t.frontOffice.departures.statement}
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                        <DepartureInfoForm
+                          buttonName={"Info"}
+                          buttonColor={"transparent"}
+                          modalHeader={"Reservation"}
+                          formTypeModal={11}
+                          roomNumber={selectedReserva?.Room}  // Passando o roomNumber
+                          dateCO={selectedReserva?.DateCO}  // Passando a data de check-out (dateCO)
+                          booker={selectedReserva?.Booker}
+                          salutation={selectedReserva?.Salutation}
+                          lastName={selectedReserva?.LastName}
+                          firstName={selectedReserva?.FirstName}
+                          roomType={selectedReserva?.RoomType}
+                          resStatus={selectedReserva?.ResStatus}
+                          totalPax={selectedReserva?.TotalPax}
+                          balance={selectedReserva?.Balance}
+                          country={selectedReserva?.Country}
+                          isBackdropVisible={true}
+                          isOpen={isModalOpen}
+                          onClose={handleCloseModal}
+                        />
+                      </td>
+                      <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.Room}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-64 max-w-xs truncate">{reserva.Notes}</td>
+                      <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
+                      <td className="text-right pr-2 whitespace-nowrap">{reserva.DateCO}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {items.map((reserva, index) => {
-                      // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
-                      return (
-                        <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
-                          <td className="pl-1 flex items-start border-r border-[#e6e6e6] relative z-10">
-                            <Dropdown>
-                              <DropdownTrigger>
-                                <Button
-                                  variant="light"
-                                  className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
-                                >
-                                  <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
-                                </Button>
-                              </DropdownTrigger>
-                              <DropdownMenu
-                                aria-label="Static Actions"
-                                closeOnSelect={true}
-                                isOpen={true}
-                                className="relative z-10 text-textPrimaryColor"
-                              >
-                                <DropdownItem key="edit" onClick={() => handleOpenModal()}>
-                                  {t.frontOffice.departures.info}
-                                </DropdownItem>
-                                <DropdownItem
-                                  key="show"
-                                  onClick={() => {
-                                    if (reserva.ResNo) {
-                                      sendResToAPI(reserva.ResNo);
-                                    } else {
-                                      console.warn("ReservationNumber não encontrado.");
-                                    }
-                                  }}
-                                >
-                                  {t.frontOffice.departures.statement}
-                                </DropdownItem>
-                              </DropdownMenu>
-                            </Dropdown>
-                            <DepartureInfoForm
-                              buttonName={"Info"}
-                              buttonColor={"transparent"}
-                              modalHeader={"Reservation"}
-                              formTypeModal={11}
-                              roomNumber={reserva.Room}  // Passando o roomNumber
-                              dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
-                              booker={reserva.Booker}
-                              salutation={reserva.Salutation}
-                              lastName={reserva.LastName}
-                              firstName={reserva.FirstName}
-                              roomType={reserva.RoomType}
-                              resStatus={reserva.ResStatus}
-                              totalPax={reserva.TotalPax}
-                              balance={reserva.Balance}
-                              country={reserva.Country}
-                              isBackdropVisible={true}
-                              isOpen={isModalOpen}
-                              onClose={handleCloseModal}
-                            />
-                          </td>
-                          <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.Room}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
-                          <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-64 max-w-xs truncate">{reserva.Notes}</td>
-                          <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
-                          <td className="text-right pr-2 whitespace-nowrap">{reserva.DateCO}</td>
-                        </tr>
-                       );
-                      })}
-                  </tbody>
-                </table>
-                  ) : (
-                    <p className="text-textLabelColor">{t.frontOffice.departures.noReservations}</p>
-                  )}
+                  );
+                })}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-textLabelColor">{t.frontOffice.departures.noReservations}</p>
+          )}
         </div>
 
       </div>

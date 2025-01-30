@@ -17,7 +17,7 @@ model properties {
   propertyConnectionString String?           @db.VarChar(2048)
   mpehotel                 Int?
   hotelName                String?           @db.VarChar(255)
-  hotelMiniTerms           String?           @db.VarChar(2048)
+  hotelTermsEN             String?           @db.VarChar(2048)
   hotelPhone               String?           @db.VarChar(20)
   hotelEmail               String?           @db.VarChar(255)
   hotelAddress             String?           @db.VarChar(255)
@@ -26,6 +26,8 @@ model properties {
   hotelNIF                 String?           @db.VarChar(50)
   passeIni                 String?           @db.VarChar(255)
   pdfFilePath              String?           @db.VarChar(255)
+  hotelTermsPT             String?           @db.VarChar(2048)
+  hotelTermsES             String?           @db.VarChar(2048)
   usersProperties          usersProperties[]
 }
 

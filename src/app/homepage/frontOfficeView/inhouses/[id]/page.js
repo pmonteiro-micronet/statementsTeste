@@ -45,7 +45,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
 
   const [locale, setLocale] = useState("pt");
-  
+
   useEffect(() => {
     // Carregar o idioma do localStorage
     const storedLanguage = localStorage.getItem("language");
@@ -66,22 +66,22 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const sendDataToAPI = async () => {
     try {
       setIsLoading(true); // Inicia o carregamento
-  
+
       // Faz a requisição GET à API de properties com o propertyID passado
       const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
-  
+
       // Verifica se a resposta contém o 'mpehotel' e executa o que for necessário
       if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
         const mpehotel = propertyResponse.data.response[0].mpehotel;
         console.log('Mpehotel encontrado:', mpehotel);
-  
+
         await axios.get("/api/reservations/inHouses/reservations_4_tat", {
           params: {
             mpehotel,
             propertyID
           },
         });
-  
+
         setPostSuccessful(true);
       } else {
         console.error('Mpehotel não encontrado para o propertyID:', propertyID);
@@ -103,7 +103,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
       setIsLoading(false);
     }
   };
-  
+
 
   // Chama a função sendDataToAPI ao carregar a página
   useEffect(() => {
@@ -113,7 +113,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const sendResToAPI = async (ResNo) => {
     console.log("Enviando ResNumber para a API:", ResNo);
     const windowValue = 0;
-  
+
     try {
       // Faz a requisição para enviar os dados do statement
       const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
@@ -123,37 +123,37 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
           propertyID,
         },
       });
-  
+
       console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
       console.log("Resposta da API ao salvar statement:", saveResponse.data);
-  
+
       // Se a resposta de salvar o statement foi bem-sucedida, agora verificamos
       // se o statement foi atualizado ou criado, e pegamos o requestID
       if (saveResponse.data && saveResponse.data.data && saveResponse.data.data.requestID) {
         const updatedRecord = saveResponse.data.data;
         const updatedRequestID = updatedRecord.requestID;
-  
+
         // Redireciona para a página jsonView com o requestID do registro atualizado
         console.log("Statement atualizado com requestID:", updatedRequestID);
         router.push(`/homepage/jsonView?recordID=${updatedRequestID}&propertyID=${propertyID}`);
       } else {
         console.warn("Resposta da API não contém requestID.");
       }
-  
+
     } catch (error) {
       console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
-  
+
       if (error.response) {
         if (error.response.status === 409) {
           // O status 409 indica que já existe um registro com a mesma uniqueKey
           console.warn("Registro já existente, buscando o requestID do registro existente.");
-  
+
           // Extraia o requestID do erro, caso a API o forneça
           const existingRequestID = error.response.data?.existingRequestID;
-  
+
           if (existingRequestID) {
             console.log("Registro existente encontrado com requestID:", existingRequestID);
-  
+
             // Redireciona para a página jsonView com o requestID do registro existente
             router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
           } else {
@@ -177,14 +177,18 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
       }
     }
   };
-  
 
-  const handleOpenModal = () => {
+  const [selectedReserva, setSelectedReserva] = useState(null);
+
+  const handleOpenModal = (reserva) => {
+    setSelectedReserva(reserva); // Armazena os dados da reserva clicada
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setSelectedReserva(null); // Limpa os dados ao fechar a modal
+    window.location.reload(); // Recarrega a página
   };
 
   // Função para pegar as reservas
@@ -388,8 +392,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                             isOpen={true}
                             className="relative z-10 text-textPrimaryColor"
                           >
-                            <DropdownItem key="edit" onClick={() => handleOpenModal()}>
-                            {t.frontOffice.inHouses.info}
+                            <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
+                              {t.frontOffice.inHouses.info}
                             </DropdownItem>
                             <DropdownItem
                               key="show"
@@ -411,21 +415,22 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                           buttonColor={"transparent"}
                           modalHeader={"Reservation"}
                           formTypeModal={11}
-                          roomNumber={reserva.Room}  // Passando o roomNumber
-                          dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
-                          booker={reserva.Booker}
-                          salutation={reserva.Salutation}
-                          lastName={reserva.LastName}
-                          firstName={reserva.FirstName}
-                          roomType={reserva.RoomType}
-                          resStatus={reserva.ResStatus}
-                          totalPax={reserva.TotalPax}
-                          balance={reserva.Balance}
-                          country={reserva.Country}
+                          roomNumber={selectedReserva?.Room}
+                          dateCI={selectedReserva?.DateCI}
+                          booker={selectedReserva?.Booker}
+                          salutation={selectedReserva?.Salutation}
+                          lastName={selectedReserva?.LastName}
+                          firstName={selectedReserva?.FirstName}
+                          roomType={selectedReserva?.RoomType}
+                          resStatus={selectedReserva?.ResStatus}
+                          totalPax={selectedReserva?.TotalPax}
+                          balance={selectedReserva?.Balance}
+                          country={selectedReserva?.Country}
                           isBackdropVisible={true}
                           isOpen={isModalOpen}
                           onClose={handleCloseModal}
                         />
+
                       </td>
                       <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCI}</td>
                       <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCO}</td>
@@ -468,12 +473,12 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
       </div>
       {/** Modal de erro */}
       {isErrorModalOpen && errorMessage && (
-       <ErrorRegistrationForm
-         modalHeader={t.frontOffice.arrivals.attention}
-         errorMessage={errorMessage}
-         onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
-       />
-     )}
+        <ErrorRegistrationForm
+          modalHeader={t.frontOffice.arrivals.attention}
+          errorMessage={errorMessage}
+          onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
+        />
+      )}
     </main>)
   );
 }
