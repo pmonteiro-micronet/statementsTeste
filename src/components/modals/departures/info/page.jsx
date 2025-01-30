@@ -19,7 +19,8 @@ const DepartureInfoForm = ({
     firstName,
     roomType,
     resStatus,
-    totalPax,
+    childs,
+    adults,
     balance,
     country,
     isOpen,
@@ -76,8 +77,12 @@ const DepartureInfoForm = ({
                                                             <p>{dateCO}</p>
                                                         </div>
                                                         <div className="flex justify-between text-textPrimaryColor">
-                                                            <p><strong>Pax</strong></p>
-                                                            <p>{totalPax}</p>
+                                                            <p><strong>Adults</strong></p>
+                                                            <p>{adults}</p>
+                                                        </div>
+                                                        <div className="flex justify-between text-textPrimaryColor">
+                                                            <p><strong>Childs</strong></p>
+                                                            <p>{childs}</p>
                                                         </div>
                                                         <div className="flex justify-between text-textPrimaryColor">
                                                             <p><strong>Balance</strong></p>

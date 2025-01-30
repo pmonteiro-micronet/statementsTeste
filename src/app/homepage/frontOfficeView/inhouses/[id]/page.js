@@ -422,8 +422,9 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                           lastName={selectedReserva?.LastName}
                           firstName={selectedReserva?.FirstName}
                           roomType={selectedReserva?.RoomType}
-                          resStatus={selectedReserva?.ResStatus}
-                          totalPax={selectedReserva?.TotalPax}
+                          resStatus={selectedReserva?.resStatus}
+                          childs={selectedReserva?.Childs}
+                          adults={selectedReserva?.Adults}
                           balance={selectedReserva?.Balance}
                           country={selectedReserva?.Country}
                           isBackdropVisible={true}
