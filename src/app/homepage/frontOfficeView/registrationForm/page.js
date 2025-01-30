@@ -497,7 +497,7 @@ export default function Page() {
                         <div className='text-textPrimaryColor'>
                             <p>{t.frontOffice.registrationForm.title}</p>
                         </div>
-                        <div className="flex flex-row gap-2 items-center language-row">
+                        <div className="flex flex-row gap-8 items-center language-row">
                         <div
           className={`flag ${activeFlag === 'pt' ? 'active' : 'inactive'}`}
           onClick={() => handleLanguageChange('pt')}
@@ -513,7 +513,7 @@ export default function Page() {
           onClick={() => handleLanguageChange('es')}
         >
           <img
-            src="/flags/es.png"
+            src="/flags/sp.png"
             alt="spanish"
             className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
           />
