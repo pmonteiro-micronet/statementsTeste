@@ -102,7 +102,7 @@ const JsonViewPage = () => {
     const checkImage = async () => {
       console.log("Checking image for propertyID:", propertyID);
       const img = new Image();
-      img.src = `/uploads/${propertyID}.png`;
+      img.src = `/logos/${propertyID}.png`;
 
       img.onload = () => {
         console.log("Image exists for propertyID:", propertyID);
@@ -138,7 +138,7 @@ const JsonViewPage = () => {
           {imageExists && (
             <div className="mb-4 w-screen">
               <img
-                src={`/uploads/${propertyID}.png`}
+                src={`/logos/${propertyID}.png`}
                 alt="Property Image"
                 className="mx-auto"
               />
