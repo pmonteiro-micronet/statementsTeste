@@ -25,7 +25,7 @@ export async function PUT(req) {
   
     const { firstName, secondName, email, password, pin, expirationDate } = body;
   
-    if (!firstName || !secondName || !email || !password || !expirationDate) {
+    if (!firstName || !secondName || !email || !password) {
       console.error("Campos obrigatórios ausentes");
       return new NextResponse(
         JSON.stringify({ error: "All fields except pin are required." }),
@@ -49,18 +49,23 @@ export async function PUT(req) {
     console.log("Encriptando a senha e o PIN");
     const hashedPassword = await bcrypt.hash(password, 10);
     const hashedPin = pin ? await bcrypt.hash(pin, 10) : null;
-  
+
+    // Se não houver expirationDate, defina a data padrão como 2222-01-01
+    const defaultExpirationDate = new Date("2222-01-01"); 
+
+    const userData = {
+      firstName,
+      secondName,
+      email,
+      password: hashedPassword,
+      pin: hashedPin,
+      expirationDate: expirationDate ? new Date(expirationDate) : defaultExpirationDate, // Usa a data padrão se não fornecida
+      permissions: 0,
+    };
+
     console.log("Criando novo usuário no banco de dados");
     const newUser = await prisma.users.create({
-      data: {
-        firstName,
-        secondName,
-        email,
-        password: hashedPassword,
-        pin: hashedPin,
-        expirationDate: new Date(expirationDate),
-        permissions: 0,
-      },
+      data: userData,
     });
   
     console.log("Usuário criado com sucesso:", newUser);
@@ -78,3 +83,4 @@ export async function PUT(req) {
     );
   }
 }
+
