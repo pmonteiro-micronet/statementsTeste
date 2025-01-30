@@ -7,9 +7,9 @@ import {
     ModalBody,
     Button,
     useDisclosure,
-    Switch,
 } from "@heroui/react";
 import { MdClose } from "react-icons/md";
+import {Switch} from "@heroui/switch";
 
 const UserPropertiesModal = ({
     buttonName,
@@ -24,7 +24,7 @@ const UserPropertiesModal = ({
 }) => {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [properties, setProperties] = useState([]);
-    const [userProperties, setUserProperties] = useState(new Set());
+    const [userProperties, setUserProperties] = useState([]);
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
@@ -35,58 +35,80 @@ const UserPropertiesModal = ({
             try {
                 const response = await axios.get(`/api/properties`);
                 if (Array.isArray(response.data.response)) {
+                    // Agora inclui `propertyTag` junto com `propertyID`
                     setProperties(response.data.response);
                 } else {
-                    console.error("Estrutura de resposta inesperada da API", response.data);
+                    console.log("Estrutura de resposta inesperada da API", response.data);
                 }
             } catch (error) {
-                console.error("Erro ao buscar propriedades:", error);
+                console.log("Erro ao buscar propriedades:", error);
             }
         };
-
-        const fetchUserProperties = async () => {
-            try {
-                const response = await axios.get(`/api/userProperties/${userID}`);
-                if (Array.isArray(response.data.response)) {
-                    setUserProperties(new Set(response.data.response.map(prop => prop.propertyID)));
-                } else {
-                    console.error("Estrutura de resposta inesperada da API", response.data);
-                }
-            } catch (error) {
-                console.error("Erro ao buscar propriedades do usuário:", error);
-            }
-        };
-
+    
         if (isOpen) {
             fetchProperties();
+        }
+    }, [isOpen]); // ✅ Agora está correto
+    
+    useEffect(() => {
+        const fetchUserProperties = async () => {
+            try {
+                const response = await axios.get(`/api/user/userProperties/${userID}`);
+                console.log("Propriedades api", response);
+                if (Array.isArray(response.data.propertyIDs)) {
+                    setUserProperties(response.data.propertyIDs);
+                } else {
+                    console.log("Estrutura de resposta inesperada da API", response.data);
+                }
+            } catch (error) {
+                console.log("Erro ao buscar propriedades do usuário:", error);
+            }
+        };
+
+        if (userID) {
             fetchUserProperties();
         }
-    }, [isOpen, userID]);
+    }, [userID]);
 
-    const handleToggleProperty = async (propertyId) => {
-        const updatedUserProperties = new Set(userProperties);
-        const isCurrentlyAssigned = updatedUserProperties.has(propertyId);
-
+    const handleToggleProperty = async (propertyId, e) => {
+        e?.preventDefault(); // Evita comportamento inesperado
+    
+        // Encontrar a propertyTag correspondente à propertyId
+        const property = properties.find((prop) => prop.propertyID === propertyId);
+        const propertyTag = property ? property.propertyTag : null;
+    
+        if (!propertyTag) {
+            console.log("Propriedade não encontrada ou tag ausente.");
+            return;
+        }
+    
         try {
             setLoading(true);
-
-            if (isCurrentlyAssigned) {
-                await axios.delete(`/api/userProperties`, { data: { userID, propertyId } });
-                updatedUserProperties.delete(propertyId);
+    
+            if (userProperties.includes(propertyId)) {
+                // Remover a propriedade (delete)
+                await axios.delete(`/api/user/userProperties/${userID}`, { data: { propertyID: propertyId } });
+                setUserProperties(prev => prev.filter(id => id !== propertyId));
             } else {
-                await axios.post(`/api/userProperties`, { userID, propertyId });
-                updatedUserProperties.add(propertyId);
+                // Adicionar a propriedade (post)
+                await axios.post(`/api/user/userProperties/${userID}`, { userID, propertyID: propertyId, propertyTag });
+                setUserProperties(prev => [...prev, propertyId]);
             }
-
-            setUserProperties(updatedUserProperties);
-            setSuccessMessage("Atualização realizada com sucesso!");
+    
+            setSuccessMessage("Update completed successfully!");
         } catch (error) {
-            setErrorMessage("Erro ao atualizar a propriedade.");
-            console.error("Erro ao atualizar a propriedade:", error);
+            setErrorMessage("Error updating property.");
+            console.log("Error updating property.", error);
+    
+            // Remover a mensagem de erro após 5 segundos
+            setTimeout(() => {
+                setErrorMessage("");
+            }, 5000);
         } finally {
             setLoading(false);
         }
-    };
+    };     
+    
 
     return (
         <>
@@ -137,9 +159,10 @@ const UserPropertiesModal = ({
                                             <div key={property.propertyID} className="flex justify-between items-center p-2 border-b">
                                                 <span>{property.propertyName}</span>
                                                 <Switch
-                                                    checked={userProperties.has(property.id)}
-                                                    onChange={() => handleToggleProperty(property.id)}
+                                                    isSelected={userProperties.includes(property.propertyID)}
+                                                    onChange={(e) => handleToggleProperty(property.propertyID, e)}
                                                 />
+
                                             </div>
                                         ))
                                     )}
