@@ -70,6 +70,7 @@ export default function AllProfiles({ }) {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setSelectedProperty(null); // Limpa o usuário selecionado
+        window.location.reload(); // Recarrega a página
     };
 
     return (

@@ -15,7 +15,9 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
     const [passeIni, setPasseIni] = useState(hotel.passeIni || "");
 
     const [hotelName, setHotelName] = useState(hotel.hotelName || "");
-    const [hotelMiniTerms, setHotelMiniTerms] = useState(hotel.hotelMiniTerms || "");
+    const [hotelTermsEN, setHotelTermsEN] = useState(hotel.hotelTermsEN || "");
+    const [hotelTermsPT, setHotelTermsPT] = useState(hotel.hotelTermsPT || "");
+    const [hotelTermsES, setHotelTermsES] = useState(hotel.hotelTermsES || "");
     const [hotelPhone, setHotelPhone] = useState(hotel.hotelPhone || "");
     const [hotelEmail, setHotelEmail] = useState(hotel.hotelEmail || "");
     const [hotelAddress, setHotelAddress] = useState(hotel.hotelAddress || "");
@@ -54,7 +56,9 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                 propertyPort: formattedPropertyPort,
                 mpehotel: formattedMpehotel,
                 hotelName,
-                hotelMiniTerms,
+                hotelTermsEN,
+                hotelTermsPT,
+                hotelTermsES,
                 hotelPhone,
                 hotelEmail,
                 hotelAddress,
@@ -348,8 +352,8 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         {activeKey === "EN" && (
                                             <div>
                                                 <textarea
-                                                    value={hotelMiniTerms}
-                                                    onChange={(e) => setHotelMiniTerms(e.target.value)}
+                                                    value={hotelTermsEN}
+                                                    onChange={(e) => setHotelTermsEN(e.target.value)}
                                                     className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                     disabled={!isEditing} // Desabilita o campo quando não está em edição
                                                 />
@@ -358,8 +362,8 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         {activeKey === "PT" && (
                                             <div>
                                                 <textarea
-                                                    value={hotelMiniTerms}
-                                                    onChange={(e) => setHotelMiniTerms(e.target.value)}
+                                                    value={hotelTermsPT}
+                                                    onChange={(e) => setHotelTermsPT(e.target.value)}
                                                     className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                     disabled={!isEditing} // Desabilita o campo quando não está em edição
                                                 />
@@ -368,8 +372,8 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         {activeKey === "ES" && (
                                             <div>
                                                 <textarea
-                                                    value={hotelMiniTerms}
-                                                    onChange={(e) => setHotelMiniTerms(e.target.value)}
+                                                    value={hotelTermsES}
+                                                    onChange={(e) => setHotelTermsES(e.target.value)}
                                                     className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                     disabled={!isEditing} // Desabilita o campo quando não está em edição
                                                 />

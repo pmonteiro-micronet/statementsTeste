@@ -32,7 +32,9 @@ const CreatePropertyModal = ({
     const [passeIni, setPasseIni] = useState("");
 
     const [hotelName, setHotelName] = useState("");
-    const [hotelMiniTerms, setHotelMiniTerms] = useState("");
+    const [hotelTermsEN, setHotelTermsEN] = useState("");
+    const [hotelTermsPT, setHotelTermsPT] = useState("");
+    const [hotelTermsES, setHotelTermsES] = useState("");
     const [hotelPhone, setHotelPhone] = useState("");
     const [hotelEmail, setHotelEmail] = useState("");
     const [hotelAddress, setHotelAddress] = useState("");
@@ -64,7 +66,9 @@ const CreatePropertyModal = ({
                 pdfFilePath,
                 passeIni,
                 hotelName,
-                hotelMiniTerms,
+                hotelTermsEN,
+                hotelTermsPT,
+                hotelTermsES,
                 hotelPhone,
                 hotelEmail,
                 hotelAddress,
@@ -103,7 +107,9 @@ const CreatePropertyModal = ({
         setPdfFilePath("");
         setPasseIni("");
         setHotelName("");
-        setHotelMiniTerms("");
+        setHotelTermsEN("");
+        setHotelTermsPT("");
+        setHotelTermsES("");
         setHotelPhone("");
         setHotelEmail("");
         setHotelAddress("");
@@ -158,6 +164,8 @@ const CreatePropertyModal = ({
         }
     };    
 
+    const [activeKey, setActiveKey] = useState("EN");
+    
     return (
         <>
             {formTypeModal === 11 && (
@@ -191,7 +199,10 @@ const CreatePropertyModal = ({
                                             color="transparent"
                                             variant="light"
                                             className="w-auto min-w-0 p-0 m-0 -pr-4"
-                                            onClick={() => onOpenChange(false)}
+                                            onClick={() => {
+                                                onOpenChange(false);
+                                                window.location.reload();
+                                            }}
                                         >
                                             <MdClose size={30} />
                                         </Button>
@@ -379,14 +390,63 @@ const CreatePropertyModal = ({
                                                     </div>
                                                 </div>
 
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Terms:"}</label>
-                                                    <textarea
-                                                        value={hotelMiniTerms}
-                                                        onChange={(e) => setHotelMiniTerms(e.target.value)}
-                                                        className="w-full h-32 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    />
-                                                </div>
+                                                
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Terms:"}</label>
+
+                                    <div className="mb-2">
+                                        <div className="flex flex-row justify-center bg-gray-100 w-32 h-8 rounded-xl items-center">
+                                            <div
+                                                onClick={() => setActiveKey("EN")}
+                                                className={`cursor-pointer p-1 ${activeKey === "EN" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
+                                            >
+                                                EN
+                                            </div>
+                                            <div
+                                                onClick={() => setActiveKey("PT")}
+                                                className={`cursor-pointer p-1 ${activeKey === "PT" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
+                                            >
+                                                PT
+                                            </div>
+                                            <div
+                                                onClick={() => setActiveKey("ES")}
+                                                className={`cursor-pointer p-1 ${activeKey === "ES" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
+                                            >
+                                                ES
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        {activeKey === "EN" && (
+                                            <div>
+                                                <textarea
+                                                    value={hotelTermsEN}
+                                                    onChange={(e) => setHotelTermsEN(e.target.value)}
+                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                />
+                                            </div>
+                                        )}
+                                        {activeKey === "PT" && (
+                                            <div>
+                                                <textarea
+                                                    value={hotelTermsPT}
+                                                    onChange={(e) => setHotelTermsPT(e.target.value)}
+                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                />
+                                            </div>
+                                        )}
+                                        {activeKey === "ES" && (
+                                            <div>
+                                                <textarea
+                                                    value={hotelTermsES}
+                                                    onChange={(e) => setHotelTermsES(e.target.value)}
+                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                                             </div>
                                         </Tab>
                                     </Tabs>
