@@ -80,10 +80,6 @@ const CreatePropertyModal = ({
             if (propertyResponse.status === 201) {
                 setSuccessMessage("Properties updated successfully.");
     
-                // Opcional: Mostrar mensagem para o usuário caso a imagem não tenha sido enviada
-                if (!imageUrl) {
-                    setErrorMessage("Properties updated, but no image was uploaded. Please upload it.");
-                }
                 resetForm();
             } else {
                 setErrorMessage(`Failed to update properties. Status: ${propertyResponse.status}`);

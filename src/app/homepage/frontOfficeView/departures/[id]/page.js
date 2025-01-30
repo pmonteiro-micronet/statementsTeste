@@ -426,9 +426,10 @@ export default function Page({ params }) {
                           lastName={selectedReserva?.LastName}
                           firstName={selectedReserva?.FirstName}
                           roomType={selectedReserva?.RoomType}
-                          resStatus={selectedReserva?.ResStatus}
-                          totalPax={selectedReserva?.TotalPax}
-                          balance={selectedReserva?.Balance}
+                          resStatus={selectedReserva?.resStatus}
+                          childs={selectedReserva?.Childs}
+                          adults={selectedReserva?.Adults}
+                          balance={selectedReserva?.balance}
                           country={selectedReserva?.Country}
                           isBackdropVisible={true}
                           isOpen={isModalOpen}

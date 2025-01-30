@@ -151,7 +151,6 @@ const UserPropertiesModal = ({
 
                             <ModalBody className="flex flex-col space-y-8 bg-background">
                                 <div className="flex flex-col gap-2">
-                                    <p className="font-semibold">Propriedades do Usuário:</p>
                                     {properties.length === 0 ? (
                                         <p>Nenhuma propriedade encontrada.</p>
                                     ) : (
