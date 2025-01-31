@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Modal,
     ModalContent,
@@ -10,6 +10,12 @@ import {
 } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import { Tabs, Tab } from "@heroui/react";
+
+import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
 
 const CreatePropertyModal = ({
     buttonName,
@@ -49,12 +55,25 @@ const CreatePropertyModal = ({
     const [selectedImage, setSelectedImage] = useState(null);
     const [imageUrl, setImageUrl] = useState(); // Estado para armazenar a URL da imagem
 
+    const [locale, setLocale] = useState("pt");
+
+    useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+        }
+    }, []);
+
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setSuccessMessage("");
         setErrorMessage("");
-    
+
         try {
             // Envio dos dados da propriedade
             const propertyResponse = await axios.put(`/api/properties`, {
@@ -76,10 +95,10 @@ const CreatePropertyModal = ({
                 hotelRNET,
                 hotelNIF,
             });
-    
+
             if (propertyResponse.status === 201) {
                 setSuccessMessage("Properties updated successfully.");
-    
+
                 resetForm();
             } else {
                 setErrorMessage(`Failed to update properties. Status: ${propertyResponse.status}`);
@@ -92,8 +111,8 @@ const CreatePropertyModal = ({
         } finally {
             setLoading(false);
         }
-    };    
-       
+    };
+
     const resetForm = () => {
         setPropertyName("");
         setPropertyTag("");
@@ -135,18 +154,18 @@ const CreatePropertyModal = ({
             setError("Please select an image to upload.");
             return;
         }
-    
+
         const formData = new FormData();
         formData.append("file", selectedImage);
         formData.append("hotelId", hotel.propertyID);
         formData.append("existingImage", imageUrl); // Passa a URL da imagem antiga
-    
+
         try {
             setLoading(true);
             const response = await axios.post("/api/upload-image", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-    
+
             if (response.status === 200) {
                 setImageUrl(response.data.imageUrl); // Atualiza a URL com a nova imagem no Cloudinary
                 setSelectedImage(null);
@@ -157,10 +176,10 @@ const CreatePropertyModal = ({
         } finally {
             setLoading(false);
         }
-    };    
+    };
 
     const [activeKey, setActiveKey] = useState("EN");
-    
+
     return (
         <>
             {formTypeModal === 11 && (
@@ -204,11 +223,11 @@ const CreatePropertyModal = ({
                                     </div>
                                 </ModalHeader>
                                 <ModalBody className="flex flex-col space-y-8 bg-background">
-                                <Tabs aria-label="Options" className="flex justify-center">
-                                        <Tab key="propertyDetails" title="Property Details">
+                                    <Tabs aria-label="Options" className="flex justify-center">
+                                        <Tab key="propertyDetails" title={t.modals.createProperty.propertyDetails}>
                                             <div className="-mt-4 flex flex-col gap-2">
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-400">{"Property Name:"}</label>
+                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.propertyName}</label>
                                                     <input
                                                         type="text"
                                                         value={propertyName}
@@ -218,7 +237,7 @@ const CreatePropertyModal = ({
                                                 </div>
                                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"Property Tag:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.propertyTag}</label>
                                                         <input
                                                             type="text"
                                                             value={propertyTag}
@@ -227,7 +246,7 @@ const CreatePropertyModal = ({
                                                         />
                                                     </div>
                                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"MPE Hotel:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.mpeHotel}</label>
                                                         <input
                                                             type="text"
                                                             value={mpehotel}
@@ -238,7 +257,7 @@ const CreatePropertyModal = ({
                                                 </div>
                                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"Property Server:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.propertyServer}</label>
                                                         <input
                                                             type="text"
                                                             value={propertyServer}
@@ -247,7 +266,7 @@ const CreatePropertyModal = ({
                                                         />
                                                     </div>
                                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"Property Port:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.propertyPort}</label>
                                                         <input
                                                             type="text"
                                                             value={propertyPort}
@@ -258,7 +277,7 @@ const CreatePropertyModal = ({
                                                 </div>
                                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"Passe Ini:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.iniPath}</label>
                                                         <input
                                                             type="text"
                                                             value={passeIni}
@@ -267,7 +286,7 @@ const CreatePropertyModal = ({
                                                         />
                                                     </div>
                                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"PDF File Path:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.pdfFile}</label>
                                                         <input
                                                             type="text"
                                                             value={pdfFilePath}
@@ -277,7 +296,7 @@ const CreatePropertyModal = ({
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Image:"}</label>
+                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelImage}</label>
                                                     <div className="flex flex-col gap-2">
                                                         <input
                                                             type="file"
@@ -292,7 +311,7 @@ const CreatePropertyModal = ({
                                                         />
                                                         {selectedImage && (
                                                             <div className="flex items-center gap-2">
-                                                                <p className="text-sm text-gray-700">Selected: {selectedImage.name}</p>
+                                                                <p className="text-sm text-gray-700">{t.modals.createProperty.selected} {selectedImage.name}</p>
                                                                 <Button
                                                                     color="primary"
                                                                     onClick={handleImageUpload}
@@ -313,10 +332,10 @@ const CreatePropertyModal = ({
                                                 </div>
                                             </div>
                                         </Tab>
-                                        <Tab key="hotelDetails" title="Hotel Details">
+                                        <Tab key="hotelDetails" title={t.modals.createProperty.hotelDetails}>
                                             <div className="-mt-4 flex flex-col gap-2 ">
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Name:"}</label>
+                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelName}</label>
                                                     <input
                                                         type="text"
                                                         value={hotelName}
@@ -326,7 +345,7 @@ const CreatePropertyModal = ({
                                                 </div>
                                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                                     <div className="flex flex-col w-2/3"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"Hotel Email:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelEmail}</label>
                                                         <input
                                                             type="text"
                                                             value={hotelEmail}
@@ -335,7 +354,7 @@ const CreatePropertyModal = ({
                                                         />
                                                     </div>
                                                     <div className="flex flex-col w-1/3"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"Hotel Phone:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelPhone}</label>
                                                         <input
                                                             type="text"
                                                             value={hotelPhone}
@@ -346,7 +365,7 @@ const CreatePropertyModal = ({
                                                 </div>
                                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                                     <div className="flex flex-col w-2/3"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"Hotel Address:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelAddress}</label>
                                                         <input
                                                             type="text"
                                                             value={hotelAddress}
@@ -355,7 +374,7 @@ const CreatePropertyModal = ({
                                                         />
                                                     </div>
                                                     <div className="flex flex-col w-1/3"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"Hotel Postal-Code:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelPCode}</label>
                                                         <input
                                                             type="text"
                                                             value={hotelPostalCode}
@@ -366,7 +385,7 @@ const CreatePropertyModal = ({
                                                 </div>
                                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"Hotel RNET:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelRNET}</label>
                                                         <input
                                                             type="text"
                                                             value={hotelRNET}
@@ -375,7 +394,7 @@ const CreatePropertyModal = ({
                                                         />
                                                     </div>
                                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{"Hotel NIF:"}</label>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelNIF}</label>
                                                         <input
                                                             type="text"
                                                             value={hotelNIF}
@@ -385,63 +404,63 @@ const CreatePropertyModal = ({
                                                     </div>
                                                 </div>
 
-                                                
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Terms:"}</label>
 
-                                    <div className="mb-2">
-                                        <div className="flex flex-row justify-center bg-gray-100 w-32 h-8 rounded-xl items-center">
-                                            <div
-                                                onClick={() => setActiveKey("EN")}
-                                                className={`cursor-pointer p-1 ${activeKey === "EN" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
-                                            >
-                                                EN
-                                            </div>
-                                            <div
-                                                onClick={() => setActiveKey("PT")}
-                                                className={`cursor-pointer p-1 ${activeKey === "PT" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
-                                            >
-                                                PT
-                                            </div>
-                                            <div
-                                                onClick={() => setActiveKey("ES")}
-                                                className={`cursor-pointer p-1 ${activeKey === "ES" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
-                                            >
-                                                ES
-                                            </div>
-                                        </div>
-                                    </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelTerms}</label>
 
-                                    <div>
-                                        {activeKey === "EN" && (
-                                            <div>
-                                                <textarea
-                                                    value={hotelTermsEN}
-                                                    onChange={(e) => setHotelTermsEN(e.target.value)}
-                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                />
-                                            </div>
-                                        )}
-                                        {activeKey === "PT" && (
-                                            <div>
-                                                <textarea
-                                                    value={hotelTermsPT}
-                                                    onChange={(e) => setHotelTermsPT(e.target.value)}
-                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                />
-                                            </div>
-                                        )}
-                                        {activeKey === "ES" && (
-                                            <div>
-                                                <textarea
-                                                    value={hotelTermsES}
-                                                    onChange={(e) => setHotelTermsES(e.target.value)}
-                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                                                    <div className="mb-2">
+                                                        <div className="flex flex-row justify-center bg-gray-100 w-32 h-8 rounded-xl items-center">
+                                                            <div
+                                                                onClick={() => setActiveKey("EN")}
+                                                                className={`cursor-pointer p-1 ${activeKey === "EN" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
+                                                            >
+                                                                EN
+                                                            </div>
+                                                            <div
+                                                                onClick={() => setActiveKey("PT")}
+                                                                className={`cursor-pointer p-1 ${activeKey === "PT" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
+                                                            >
+                                                                PT
+                                                            </div>
+                                                            <div
+                                                                onClick={() => setActiveKey("ES")}
+                                                                className={`cursor-pointer p-1 ${activeKey === "ES" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
+                                                            >
+                                                                ES
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        {activeKey === "EN" && (
+                                                            <div>
+                                                                <textarea
+                                                                    value={hotelTermsEN}
+                                                                    onChange={(e) => setHotelTermsEN(e.target.value)}
+                                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        {activeKey === "PT" && (
+                                                            <div>
+                                                                <textarea
+                                                                    value={hotelTermsPT}
+                                                                    onChange={(e) => setHotelTermsPT(e.target.value)}
+                                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        {activeKey === "ES" && (
+                                                            <div>
+                                                                <textarea
+                                                                    value={hotelTermsES}
+                                                                    onChange={(e) => setHotelTermsES(e.target.value)}
+                                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </Tab>
                                     </Tabs>
@@ -459,7 +478,7 @@ const CreatePropertyModal = ({
                                         isLoading={loading}
                                         className="rounded-md"
                                     >
-                                        Submit
+                                        {t.modals.createProperty.save}
                                     </Button>
                                 </div>
                             </form>

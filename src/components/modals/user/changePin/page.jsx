@@ -1,8 +1,14 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button, useDisclosure } from "@heroui/react";
 import axios from "axios";
 import { MdClose } from "react-icons/md";
+
+import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
 
 const OkPIN = ({ buttonName, buttonIcon, modalHeader, userID }) => {
     const [activeField, setActiveField] = useState("old"); // Controla o campo ativo
@@ -12,6 +18,19 @@ const OkPIN = ({ buttonName, buttonIcon, modalHeader, userID }) => {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+    const [locale, setLocale] = useState("pt");
+
+    useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+        }
+    }, []);
+
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
     const resetForm = () => {
         setOldPin("");
@@ -94,8 +113,8 @@ const OkPIN = ({ buttonName, buttonIcon, modalHeader, userID }) => {
                             {modalHeader}
                         </div>
                         <div className="flex flex-row items-center justify-end">
-                            <Button color="transparent" variant="light" className="w-auto min-w-0 p-0 m-0 -pr-4" 
-                            onClick={() => {
+                            <Button color="transparent" variant="light" className="w-auto min-w-0 p-0 m-0 -pr-4"
+                                onClick={() => {
                                     resetForm();
                                     onOpenChange(false);
                                 }}>
@@ -105,39 +124,36 @@ const OkPIN = ({ buttonName, buttonIcon, modalHeader, userID }) => {
                     </ModalHeader>
                     <ModalBody className="px-4 py-2 flex flex-col gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-400">{`Old PIN:`}</label>
+                            <label className="block text-sm font-medium text-gray-400">{t.modals.changePin.oldPin}</label>
                             <input
                                 type="password"
                                 value={oldPin}
                                 onClick={() => setActiveField("old")}
                                 readOnly
-                                className={`w-full border rounded-md px-2 py-1 focus:outline-none text-center ${
-                                    activeField === "old" ? "border-primary ring-1 ring-primary" : "border-gray-300"
-                                }`}
+                                className={`w-full border rounded-md px-2 py-1 focus:outline-none text-center ${activeField === "old" ? "border-primary ring-1 ring-primary" : "border-gray-300"
+                                    }`}
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-400">{`New PIN:`}</label>
+                            <label className="block text-sm font-medium text-gray-400">{t.modals.changePin.newPin}</label>
                             <input
                                 type="password"
                                 value={newPin}
                                 onClick={() => setActiveField("new")}
                                 readOnly
-                                className={`w-full border rounded-md px-2 py-1 focus:outline-none text-center ${
-                                    activeField === "new" ? "border-primary ring-1 ring-primary" : "border-gray-300"
-                                }`}
+                                className={`w-full border rounded-md px-2 py-1 focus:outline-none text-center ${activeField === "new" ? "border-primary ring-1 ring-primary" : "border-gray-300"
+                                    }`}
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-400">{`Confirm New PIN:`}</label>
+                            <label className="block text-sm font-medium text-gray-400">{t.modals.changePin.confirmNewPin}</label>
                             <input
                                 type="password"
                                 value={confirmNewPin}
                                 onClick={() => setActiveField("confirm")}
                                 readOnly
-                                className={`w-full border rounded-md px-2 py-1 focus:outline-none text-center ${
-                                    activeField === "confirm" ? "border-primary ring-1 ring-primary" : "border-gray-300"
-                                }`}
+                                className={`w-full border rounded-md px-2 py-1 focus:outline-none text-center ${activeField === "confirm" ? "border-primary ring-1 ring-primary" : "border-gray-300"
+                                    }`}
                             />
                         </div>
                         <div className="grid grid-cols-3 gap-2 mt-4">
@@ -147,10 +163,10 @@ const OkPIN = ({ buttonName, buttonIcon, modalHeader, userID }) => {
                                     type="button"
                                     onClick={() => handleKeyPress(key)}
                                     className={`p-4 rounded ${key === "C"
-                                            ? "bg-gray-300 text-black"
-                                            : key === "OK"
-                                                ? "bg-primary text-white"
-                                                : "bg-lightGray text-black"
+                                        ? "bg-gray-300 text-black"
+                                        : key === "OK"
+                                            ? "bg-primary text-white"
+                                            : "bg-lightGray text-black"
                                         } text-center font-bold`}
                                 >
                                     {key}

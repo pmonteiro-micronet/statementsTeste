@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Modal,
     ModalContent,
@@ -9,6 +9,12 @@ import {
     useDisclosure,
 } from "@heroui/react";
 import { MdClose } from "react-icons/md";
+
+import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
 
 const CreateUserModal = ({
     buttonName,
@@ -31,12 +37,25 @@ const CreateUserModal = ({
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const [locale, setLocale] = useState("pt");
+
+    useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+        }
+    }, []);
+
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setSuccessMessage("");
         setErrorMessage("");
-    
+
         try {
             const response = await axios.put(`/api/user`, {
                 firstName,
@@ -46,7 +65,7 @@ const CreateUserModal = ({
                 pin,
                 expirationDate,
             });
-    
+
             if (response.status === 201) {
                 setSuccessMessage("User created successfully.");
                 resetForm();
@@ -65,7 +84,7 @@ const CreateUserModal = ({
             setLoading(false);
         }
     };
-    
+
 
     const resetForm = () => {
         setFirstName("");
@@ -119,7 +138,7 @@ const CreateUserModal = ({
                                     <div className="flex flex-col gap-2">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-400">
-                                                {`Name:`}
+                                                {t.modals.createUser.name}
                                             </label>
                                             <input
                                                 type="text"
@@ -130,7 +149,7 @@ const CreateUserModal = ({
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-400">
-                                                {`Surname:`}
+                                                {t.modals.createUser.surname}
                                             </label>
                                             <input
                                                 type="text"
@@ -141,7 +160,7 @@ const CreateUserModal = ({
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-400">
-                                                {`E-mail:`}
+                                                {t.modals.createUser.email}
                                             </label>
                                             <input
                                                 type="email"
@@ -152,7 +171,7 @@ const CreateUserModal = ({
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-400">
-                                                {`Password:`}
+                                                {t.modals.createUser.password}
                                             </label>
                                             <input
                                                 type="password"
@@ -163,7 +182,7 @@ const CreateUserModal = ({
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-400">
-                                                {`Pin:`}
+                                                {t.modals.createUser.pin}
                                             </label>
                                             <input
                                                 type="password"
@@ -174,7 +193,7 @@ const CreateUserModal = ({
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-400">
-                                                {`Expiration Date:`}
+                                                {t.modals.createUser.expirationDate}
                                             </label>
                                             <input
                                                 type="date"
@@ -198,7 +217,7 @@ const CreateUserModal = ({
                                         isLoading={loading}
                                         className="rounded-md"
                                     >
-                                        Submit
+                                        {t.modals.createUser.submit}
                                     </Button>
                                 </div>
                             </form>

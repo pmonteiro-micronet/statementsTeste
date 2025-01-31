@@ -9,7 +9,13 @@ import {
     useDisclosure,
 } from "@heroui/react";
 import { MdClose } from "react-icons/md";
-import {Switch} from "@heroui/switch";
+import { Switch } from "@heroui/switch";
+
+import en from "../../../../../../public/locales/english/common.json";
+import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
 
 const UserPropertiesModal = ({
     buttonName,
@@ -29,6 +35,19 @@ const UserPropertiesModal = ({
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
+    const [locale, setLocale] = useState("pt");
+
+    useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+        }
+    }, []);
+
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
+
     console.log(loading);
     useEffect(() => {
         const fetchProperties = async () => {
@@ -44,12 +63,12 @@ const UserPropertiesModal = ({
                 console.log("Erro ao buscar propriedades:", error);
             }
         };
-    
+
         if (isOpen) {
             fetchProperties();
         }
     }, [isOpen]); // ✅ Agora está correto
-    
+
     useEffect(() => {
         const fetchUserProperties = async () => {
             try {
@@ -72,19 +91,19 @@ const UserPropertiesModal = ({
 
     const handleToggleProperty = async (propertyId, e) => {
         e?.preventDefault(); // Evita comportamento inesperado
-    
+
         // Encontrar a propertyTag correspondente à propertyId
         const property = properties.find((prop) => prop.propertyID === propertyId);
         const propertyTag = property ? property.propertyTag : null;
-    
+
         if (!propertyTag) {
             console.log("Propriedade não encontrada ou tag ausente.");
             return;
         }
-    
+
         try {
             setLoading(true);
-    
+
             if (userProperties.includes(propertyId)) {
                 // Remover a propriedade (delete)
                 await axios.delete(`/api/user/userProperties/${userID}`, { data: { propertyID: propertyId } });
@@ -94,12 +113,12 @@ const UserPropertiesModal = ({
                 await axios.post(`/api/user/userProperties/${userID}`, { userID, propertyID: propertyId, propertyTag });
                 setUserProperties(prev => [...prev, propertyId]);
             }
-    
+
             setSuccessMessage("Update completed successfully!");
         } catch (error) {
             setErrorMessage("Error updating property.");
             console.log("Error updating property.", error);
-    
+
             // Remover a mensagem de erro após 5 segundos
             setTimeout(() => {
                 setErrorMessage("");
@@ -107,8 +126,8 @@ const UserPropertiesModal = ({
         } finally {
             setLoading(false);
         }
-    };     
-    
+    };
+
 
     return (
         <>
@@ -152,7 +171,7 @@ const UserPropertiesModal = ({
                             <ModalBody className="flex flex-col space-y-8 bg-background">
                                 <div className="flex flex-col gap-2">
                                     {properties.length === 0 ? (
-                                        <p>Nenhuma propriedade encontrada.</p>
+                                        <p>{t.modals.user.userProperties.noResults}</p>
                                     ) : (
                                         properties.map((property) => (
                                             <div key={property.propertyID} className="flex justify-between items-center p-2 border-b">
@@ -176,7 +195,7 @@ const UserPropertiesModal = ({
                                     className="rounded-md"
                                     onClick={() => onOpenChange(false)}
                                 >
-                                    Fechar
+                                    {t.modals.user.userProperties.close}
                                 </Button>
                             </div>
                         </ModalContent>

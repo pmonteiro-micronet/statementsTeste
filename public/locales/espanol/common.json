@@ -208,6 +208,124 @@
         "insertPin": "Insertar PIN",
         "noData": "No hay datos disponibles."
     },
+    "allProperties": {
+        "title": "Todas las propiedades",
+        "createPropertyHeader": "Crear propiedad",
+        "table": {
+            "search": "Buscar por ID, nombre de propiedad o etiqueta de propiedad",
+            "propertyTag": "Etiqueta de Propiedad",
+            "propertyName": "Nombre de Propiedad",
+            "info": "Info"
+        }
+    },
+    "allProfiles": {
+        "title": "Todos los perfiles",
+        "modalHeader": "Info de Usuario",
+        "createUserHeader": "Crear usuario",
+        "table": {
+            "search": "Buscar por ID, Nombre o Apellido",
+            "name": "Nombre",
+            "lastName": "Apellido",
+            "email": "Correo electrónico",
+            "info": "Info"
+        }
+    },
+    "modals": {
+        "user": {
+            "allProfiles": {
+                "tabs": {
+                    "idInfo": "ID Info",
+                    "properties": "Prop."
+                },
+                "name": "Nombre:",
+                "surname": "Apellido:",
+                "email": "Correo electrónico:",
+                "expirationDate": "Fecha de expiración:",
+                "changePassword": "Cambiar la contraseña",
+                "modalHeaderPin": "Cambiar PIN",
+                "oldPassword": "Contraseña anterior:",
+                "newPassword": "Nueva contraseña:",
+                "confirmNewPassword": "Confirmar nueva contraseña",
+                "cancel": "Cancelar",
+                "updatePassword": "Actualizar contraseña",
+                "modalHeaderProp": "Agregar usuario a la propiedad",
+                "noResults": "No se encontraron propiedades."
+            },
+            "userProperties": {
+                "noResults": "No se encontraron propiedades.",
+                "close": "Cerca"
+            }
+        },
+        "changePin": {
+            "oldPin": "PIN antiguo:",
+            "newPin": "Nuevo PIN:",
+            "confirmNewPin": "Confirmar nuevo PIN:"
+        },
+        "createUser": {
+            "name": "Nombre:",
+            "surname": "Apellido:",
+            "email": "Correo electrónico:",
+            "password": "Contraseña:",
+            "pin": "PIN::",
+            "expirationDate": "Fecha de expiración:",
+            "submit": "Ahorrar"
+        },
+        "createProperty": {
+            "propertyDetails": "Detalles de la propiedad",
+            "propertyName": "Nombre de la propiedad:",
+            "propertyTag": "Etiqueta de propiedad:",
+            "mpeHotel": "Hotel MPE:",
+            "propertyServer": "Servidor de propiedades:",
+            "propertyPort": "Puerta de propiedad:",
+            "iniPath": "Camino  Ini:",
+            "pdfFile": "Camino PDF:",
+            "hotelDetails": "Detalles del hotel",
+            "hotelName": "Nombre del hotel:",
+            "hotelEmail": "Correo electrónico del hotel:",
+            "hotelPhone": "Teléfono del hotel:",
+            "hotelAddress": "Dirección del hotel:",
+            "hotelPCode": "Código Postal del hotel:",
+            "hotelRNET": "Hotel RNET:",
+            "hotelNIF": "Hotel NIF:",
+            "hotelTerms": "Términos del hotel:",
+            "hotelImage": "Imagen del hotel:",
+            "selected": "Seleccionado:",
+            "cancel": "Cancelar",
+            "edit": "Editar",
+            "save": "Ahorrar",
+            "saving": "Ahorro..."
+
+        },
+        "propertiesEdit": {
+            "propertyDetails": "Detalles de la propiedad",
+            "hotelDetails": "Detalles del hotel",
+            "editProperty": "Editar propiedad",
+            "viewProperty": "Ver propiedad",
+            "settings": "Ajustes",
+            "propertyName": "Nombre de la propiedad:",
+            "propertyTag": "Etiqueta de propiedad:",
+            "mpeHotel": "Hotel MPE:",
+            "propertyServer": "Servidor de propiedades:",
+            "propertyPort": "Puerta de propiedad:",
+            "iniPath": "Camino  Ini:",
+            "pdfFile": "Camino PDF:",
+            "details": "Detalles",
+            "hotelName": "Nombre del hotel:",
+            "hotelEmail": "Correo electrónico del hotel:",
+            "hotelPhone": "Teléfono del hotel:",
+            "hotelAddress": "Dirección del hotel:",
+            "hotelPCode": "Código Postal del hotel:",
+            "hotelRNET": "Hotel RNET:",
+            "hotelNIF": "Hotel NIF:",
+            "hotelTerms": "Términos del hotel:",
+            "hotelImage": "Imagen del hotel:",
+            "selected": "Seleccionado:",
+            "cancel": "Cancelar",
+            "edit": "Editar",
+            "save": "Ahorrar",
+            "saving": "Ahorro..."
+        }
+    },
     "pagination": {
         "itemsPerPage": "Artículos por página"
     },

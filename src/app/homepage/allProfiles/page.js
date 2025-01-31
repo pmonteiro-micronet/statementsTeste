@@ -10,6 +10,12 @@ import { FaGear, FaPlus } from "react-icons/fa6";
 import ProfileModalEditForm from "@/components/modals/user/allProfiles/page";
 import CreateUserModal from "@/components/modals/user/createUser/page";
 
+import en from "../../../../public/locales/english/common.json";
+import pt from "../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
+
 export default function AllProfiles({ }) {
     const [users, setUsers] = useState([]); // Estado para armazenar os usuários
     const [filteredUsers, setFilteredUsers] = useState([]); // Estado para usuários filtrados
@@ -18,6 +24,19 @@ export default function AllProfiles({ }) {
     const [rowsPerPage, setRowsPerPage] = useState(25);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+
+    const [locale, setLocale] = useState("pt");
+
+    useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+        }
+    }, []);
+
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -75,12 +94,12 @@ export default function AllProfiles({ }) {
             <div className="flex-grow overflow-y-auto p-4">
                 <div className="flex justify-between items-center w-full">
                     <div className="header-container flex items-center !justify-between w-full">
-                        <h2 className="text-xl text-textPrimaryColor">All Profiles</h2>
-                        <CreateUserModal 
-                            buttonIcon={<FaPlus color="white"/>}
+                        <h2 className="text-xl text-textPrimaryColor">{t.allProfiles.title}</h2>
+                        <CreateUserModal
+                            buttonIcon={<FaPlus color="white" />}
                             buttonColor={"primary"}
                             formTypeModal={11}
-                            modalHeader={"Create User"}
+                            modalHeader={t.allProfiles.createUserHeader}
                         />
                     </div>
                 </div>
@@ -88,7 +107,7 @@ export default function AllProfiles({ }) {
                 <div className="mt-4">
                     <input
                         type="text"
-                        placeholder="Search by ID, First Name, or Last Name"
+                        placeholder={t.allProfiles.table.search}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="border border-gray-300 rounded-md px-4 py-2 w-full"
@@ -104,9 +123,9 @@ export default function AllProfiles({ }) {
                                         <FaGear size={18} color="white" />
                                     </td>
                                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">ID</td>
-                                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">Name</td>
-                                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">Last Name</td>
-                                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">Email</td>
+                                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.allProfiles.table.name}</td>
+                                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.allProfiles.table.lastName}</td>
+                                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.allProfiles.table.email}</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -131,7 +150,7 @@ export default function AllProfiles({ }) {
                                                     className="relative z-10 text-textPrimaryColor"
                                                 >
                                                     <DropdownItem key="info" onClick={() => handleOpenModal(user)}>
-                                                        Info
+                                                        {t.allProfiles.table.info}
                                                     </DropdownItem>
                                                 </DropdownMenu>
                                             </Dropdown>
@@ -169,7 +188,7 @@ export default function AllProfiles({ }) {
                 <ProfileModalEditForm
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
-                    modalHeader="User Info"
+                    modalHeader={t.allProfiles.modalHeader}
                     formTypeModal={11}
                     firstName={selectedUser.firstName}
                     secondName={selectedUser.secondName}
