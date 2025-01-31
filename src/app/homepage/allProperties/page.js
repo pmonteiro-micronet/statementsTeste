@@ -12,6 +12,12 @@ import CreatePropertyModal from "@/components/modals/allProperties/createPropert
 
 import PropertiesEditForm from "@/components/modals/allProperties/propertiesEdit/page";
 
+import en from "../../../../public/locales/english/common.json";
+import pt from "../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
+
 export default function AllProfiles({ }) {
     const [properties, setProperties] = useState([]); // Estado para armazenar os usuários
     const [filteredproperties, setFilteredproperties] = useState([]); // Estado para usuários filtrados
@@ -20,6 +26,19 @@ export default function AllProfiles({ }) {
     const [rowsPerPage, setRowsPerPage] = useState(25);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProperty, setSelectedProperty] = useState(null);
+
+    const [locale, setLocale] = useState("pt");
+
+    useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+          setLocale(storedLanguage);
+        }
+      }, []);
+    
+      // Carregar as traduções com base no idioma atual
+      const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
     useEffect(() => {
         const fetchproperties = async () => {
@@ -78,12 +97,12 @@ export default function AllProfiles({ }) {
             <div className="flex-grow overflow-y-auto p-4">
                 <div className="flex justify-between items-center w-full">
                     <div className="header-container flex items-center !justify-between w-full">
-                        <h2 className="text-xl text-textPrimaryColor">All Properties</h2>
+                        <h2 className="text-xl text-textPrimaryColor">{t.allProperties.title}</h2>
                         <CreatePropertyModal
                             buttonIcon={<FaPlus color="white" />}
                             buttonColor={"primary"}
                             formTypeModal={11}
-                            modalHeader={"Create Property"}
+                            modalHeader={t.allProperties.createPropertyHeader}
                         />
                     </div>
                 </div>
@@ -91,7 +110,7 @@ export default function AllProfiles({ }) {
                 <div className="mt-4">
                     <input
                         type="text"
-                        placeholder="Search by ID, Property Name, or Property Tag"
+                        placeholder={t.allProperties.table.search}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="border border-gray-300 rounded-md px-4 py-2 w-full"
@@ -107,8 +126,8 @@ export default function AllProfiles({ }) {
                                         <FaGear size={18} color="white" />
                                     </td>
                                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">ID</td>
-                                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">Property Tag</td>
-                                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">Property Name</td>
+                                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.allProperties.table.propertyTag}</td>
+                                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.allProperties.table.propertyName}</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -133,7 +152,7 @@ export default function AllProfiles({ }) {
                                                     className="relative z-10 text-textPrimaryColor"
                                                 >
                                                     <DropdownItem key="info" onClick={() => handleOpenModal(property)}>
-                                                        Info
+                                                        {t.allProperties.table.info}
                                                     </DropdownItem>
                                                 </DropdownMenu>
                                             </Dropdown>

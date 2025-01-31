@@ -16,6 +16,12 @@ import { FaPencilAlt } from "react-icons/fa";
 import PropertiesEditForm from "@/components/modals/user/propertiesEdit/page";
 import ChangePIN from "@/components/modals/user/changePin/page";
 
+import en from "../../../../public/locales/english/common.json";
+import pt from "../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
+
 const ProfileModalForm = ({
     buttonName,
     buttonIcon,
@@ -46,6 +52,18 @@ const ProfileModalForm = ({
     const { firstName, secondName, email, expirationDate } = user;
 
     const isAdmin = user?.permission === 1; // Verifica se o usuário é admin
+    const [locale, setLocale] = useState("pt");
+
+    useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+        }
+    }, []);
+
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
     useEffect(() => {
         const fetchHotels = async () => {
@@ -128,11 +146,11 @@ const ProfileModalForm = ({
             return acc;
         }, {});
         setLoadingMap(initialLoadingMap);
-    
+
         for (const hotel of hotels) {
             let attempts = 0;
             let success = false;
-    
+
             while (attempts < 3 && !success) {
                 try {
                     const hotelData = {
@@ -140,7 +158,7 @@ const ProfileModalForm = ({
                         propertyPort: hotel.propertyPort,
                     };
                     const response = await axios.post("/api/verifyProperty", hotelData);
-    
+
                     success = response.data.success;
                     setStatusMap((prevStatusMap) => ({
                         ...prevStatusMap,
@@ -153,27 +171,27 @@ const ProfileModalForm = ({
                         [hotel.propertyID]: false, // Marca o status como 'false' em caso de erro
                     }));
                 }
-    
+
                 attempts++;
             }
-    
+
             if (!success) {
                 setStatusMap((prevStatusMap) => ({
                     ...prevStatusMap,
                     [hotel.propertyID]: false,
                 }));
             }
-    
+
             // Marca o hotel atual como "não carregando"
             setLoadingMap((prev) => ({
                 ...prev,
                 [hotel.propertyID]: false,
             }));
-    
+
             await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 segundo de atraso
         }
     };
-    
+
     useEffect(() => {
         if (activeKey === "properties" && hotels.length > 0) {
             verifyProperties();
@@ -227,13 +245,13 @@ const ProfileModalForm = ({
                                                 onClick={() => setActiveKey("idInfo")}
                                                 className={`cursor-pointer p-2 ${activeKey === "idInfo" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
                                             >
-                                                ID Info
+                                                {t.modals.user.allProfiles.tabs.idInfo}
                                             </div>
                                             <div
                                                 onClick={() => setActiveKey("properties")}
                                                 className={`cursor-pointer p-2 ${activeKey === "properties" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
                                             >
-                                                Properties
+                                                {t.modals.user.allProfiles.tabs.properties}
                                             </div>
                                         </div>
                                     </div>
@@ -243,7 +261,7 @@ const ProfileModalForm = ({
                                         {activeKey === "idInfo" && (
                                             <div className="-mt-10 flex flex-col gap-4">
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-400">{`Name:`}</label>
+                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.user.allProfiles.name}</label>
                                                     <input
                                                         type="text"
                                                         value={firstName || ""}
@@ -252,7 +270,7 @@ const ProfileModalForm = ({
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-400">{`Surname:`}</label>
+                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.user.allProfiles.surname}</label>
                                                     <input
                                                         type="text"
                                                         value={secondName || ""}
@@ -261,7 +279,7 @@ const ProfileModalForm = ({
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-400">{`E-mail:`}</label>
+                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.user.allProfiles.email}</label>
                                                     <input
                                                         type="text"
                                                         value={email || ""}
@@ -270,7 +288,7 @@ const ProfileModalForm = ({
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-400">{`Expiration Date:`}</label>
+                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.user.allProfiles.expirationDate}</label>
                                                     <input
                                                         type="text"
                                                         value={expirationDate ? new Date(expirationDate).toLocaleDateString('en-GB') : ""}
@@ -288,14 +306,14 @@ const ProfileModalForm = ({
                                                                 setIsPasswordUpdate(true);
                                                             }}
                                                         >
-                                                            Change Password
+                                                            {t.modals.user.allProfiles.changePassword}
                                                         </button>
                                                     )}
 
                                                     <div className="">
                                                         <ChangePIN
-                                                            buttonName={"Change Pin"}
-                                                            modalHeader={"Change Pin"}
+                                                            buttonName={t.modals.user.allProfiles.modalHeaderPin}
+                                                            modalHeader={t.modals.user.allProfiles.modalHeaderPin}
                                                             userID={user.id}
                                                         />
                                                     </div>
@@ -305,7 +323,7 @@ const ProfileModalForm = ({
                                                 {showPasswordFields && (
                                                     <>
                                                         <div>
-                                                            <label className="block text-sm font-medium text-gray-400">{`Old Password:`}</label>
+                                                            <label className="block text-sm font-medium text-gray-400">{t.modals.user.allProfiles.oldPassword}</label>
                                                             <input
                                                                 type="password"
                                                                 value={oldPassword}
@@ -315,7 +333,7 @@ const ProfileModalForm = ({
                                                             />
                                                         </div>
                                                         <div>
-                                                            <label className="block text-sm font-medium text-gray-400">{`New Password:`}</label>
+                                                            <label className="block text-sm font-medium text-gray-400">{t.modals.user.allProfiles.newPassword}</label>
                                                             <input
                                                                 type="password"
                                                                 value={newPassword}
@@ -325,7 +343,7 @@ const ProfileModalForm = ({
                                                             />
                                                         </div>
                                                         <div>
-                                                            <label className="block text-sm font-medium text-gray-400">{`Confirm New Password:`}</label>
+                                                            <label className="block text-sm font-medium text-gray-400">{t.modals.user.allProfiles.confirmNewPassword}</label>
                                                             <input
                                                                 type="password"
                                                                 value={confirmNewPassword}
@@ -349,14 +367,14 @@ const ProfileModalForm = ({
                                                                     setIsPasswordUpdate(false);
                                                                 }}
                                                             >
-                                                                Cancel
+                                                                {t.modals.user.allProfiles.cancel}
                                                             </Button>
                                                             <Button
                                                                 type="submit"
                                                                 color="primary"
                                                                 className="w-32 text-xs"
                                                             >
-                                                                Update Password
+                                                                {t.modals.user.allProfiles.updatePassword}
                                                             </Button>
                                                         </div>
                                                     </>
@@ -366,44 +384,44 @@ const ProfileModalForm = ({
                                         {activeKey === "properties" && (
                                             <div>
                                                 {hotels.length > 0 ? (
-    hotels.map((hotel) => (
-        <div
-            key={hotel.propertyID}
-            className="mb-4 flex flex-col items-left"
-        >
-            <label className="block text-sm font-medium text-gray-400">
-                {hotel.propertyName}
-            </label>
-            <div className="flex items-center gap-4">
-                <input
-                    type="text"
-                    value={hotel.propertyName || ""}
-                    readOnly
-                    className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
-                />
-                {loadingMap[hotel.propertyID] ? (
-                    <div className="text-gray-400">Loading...</div>
-                ) : (
-                    <div className="flex flex-col items-center">
-                        <span className="text-xs text-gray-500">PMS Service</span>
-                        <Switch
-                            size="sm"
-                            isSelected={statusMap[hotel.propertyID]}
-                            onChange={() => console.log(`Switch ${hotel.propertyID} toggled`)}
-                        />
-                    </div>
-                )}
-                <FaPencilAlt
-                    className={`cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`}
-                    onClick={() => handleEditClick(hotel)}
-                    style={{ pointerEvents: isAdmin ? "auto" : "none" }}
-                />
-            </div>
-        </div>
-    ))
-) : (
-    <p>No properties found.</p>
-)}
+                                                    hotels.map((hotel) => (
+                                                        <div
+                                                            key={hotel.propertyID}
+                                                            className="mb-4 flex flex-col items-left"
+                                                        >
+                                                            <label className="block text-sm font-medium text-gray-400">
+                                                                {hotel.propertyName}
+                                                            </label>
+                                                            <div className="flex items-center gap-4">
+                                                                <input
+                                                                    type="text"
+                                                                    value={hotel.propertyName || ""}
+                                                                    readOnly
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
+                                                                />
+                                                                {loadingMap[hotel.propertyID] ? (
+                                                                    <div className="text-gray-400">Loading...</div>
+                                                                ) : (
+                                                                    <div className="flex flex-col items-center">
+                                                                        <span className="text-xs text-gray-500">PMS Service</span>
+                                                                        <Switch
+                                                                            size="sm"
+                                                                            isSelected={statusMap[hotel.propertyID]}
+                                                                            onChange={() => console.log(`Switch ${hotel.propertyID} toggled`)}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                                <FaPencilAlt
+                                                                    className={`cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`}
+                                                                    onClick={() => handleEditClick(hotel)}
+                                                                    style={{ pointerEvents: isAdmin ? "auto" : "none" }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <p>{t.modals.user.allProfiles.noResults}</p>
+                                                )}
                                             </div>
                                         )}
                                     </div>

@@ -1,9 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import axios from "axios";
 import { Tabs, Tab } from "@heroui/react";
+
+import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
 
 const PropertiesEditForm = ({ hotel, onClose }) => {
     const [propertyName, setPropertyName] = useState(hotel.propertyName || "");
@@ -28,6 +34,19 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false); // Novo estado para controlar se estamos no modo de edição
+
+    const [locale, setLocale] = useState("pt");
+
+    useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+        }
+    }, []);
+
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
     const handleSave = async () => {
         if (!propertyName || !propertyTag || !propertyServer) {
@@ -105,18 +124,18 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
             setError("Please select an image to upload.");
             return;
         }
-    
+
         const formData = new FormData();
         formData.append("file", selectedImage);
         formData.append("hotelId", hotel.propertyID);
         formData.append("existingImage", imageUrl); // Passa a URL da imagem antiga
-    
+
         try {
             setLoading(true);
             const response = await axios.post("/api/upload-image", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-    
+
             if (response.status === 200) {
                 setImageUrl(response.data.imageUrl); // Atualiza a URL com a nova imagem no Cloudinary
                 setSelectedImage(null);
@@ -142,7 +161,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
         >
             <ModalContent>
                 <ModalHeader className="flex flex-row justify-between items-center gap-1 p-2 px-4 bg-primary text-white">
-                    {isEditing ? "Edit Property" : "View Property"} {/* Mudança do título com base no modo */}
+                    {isEditing ? t.modals.propertiesEdit.editProperty : t.modals.propertiesEdit.viewProperty } {/* Mudança do título com base no modo */}
                     <Button
                         color="transparent"
                         variant="light"
@@ -154,10 +173,10 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                 </ModalHeader>
                 <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor">
                     <Tabs aria-label="Options" className="flex justify-center">
-                        <Tab key="propertyDetails" title="Settings">
+                        <Tab key="propertyDetails" title={t.modals.propertiesEdit.settings}>
                             <div className="-mt-4 flex flex-col gap-2">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400">{"Property Name:"}</label>
+                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.propertyName}</label>
                                     <input
                                         type="text"
                                         value={propertyName}
@@ -178,7 +197,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                 </div> */}
                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{"Property Tag:"}</label>
+                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.propertyTag}</label>
                                         <input
                                             type="text"
                                             value={propertyTag}
@@ -188,7 +207,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         />
                                     </div>
                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{"MPE Hotel:"}</label>
+                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.mpeHotel}</label>
                                         <input
                                             type="text"
                                             value={mpehotel}
@@ -200,7 +219,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                 </div>
                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{"Property Server:"}</label>
+                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.propertyServer}</label>
                                         <input
                                             type="text"
                                             value={propertyServer}
@@ -210,7 +229,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         />
                                     </div>
                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{"Property Port:"}</label>
+                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.propertyPort}</label>
                                         <input
                                             type="text"
                                             value={propertyPort}
@@ -222,7 +241,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                 </div>
 
                                 <div className="flex flex-col"> {/* Cada campo ocupa metade do espaço */}
-                                    <label className="block text-sm font-medium text-gray-400">{"Ini Path:"}</label>
+                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.iniPath}</label>
                                     <input
                                         type="text"
                                         value={passeIni}
@@ -232,7 +251,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                     />
                                 </div>
                                 <div className="flex flex-col"> {/* Cada campo ocupa metade do espaço */}
-                                    <label className="block text-sm font-medium text-gray-400">{"PDF File Path:"}</label>
+                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.pdfFile}</label>
                                     <input
                                         type="text"
                                         value={pdfFilePath}
@@ -243,10 +262,10 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                 </div>
                             </div>
                         </Tab>
-                        <Tab key="hotelDetails" title="Details">
+                        <Tab key="hotelDetails" title={t.modals.propertiesEdit.details}>
                             <div className="-mt-4 flex flex-col gap-2 -ml-8 -mr-8">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Name:"}</label>
+                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelName}</label>
                                     <input
                                         type="text"
                                         value={hotelName}
@@ -257,7 +276,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                 </div>
                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                     <div className="flex flex-col w-2/3"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{"Hotel Email:"}</label>
+                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelEmail}</label>
                                         <input
                                             type="text"
                                             value={hotelEmail}
@@ -267,7 +286,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         />
                                     </div>
                                     <div className="flex flex-col w-1/3"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{"Hotel Phone:"}</label>
+                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelPhone}</label>
                                         <input
                                             type="text"
                                             value={hotelPhone}
@@ -279,7 +298,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                 </div>
                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                     <div className="flex flex-col w-2/3"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{"Hotel Address:"}</label>
+                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelAddress}</label>
                                         <input
                                             type="text"
                                             value={hotelAddress}
@@ -289,7 +308,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         />
                                     </div>
                                     <div className="flex flex-col w-1/3"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{"Hotel Postal-Code:"}</label>
+                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelPCode}</label>
                                         <input
                                             type="text"
                                             value={hotelPostalCode}
@@ -301,7 +320,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                 </div>
                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{"Hotel RNET:"}</label>
+                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelRNET}</label>
                                         <input
                                             type="text"
                                             value={hotelRNET}
@@ -311,7 +330,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         />
                                     </div>
                                     <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{"Hotel NIF:"}</label>
+                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelNIF}</label>
                                         <input
                                             type="text"
                                             value={hotelNIF}
@@ -323,7 +342,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Terms:"}</label>
+                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelTerms}</label>
 
                                     <div className="mb-2">
                                         <div className="flex flex-row justify-center bg-gray-100 w-32 h-8 rounded-xl items-center">
@@ -383,7 +402,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400">{"Hotel Image:"}</label>
+                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelImage}</label>
                                     <div className="flex flex-col gap-2">
                                         <input
                                             type="file"
@@ -398,7 +417,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                         />
                                         {selectedImage && (
                                             <div className="flex items-center gap-2">
-                                                <p className="text-sm text-gray-700">Selected: {selectedImage.name}</p>
+                                                <p className="text-sm text-gray-700">{t.modals.propertiesEdit.selected} {selectedImage.name}</p>
                                                 <Button
                                                     color="primary"
                                                     onClick={handleImageUpload}
@@ -426,7 +445,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
 
                     <div className="flex justify-end space-x-2">
                         <Button color="error" onClick={onClose}>
-                            Cancel
+                        {t.modals.propertiesEdit.cancel}
                         </Button>
                         {isEditing ? (
                             <Button color="primary" onClick={handleSave} disabled={loading}>
@@ -434,7 +453,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                             </Button>
                         ) : (
                             <Button color="primary" onClick={() => setIsEditing(true)}>
-                                Edit
+                                {t.modals.propertiesEdit.edit}
                             </Button>
                         )}
                     </div>
