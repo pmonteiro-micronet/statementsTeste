@@ -11,6 +11,7 @@ import pt from "../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../public/locales/espanol/common.json";
 
 const translations = { en, pt, es };
+const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/dp6iart4f/image/upload/hotels/";
 
 const JsonViewPage = () => {
   const [reservationData, setReservationData] = useState(null);
@@ -98,11 +99,19 @@ const JsonViewPage = () => {
     }
   }, []);
 
+  const [imageUrl, setImageUrl] = useState("");
+
   useEffect(() => {
     const checkImage = async () => {
+      if (!propertyID) return;
+
       console.log("Checking image for propertyID:", propertyID);
+
+      const imgUrl = `${CLOUDINARY_BASE_URL}${propertyID}.png`; // Construindo a URL esperada
+      setImageUrl(imgUrl); // Atualiza o estado com a URL da imagem
+
       const img = new Image();
-      img.src = `/logos/${propertyID}.png`;
+      img.src = imgUrl;
 
       img.onload = () => {
         console.log("Image exists for propertyID:", propertyID);
@@ -114,9 +123,7 @@ const JsonViewPage = () => {
       };
     };
 
-    if (propertyID) {
-      checkImage();
-    }
+    checkImage();
   }, [propertyID]);
 
   const handleOkClick = () => {
@@ -138,13 +145,12 @@ const JsonViewPage = () => {
           {imageExists && (
             <div className="mb-4 w-screen">
               <img
-                src={`/logos/${propertyID}.png`}
+                src={imageUrl}
                 alt="Property Image"
                 className="mx-auto"
               />
             </div>
           )}
-
 
           <div className="flex flex-col justify-between items-center w-[80%] mx-auto mt-4">
             <div className="flex flex-row justify-between w-[80%] mb-10 infoContainer">

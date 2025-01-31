@@ -132,29 +132,28 @@ const CreatePropertyModal = ({
 
     const handleImageUpload = async () => {
         if (!selectedImage) {
-            setErrorMessage("Please select an image to upload.");
+            setError("Please select an image to upload.");
             return;
         }
     
         const formData = new FormData();
         formData.append("file", selectedImage);
+        formData.append("hotelId", hotel.propertyID);
+        formData.append("existingImage", imageUrl); // Passa a URL da imagem antiga
     
         try {
             setLoading(true);
-            const imageResponse = await axios.post("/api/upload-image", formData, {
+            const response = await axios.post("/api/upload-image", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
     
-            if (imageResponse.status === 200) {
-                setImageUrl(imageResponse.data.imageUrl); // Atualiza a URL da imagem no estado
-                setSelectedImage(null); // Limpa a seleção após o upload
-                setSuccessMessage("Image uploaded successfully.");
-            } else {
-                setErrorMessage(`Image upload failed. Status: ${imageResponse.status}`);
+            if (response.status === 200) {
+                setImageUrl(response.data.imageUrl); // Atualiza a URL com a nova imagem no Cloudinary
+                setSelectedImage(null);
             }
         } catch (error) {
             console.error("Error uploading image:", error);
-            setErrorMessage("An error occurred during image upload. Please try again.");
+            setError("Failed to upload image. Please try again.");
         } finally {
             setLoading(false);
         }
