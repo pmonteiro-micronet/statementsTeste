@@ -143,21 +143,21 @@ const PropertiesEditForm = ({
             setError("Please select an image to upload.");
             return;
         }
-
+    
         const formData = new FormData();
-        formData.append("file", selectedImage); // Adiciona a nova imagem
-        formData.append("hotelId", hotel.propertyID); // Passa o ID do hotel
-        formData.append("existingImage", hotel.imageUrl); // Passa o caminho da imagem antiga
-
+        formData.append("file", selectedImage);
+        formData.append("hotelId", hotel.propertyID);
+        formData.append("existingImage", imageUrl); // Passa a URL da imagem antiga
+    
         try {
             setLoading(true);
             const response = await axios.post("/api/upload-image", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-
+    
             if (response.status === 200) {
-                setImageUrl(response.data.imageUrl); // Atualiza a URL da imagem
-                setSelectedImage(null); // Limpa a seleção após o upload
+                setImageUrl(response.data.imageUrl); // Atualiza a URL com a nova imagem no Cloudinary
+                setSelectedImage(null);
             }
         } catch (error) {
             console.error("Error uploading image:", error);
@@ -165,7 +165,7 @@ const PropertiesEditForm = ({
         } finally {
             setLoading(false);
         }
-    };
+    };    
 
     const [activeKey, setActiveKey] = useState("EN"); // Estado de controle da aba ativa
 

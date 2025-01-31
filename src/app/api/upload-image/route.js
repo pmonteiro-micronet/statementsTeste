@@ -1,20 +1,18 @@
+import { v2 as cloudinary } from "cloudinary";
 import { NextResponse } from "next/server";
-import path from "path";
-import fs from "fs/promises";
 
-// Configuração do diretório para armazenar uploads
-const uploadDir = path.join(process.cwd(), "public/uploads");
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(req) {
     try {
-        // Verifica se o diretório existe, senão cria
-        await fs.mkdir(uploadDir, { recursive: true });
-
-        // Obtém os dados enviados
         const data = await req.formData();
         const file = data.get("file");
         const hotelId = data.get("hotelId");
-        const existingImage = data.get("existingImage");
+        const existingImage = data.get("existingImage"); // URL da imagem antiga no Cloudinary
 
         if (!file || !hotelId) {
             return NextResponse.json(
@@ -23,50 +21,32 @@ export async function POST(req) {
             );
         }
 
-        // Extrai a extensão do arquivo original
-        const originalFileName = file.name;
-        const fileExtension = path.extname(originalFileName).toLowerCase(); // Converte para minúsculas para comparação
-
-        // Verifica se a extensão é .png
-        if (fileExtension !== '.png') {
-            return NextResponse.json(
-                { error: "Only PNG files are allowed." },
-                { status: 400 }
-            );
-        }
-
-        // Define o novo nome do arquivo baseado no hotelId
-        const newFileName = `${hotelId}${fileExtension}`;
-
-        // Define o caminho completo do arquivo
-        const filePath = path.join(uploadDir, newFileName);
-
-        // Verifica se já existe uma imagem associada ao hotel e a exclui, se necessário
-        if (existingImage && existingImage !== "undefined") {
-            const existingImagePath = path.join(
-                process.cwd(),
-                "public",
-                existingImage.startsWith("/") ? existingImage.slice(1) : existingImage
-            );
-            try {
-                await fs.unlink(existingImagePath);
-            } catch (error) {
-                console.error("Error deleting existing image:", error);
-            }
-        }
-
-        // Salva o arquivo no diretório especificado
+        // Converte a imagem para base64
         const fileBuffer = await file.arrayBuffer();
-        await fs.writeFile(filePath, Buffer.from(fileBuffer));
+        const base64Image = Buffer.from(fileBuffer).toString("base64");
+        const dataUri = `data:${file.type};base64,${base64Image}`;
 
-        // Retorna o caminho relativo para o frontend
-        const relativeFilePath = `/uploads/${newFileName}`;
-        return NextResponse.json(
-            { message: "Image uploaded successfully", imageUrl: relativeFilePath },
-            { status: 200 }
-        );
+        // Se já existe uma imagem, tenta excluí-la antes de fazer o upload da nova
+        if (existingImage && existingImage.includes("res.cloudinary.com")) {
+            // Extrai o public_id do Cloudinary a partir da URL
+            const publicId = existingImage.split('/').pop().split('.')[0]; // Obtém o ID sem a extensão
+            await cloudinary.uploader.destroy(`hotels/${publicId}`);
+        }
+
+        // Faz o upload para Cloudinary, usando o hotelId como nome do arquivo
+        const uploadResponse = await cloudinary.uploader.upload(dataUri, {
+            folder: "hotels",
+            public_id: hotelId, // Define o nome do arquivo como hotelId
+            overwrite: true, // Garante que a imagem seja substituída
+        });
+
+        return NextResponse.json({
+            message: "Upload successful",
+            imageUrl: uploadResponse.secure_url, // Nova URL da imagem no Cloudinary
+        }, { status: 200 });
+
     } catch (error) {
-        console.error("Error saving file:", error);
+        console.error("Error uploading image:", error);
         return NextResponse.json(
             { error: "Failed to upload image" },
             { status: 500 }

@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf';
 
-// Função para carregar imagem do servidor e convertê-la para base64
+// Função para carregar imagem do Cloudinary e convertê-la para base64
 const loadImageAsBase64 = async (imagePath) => {
     try {
         const response = await fetch(imagePath);
@@ -28,8 +28,11 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
         return (datePart !== '1900-01-01' && datePart !== '2050-12-31') ? datePart : "";
     };
 
-    // Monta o caminho da imagem com base no propertyID
-    const logoPath = `/logos/${reserva.PropertyID}.png`;
+    // Defina a URL da imagem no Cloudinary
+    const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/dp6iart4f/image/upload/hotels/";  // Substitua SEU_CLOUD_NAME
+    const logoPath = `${CLOUDINARY_BASE_URL}${reserva.PropertyID}.png`; // URL da imagem no Cloudinary
+
+    // Converte a imagem do Cloudinary para base64
     const logoBase64 = await loadImageAsBase64(logoPath);
 
     // Tamanho da página (A4 padrão)
