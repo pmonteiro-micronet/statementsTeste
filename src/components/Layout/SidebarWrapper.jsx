@@ -101,23 +101,9 @@ export default function SidebarWrapper({ children }) {
     if (selectedHotelID) {
       setIsLoading(true);
       try {
-        // Fetch mpehotel from properties API before making other requests
-        const propertyResponse = await axios.get(`/api/properties/${selectedHotelID}`);
-        const mpehotel = propertyResponse.data.response?.[0]?.mpehotel;
-  
-        if (mpehotel) {
-          // Call all APIs (arrivals, inhouses, departures)
-          await Promise.all([
-            sendDataToAPI("arrivals", mpehotel),
-            sendDataToAPI("inhouses", mpehotel),
-            sendDataToAPI("departures", mpehotel),
-          ]);
-  
           // Redirect after all API calls have been made
           router.push(`/homepage/frontOfficeView/${type}/${selectedHotelID}`);
-        } else {
-          console.error("Mpehotel not found for the selected hotel.");
-        }
+       
       } catch (error) {
         console.error("Erro durante as requisições", error);
       } finally {
@@ -126,29 +112,29 @@ export default function SidebarWrapper({ children }) {
     }
   };
   
-  const sendDataToAPI = async (type, mpehotel) => {
-    try {
-      const propertyID = selectedHotelID;
+  // const sendDataToAPI = async (type, mpehotel) => {
+  //   try {
+  //     const propertyID = selectedHotelID;
   
-      if (mpehotel && propertyID) {
-        if (type === "arrivals") {
-          await axios.get("/api/reservations/checkins/reservations_4_tat", {
-            params: { mpehotel, propertyID },
-          });
-        } else if (type === "inhouses") {
-          await axios.get("/api/reservations/inHouses/reservations_4_tat", {
-            params: { mpehotel, propertyID },
-          });
-        } else if (type === "departures") {
-          await axios.get("/api/reservations/info", {
-            params: { mpehotel, propertyID },
-          });
-        }
-      }
-    } catch (error) {
-      console.error(`Erro ao enviar os dados para ${type}:`, error);
-    }
-  };
+  //     if (mpehotel && propertyID) {
+  //       if (type === "arrivals") {
+  //         await axios.get("/api/reservations/checkins/reservations_4_tat", {
+  //           params: { mpehotel, propertyID },
+  //         });
+  //       } else if (type === "inhouses") {
+  //         await axios.get("/api/reservations/inHouses/reservations_4_tat", {
+  //           params: { mpehotel, propertyID },
+  //         });
+  //       } else if (type === "departures") {
+  //         await axios.get("/api/reservations/info", {
+  //           params: { mpehotel, propertyID },
+  //         });
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error(`Erro ao enviar os dados para ${type}:`, error);
+  //   }
+  // };
   
   useEffect(() => {
     if (selectedHotelID && session?.user) {

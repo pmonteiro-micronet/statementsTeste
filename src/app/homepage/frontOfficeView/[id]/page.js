@@ -1,4 +1,4 @@
-'use client';
+"use client"
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
@@ -32,9 +32,14 @@ const FrontOffice = () => {
   const router = useRouter();
   const selectedHotelID = pathname.split('/').pop();
 
+  // Chamar a API sempre que o componente for montado ou recarregado
   useEffect(() => {
     if (session?.user?.propertyIDs && selectedHotelID) {
+      // Chama a função de contadores
       fetchCounters();
+      
+      // Chama a função sendDataToAPIForAllTypes para fazer as requisições automaticamente ao carregar a página
+      sendDataToAPIForAllTypes();  // Função para chamadas da API para arrivals, inhose, departures
     }
   }, [session?.user?.propertyIDs, selectedHotelID]);
 
@@ -71,29 +76,8 @@ const FrontOffice = () => {
   const handleRedirect = async (type) => {
     if (isLoading) return;
 
-    if (selectedHotelID) {
-      setIsLoading(true);
-      try {
-        const propertyResponse = await axios.get(`/api/properties/${selectedHotelID}`);
-        const mpehotel = propertyResponse.data.response?.[0]?.mpehotel;
-
-        if (mpehotel) {
-          await Promise.all([
-            sendDataToAPI("arrivals", mpehotel),
-            sendDataToAPI("inhouses", mpehotel),
-            sendDataToAPI("departures", mpehotel),
-          ]);
-
-          router.push(`/homepage/frontOfficeView/${type}/${selectedHotelID}`);
-        } else {
-          console.error("Mpehotel not found for the selected hotel.");
-        }
-      } catch (error) {
-        console.error("Erro durante as requisições", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
+    // Redireciona para a página correta, sem fazer as requisições
+    router.push(`/homepage/frontOfficeView/${type}/${selectedHotelID}`);
   };
 
   const sendDataToAPI = async (type, mpehotel) => {
@@ -120,6 +104,27 @@ const FrontOffice = () => {
     }
   };
 
+  // Função que chama a sendDataToAPI para todos os tipos (arrivals, inhous, departures) automaticamente ao carregar a página
+  const sendDataToAPIForAllTypes = async () => {
+    if (selectedHotelID) {
+      try {
+        const propertyResponse = await axios.get(`/api/properties/${selectedHotelID}`);
+        const mpehotel = propertyResponse.data.response?.[0]?.mpehotel;
+
+        if (mpehotel) {
+          // Faz as requisições simultâneas para arrivals, inhous e departures
+          await Promise.all([ 
+            sendDataToAPI("arrivals", mpehotel),
+            sendDataToAPI("inhouses", mpehotel),
+            sendDataToAPI("departures", mpehotel),
+          ]);
+        }
+      } catch (error) {
+        console.error("Erro ao chamar sendDataToAPI para todos os tipos:", error);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-primaryBackground">
       {isLoading && <LoadingBackdrop open={isLoading} />} {/* Indicador de carregamento */}
@@ -128,9 +133,7 @@ const FrontOffice = () => {
 
         <div className="flex flex-row gap-5">
           <div
-            className={`border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer ${
-              isLoading ? "cursor-not-allowed opacity-50" : ""
-            }`}
+            className={`border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
             onClick={() => !isLoading && handleRedirect("arrivals")}
           >
             <div className="flex flex-col">
@@ -141,9 +144,7 @@ const FrontOffice = () => {
             </div>
           </div>
           <div
-            className={`border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer ${
-              isLoading ? "cursor-not-allowed opacity-50" : ""
-            }`}
+            className={`border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
             onClick={() => !isLoading && handleRedirect("inhouses")}
           >
             <div className="flex flex-col">
@@ -154,9 +155,7 @@ const FrontOffice = () => {
             </div>
           </div>
           <div
-            className={`border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer ${
-              isLoading ? "cursor-not-allowed opacity-50" : ""
-            }`}
+            className={`border border-gray-300 rounded-lg w-64 flex justify-center text-center py-10 px-2 cursor-pointer ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
             onClick={() => !isLoading && handleRedirect("departures")}
           >
             <div className="flex flex-col">

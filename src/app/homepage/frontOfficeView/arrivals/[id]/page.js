@@ -55,23 +55,31 @@ export default function Arrivals({ params }) {
   const sendDataToAPI = async () => {
     try {
       setIsLoading(true); // Inicia o carregamento
-
-      // Faz a requisição GET à API de properties com o propertyID passado
+  
       const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
-
-      // Verifica se a resposta contém o 'mpehotel' e executa o que for necessário
+  
       if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
         const mpehotel = propertyResponse.data.response[0].mpehotel;
         console.log('Mpehotel encontrado:', mpehotel);
-
-        await axios.get("/api/reservations/checkins/reservations_4_tat", {
-          params: {
-            mpehotel,
-            propertyID,
-          },
-        });
-
+  
+        // Faz as três requisições simultaneamente
+        await Promise.all([
+          axios.get("/api/reservations/checkins/reservations_4_tat", {
+            params: { mpehotel, propertyID },
+          }),
+          axios.get("/api/reservations/inHouses/reservations_4_tat", {
+            params: { mpehotel, propertyID },
+          }),
+          axios.get("/api/reservations/info", {
+            params: { mpehotel, propertyID },
+          }),
+        ]);
+  
         setPostSuccessful(true);
+  
+        // Aguarda um curto tempo antes de buscar as reservas para garantir que os dados sejam atualizados no backend
+        setTimeout(fetchReservas, 1000); 
+  
       } else {
         console.error('Mpehotel não encontrado para o propertyID:', propertyID);
         setPostSuccessful(false);
@@ -89,7 +97,7 @@ export default function Arrivals({ params }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  };  
 
   const [locale, setLocale] = useState("pt");
 
@@ -119,96 +127,90 @@ export default function Arrivals({ params }) {
 
 
   // Função para pegar as reservas
-  useEffect(() => {
-    const fetchReservas = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
-        console.log("Response completo:", response);
+  const fetchReservas = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
+      console.log("Response completo:", response);
 
-        const reservasArray = response.data.response.flatMap(item => {
-          try {
-            // Parsear o `requestBody` como JSON se estiver stringificado
-            const parsedRequestBody = JSON.parse(item.responseBody);
+      const reservasArray = response.data.response.flatMap(item => {
+        try {
+          const parsedRequestBody = JSON.parse(item.responseBody);
+          const reservations = Array.isArray(parsedRequestBody)
+            ? parsedRequestBody.flatMap(data =>
+              data.ReservationInfo?.map(reserva => {
+                const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
+                const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
 
-            // Extrair as informações do formato correto
-            const reservations = Array.isArray(parsedRequestBody)
-              ? parsedRequestBody.flatMap(data =>
-                data.ReservationInfo?.map(reserva => {
-                  const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
-                  const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
+                return {
+                  requestID: item.requestID,
+                  propertyID: item.propertyID,
+                  profileID: guestDetails.ProfileID,
+                  DateCI: reserva.DateCI,
+                  Booker: reserva.Booker,
+                  Company: reserva.Company,
+                  Group: reserva.Group,
+                  Room: reserva.Room,
+                  ResNo: reserva.ResNo,
+                  Notes: reserva.Notes,
+                  RoomStatus: reserva.RoomStatus,
+                  RoomType: reserva.RoomType,
+                  TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
+                  Price: reserva.Price,
+                  CityTax: reserva.CityTax,
+                  Total: reserva.Total,
+                  Salutation: guestDetails.Salution,
+                  LastName: guestDetails.LastName,
+                  FirstName: guestDetails.FirstName,
+                  Country: addressDetails.Country,
+                  Street: addressDetails.Street,
+                  PostalCode: addressDetails.PostalCode,
+                  City: addressDetails.City,
+                  Region: addressDetails.Region,
+                };
+              }) || []
+            )
+            : [];
 
-                  return {
-                    requestID: item.requestID,
-                    propertyID: item.propertyID, // Adiciona o requestID
-                    profileID: guestDetails.ProfileID,
-                    DateCI: reserva.DateCI,
-                    Booker: reserva.Booker,
-                    Company: reserva.Company,
-                    Group: reserva.Group,
-                    Room: reserva.Room,
-                    ResNo: reserva.ResNo,
-                    Notes: reserva.Notes,
-                    RoomStatus: reserva.RoomStatus,
-                    RoomType: reserva.RoomType,
-                    TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
-                    Price: reserva.Price,
-                    CityTax: reserva.CityTax,
-                    Total: reserva.Total,
-                    Salutation: guestDetails.Salution,
-                    LastName: guestDetails.LastName,
-                    FirstName: guestDetails.FirstName,
-                    Country: addressDetails.Country,
-                    Street: addressDetails.Street,
-                    PostalCode: addressDetails.PostalCode,
-                    City: addressDetails.City,
-                    Region: addressDetails.Region,
-                  };
-                }) || []
-              )
-              : [];
-
-            return reservations;
-          } catch (err) {
-            console.error("Erro ao processar requestBody ou reservas:", err);
-            return [];
-          }
-        });
-
-        console.log("Reservas após parse:", reservasArray);
-
-        if (reservasArray.length === 0) {
-          console.warn("Nenhuma reserva encontrada após parse.");
-          return;
+          return reservations;
+        } catch (err) {
+          console.error("Erro ao processar requestBody ou reservas:", err);
+          return [];
         }
+      });
 
-        const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
-        const reservasFiltradas = reservasArray.filter(reserva => {
-          if (!reserva.DateCI) {
-            console.warn("DateCI está indefinido ou vazio para esta reserva:", reserva);
-            return false;
-          }
-          const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
-          return formattedDateCI === formattedCurrentDate;
-        });
+      console.log("Reservas após parse:", reservasArray);
 
-        console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
+      const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
+      const reservasFiltradas = reservasArray.filter(reserva => {
+        if (!reserva.DateCI) {
+          console.warn("DateCI está indefinido ou vazio para esta reserva:", reserva);
+          return false;
+        }
+        const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
+        return formattedDateCI === formattedCurrentDate;
+      });
 
-        const reservasUnicas = Array.from(
-          new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
-        );
+      console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
 
-        console.log("Reservas únicas para a data atual:", reservasUnicas);
-        setReservas(reservasUnicas);
-      } catch (error) {
-        console.error("Erro ao buscar reservas:", error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      const reservasUnicas = Array.from(
+        new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
+      );
 
-    fetchReservas();
-  }, [currentDate, propertyID]);
+      console.log("Reservas únicas para a data atual:", reservasUnicas);
+      setReservas(reservasUnicas);
+    } catch (error) {
+      console.error("Erro ao buscar reservas:", error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (postSuccessful) {
+      fetchReservas();
+    }
+  }, [postSuccessful]);
 
 
   useEffect(() => {
@@ -255,7 +257,7 @@ export default function Arrivals({ params }) {
   // const handleRefreshClick = () => {
   //   sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
   // };
-  
+
   const handleRefreshClick = async () => {
     try {
       setIsLoading(true); // Ativa o loading
@@ -267,7 +269,7 @@ export default function Arrivals({ params }) {
       setIsLoading(false); // Garante que o loading seja desativado
     }
   };
-  
+
 
   const fetchPropertyDetails = async (propertyID) => {
     try {
@@ -284,7 +286,7 @@ export default function Arrivals({ params }) {
 
   const verifyProperty = async (propertyDetails) => {
     const { propertyServer, propertyPort } = propertyDetails;
-  
+
     for (let attempts = 0; attempts < 3; attempts++) {
       try {
         const response = await axios.post("/api/verifyProperty", { propertyServer, propertyPort });
@@ -293,10 +295,10 @@ export default function Arrivals({ params }) {
         console.error(`Tentativa ${attempts + 1} falhou para a propriedade ${propertyDetails.propertyName}:`, error);
       }
     }
-  
+
     return false;
   };
-  
+
   return (
     (<main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       {isLoading && <LoadingBackdrop open={isLoading} />}
@@ -389,34 +391,34 @@ export default function Arrivals({ params }) {
                               <DropdownItem key="edit" onClick={() => handleOpenModal()}>
                                 {t.frontOffice.arrivals.info}
                               </DropdownItem>
-                             <DropdownItem
-  key="show"
-  onClick={async () => {
-    // Busca os detalhes da propriedade
-    const propertyDetails = await fetchPropertyDetails(reserva.propertyID);
+                              <DropdownItem
+                                key="show"
+                                onClick={async () => {
+                                  // Busca os detalhes da propriedade
+                                  const propertyDetails = await fetchPropertyDetails(reserva.propertyID);
 
-    if (!propertyDetails) {
-      console.error("Não foi possível encontrar os detalhes da propriedade.");
-      return;
-    }
+                                  if (!propertyDetails) {
+                                    console.error("Não foi possível encontrar os detalhes da propriedade.");
+                                    return;
+                                  }
 
-    // Verifica se a propriedade está acessível
-    const isVerified = await verifyProperty(propertyDetails);
+                                  // Verifica se a propriedade está acessível
+                                  const isVerified = await verifyProperty(propertyDetails);
 
-    if (isVerified) {
-      // Redireciona caso seja verificado com sucesso
-      router.push(
-        `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}`
-      );
-    } else {
-      // Exibe mensagem de erro no modal
-      setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
-      setIsErrorModalOpen(true);
-    }
-  }}
->
-  {t.frontOffice.arrivals.registrationForm}
-</DropdownItem>
+                                  if (isVerified) {
+                                    // Redireciona caso seja verificado com sucesso
+                                    router.push(
+                                      `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}`
+                                    );
+                                  } else {
+                                    // Exibe mensagem de erro no modal
+                                    setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
+                                    setIsErrorModalOpen(true);
+                                  }
+                                }}
+                              >
+                                {t.frontOffice.arrivals.registrationForm}
+                              </DropdownItem>
                             </DropdownMenu>
                           </Dropdown>
 
