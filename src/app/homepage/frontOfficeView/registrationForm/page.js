@@ -520,38 +520,38 @@ export default function Page() {
                         <div className='text-textPrimaryColor'>
                             <p>{t.frontOffice.registrationForm.title}</p>
                         </div>
-                        <div className="flex flex-row gap-2 items-center language-row">
-                            <div
-                                className={`flag ${activeFlag === 'pt' ? 'active' : 'inactive'}`}
-                                onClick={() => handleLanguageChange('pt')}
-                            >
-                                <img
-                                    src="/flags/pt.png"
-                                    alt="portuguese"
-                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                />
-                            </div>
-                            <div
-                                className={`flag ${activeFlag === 'es' ? 'active' : 'inactive'}`}
-                                onClick={() => handleLanguageChange('es')}
-                            >
-                                <img
-                                    src="/flags/es.png"
-                                    alt="spanish"
-                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                />
-                            </div>
-                            <div
-                                className={`flag ${activeFlag === 'usa-uk' ? 'active' : 'inactive'}`}
-                                onClick={() => handleLanguageChange('en')}
-                            >
-                                <img
-                                    src="/flags/uk.png"
-                                    alt="english"
-                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-                                />
-                            </div>
-                        </div>
+<div className="flex flex-row gap-8 items-center language-row">
+                        <div
+          className={`flag ${activeFlag === 'pt' ? 'active' : 'inactive'}`}
+          onClick={() => handleLanguageChange('pt')}
+        >
+          <img
+            src="/flags/pt.png"
+            alt="portuguese"
+            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+          />
+        </div>
+        <div
+          className={`flag ${activeFlag === 'es' ? 'active' : 'inactive'}`}
+          onClick={() => handleLanguageChange('es')}
+        >
+          <img
+            src="/flags/sp.png"
+            alt="spanish"
+            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+          />
+        </div>
+        <div
+          className={`flag ${activeFlag === 'usa-uk' ? 'active' : 'inactive'}`}
+          onClick={() => handleLanguageChange('en')}
+        >
+          <img
+            src="/flags/uk.png"
+            alt="english"
+            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+          />
+        </div>
+      </div>
 
                         {/* Combo Box with Flag Images */}
                         <div className="ml-4 relative language-combobox">
@@ -560,7 +560,7 @@ export default function Page() {
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
                             >
                                 <img
-                                    src={`/flags/${activeFlag === 'usa-uk' ? 'uk.png' : activeFlag === 'pt' ? 'pt.png' : 'es.png'}`}
+                                    src={`/flags/${activeFlag === 'usa-uk' ? 'uk.png' : activeFlag === 'pt' ? 'pt.png' : 'sp.png'}`}
                                     alt={activeFlag}
                                     className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
                                 />
