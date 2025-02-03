@@ -63,7 +63,9 @@ export default function Page({ params }) {
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
 
   const [propertyName, setPropertyName] = useState([]);
-  console.log(postSuccessful);
+
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
     try {
@@ -75,23 +77,29 @@ export default function Page({ params }) {
         const mpehotel = propertyResponse.data.response[0].mpehotel;
         console.log('Mpehotel encontrado:', mpehotel);
   
-        // Faz as três requisições simultaneamente
-        await Promise.all([
-          axios.get("/api/reservations/checkins/reservations_4_tat", {
-            params: { mpehotel, propertyID },
-          }),
-          axios.get("/api/reservations/inHouses/reservations_4_tat", {
-            params: { mpehotel, propertyID },
-          }),
-          axios.get("/api/reservations/info", {
-            params: { mpehotel, propertyID },
-          }),
-        ]);
+        // Faz as requisições com delay
+        await axios.get("/api/reservations/checkins/reservations_4_tat", {
+          params: { mpehotel, propertyID },
+        });
+  
+        // Aguarda 1 segundo antes de fazer a próxima requisição
+        await sleep(1000); 
+  
+        await axios.get("/api/reservations/inHouses/reservations_4_tat", {
+          params: { mpehotel, propertyID },
+        });
+  
+        // Aguarda mais 1 segundo antes de fazer a última requisição
+        await sleep(1000); 
+  
+        await axios.get("/api/reservations/info", {
+          params: { mpehotel, propertyID },
+        });
   
         setPostSuccessful(true);
   
         // Aguarda um curto tempo antes de buscar as reservas para garantir que os dados sejam atualizados no backend
-        setTimeout(fetchReservas, 1000); 
+        setTimeout(fetchReservas, 1000);
   
       } else {
         console.error('Mpehotel não encontrado para o propertyID:', propertyID);
@@ -110,7 +118,7 @@ export default function Page({ params }) {
     } finally {
       setIsLoading(false);
     }
-  }; 
+  };  
 
   // Chama a função sendDataToAPI ao carregar a página
   useEffect(() => {
