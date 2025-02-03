@@ -45,7 +45,11 @@ export default function Page() {
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // Controle do modal de erro
     // Estados para armazenar as informações do hotel
     const [hotelName, setHotelName] = useState('');
-    const [hotelMiniTerms, setHotelMiniTerms] = useState('');
+    const [hotelTermsEN, setHotelTermsEN] = useState("");
+    const [hotelTermsPT, setHotelTermsPT] = useState("");
+    const [hotelTermsES, setHotelTermsES] = useState("");
+    const [hotelTerms, setHotelTerms] = useState(""); // Estado dinâmico para exibição
+
     const [hotelNIF, setHotelNIF] = useState('');
     const [hotelPhone, setHotelPhone] = useState('');
     const [hotelEmail, setHotelEmail] = useState('');
@@ -61,19 +65,24 @@ export default function Page() {
     const handleLanguageChange = (lang) => {
         setLocale(lang);
         setActiveFlag(lang === "en" ? "usa-uk" : lang === "pt" ? "pt" : "es");
-        localStorage.setItem("language", lang); // Salvar no localStorage
-        window.location.reload(); // Recarregar a página para aplicar o idioma
-      };
-    
+        localStorage.setItem("language", lang);
 
-      useEffect(() => {
+        // Atualiza os termos do hotel conforme o idioma selecionado
+        setHotelTerms(
+            lang === "en" ? hotelTermsEN :
+                lang === "pt" ? hotelTermsPT :
+                    hotelTermsES
+        );
+    };
+
+    useEffect(() => {
         // Carregar o idioma do localStorage
         const storedLanguage = localStorage.getItem("language");
         if (storedLanguage) {
-          setLocale(storedLanguage);
-          setActiveFlag(storedLanguage === "en" ? "usa-uk" : storedLanguage === "pt" ? "pt" : "es");
+            setLocale(storedLanguage);
+            setActiveFlag(storedLanguage === "en" ? "usa-uk" : storedLanguage === "pt" ? "pt" : "es");
         }
-      }, []);
+    }, []);
 
     // Carregar as traduções com base no idioma atual
     const t = translations[locale] || translations["pt"]; // fallback para "pt"
@@ -140,11 +149,12 @@ export default function Page() {
                 const response = await axios.get(`/api/properties/${propertyID}`);
                 console.log("Resposta da API para as propriedades:", response);
 
-                const property = response.data.response[0]; // Acessando o primeiro item do array 'response'
+                const property = response.data.response[0];
                 if (property) {
-                    // Agora você pode acessar corretamente as propriedades
-                    const hotelName = property.hotelName; // Note que 'propertyName' é a chave correta
-                    const hotelMiniTerms = property.hotelMiniTerms;
+                    const hotelName = property.hotelName;
+                    const hotelTermsEN = property.hotelTermsEN;
+                    const hotelTermsPT = property.hotelTermsPT;
+                    const hotelTermsES = property.hotelTermsES;
                     const hotelNIF = property.hotelNIF;
                     const hotelPhone = property.hotelPhone;
                     const hotelEmail = property.hotelEmail;
@@ -152,10 +162,11 @@ export default function Page() {
                     const hotelPostalCode = property.hotelPostalCode;
                     const hotelRNET = property.hotelRNET;
 
-                    // Aqui você pode armazenar essas informações no estado ou usá-las conforme necessário
                     console.log("Hotel Information:", {
                         hotelName,
-                        hotelMiniTerms,
+                        hotelTermsEN,
+                        hotelTermsPT,
+                        hotelTermsES,
                         hotelNIF,
                         hotelPhone,
                         hotelEmail,
@@ -166,7 +177,9 @@ export default function Page() {
 
                     // Atualizando o estado
                     setHotelName(hotelName);
-                    setHotelMiniTerms(hotelMiniTerms);
+                    setHotelTermsEN(hotelTermsEN);
+                    setHotelTermsPT(hotelTermsPT);
+                    setHotelTermsES(hotelTermsES);
                     setHotelNIF(hotelNIF);
                     setHotelPhone(hotelPhone);
                     setHotelEmail(hotelEmail);
@@ -390,7 +403,7 @@ export default function Page() {
                 PersonalEmail: contacts.Email,
                 ProtectionPolicy: policyAccepted,
                 HotelName: hotelName,
-                HotelMiniTerms: hotelMiniTerms,
+                HotelTermsEN: hotelTerms,
                 HotelPhone: hotelPhone,
                 HotelEmail: hotelEmail,
                 HotelAddress: hotelAddress,
@@ -485,6 +498,16 @@ export default function Page() {
         setIsModalOpen(false);
     };
 
+    useEffect(() => {
+        if (locale === "en") {
+            setHotelTerms(hotelTermsEN);
+        } else if (locale === "pt") {
+            setHotelTerms(hotelTermsPT);
+        } else {
+            setHotelTerms(hotelTermsES);
+        }
+    }, [locale, hotelTermsEN, hotelTermsPT, hotelTermsES]);
+
     return (
         <div className='bg-background main-page min-h-screen'>
             {/* Exibe o loader enquanto isLoading for verdadeiro */}
@@ -497,7 +520,7 @@ export default function Page() {
                         <div className='text-textPrimaryColor'>
                             <p>{t.frontOffice.registrationForm.title}</p>
                         </div>
-                        <div className="flex flex-row gap-8 items-center language-row">
+<div className="flex flex-row gap-8 items-center language-row">
                         <div
           className={`flag ${activeFlag === 'pt' ? 'active' : 'inactive'}`}
           onClick={() => handleLanguageChange('pt')}
@@ -530,55 +553,55 @@ export default function Page() {
         </div>
       </div>
 
-      {/* Combo Box with Flag Images */}
-      <div className="ml-4 relative language-combobox">
-        <div
-          className="flex items-center cursor-pointer"
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-        >
-          <img
-            src={`/flags/${activeFlag === 'usa-uk' ? 'uk.png' : activeFlag === 'pt' ? 'pt.png' : 'es.png'}`}
-            alt={activeFlag}
-            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-          />
-        </div>
-        {dropdownOpen && (
-          <div className="absolute mt-2 bg-white border rounded shadow-lg">
-            <div
-              className="flex items-center p-2 cursor-pointer"
-              onClick={() => handleLanguageChange('pt')}
-            >
-              <img
-                src="/flags/pt.png"
-                alt="portuguese"
-                className="w-8 h-8 object-cover rounded-full"
-              />
-              <span className="ml-2">Portuguese</span>
-            </div>
-            <div
-              className="flex items-center p-2 cursor-pointer"
-              onClick={() => handleLanguageChange('es')}
-            >
-              <img
-                src="/flags/es.png"
-                alt="spanish"
-                className="w-8 h-8 object-cover rounded-full"
-              />
-              <span className="ml-2">Spanish</span>
-            </div>
-            <div
-              className="flex items-center p-2 cursor-pointer"
-              onClick={() => handleLanguageChange('en')}
-            >
-              <img
-                src="/flags/uk.png"
-                alt="english"
-                className="w-8 h-8 object-cover rounded-full"
-              />
-              <span className="ml-2">English</span>
-            </div>
-          </div>
-        )}
+                        {/* Combo Box with Flag Images */}
+                        <div className="ml-4 relative language-combobox">
+                            <div
+                                className="flex items-center cursor-pointer"
+                                onClick={() => setDropdownOpen(!dropdownOpen)}
+                            >
+                                <img
+                                    src={`/flags/${activeFlag === 'usa-uk' ? 'uk.png' : activeFlag === 'pt' ? 'pt.png' : 'sp.png'}`}
+                                    alt={activeFlag}
+                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+                                />
+                            </div>
+                            {dropdownOpen && (
+                                <div className="absolute mt-2 bg-white border rounded shadow-lg">
+                                    <div
+                                        className="flex items-center p-2 cursor-pointer"
+                                        onClick={() => handleLanguageChange('pt')}
+                                    >
+                                        <img
+                                            src="/flags/pt.png"
+                                            alt="portuguese"
+                                            className="w-8 h-8 object-cover rounded-full"
+                                        />
+                                        <span className="ml-2">Portuguese</span>
+                                    </div>
+                                    <div
+                                        className="flex items-center p-2 cursor-pointer"
+                                        onClick={() => handleLanguageChange('es')}
+                                    >
+                                        <img
+                                            src="/flags/es.png"
+                                            alt="spanish"
+                                            className="w-8 h-8 object-cover rounded-full"
+                                        />
+                                        <span className="ml-2">Spanish</span>
+                                    </div>
+                                    <div
+                                        className="flex items-center p-2 cursor-pointer"
+                                        onClick={() => handleLanguageChange('en')}
+                                    >
+                                        <img
+                                            src="/flags/uk.png"
+                                            alt="english"
+                                            className="w-8 h-8 object-cover rounded-full"
+                                        />
+                                        <span className="ml-2">English</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -1124,7 +1147,7 @@ export default function Page() {
                                 {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
                             </div>
                             <p className='text-xs text-gray-500 mt-4 text-justify text-style'>
-                                {hotelMiniTerms}
+                                {hotelTerms}
                             </p>
                             <div className='flex flex-row justify-between items-center mt-4 buttons-style'>
                                 <button

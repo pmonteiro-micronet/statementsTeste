@@ -211,7 +211,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
 
     // Texto justificado dentro do retângulo
     const justificationText = `
-    ${reserva.HotelMiniTerms}
+    ${reserva.HotelTermsEN}
     `;
 
     doc.text(justificationText, termsColumn1X, termsTextY, { maxWidth: termsRectWidth - 10 });
