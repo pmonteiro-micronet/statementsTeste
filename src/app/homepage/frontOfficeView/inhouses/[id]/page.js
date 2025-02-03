@@ -66,34 +66,40 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const sendDataToAPI = async () => {
     try {
       setIsLoading(true); // Inicia o carregamento
-
-      // Faz a requisição GET à API de properties com o propertyID passado
+  
       const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
-
-      // Verifica se a resposta contém o 'mpehotel' e executa o que for necessário
+  
       if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
         const mpehotel = propertyResponse.data.response[0].mpehotel;
         console.log('Mpehotel encontrado:', mpehotel);
-
-        await axios.get("/api/reservations/inHouses/reservations_4_tat", {
-          params: {
-            mpehotel,
-            propertyID
-          },
-        });
-
+  
+        // Faz as três requisições simultaneamente
+        await Promise.all([
+          axios.get("/api/reservations/checkins/reservations_4_tat", {
+            params: { mpehotel, propertyID },
+          }),
+          axios.get("/api/reservations/inHouses/reservations_4_tat", {
+            params: { mpehotel, propertyID },
+          }),
+          axios.get("/api/reservations/info", {
+            params: { mpehotel, propertyID },
+          }),
+        ]);
+  
         setPostSuccessful(true);
+  
+        // Aguarda um curto tempo antes de buscar as reservas para garantir que os dados sejam atualizados no backend
+        setTimeout(fetchReservas, 1000); 
+  
       } else {
         console.error('Mpehotel não encontrado para o propertyID:', propertyID);
         setPostSuccessful(false);
       }
     } catch (error) {
       if (error.response && error.response.status === 500) {
-        // Trata o erro 500
         console.log("Erro 500: Não conseguimos comunicar com o serviço PMS.");
         setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
       } else {
-        // Trata outros erros
         console.log("Erro inesperado:", error.response ? error.response.data : error.message);
         setErrorMessage("We were unable to fulfill your order. Please contact support.");
       }
@@ -102,7 +108,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     } finally {
       setIsLoading(false);
     }
-  };
+  };  
 
 
   // Chama a função sendDataToAPI ao carregar a página
@@ -192,7 +198,6 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   };
 
   // Função para pegar as reservas
-  useEffect(() => {
     const fetchReservas = async () => {
       setIsLoading(true);
       try {
@@ -269,8 +274,11 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
       }
     };
 
-    fetchReservas();
-  }, [currentDate, propertyID]);
+    useEffect(() => {
+      if (postSuccessful) {
+        fetchReservas();
+      }
+    }, [postSuccessful]);
 
 
   useEffect(() => {
