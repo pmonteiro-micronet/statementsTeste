@@ -48,44 +48,42 @@ export default function Arrivals({ params }) {
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
 
   const [propertyName, setPropertyName] = useState([]);
-
+  console.log(postSuccessful);
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
     try {
       setIsLoading(true); // Inicia o carregamento
-  
+
       const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
-  
+
       if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
         const mpehotel = propertyResponse.data.response[0].mpehotel;
         console.log('Mpehotel encontrado:', mpehotel);
-  
+
         // Faz as requisições com delay
         await axios.get("/api/reservations/checkins/reservations_4_tat", {
           params: { mpehotel, propertyID },
         });
-  
+
         // Aguarda 1 segundo antes de fazer a próxima requisição
-        await sleep(1000); 
-  
+        await sleep(1000);
+
         await axios.get("/api/reservations/inHouses/reservations_4_tat", {
           params: { mpehotel, propertyID },
         });
-  
+
         // Aguarda mais 1 segundo antes de fazer a última requisição
-        await sleep(1000); 
-  
+        await sleep(1000);
+
         await axios.get("/api/reservations/info", {
           params: { mpehotel, propertyID },
         });
-  
+
+        await sleep(1000);
         setPostSuccessful(true);
-  
-        // Aguarda um curto tempo antes de buscar as reservas para garantir que os dados sejam atualizados no backend
-        setTimeout(fetchReservas, 1000);
-  
+
       } else {
         console.error('Mpehotel não encontrado para o propertyID:', propertyID);
         setPostSuccessful(false);
@@ -103,7 +101,7 @@ export default function Arrivals({ params }) {
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
 
   const [locale, setLocale] = useState("pt");
 
@@ -133,91 +131,87 @@ export default function Arrivals({ params }) {
 
 
   // Função para pegar as reservas
-  const fetchReservas = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
-      console.log("Response completo:", response);
-
-      const reservasArray = response.data.response.flatMap(item => {
-        try {
-          const parsedRequestBody = JSON.parse(item.responseBody);
-          const reservations = Array.isArray(parsedRequestBody)
-            ? parsedRequestBody.flatMap(data =>
-              data.ReservationInfo?.map(reserva => {
-                const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
-                const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
-
-                return {
-                  requestID: item.requestID,
-                  propertyID: item.propertyID,
-                  profileID: guestDetails.ProfileID,
-                  DateCI: reserva.DateCI,
-                  Booker: reserva.Booker,
-                  Company: reserva.Company,
-                  Group: reserva.Group,
-                  Room: reserva.Room,
-                  ResNo: reserva.ResNo,
-                  Notes: reserva.Notes,
-                  RoomStatus: reserva.RoomStatus,
-                  RoomType: reserva.RoomType,
-                  TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
-                  Price: reserva.Price,
-                  CityTax: reserva.CityTax,
-                  Total: reserva.Total,
-                  Salutation: guestDetails.Salution,
-                  LastName: guestDetails.LastName,
-                  FirstName: guestDetails.FirstName,
-                  Country: addressDetails.Country,
-                  Street: addressDetails.Street,
-                  PostalCode: addressDetails.PostalCode,
-                  City: addressDetails.City,
-                  Region: addressDetails.Region,
-                };
-              }) || []
-            )
-            : [];
-
-          return reservations;
-        } catch (err) {
-          console.error("Erro ao processar requestBody ou reservas:", err);
-          return [];
-        }
-      });
-
-      console.log("Reservas após parse:", reservasArray);
-
-      const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
-      const reservasFiltradas = reservasArray.filter(reserva => {
-        if (!reserva.DateCI) {
-          console.warn("DateCI está indefinido ou vazio para esta reserva:", reserva);
-          return false;
-        }
-        const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
-        return formattedDateCI === formattedCurrentDate;
-      });
-
-      console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
-
-      const reservasUnicas = Array.from(
-        new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
-      );
-
-      console.log("Reservas únicas para a data atual:", reservasUnicas);
-      setReservas(reservasUnicas);
-    } catch (error) {
-      console.error("Erro ao buscar reservas:", error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (postSuccessful) {
-      fetchReservas();
-    }
-  }, [postSuccessful]);
+    const fetchReservas = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`/api/reservations/checkins/${propertyID}`);
+        console.log("Response completo:", response);
 
+        const reservasArray = response.data.response.flatMap(item => {
+          try {
+            const parsedRequestBody = JSON.parse(item.responseBody);
+            const reservations = Array.isArray(parsedRequestBody)
+              ? parsedRequestBody.flatMap(data =>
+                data.ReservationInfo?.map(reserva => {
+                  const guestDetails = data.GuestInfo?.[0]?.GuestDetails?.[0] || {};
+                  const addressDetails = data.GuestInfo?.[0]?.Address?.[0] || {};
+
+                  return {
+                    requestID: item.requestID,
+                    propertyID: item.propertyID,
+                    profileID: guestDetails.ProfileID,
+                    DateCI: reserva.DateCI,
+                    Booker: reserva.Booker,
+                    Company: reserva.Company,
+                    Group: reserva.Group,
+                    Room: reserva.Room,
+                    ResNo: reserva.ResNo,
+                    Notes: reserva.Notes,
+                    RoomStatus: reserva.RoomStatus,
+                    RoomType: reserva.RoomType,
+                    TotalPax: (reserva.Adults || 0) + (reserva.Childs || 0),
+                    Price: reserva.Price,
+                    CityTax: reserva.CityTax,
+                    Total: reserva.Total,
+                    Salutation: guestDetails.Salution,
+                    LastName: guestDetails.LastName,
+                    FirstName: guestDetails.FirstName,
+                    Country: addressDetails.Country,
+                    Street: addressDetails.Street,
+                    PostalCode: addressDetails.PostalCode,
+                    City: addressDetails.City,
+                    Region: addressDetails.Region,
+                  };
+                }) || []
+              )
+              : [];
+
+            return reservations;
+          } catch (err) {
+            console.error("Erro ao processar requestBody ou reservas:", err);
+            return [];
+          }
+        });
+
+        console.log("Reservas após parse:", reservasArray);
+
+        const formattedCurrentDate = dayjs(currentDate).startOf('day').format('YYYY-MM-DD');
+        const reservasFiltradas = reservasArray.filter(reserva => {
+          if (!reserva.DateCI) {
+            console.warn("DateCI está indefinido ou vazio para esta reserva:", reserva);
+            return false;
+          }
+          const formattedDateCI = dayjs(reserva.DateCI).startOf('day').format('YYYY-MM-DD');
+          return formattedDateCI === formattedCurrentDate;
+        });
+
+        console.log("Reservas para a data atual (antes de remover duplicatas):", reservasFiltradas);
+
+        const reservasUnicas = Array.from(
+          new Map(reservasFiltradas.map(reserva => [reserva.Room, reserva])).values()
+        );
+
+        console.log("Reservas únicas para a data atual:", reservasUnicas);
+        setReservas(reservasUnicas);
+      } catch (error) {
+        console.error("Erro ao buscar reservas:", error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchReservas();
+  }, [currentDate, propertyID]);
 
   useEffect(() => {
     const fetchHotelName = async () => {

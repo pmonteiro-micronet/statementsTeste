@@ -63,8 +63,9 @@ export default function Page({ params }) {
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
 
   const [propertyName, setPropertyName] = useState([]);
+  console.log(postSuccessful);
 
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
@@ -96,10 +97,8 @@ export default function Page({ params }) {
           params: { mpehotel, propertyID },
         });
   
+        await sleep(1000); 
         setPostSuccessful(true);
-  
-        // Aguarda um curto tempo antes de buscar as reservas para garantir que os dados sejam atualizados no backend
-        setTimeout(fetchReservas, 1000);
   
       } else {
         console.error('Mpehotel não encontrado para o propertyID:', propertyID);
@@ -207,6 +206,7 @@ export default function Page({ params }) {
   };
 
   // Função para pegar as reservas
+  useEffect(() => {
     const fetchReservas = async () => {
       setIsLoading(true);
       try {
@@ -259,11 +259,9 @@ export default function Page({ params }) {
       }
     };
 
-    useEffect(() => {
-      if (postSuccessful) {
-        fetchReservas();
-      }
-    }, [postSuccessful]);
+    fetchReservas();
+  }, [currentDate, propertyID]);
+
 
   useEffect(() => {
     const fetchHotelName = async () => {
