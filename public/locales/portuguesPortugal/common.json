@@ -332,5 +332,30 @@
         "loading": "A carregar",
         "unknownUser": "Utilizador desconhecido",
         "unknownEmail": "E-mail desconhecido"
+    },
+    "registrationForm": {
+        "stayDetails": "Detalhes da estadia",
+        "terms": "Aceito a Política de Proteção de Dados do Hotel",
+        "signature": "Assinatura",
+        "callInfo": "(custo da chamada para a rede fixa nacional)",
+        "name": "Nome:",
+        "address": "Morada:",
+        "country": "País:",
+        "idTypeDoc": "Tipo de documento de identificação:",
+        "email": "Email:",
+        "docNo": "Nº do documento:",
+        "phone": "Telefone:",
+        "expDate": "Data de expiração:",
+        "birthDate": "Data de nascimento:",
+        "countryIssue": "País de emissão:",
+        "birthPlace": "Local de nascimento:",
+        "vatNo": "Nº de IVA:",
+        "reservationNo": "Nº da reserva:",
+        "room": "Quarto:",
+        "arrivalDate": "Data de chegada:",
+        "departureDate": "Data de saída:",
+        "paxNo": "Nº de pessoas/adultos:",
+        "rateCode": "Código de tarifa:",
+        "notes": "Notas:"
     }
 }
