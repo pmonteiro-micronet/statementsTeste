@@ -331,5 +331,30 @@
         "loading": "Loading",
         "unknownUser": "Unknown user",
         "unknownEmail": "Unknown e-mail"
+    },
+    "registrationForm": {
+        "stayDetails": "Stay Details",
+        "terms": "I accept the Hotel Data Protection Policy",
+        "signature": "Signature",
+        "callInfo": "(call cost to national landline network)",
+        "name": "Name:",
+        "address": "Address:",
+        "country": "Country:",
+        "idTypeDoc": "ID Type Doc:",
+        "email": "Email:",
+        "docNo": "Doc No.:",
+        "phone": "Phone:",
+        "expDate": "Exp. Date:",
+        "birthDate": "Birth Date:",
+        "countryIssue": "Country Issue:",
+        "birthPlace": "Birthplace:",
+        "vatNo": "VAT No.:",
+        "reservationNo": "Reservation No.:",
+        "room": "Room:",
+        "arrivalDate": "Arrival Date:",
+        "departureDate": "Departure Date:",
+        "paxNo": "No.Pax/Ch.:",
+        "rateCode": "Rate Code:",
+        "notes": "Notes:"
     }
 }

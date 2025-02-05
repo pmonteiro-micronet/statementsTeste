@@ -411,12 +411,12 @@ export default function Page() {
                 HotelNIF: hotelNIF,
                 HotelRNET: hotelRNET,
                 RateCode: reserva.RateCode,
+                Locale: locale, // passa a variavel de idioma
             };
 
             // Geração do PDF
             const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
             const pdfBlob = pdfDoc.output('blob'); // Gerar o PDF como um Blob
-
             // Compressão do PDF com pako (gzip)
             const pdfArrayBuffer = await pdfBlob.arrayBuffer();
             const compressedPdf = pako.gzip(new Uint8Array(pdfArrayBuffer)); // Comprime usando gzip
@@ -439,7 +439,6 @@ export default function Page() {
             setIsSuccessModalOpen(true);
         } catch (error) {
             console.error('Erro ao gerar ou enviar o PDF:', error);
-
             errors.push("There was an issue generating or sending the form. Please contact support.");
             setErrorMessage(errors.join("\n"));
             setIsErrorModalOpen(true);

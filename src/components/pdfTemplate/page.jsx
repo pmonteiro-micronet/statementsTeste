@@ -1,5 +1,11 @@
 import { jsPDF } from 'jspdf';
 
+import en from "../../../public/locales/english/common.json";
+import pt from "../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
+
 // Função para carregar imagem do Cloudinary e convertê-la para base64
 const loadImageAsBase64 = async (imagePath) => {
     try {
@@ -18,6 +24,11 @@ const loadImageAsBase64 = async (imagePath) => {
 };
 
 export const generatePDFTemplate = async (reserva, signatureBase64) => {
+    const { Locale } = reserva.Locale; 
+
+    // A partir do locale, você pode acessar as traduções
+    const t = translations[Locale] || translations["en"];
+
     const doc = new jsPDF();
 
     // Função utilitária para formatar datas
@@ -102,18 +113,18 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
 
     // Ajuste o texto das descrições (títulos) para a cor cinza
     doc.setTextColor(...grayColor); // Define a cor do texto para cinza
-    doc.text(`Name:`, guestColumn1X, guestTextY);
-    doc.text(`Address:`, guestColumn1X, guestTextY + lineHeight);
-    doc.text(`Country:`, guestColumn1X, guestTextY + 2 * lineHeight);
-    doc.text(`ID Type Doc:`, guestColumn2X, guestTextY + 2 * lineHeight);
-    doc.text(`Email:`, guestColumn1X, guestTextY + 3 * lineHeight);
-    doc.text(`Doc No.:`, guestColumn2X, guestTextY + 3 * lineHeight);
-    doc.text(`Phone:`, guestColumn1X, guestTextY + 4 * lineHeight);
-    doc.text(`Exp. Date:`, guestColumn2X, guestTextY + 4 * lineHeight);
-    doc.text(`Birth Date:`, guestColumn1X, guestTextY + 5 * lineHeight);
-    doc.text(`Country Issue:`, guestColumn2X, guestTextY + 5 * lineHeight);
-    doc.text(`Birthplace:`, guestColumn1X, guestTextY + 6 * lineHeight);
-    doc.text(`VAT No.:`, guestColumn2X, guestTextY + 6 * lineHeight);
+    doc.text(t.registrationForm.name, guestColumn1X, guestTextY);
+    doc.text(t.registrationForm.address, guestColumn1X, guestTextY + lineHeight);
+    doc.text(t.registrationForm.country, guestColumn1X, guestTextY + 2 * lineHeight);
+    doc.text(t.registrationForm.idTypeDoc, guestColumn2X, guestTextY + 2 * lineHeight);
+    doc.text(t.registrationForm.email, guestColumn1X, guestTextY + 3 * lineHeight);
+    doc.text(t.registrationForm.docNo, guestColumn2X, guestTextY + 3 * lineHeight);
+    doc.text(t.registrationForm.phone, guestColumn1X, guestTextY + 4 * lineHeight);
+    doc.text(t.registrationForm.expDate, guestColumn2X, guestTextY + 4 * lineHeight);
+    doc.text(t.registrationForm.birthDate, guestColumn1X, guestTextY + 5 * lineHeight);
+    doc.text(t.registrationForm.countryIssue, guestColumn2X, guestTextY + 5 * lineHeight);
+    doc.text(t.registrationForm.birthPlace, guestColumn1X, guestTextY + 6 * lineHeight);
+    doc.text(t.registrationForm.vatNo, guestColumn2X, guestTextY + 6 * lineHeight);
 
     // Agora, definimos a cor preta para as variáveis (valores)
     doc.setTextColor(...blackColor); // Define a cor do texto para preto
@@ -135,7 +146,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     // Adiciona título e detalhes da estadia
     doc.setFont('helvetica', 'bold');
     const stayDetailsStartY = guestRectY + guestRectHeight + 10;
-    doc.text('Stay Details', 10, stayDetailsStartY);
+    doc.text(t.registrationForm.stayDetails, 10, stayDetailsStartY);
     doc.setFont('helvetica', 'normal');
 
     const stayguestRectX = 10;
@@ -151,13 +162,13 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
 
     // Ajuste o texto das descrições (títulos) para a cor cinza
     doc.setTextColor(...grayColor); // Define a cor do texto para cinza
-    doc.text(`Reservation Nr.:`, stayColumn1X, stayTextY);
-    doc.text(`Room:`, stayColumn2X, stayTextY);
-    doc.text(`Arrival Date:`, stayColumn1X, stayTextY + lineHeight);
-    doc.text(`Departure Date:`, stayColumn2X, stayTextY + lineHeight);
-    doc.text(`Nr.Pax/Ch.:`, stayColumn1X, stayTextY + 2 * lineHeight);
-    doc.text(`Rate Code:`, stayColumn2X, stayTextY + 2 * lineHeight);
-    doc.text(`Notes:`, stayColumn1X, stayTextY + 3 * lineHeight);
+    doc.text(t.registrationForm.reservationNo, stayColumn1X, stayTextY);
+    doc.text(t.registrationForm.room, stayColumn2X, stayTextY);
+    doc.text(t.registrationForm.arrivalDate, stayColumn1X, stayTextY + lineHeight);
+    doc.text(t.registrationForm.departureDate, stayColumn2X, stayTextY + lineHeight);
+    doc.text(t.registrationForm.paxNo, stayColumn1X, stayTextY + 2 * lineHeight);
+    doc.text(t.registrationForm.rateCode, stayColumn2X, stayTextY + 2 * lineHeight);
+    doc.text(t.registrationForm.notes, stayColumn1X, stayTextY + 3 * lineHeight);
 
     // Agora, definimos a cor preta para as variáveis (valores)
     doc.setTextColor(...blackColor); // Define a cor do texto para preto
@@ -199,7 +210,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     }
 
     // Texto ao lado da checkbox
-    doc.text("I accept the Hotel Data Protection Policy", checkboxX + checkboxSize + 5, checkboxY + checkboxSize - 1);
+    doc.text(t.registrationForm.terms, checkboxX + checkboxSize + 5, checkboxY + checkboxSize - 1);
 
     // Colunas e textos dentro do retângulo (abaixo da checkbox)
     const termsColumn1X = termsRectX + 5; // Margem interna do retângulo
@@ -221,7 +232,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     // Adiciona a assinatura (se disponível)
     const signatureStartY = termsStartY + termsRectHeight + 10; // Ajuste a posição Y da assinatura
     doc.setFont('helvetica', 'bold');
-    doc.text('Signature', 10, signatureStartY);
+    doc.text(t.registrationForm.signature, 10, signatureStartY);
     doc.setFont('helvetica', 'normal');
 
     // Adiciona a imagem da assinatura se disponível
@@ -251,7 +262,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     // Informações do rodapé
     const footerLines = [
         `${reserva.HotelName}`,
-        `${reserva.HotelPhone}   (call cost to national landline network) ${reserva.HotelEmail}`,
+        `${reserva.HotelPhone}   ${t.registrationForm.callInfo} ${reserva.HotelEmail}`,
         `${reserva.HotelAddress} ${reserva.HotelPostalCode}, SA   NIF - ${reserva.HotelNIF} RNET – ${reserva.HotelRNET}`
     ];
 
@@ -275,4 +286,3 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     return doc; // Retorna o documento PDF gerado
 
 };
-

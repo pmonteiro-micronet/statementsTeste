@@ -92,6 +92,7 @@ export default function Page({ params }) {
   
         // Aguarda mais 1 segundo antes de fazer a última requisição
         await sleep(1000); 
+        //teste
   
         await axios.get("/api/reservations/info", {
           params: { mpehotel, propertyID },

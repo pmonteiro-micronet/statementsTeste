@@ -20,27 +20,30 @@ const FrontOffice = () => {
   const [inhouses, setInhouses] = useState(null);
   const [departures, setDepartures] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const t = translations[locale] || translations["pt"];
+  const router = useRouter();
+  const selectedHotelID = pathname.split('/').pop();
 
   useEffect(() => {
     const storedLanguage = localStorage.getItem("language");
     if (storedLanguage) {
       setLocale(storedLanguage);
     }
-  }, []);
 
-  const t = translations[locale] || translations["pt"];
-  const router = useRouter();
-  const selectedHotelID = pathname.split('/').pop();
+    // Função para buscar os contadores
+    const fetchCountersPeriodically = async () => {
+      if (session?.user?.propertyIDs && selectedHotelID) {
+        await fetchCounters();
+      }
+    };
 
-  // Chamar a API sempre que o componente for montado ou recarregado
-  useEffect(() => {
-    if (session?.user?.propertyIDs && selectedHotelID) {
-      // Chama a função de contadores
-      fetchCounters();
-      
-      // Chama a função sendDataToAPIForAllTypes para fazer as requisições automaticamente ao carregar a página
-      sendDataToAPIForAllTypes();  // Função para chamadas da API para arrivals, inhose, departures
-    }
+    // Chama fetchCounters imediatamente ao carregar e depois a cada 30 segundos (30000ms)
+    fetchCountersPeriodically();
+    const intervalId = setInterval(fetchCountersPeriodically, 30000); // 30 segundos
+
+    // Limpeza do intervalo quando o componente for desmontado ou quando mudar a página
+    return () => clearInterval(intervalId);
+
   }, [session?.user?.propertyIDs, selectedHotelID]);
 
   const fetchCounters = async () => {
@@ -80,50 +83,62 @@ const FrontOffice = () => {
     router.push(`/homepage/frontOfficeView/${type}/${selectedHotelID}`);
   };
 
-  const sendDataToAPI = async (type, mpehotel) => {
-    try {
-      const propertyID = selectedHotelID;
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-      if (mpehotel && propertyID) {
-        if (type === "arrivals") {
-          await axios.get("/api/reservations/checkins/reservations_4_tat", {
-            params: { mpehotel, propertyID },
-          });
-        } else if (type === "inhouses") {
-          await axios.get("/api/reservations/inHouses/reservations_4_tat", {
-            params: { mpehotel, propertyID },
-          });
-        } else if (type === "departures") {
-          await axios.get("/api/reservations/info", {
-            params: { mpehotel, propertyID },
-          });
-        }
+  // Função para enviar os dados para a API
+  const sendDataToAPI = async () => {
+    try {
+      setIsLoading(true); // Inicia o carregamento
+
+      const propertyResponse = await axios.get(`/api/properties/${selectedHotelID}`);
+
+      if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
+        const mpehotel = propertyResponse.data.response[0].mpehotel;
+        console.log('Mpehotel encontrado:', mpehotel);
+
+        // Faz as requisições com delay e passando propertyID corretamente
+        await axios.get("/api/reservations/checkins/reservations_4_tat", {
+          params: { mpehotel, propertyID: selectedHotelID }, // Alterado aqui
+        });
+
+        await sleep(1000);
+
+        await axios.get("/api/reservations/inHouses/reservations_4_tat", {
+          params: { mpehotel, propertyID: selectedHotelID }, // Alterado aqui
+        });
+
+        await sleep(1000);
+
+        await axios.get("/api/reservations/info", {
+          params: { mpehotel, propertyID: selectedHotelID }, // Alterado aqui
+        });
+
+        await sleep(1000);
+        setPostSuccessful(true);
+
+      } else {
+        console.error('Mpehotel não encontrado para o selectedHotelID:', selectedHotelID);
+        setPostSuccessful(false);
       }
     } catch (error) {
-      console.error(`Erro ao enviar os dados para ${type}:`, error);
-    }
-  };
-
-  // Função que chama a sendDataToAPI para todos os tipos (arrivals, inhous, departures) automaticamente ao carregar a página
-  const sendDataToAPIForAllTypes = async () => {
-    if (selectedHotelID) {
-      try {
-        const propertyResponse = await axios.get(`/api/properties/${selectedHotelID}`);
-        const mpehotel = propertyResponse.data.response?.[0]?.mpehotel;
-
-        if (mpehotel) {
-          // Faz as requisições simultâneas para arrivals, inhous e departures
-          await Promise.all([ 
-            sendDataToAPI("arrivals", mpehotel),
-            sendDataToAPI("inhouses", mpehotel),
-            sendDataToAPI("departures", mpehotel),
-          ]);
-        }
-      } catch (error) {
-        console.error("Erro ao chamar sendDataToAPI para todos os tipos:", error);
+      if (error.response && error.response.status === 500) {
+        console.log("Erro 500: Não conseguimos comunicar com o serviço PMS.");
+        setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
+      } else {
+        console.log("Erro inesperado:", error.response ? error.response.data : error.message);
+        setErrorMessage("We were unable to fulfill your order. Please contact support.");
       }
+      setIsErrorModalOpen(true);
+      setPostSuccessful(false);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  // Chama a função sendDataToAPI ao carregar a página
+  useEffect(() => {
+    sendDataToAPI();
+  }, [selectedHotelID]);
 
   return (
     <div className="min-h-screen flex bg-primaryBackground">
