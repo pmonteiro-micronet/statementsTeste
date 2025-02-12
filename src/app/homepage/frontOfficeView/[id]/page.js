@@ -49,47 +49,47 @@ const FrontOffice = () => {
 
   }, [session?.user?.propertyIDs, selectedHotelID]);
 
-const [firstLoad, setFirstLoad] = useState(true);  // Controla se é a primeira carga
+  const [firstLoad, setFirstLoad] = useState(true);  // Controla se é a primeira carga
 
-const fetchCounters = async () => {
-  try {
-    if (firstLoad) setIsLoading(true); // Mostra o loading apenas na primeira vez
-    
-    const response = await fetch("/api/counter");
-    const data = await response.json();
+  const fetchCounters = async () => {
+    try {
+      if (firstLoad) setIsLoading(true); // Mostra o loading apenas na primeira vez
 
-    if (response.ok) {
-      const arrivalsData = data.response.find(
-        (item) => item.counterName === "arrivals" && String(item.propertyID) === String(selectedHotelID)
-      );
-      const inhousesData = data.response.find(
-        (item) => item.counterName === "inhouses" && String(item.propertyID) === String(selectedHotelID)
-      );
-      const departuresData = data.response.find(
-        (item) => item.counterName === "departures" && String(item.propertyID) === String(selectedHotelID)
-      );
+      const response = await fetch("/api/counter");
+      const data = await response.json();
 
-      setArrivals(arrivalsData ? arrivalsData.count : 0);
-      setInhouses(inhousesData ? inhousesData.count : 0);
-      setDepartures(departuresData ? departuresData.count : 0);
-    } else {
-      console.error("Erro ao buscar dados:", data.error);
+      if (response.ok) {
+        const arrivalsData = data.response.find(
+          (item) => item.counterName === "arrivals" && String(item.propertyID) === String(selectedHotelID)
+        );
+        const inhousesData = data.response.find(
+          (item) => item.counterName === "inhouses" && String(item.propertyID) === String(selectedHotelID)
+        );
+        const departuresData = data.response.find(
+          (item) => item.counterName === "departures" && String(item.propertyID) === String(selectedHotelID)
+        );
+
+        setArrivals(arrivalsData ? arrivalsData.count : 0);
+        setInhouses(inhousesData ? inhousesData.count : 0);
+        setDepartures(departuresData ? departuresData.count : 0);
+      } else {
+        console.error("Erro ao buscar dados:", data.error);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar dados da API:", error);
+    } finally {
+      setIsLoading(false);
+      setFirstLoad(false); // Nunca mais exibe o loading após a primeira chamada
     }
-  } catch (error) {
-    console.error("Erro ao buscar dados da API:", error);
-  } finally {
-    setIsLoading(false); 
-    setFirstLoad(false); // Nunca mais exibe o loading após a primeira chamada
-  }
-};
+  };
 
-useEffect(() => {
-  if (session?.user?.propertyIDs && selectedHotelID) {
-    fetchCounters();
-    const intervalId = setInterval(fetchCounters, 30000); // Atualiza a cada 30s sem loading
-    return () => clearInterval(intervalId);
-  }
-}, [session?.user?.propertyIDs, selectedHotelID]);
+  useEffect(() => {
+    if (session?.user?.propertyIDs && selectedHotelID) {
+      fetchCounters();
+      const intervalId = setInterval(fetchCounters, 30000); // Atualiza a cada 30s sem loading
+      return () => clearInterval(intervalId);
+    }
+  }, [session?.user?.propertyIDs, selectedHotelID]);
 
 
   const handleRedirect = async (type) => {
@@ -101,69 +101,55 @@ useEffect(() => {
 
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  // Função para enviar os dados para a API
-  const sendDataToAPI = async () => {
-    try {
-      setIsLoading(true); // O loading começa ao abrir a página
-  
-      const propertyResponse = await axios.get(`/api/properties/${selectedHotelID}`);
-  
-      if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
-        const mpehotel = propertyResponse.data.response[0].mpehotel;
-        console.log('Mpehotel encontrado:', mpehotel);
-  
-        // Executa todas as requisições sequencialmente com delay
-        await axios.get("/api/reservations/checkins/reservations_4_tat", {
-          params: { mpehotel, propertyID: selectedHotelID },
-        });
-  
-        await sleep(1000);
-  
-        await axios.get("/api/reservations/inHouses/reservations_4_tat", {
-          params: { mpehotel, propertyID: selectedHotelID },
-        });
-  
-        await sleep(1000);
-  
-        await axios.get("/api/reservations/info", {
-          params: { mpehotel, propertyID: selectedHotelID },
-        });
-  
-        await sleep(1000);
-        setPostSuccessful(true);
-  
-        // ⚡ Chama `fetchCounters` imediatamente após obter os dados
-        await fetchCounters();
-  
-      } else {
-        console.error('Mpehotel não encontrado para o selectedHotelID:', selectedHotelID);
-        setPostSuccessful(false);
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 500) {
-        console.log("Erro 500: Não conseguimos comunicar com o serviço PMS.");
-        setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
-      } else {
-        console.log("Erro inesperado:", error.response ? error.response.data : error.message);
-        setErrorMessage("We were unable to fulfill your order. Please contact support.");
-      }
-      setIsErrorModalOpen(true);
-      setPostSuccessful(false);
-    } finally {
-      setIsLoading(false); // O loading só some depois que `fetchCounters` rodar
-    }
-  };
-  
-  // Chama `sendDataToAPI` ao carregar a página
   useEffect(() => {
-    sendDataToAPI();
-  }, [selectedHotelID]);
-  
+    const sendDataToAPI = async () => {
+      try {
+        setIsLoading(true); // Ativa o loading imediatamente
 
-  // Chama a função sendDataToAPI ao carregar a página
-  useEffect(() => {
+        const propertyResponse = await axios.get(`/api/properties/${selectedHotelID}`);
+
+        if (propertyResponse.data?.response?.length > 0) {
+          const mpehotel = propertyResponse.data.response[0].mpehotel;
+
+          console.log("Mpehotel encontrado:", mpehotel);
+
+          // Faz as chamadas com delay de 1 segundo entre elas
+          await axios.get("/api/reservations/checkins/reservations_4_tat", {
+            params: { mpehotel, propertyID: selectedHotelID },
+          });
+          await sleep(1000);
+
+          await axios.get("/api/reservations/inHouses/reservations_4_tat", {
+            params: { mpehotel, propertyID: selectedHotelID },
+          });
+          await sleep(1000);
+
+          await axios.get("/api/reservations/info", {
+            params: { mpehotel, propertyID: selectedHotelID },
+          });
+          await sleep(1000);
+
+          setPostSuccessful(true);
+
+          // Somente busca os contadores depois que as reservas foram carregadas
+          await fetchCounters();
+        } else {
+          console.error("Mpehotel não encontrado para o selectedHotelID:", selectedHotelID);
+          setPostSuccessful(false);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+        setErrorMessage("We were unable to fulfill your order. Please contact support.");
+        setIsErrorModalOpen(true);
+        setPostSuccessful(false);
+      } finally {
+        setIsLoading(false); // O loading só desaparece depois que TUDO foi processado
+      }
+    };
+
     sendDataToAPI();
   }, [selectedHotelID]);
+
 
   return (
     <div className="min-h-screen flex bg-primaryBackground">
