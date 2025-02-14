@@ -14,9 +14,11 @@ import SignaturePad from 'signature_pad';
 import TermsConditionsForm from "@/components/terms&conditions/page";
 import ProtectionPolicyForm from "@/components/protectionPolicy/page";
 import EditRegistrationForm from "@/components/modals/arrivals/reservationForm/edit/page";
+import CompanyVATForm from "@/components/modals/arrivals/reservationForm/companyVAT/page";
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
 import SuccessRegistrationForm from "@/components/modals/arrivals/reservationForm/success/page";
 import LoadingBackdrop from "@/components/Loader/page";
+import { FaPlus } from "react-icons/fa";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -468,6 +470,7 @@ export default function Page() {
     const [email, setEmail] = useState("");
     const [vatNo, setVatNo] = useState(""); // Novo estado para VAT No.
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isCVATModalOpen, setIsCVATModalOpen] = useState(false);
     const [modalField, setModalField] = useState(null); // Para identificar o campo em edição
 
     const [initialEmail, setInitialEmail] = useState("");
@@ -507,6 +510,8 @@ export default function Page() {
         }
     }, [locale, hotelTermsEN, hotelTermsPT, hotelTermsES]);
 
+    const [activeKey, setActiveKey] = useState("individual");
+
     return (
         <div className='bg-background main-page min-h-screen'>
             {/* Exibe o loader enquanto isLoading for verdadeiro */}
@@ -519,38 +524,38 @@ export default function Page() {
                         <div className='text-textPrimaryColor'>
                             <p>{t.frontOffice.registrationForm.title}</p>
                         </div>
-<div className="flex flex-row gap-8 items-center language-row">
-                        <div
-          className={`flag ${activeFlag === 'pt' ? 'active' : 'inactive'}`}
-          onClick={() => handleLanguageChange('pt')}
-        >
-          <img
-            src="/flags/pt.png"
-            alt="portuguese"
-            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-          />
-        </div>
-        <div
-          className={`flag ${activeFlag === 'es' ? 'active' : 'inactive'}`}
-          onClick={() => handleLanguageChange('es')}
-        >
-          <img
-            src="/flags/sp.png"
-            alt="spanish"
-            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-          />
-        </div>
-        <div
-          className={`flag ${activeFlag === 'usa-uk' ? 'active' : 'inactive'}`}
-          onClick={() => handleLanguageChange('en')}
-        >
-          <img
-            src="/flags/uk.png"
-            alt="english"
-            className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
-          />
-        </div>
-      </div>
+                        <div className="flex flex-row gap-8 items-center language-row">
+                            <div
+                                className={`flag ${activeFlag === 'pt' ? 'active' : 'inactive'}`}
+                                onClick={() => handleLanguageChange('pt')}
+                            >
+                                <img
+                                    src="/flags/pt.png"
+                                    alt="portuguese"
+                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+                                />
+                            </div>
+                            <div
+                                className={`flag ${activeFlag === 'es' ? 'active' : 'inactive'}`}
+                                onClick={() => handleLanguageChange('es')}
+                            >
+                                <img
+                                    src="/flags/sp.png"
+                                    alt="spanish"
+                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+                                />
+                            </div>
+                            <div
+                                className={`flag ${activeFlag === 'usa-uk' ? 'active' : 'inactive'}`}
+                                onClick={() => handleLanguageChange('en')}
+                            >
+                                <img
+                                    src="/flags/uk.png"
+                                    alt="english"
+                                    className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
+                                />
+                            </div>
+                        </div>
 
                         {/* Combo Box with Flag Images */}
                         <div className="ml-4 relative language-combobox">
@@ -1009,18 +1014,78 @@ export default function Page() {
                                     {/** Dados de faturação */}
                                     <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card">
                                         <div className="flex flex-row justify-between">
+                                            <div className='flex justify-start gap-6'>
                                             <p className="text-[#f7ba83] mb-1">{t.frontOffice.registrationForm.invoiceData}</p>
-                                            <FaPencilAlt
-                                                size={15}
-                                                color={reserva.BlockedVatNO === 1 ? "gray" : "#FC9D25"}
-                                                style={{ cursor: reserva.BlockedVatNO === 1 ? "not-allowed" : "pointer" }}
-                                                onClick={() => {
-                                                    if (reserva.BlockedVatNO === 0) {
-                                                        setModalField("VatNo"); // Define o campo em edição
-                                                        setIsModalOpen(true); // Abre o modal
-                                                    }
-                                                }}
-                                            />
+                                            <div className="flex flex-row justify-center bg-gray-100 w-34 h-8 rounded-xl items-center -mt-1">
+                                                    <div
+                                                        onClick={() => setActiveKey("individual")}
+                                                        className={`cursor-pointer p-2 ${activeKey === "individual" ? "h-6 flex items-center bg-white text-black rounded-lg m-0.5 text-xs text-bold border border-gray-200" : "text-gray-500 m-1 text-xs"}`}
+                                                    >
+                                                        Individual
+                                                    </div>
+                                                    <div
+                                                        onClick={() => setActiveKey("company")}
+                                                        className={`cursor-pointer p-2 ${activeKey === "company" ? "h-6 flex items-center bg-white text-black rounded-lg m-0.5 text-xs text-bold border border-gray-200" : "text-gray-500 m-1 text-xs"}`}
+                                                    >
+                                                        Company
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {/* <div className="flex justify-center">
+                                                <div className="flex flex-row justify-center bg-gray-100 w-34 h-8 rounded-xl items-center">
+                                                    <div
+                                                        onClick={() => setActiveKey("individual")}
+                                                        className={`cursor-pointer p-2 ${activeKey === "individual" ? "h-6 flex items-center bg-white text-black rounded-lg m-0.5 text-xs text-bold border border-gray-200" : "text-gray-500 m-1 text-xs"}`}
+                                                    >
+                                                        Individual
+                                                    </div>
+                                                    <div
+                                                        onClick={() => setActiveKey("company")}
+                                                        className={`cursor-pointer p-2 ${activeKey === "company" ? "h-6 flex items-center bg-white text-black rounded-lg m-0.5 text-xs text-bold border border-gray-200" : "text-gray-500 m-1 text-xs"}`}
+                                                    >
+                                                        Company
+                                                    </div>
+                                                </div>
+                                            </div> */}
+                                            <div>
+                                                {activeKey === "individual" && (
+                                                    <FaPencilAlt
+                                                        size={15}
+                                                        color={reserva.BlockedVatNO === 1 ? "gray" : "#FC9D25"}
+                                                        style={{ cursor: reserva.BlockedVatNO === 1 ? "not-allowed" : "pointer" }}
+                                                        title={reserva.BlockedVatNO === 1 ? "Fiscalizado" : ""}
+                                                        onClick={() => {
+                                                            if (reserva.BlockedVatNO === 0) {
+                                                                setModalField("VatNo"); // Define o campo em edição
+                                                                setIsModalOpen(true); // Abre o modal
+                                                            }
+                                                        }}
+                                                    />
+                                                )}
+
+                                                {activeKey === "company" && (
+                                                    reserva.hasCompanyVAT === 1 ? (
+                                                        <FaPencilAlt
+                                                            size={15}
+                                                            color="#FC9D25"
+                                                            style={{ cursor: "pointer" }}
+                                                            // onClick={() => {
+                                                            //     setModalField("CompanyVatNo"); // Define o campo em edição
+                                                            //     setIsModalOpen(true); // Abre o modal
+                                                            // }}
+                                                        />
+                                                    ) : (
+                                                        <FaPlus
+                                                            size={15}
+                                                            color="#FC9D25"
+                                                            style={{ cursor: "pointer" }}
+                                                            onClick={() => {
+                                                                setIsCVATModalOpen(true); // Abre o modal
+                                                            }}
+                                                        />
+                                                    )
+                                                )}
+                                            </div>
                                         </div>
                                         <div className="mt-2">
                                             <p className="!text-textLabelColor text-lg">{guestInfo.LastName}, {guestInfo.FirstName}</p>
@@ -1031,7 +1096,9 @@ export default function Page() {
                                                     name="VAT Nr."
                                                     label={t.frontOffice.registrationForm.vatNr}
                                                     ariaLabel="VAT Nr.:"
-                                                    value={vatNo}
+                                                    value={
+                                                        reserva.BlockedVatNO === 1 && !vatNo ? "999999990" : vatNo
+                                                    }
                                                     style={inputStyleFull}
                                                     disabled
                                                 />
@@ -1051,6 +1118,15 @@ export default function Page() {
                                             }
                                             onSave={(newValue) => handleModalSave(newValue)}
                                             onClose={() => setIsModalOpen(false)}
+                                        />
+                                    )}
+
+                                     {/** Modal Dinâmico */}
+                                     {isCVATModalOpen && (
+                                        <CompanyVATForm
+                                            onClose={() => setIsCVATModalOpen(false)}
+                                            profileID = {guestInfo.ProfileID}
+                                            propertyID = {propertyID}
                                         />
                                     )}
                                 </div>

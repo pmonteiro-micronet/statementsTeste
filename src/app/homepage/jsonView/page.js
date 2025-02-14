@@ -147,7 +147,7 @@ const JsonViewPage = () => {
               <img
                 src={imageUrl}
                 alt="Property Image"
-                className="mx-auto"
+                className="mx-auto w-52"
               />
             </div>
           )}

@@ -91,7 +91,6 @@ const FrontOffice = () => {
     }
   }, [session?.user?.propertyIDs, selectedHotelID]);
 
-
   const handleRedirect = async (type) => {
     if (isLoading) return;
 
