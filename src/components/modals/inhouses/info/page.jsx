@@ -51,7 +51,7 @@ const InHousesInfoForm = ({
                                                 {editIcon} {modalHeader} {modalEditArrow} {modalEdit}
                                             </div>
                                             <div className='flex flex-row items-center justify-end'>
-                                                <Button color="transparent" variant="light" className={"w-auto min-w-0 p-0 m-0 -pr-4"} onClick={() => { onClose() }}><MdClose size={30} /></Button>
+                                                <Button color="transparent" variant="light" className={"w-auto min-w-0 p-0 m-0 -pr-4"} onClick={() => { onClose(); window.location.reload();}}><MdClose size={30} /></Button>
                                             </div>
                                         </ModalHeader>
                                         <ModalBody className="flex flex-col mx-5 my-2 space-y-8 bg-background">

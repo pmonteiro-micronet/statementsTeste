@@ -50,7 +50,7 @@ const DepartureInfoForm = ({
                                                 {editIcon} {modalHeader} {modalEditArrow} {modalEdit}
                                             </div>
                                             <div className='flex flex-row items-center'>
-                                                <Button color="transparent" variant="light" className="w-auto min-w-0 p-0 m-0" onClick={() => onClose()}>
+                                                <Button color="transparent" variant="light" className="w-auto min-w-0 p-0 m-0" onClick={() => { onClose(); window.location.reload();}}>
                                                     <MdClose size={30} />
                                                 </Button>
                                             </div>
