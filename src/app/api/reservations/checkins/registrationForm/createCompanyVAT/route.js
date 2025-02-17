@@ -8,10 +8,10 @@ export async function POST(request) {
     const body = await request.json();
     console.log("Dados recebidos no backend:", body);
 
-    // Obtém o profileID do corpo da requisição
-    const { profileID, propertyID, companyName, country, streetAddress, zipCode, city, state } = body;
+    // Obtém os dados do corpo da requisição
+    const { profileID, propertyID, companyName, vatNo, emailAddress, country, streetAddress, zipCode, city, state } = body;
 
-    if (!profileID || !propertyID || !companyName || !country || !streetAddress || !zipCode || !city || !state) {
+    if (!profileID || !propertyID || !companyName || !vatNo || !emailAddress || !country || !streetAddress || !zipCode || !city || !state) {
       return new NextResponse(
         JSON.stringify({ error: "Todos os campos são obrigatórios, incluindo profileID." }),
         { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
@@ -49,6 +49,8 @@ export async function POST(request) {
     const dataToSend = {
       profileID,
       companyName,
+      vatNo,
+      emailAddress,
       country,
       streetAddress,
       zipCode,
