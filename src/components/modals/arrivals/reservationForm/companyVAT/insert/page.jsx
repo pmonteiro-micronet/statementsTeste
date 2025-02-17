@@ -5,20 +5,6 @@ import Select from "react-select";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 
-const countryOptions = [
-    { value: "PT", label: "Portugal" },
-    { value: "US", label: "Estados Unidos" },
-    { value: "GB", label: "Reino Unido" },
-    { value: "DE", label: "Alemanha" },
-    { value: "FR", label: "França" },
-    { value: "IT", label: "Itália" },
-    { value: "ES", label: "Espanha" },
-    { value: "BR", label: "Brasil" },
-    { value: "CA", label: "Canadá" },
-    { value: "AU", label: "Austrália" },
-    { value: "JP", label: "Japão" },
-];
-
 const customStyles = {
     control: (provided) => ({
         ...provided,
@@ -50,6 +36,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
     const [errorMessage, setErrorMessage] = useState("");
     const [vatError, setVatError] = useState("");
     const inputRef = useRef(null);
+    const [countryOptions, setCountryOptions] = useState([]);
 
     useEffect(() => {
         if (inputRef.current) {
@@ -89,6 +76,23 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
         });
     };
 
+    const fetchNationalities = async () => {
+        try {
+            const response = await axios.get(`/api/nationalities?propertyID=${propertyID}`);
+            const nationalities = response.data;
+    
+            const formattedOptions = nationalities.map((country) => ({
+                value: country.codenr, // ID do país
+                label: country.land    // Nome do país
+            }));
+    
+            setCountryOptions(formattedOptions);
+        } catch (error) {
+            console.error("Erro ao buscar nacionalidades:", error);
+            setErrorMessage("Erro ao carregar os países.");
+        }
+    };
+    
     const handleSave = async () => {
         for (const key in formData) {
             if (!formData[key].trim()) {
@@ -117,6 +121,10 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
         }
     };
 
+    useEffect(() => {
+        fetchNationalities();
+    }, []); // Chamar apenas uma vez ao montar o componente
+    
     return (
         <Modal isOpen={true} onOpenChange={onClose} className="z-50" size="lg" hideCloseButton={true}>
             <ModalContent>
@@ -151,7 +159,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">Country:</label>
+                                <label className="block text-sm font-medium">Country:</label>
                                 <Select
                                     options={countryOptions}
                                     value={countryOptions.find(option => option.value === formData.country)}

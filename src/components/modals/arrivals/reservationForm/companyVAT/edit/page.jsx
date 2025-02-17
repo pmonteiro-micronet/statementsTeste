@@ -1,10 +1,9 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 
-const CompanyVATFormEdit = ({ onClose, profileID, propertyID, initialData }) => {
+const CompanyVATFormEdit = ({ onClose, initialData }) => {
     const [formData, setFormData] = useState({
         companyName: initialData.companyName || "",
         vatNo: initialData.vatNo || "",
