@@ -151,7 +151,7 @@ const CompanyVATForm = ({ onClose, profileID, propertyID }) => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">País:</label>
+                                <label className="block text-sm font-medium text-textPrimaryColor">Country:</label>
                                 <Select
                                     options={countryOptions}
                                     value={countryOptions.find(option => option.value === formData.country)}
