@@ -7,6 +7,8 @@ import { MdClose } from "react-icons/md";
 const CompanyVATForm = ({ onClose, profileID, propertyID }) => {
     const [formData, setFormData] = useState({
         companyName: "",
+        vatNo: "",
+        emailAddress: "",
         country: "",
         streetAddress: "",
         zipCode: "",
@@ -60,16 +62,18 @@ const CompanyVATForm = ({ onClose, profileID, propertyID }) => {
                 {(onCloseModal) => (
                     <>
                         <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white">
-                            Create new Company VAT No.
+                            Create New Company VAT No.
                             <Button color="transparent" variant="light" onClick={onCloseModal} className="w-auto min-w-0 p-0 m-0">
                                 <MdClose size={30} />
                             </Button>
                         </ModalHeader>
-                        <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor">
-                            {["companyName", "country", "streetAddress", "zipCode", "city", "state"].map((field, index) => (
+                        <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
+                            {[
+                                "companyName", "vatNo", "emailAddress", "country", "streetAddress", "zipCode", "city", "state"
+                            ].map((field, index) => (
                                 <div key={index}>
                                     <label className="block text-sm font-medium text-textPrimaryColor">
-                                        {field.replace(/([A-Z])/g, ' $1').trim()}:
+                                        {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1').trim()}:
                                     </label>
                                     <input
                                         ref={index === 0 ? inputRef : null}
