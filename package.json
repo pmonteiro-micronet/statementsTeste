@@ -30,6 +30,7 @@
       "react-dom": "^19.0.0",
       "react-icons": "^5.4.0",
       "react-responsive": "^10.0.0",
+      "react-select": "^5.10.0",
       "signature_pad": "^5.0.4",
       "tailwind-merge": "^2.6.0"
    },
