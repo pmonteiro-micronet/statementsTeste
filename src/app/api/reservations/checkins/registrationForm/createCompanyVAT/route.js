@@ -8,12 +8,12 @@ export async function POST(request) {
     const body = await request.json();
     console.log("Dados recebidos no backend:", body);
 
-    // Obtém os dados do corpo da requisição
-    const { profileID, propertyID, companyName, vatNo, emailAddress, country, streetAddress, zipCode, city, state } = body;
+    // Extrai os dados do corpo da requisição
+    const { profileID, propertyID, companyName, vatNo, emailAddress, countryID, countryName, streetAddress, zipCode, city, state } = body;
 
-    if (!profileID || !propertyID || !companyName || !vatNo || !emailAddress || !country || !streetAddress || !zipCode || !city || !state) {
+    if (!profileID || !propertyID || !companyName || !vatNo || !emailAddress || !countryID || !countryName || !streetAddress || !zipCode || !city || !state) {
       return new NextResponse(
-        JSON.stringify({ error: "Todos os campos são obrigatórios, incluindo profileID." }),
+        JSON.stringify({ error: "Todos os campos são obrigatórios, incluindo countryID e countryName." }),
         { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
       );
     }
@@ -22,16 +22,16 @@ export async function POST(request) {
     const propertyIDInt = parseInt(propertyID, 10);
 
     if (isNaN(propertyIDInt)) {
-        return new NextResponse(
-          JSON.stringify({ error: "PropertyID inválido, deve ser um número" }),
-          { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
-        );
-      }
-  
+      return new NextResponse(
+        JSON.stringify({ error: "PropertyID inválido, deve ser um número" }),
+        { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
+      );
+    }
+
     // Consulta ao banco de dados para obter informações do servidor
     const property = await prisma.properties.findUnique({
-        where: { propertyID: propertyIDInt },
-        select: { propertyServer: true, propertyPort: true }
+      where: { propertyID: propertyIDInt },
+      select: { propertyServer: true, propertyPort: true }
     });
 
     if (!property) {
@@ -42,20 +42,20 @@ export async function POST(request) {
     }
 
     const { propertyServer, propertyPort } = property;
-    const url = `http://${propertyServer}:${propertyPort}/companyVAT`;
+    const url = `http://${propertyServer}:${propertyPort}/insertCompany`;
     console.log("URL de destino:", url);
 
-    // Dados a serem enviados para o servidor externo
+    // Enviar para API externa corretamente
     const dataToSend = {
-      profileID,
-      companyName,
-      vatNo,
-      emailAddress,
-      country,
-      streetAddress,
-      zipCode,
-      city,
-      state
+      CompanyName: companyName,
+      CountryID: countryID, // ID do país
+      CountryName: countryName, // Nome do país
+      StreetAddress: streetAddress,
+      ZipCode: zipCode,
+      City: city,
+      State: state,
+      VatNo: vatNo,
+      Email: emailAddress
     };
 
     // Envio dos dados com token de autorização

@@ -14,11 +14,12 @@ import SignaturePad from 'signature_pad';
 import TermsConditionsForm from "@/components/terms&conditions/page";
 import ProtectionPolicyForm from "@/components/protectionPolicy/page";
 import EditRegistrationForm from "@/components/modals/arrivals/reservationForm/edit/page";
-import CompanyVATForm from "@/components/modals/arrivals/reservationForm/companyVAT/page";
+import CompanyVATFormEdit from "@/components/modals/arrivals/reservationForm/companyVAT/edit/page";
+import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insert/page";
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
 import SuccessRegistrationForm from "@/components/modals/arrivals/reservationForm/success/page";
 import LoadingBackdrop from "@/components/Loader/page";
-import { FaPlus } from "react-icons/fa";
+import { FaPlusCircle } from "react-icons/fa";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -471,6 +472,8 @@ export default function Page() {
     const [vatNo, setVatNo] = useState(""); // Novo estado para VAT No.
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCVATModalOpen, setIsCVATModalOpen] = useState(false);
+    const [isCVATModalOpenInsert, setIsCVATModalOpenInsert] = useState(false);
+    const [companyVATData, setCompanyVATData] = useState(null);
     const [modalField, setModalField] = useState(null); // Para identificar o campo em edição
 
     const [initialEmail, setInitialEmail] = useState("");
@@ -1015,8 +1018,8 @@ export default function Page() {
                                     <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card">
                                         <div className="flex flex-row justify-between">
                                             <div className='flex justify-start gap-6'>
-                                            <p className="text-[#f7ba83] mb-1">{t.frontOffice.registrationForm.invoiceData}</p>
-                                            <div className="flex flex-row justify-center bg-gray-100 w-34 h-8 rounded-xl items-center -mt-1">
+                                                <p className="text-[#f7ba83] mb-1">{t.frontOffice.registrationForm.invoiceData}</p>
+                                                <div className="flex flex-row justify-center bg-gray-100 w-34 h-8 rounded-xl items-center -mt-1">
                                                     <div
                                                         onClick={() => setActiveKey("individual")}
                                                         className={`cursor-pointer p-2 ${activeKey === "individual" ? "h-6 flex items-center bg-white text-black rounded-lg m-0.5 text-xs text-bold border border-gray-200" : "text-gray-500 m-1 text-xs"}`}
@@ -1069,18 +1072,27 @@ export default function Page() {
                                                             size={15}
                                                             color="#FC9D25"
                                                             style={{ cursor: "pointer" }}
-                                                            // onClick={() => {
-                                                            //     setModalField("CompanyVatNo"); // Define o campo em edição
-                                                            //     setIsModalOpen(true); // Abre o modal
-                                                            // }}
+                                                            onClick={() => {
+                                                                setCompanyVATData({
+                                                                    companyName: reserva.companyName || "",
+                                                                    vatNo: reserva.companyVAT || "",
+                                                                    emailAddress: reserva.companyEmail || "",
+                                                                    country: reserva.companyCountry || "",
+                                                                    streetAddress: reserva.companyAddress || "",
+                                                                    zipCode: reserva.companyZip || "",
+                                                                    city: reserva.companyCity || "",
+                                                                    state: reserva.companyState || ""
+                                                                });
+                                                                setIsCVATModalOpen(true);
+                                                            }}
                                                         />
                                                     ) : (
-                                                        <FaPlus
-                                                            size={15}
+                                                        <FaPlusCircle
+                                                            size={20}
                                                             color="#FC9D25"
                                                             style={{ cursor: "pointer" }}
                                                             onClick={() => {
-                                                                setIsCVATModalOpen(true); // Abre o modal
+                                                                setIsCVATModalOpenInsert(true); // Abre o modal
                                                             }}
                                                         />
                                                     )
@@ -1088,7 +1100,13 @@ export default function Page() {
                                             </div>
                                         </div>
                                         <div className="mt-2">
-                                            <p className="!text-textLabelColor text-lg">{guestInfo.LastName}, {guestInfo.FirstName}</p>
+                                            <p className="!text-textLabelColor text-lg">
+                                                {activeKey === "company"
+                                                    ? reserva.hasCompanyVAT === 1
+                                                        ? reserva.companyName || "" // Exibe o nome da empresa se disponível
+                                                        : ""
+                                                    : `${guestInfo.LastName}, ${guestInfo.FirstName}`}
+                                            </p>
                                             <div className="mt-4">
                                                 <InputFieldControlled
                                                     type="text"
@@ -1097,7 +1115,13 @@ export default function Page() {
                                                     label={t.frontOffice.registrationForm.vatNr}
                                                     ariaLabel="VAT Nr.:"
                                                     value={
-                                                        reserva.BlockedVatNO === 1 && !vatNo ? "999999990" : vatNo
+                                                        activeKey === "company"
+                                                            ? reserva.hasCompanyVAT === 1
+                                                                ? reserva.companyVAT || "" // Exibe o VAT da empresa se disponível
+                                                                : ""
+                                                            : reserva.BlockedVatNO === 1 && !vatNo
+                                                                ? "999999990"
+                                                                : vatNo
                                                     }
                                                     style={inputStyleFull}
                                                     disabled
@@ -1121,12 +1145,21 @@ export default function Page() {
                                         />
                                     )}
 
-                                     {/** Modal Dinâmico */}
-                                     {isCVATModalOpen && (
-                                        <CompanyVATForm
+                                    {/** Modal Dinâmico */}
+                                    {isCVATModalOpen && (
+                                        <CompanyVATFormEdit
                                             onClose={() => setIsCVATModalOpen(false)}
-                                            profileID = {guestInfo.ProfileID}
-                                            propertyID = {propertyID}
+                                            profileID={guestInfo.ProfileID}
+                                            propertyID={propertyID}
+                                            initialData={companyVATData} // Aqui usamos o nome correto da variável
+                                        />
+                                    )}
+
+                                    {isCVATModalOpenInsert && (
+                                        <CompanyVATFormInsert
+                                            onClose={() => setIsCVATModalOpenInsert(false)}
+                                            profileID={guestInfo.ProfileID}
+                                            propertyID={propertyID}
                                         />
                                     )}
                                 </div>
