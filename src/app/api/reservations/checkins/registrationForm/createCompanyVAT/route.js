@@ -9,11 +9,11 @@ export async function POST(request) {
     console.log("Dados recebidos no backend:", body);
 
     // Extrai os dados do corpo da requisição
-    const { profileID, propertyID, companyName, vatNo, emailAddress, country, streetAddress, zipCode, city, state } = body;
+    const { profileID, propertyID, companyName, vatNo, emailAddress, countryID, countryName, streetAddress, zipCode, city, state } = body;
 
-    if (!profileID || !propertyID || !companyName || !vatNo || !emailAddress || !country || !streetAddress || !zipCode || !city || !state) {
+    if (!profileID || !propertyID || !companyName || !vatNo || !emailAddress || !countryID || !countryName || !streetAddress || !zipCode || !city || !state) {
       return new NextResponse(
-        JSON.stringify({ error: "Todos os campos são obrigatórios, incluindo profileID." }),
+        JSON.stringify({ error: "Todos os campos são obrigatórios, incluindo countryID e countryName." }),
         { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
       );
     }
@@ -45,11 +45,11 @@ export async function POST(request) {
     const url = `http://${propertyServer}:${propertyPort}/insertCompany`;
     console.log("URL de destino:", url);
 
-    // Dados formatados corretamente para a API externa
+    // Enviar para API externa corretamente
     const dataToSend = {
       CompanyName: companyName,
-      CountryID: country, // Se precisar de um ID específico, deve ser mapeado corretamente
-      CountryName: country,
+      CountryID: countryID, // ID do país
+      CountryName: countryName, // Nome do país
       StreetAddress: streetAddress,
       ZipCode: zipCode,
       City: city,

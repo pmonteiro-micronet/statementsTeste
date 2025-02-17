@@ -64,7 +64,8 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
         setFormData((prevData) => {
             const updatedData = {
                 ...prevData,
-                country: selectedOption.value,
+                country: selectedOption.value, // ID do país (codenr)
+                countryName: selectedOption.label, // Nome do país (land)
             };
 
             // Limpar o campo VAT No. se o país for alterado
@@ -80,19 +81,19 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
         try {
             const response = await axios.get(`/api/nationalities?propertyID=${propertyID}`);
             const nationalities = response.data;
-    
+
             const formattedOptions = nationalities.map((country) => ({
                 value: country.codenr, // ID do país
                 label: country.land    // Nome do país
             }));
-    
+
             setCountryOptions(formattedOptions);
         } catch (error) {
             console.error("Erro ao buscar nacionalidades:", error);
             setErrorMessage("Erro ao carregar os países.");
         }
     };
-    
+
     const handleSave = async () => {
         for (const key in formData) {
             if (!formData[key].trim()) {
@@ -110,6 +111,8 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
             const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVAT", {
                 profileID,
                 propertyID,
+                countryID: formData.country, // ID do país
+                countryName: formData.countryName, // Nome do país
                 ...formData
             });
             console.log("Success:", response.data);
@@ -124,7 +127,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
     useEffect(() => {
         fetchNationalities();
     }, []); // Chamar apenas uma vez ao montar o componente
-    
+
     return (
         <Modal isOpen={true} onOpenChange={onClose} className="z-50" size="lg" hideCloseButton={true}>
             <ModalContent>
