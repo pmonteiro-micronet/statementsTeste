@@ -95,18 +95,11 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
     };
 
     const handleSave = async () => {
-        for (const key in formData) {
-            if (!formData[key].trim()) {
-                setErrorMessage(`Todos os campos devem ser preenchidos.`);
-                return;
-            }
-        }
-
-        if (formData.country === "PT" && !validatePortugueseVAT(formData.vatNo)) {
-            setErrorMessage("O NIF português está incorreto.");
+        if (!formData.companyName) {
+            setErrorMessage("O nome da empresa é obrigatório.");
             return;
         }
-
+    
         try {
             const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVAT", {
                 profileID,
@@ -115,6 +108,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
                 countryName: formData.countryName, // Nome do país
                 ...formData
             });
+    
             console.log("Success:", response.data);
             setErrorMessage("");
             onClose();
@@ -123,6 +117,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
             setErrorMessage("Falha ao salvar. Por favor, tente novamente.");
         }
     };
+    
 
     useEffect(() => {
         fetchNationalities();
