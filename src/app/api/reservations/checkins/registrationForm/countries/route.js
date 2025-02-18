@@ -43,6 +43,7 @@ export async function GET(request) {
 
     // Fazer a requisição para buscar as nacionalidades
     const response = await axios.get(url);
+    console.log(response)
     const nationalities = response.data;
 
     // Retornar os dados como JSON
