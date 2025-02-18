@@ -156,32 +156,28 @@ export default function SidebarWrapper({ children }) {
               ref: `/homepage/frontOfficeView/${selectedHotelID}`,
               label: `${t.navbar.text.dashboard}`,
               onClick: () => router.push(`/homepage/frontOfficeView/${selectedHotelID}`),
-              icon: <TbLayoutDashboardFilled  />
+              icon: <TbLayoutDashboardFilled />,
             },
-            ...(isAdmin
-              ? [
-                {
-                  ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
-                  label: `${t.navbar.text.arrivals}`,
-                  onClick: () => handleRedirect("arrivals"),
-                  icon: <LiaPlaneArrivalSolid />,
-                },
-                {
-                  ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
-                  label: `${t.navbar.text.inHouses}`,
-                  onClick: () => handleRedirect("inhouses"),
-                  icon: <LuMapPinHouse />,
-                },
-              ]
-              : []),
-              {
-                ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
-                label: `${t.navbar.text.departures}`,
-                onClick: () => handleRedirect("departures"),
-                icon: <LiaPlaneDepartureSolid />,
-              },
+            {
+              ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
+              label: `${t.navbar.text.arrivals}`,
+              onClick: () => handleRedirect("arrivals"),
+              icon: <LiaPlaneArrivalSolid />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
+              label: `${t.navbar.text.inHouses}`,
+              onClick: () => handleRedirect("inhouses"),
+              icon: <LuMapPinHouse />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
+              label: `${t.navbar.text.departures}`,
+              onClick: () => handleRedirect("departures"),
+              icon: <LiaPlaneDepartureSolid />,
+            },
           ],
-        },
+        },        
       });
     } else {
       setListItems({});
