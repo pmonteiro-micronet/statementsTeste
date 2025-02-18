@@ -79,7 +79,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
 
     const fetchNationalities = async () => {
         try {
-            const response = await axios.get(`/api/nationalities?propertyID=${propertyID}`);
+            const response = await axios.get(`/api/reservations/checkins/registragionForm/countries?propertyID=${propertyID}`);
             const nationalities = response.data;
 
             const formattedOptions = nationalities.map((country) => ({
