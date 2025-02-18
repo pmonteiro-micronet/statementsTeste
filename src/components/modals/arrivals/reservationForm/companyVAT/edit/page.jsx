@@ -5,20 +5,6 @@ import Select from "react-select";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 
-const countryOptions = [
-    { value: "PT", label: "Portugal" },
-    { value: "US", label: "Estados Unidos" },
-    { value: "GB", label: "Reino Unido" },
-    { value: "DE", label: "Alemanha" },
-    { value: "FR", label: "França" },
-    { value: "IT", label: "Itália" },
-    { value: "ES", label: "Espanha" },
-    { value: "BR", label: "Brasil" },
-    { value: "CA", label: "Canadá" },
-    { value: "AU", label: "Austrália" },
-    { value: "JP", label: "Japão" },
-];
-
 const customStyles = {
     control: (provided) => ({
         ...provided,
@@ -32,11 +18,9 @@ const customStyles = {
     })
 };
 
-const validatePortugueseVAT = (vat) => {
-    return /^PT\d{9}$/.test(vat);
-};
+const validatePortugueseVAT = (vat) => /^PT\d{9}$/.test(vat);
 
-const CompanyVATForm = ({ onClose, profileID, propertyID }) => {
+const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
     const [formData, setFormData] = useState({
         companyName: "",
         vatNo: "",
@@ -49,20 +33,65 @@ const CompanyVATForm = ({ onClose, profileID, propertyID }) => {
     });
     const [errorMessage, setErrorMessage] = useState("");
     const [vatError, setVatError] = useState("");
+    const [countryOptions, setCountryOptions] = useState([]);
+    const [loading, setLoading] = useState(true);
     const inputRef = useRef(null);
 
     useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.focus();
+        if (inputRef.current) inputRef.current.focus();
+    }, []);
+
+    // 🔹 Buscar lista de países da API
+    const fetchCountries = async () => {
+        try {
+            const response = await axios.get(`/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`);
+            const formattedOptions = response.data.map(country => ({
+                value: country.codenr, 
+                label: country.land 
+            }));
+            setCountryOptions(formattedOptions);
+        } catch (error) {
+            console.error("Erro ao carregar países:", error);
+            setErrorMessage("Erro ao carregar os países.");
         }
+    };
+
+    // 🔹 Buscar os dados da empresa caso existam
+    const fetchCompanyData = async () => {
+        try {
+            const response = await axios.get(`/api/reservations/checkins/registrationForm/getCompanyVAT`, {
+                params: { profileID, propertyID }
+            });
+
+            if (response.data) {
+                setFormData({
+                    companyName: response.data.companyName || "",
+                    vatNo: response.data.vatNo || "",
+                    emailAddress: response.data.emailAddress || "",
+                    country: response.data.country || "",
+                    streetAddress: response.data.streetAddress || "",
+                    zipCode: response.data.zipCode || "",
+                    city: response.data.city || "",
+                    state: response.data.state || ""
+                });
+            }
+        } catch (error) {
+            console.error("Erro ao buscar dados da empresa:", error);
+            setErrorMessage("Não foi possível carregar os dados da empresa.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 🔹 Buscar os países e os dados da empresa ao carregar o componente
+    useEffect(() => {
+        fetchCountries();
+        fetchCompanyData();
     }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleBlur = () => {
@@ -74,27 +103,17 @@ const CompanyVATForm = ({ onClose, profileID, propertyID }) => {
     };
 
     const handleCountryChange = (selectedOption) => {
-        setFormData((prevData) => {
-            const updatedData = {
-                ...prevData,
-                country: selectedOption.value,
-            };
-
-            // Limpar o campo VAT No. se o país for alterado
-            if (updatedData.country !== prevData.country) {
-                updatedData.vatNo = "";
-            }
-
-            return updatedData;
-        });
+        setFormData(prev => ({
+            ...prev,
+            country: selectedOption.value,
+            vatNo: prev.country !== selectedOption.value ? "" : prev.vatNo
+        }));
     };
 
     const handleSave = async () => {
-        for (const key in formData) {
-            if (!formData[key].trim()) {
-                setErrorMessage(`Todos os campos devem ser preenchidos.`);
-                return;
-            }
+        if (Object.values(formData).some(value => !value.trim())) {
+            setErrorMessage("Todos os campos devem ser preenchidos.");
+            return;
         }
 
         if (formData.country === "PT" && !validatePortugueseVAT(formData.vatNo)) {
@@ -103,19 +122,20 @@ const CompanyVATForm = ({ onClose, profileID, propertyID }) => {
         }
 
         try {
-            const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVAT", {
+            await axios.post("/api/reservations/checkins/registrationForm/createOrUpdateCompanyVAT", {
                 profileID,
                 propertyID,
                 ...formData
             });
-            console.log("Success:", response.data);
             setErrorMessage("");
             onClose();
         } catch (error) {
-            console.error("Erro ao salvar informações de VAT:", error);
-            setErrorMessage("Falha ao salvar. Por favor, tente novamente.");
+            console.error("Erro ao salvar empresa:", error);
+            setErrorMessage("Erro ao salvar. Por favor, tente novamente.");
         }
     };
+
+    if (loading) return <p>Carregando...</p>;
 
     return (
         <Modal isOpen={true} onOpenChange={onClose} className="z-50" size="lg" hideCloseButton={true}>
@@ -123,94 +143,27 @@ const CompanyVATForm = ({ onClose, profileID, propertyID }) => {
                 {(onCloseModal) => (
                     <>
                         <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white">
-                            Criar Novo Número de VAT da Empresa
+                            Atualizar Empresa
                             <Button color="transparent" variant="light" onClick={onCloseModal} className="w-auto min-w-0 p-0 m-0">
                                 <MdClose size={30} />
                             </Button>
                         </ModalHeader>
                         <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
                             <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">Company Name:</label>
-                                <input
-                                    ref={inputRef}
-                                    type="text"
-                                    name="companyName"
-                                    value={formData.companyName}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                />
+                                <label className="block text-sm font-medium">Company Name:</label>
+                                <input ref={inputRef} type="text" name="companyName" value={formData.companyName} onChange={handleChange} className="w-full border border-gray-300 rounded-md px-2 py-1" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">Email Address:</label>
-                                <input
-                                    type="text"
-                                    name="emailAddress"
-                                    value={formData.emailAddress}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                />
+                                <label className="block text-sm font-medium">Email Address:</label>
+                                <input type="text" name="emailAddress" value={formData.emailAddress} onChange={handleChange} className="w-full border border-gray-300 rounded-md px-2 py-1" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">Country:</label>
-                                <Select
-                                    options={countryOptions}
-                                    value={countryOptions.find(option => option.value === formData.country)}
-                                    onChange={handleCountryChange}
-                                    isSearchable
-                                    styles={customStyles}
-                                />
+                                <label className="block text-sm font-medium">Country:</label>
+                                <Select options={countryOptions} value={countryOptions.find(option => option.value === formData.country)} onChange={handleCountryChange} isSearchable styles={customStyles} />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">Street Address:</label>
-                                <input
-                                    type="text"
-                                    name="streetAddress"
-                                    value={formData.streetAddress}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">Zip Code:</label>
-                                <input
-                                    type="text"
-                                    name="zipCode"
-                                    value={formData.zipCode}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">City:</label>
-                                <input
-                                    type="text"
-                                    name="city"
-                                    value={formData.city}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">State:</label>
-                                <input
-                                    type="text"
-                                    name="state"
-                                    value={formData.state}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">VAT No.:</label>
-                                <input
-                                    type="text"
-                                    name="vatNo"
-                                    value={formData.vatNo}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    disabled={!formData.country} // Desabilita o campo se o país não for selecionado
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                />
+                                <label className="block text-sm font-medium">VAT No.:</label>
+                                <input type="text" name="vatNo" value={formData.vatNo} onChange={handleChange} onBlur={handleBlur} disabled={!formData.country} className="w-full border border-gray-300 rounded-md px-2 py-1" />
                                 {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
                             </div>
                             {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
@@ -226,4 +179,4 @@ const CompanyVATForm = ({ onClose, profileID, propertyID }) => {
     );
 };
 
-export default CompanyVATForm;
+export default CompanyVATFormInsert;

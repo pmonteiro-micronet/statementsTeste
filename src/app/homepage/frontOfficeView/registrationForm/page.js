@@ -1074,7 +1074,7 @@ export default function Page() {
                                                             style={{ cursor: "pointer" }}
                                                             onClick={() => {
                                                                 setCompanyVATData({
-                                                                    companyName: reserva.companyName || "",
+                                                                    companyName: reserva.Company || "",
                                                                     vatNo: reserva.companyVAT || "",
                                                                     emailAddress: reserva.companyEmail || "",
                                                                     country: reserva.companyCountry || "",
