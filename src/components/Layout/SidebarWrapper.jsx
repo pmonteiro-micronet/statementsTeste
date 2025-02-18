@@ -138,7 +138,7 @@ export default function SidebarWrapper({ children }) {
   
   useEffect(() => {
     if (selectedHotelID && session?.user) {
-      const isAdmin = session?.user?.permission === 1;
+      // const isAdmin = session?.user?.permission === 1;
 
       setListItems({
         [t.navbar.text.statements]: {
