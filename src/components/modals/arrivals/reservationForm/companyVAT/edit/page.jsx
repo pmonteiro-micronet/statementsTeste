@@ -37,6 +37,8 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
     const [loading, setLoading] = useState(true);
     const inputRef = useRef(null);
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     useEffect(() => {
         if (inputRef.current) inputRef.current.focus();
     }, []);
@@ -45,17 +47,21 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
     const fetchCountries = async () => {
         try {
             const response = await axios.get(`/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`);
-            const formattedOptions = response.data.map(country => ({
-                value: country.codenr, 
-                label: country.land 
-            }));
+            const nationalities = response.data;
+
+            const formattedOptions = nationalities
+                .map((country) => ({
+                    value: country.codenr, // ID do país
+                    label: country.land    // Nome do país
+                }))
+                .sort((a, b) => a.label.localeCompare(b.label)); // Ordena alfabeticamente
+
             setCountryOptions(formattedOptions);
         } catch (error) {
-            console.error("Erro ao carregar países:", error);
+            console.error("Erro ao buscar nacionalidades:", error);
             setErrorMessage("Erro ao carregar os países.");
         }
     };
-
     // 🔹 Buscar os dados da empresa caso existam
     const fetchCompanyData = async () => {
         try {
@@ -92,11 +98,23 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+
+        if (name === "emailAddress") {
+            if (!emailRegex.test(value)) {
+                setErrorMessage("E-mail inválido.");
+            } else {
+                setErrorMessage("");
+            }
+        }
     };
 
     const handleBlur = () => {
-        if (formData.country === "PT" && !validatePortugueseVAT(formData.vatNo)) {
-            setVatError("O NIF português deve começar com 'PT' seguido de 9 dígitos.");
+        if (formData.country === "Portugal" && !validatePortugueseVAT(formData.vatNo)) {
+            if (!/^\d{9}$/.test(formData.vatNo)) {
+                setVatError("O NIF português deve ter exatamente 9 dígitos.");
+            } else {
+                setVatError("");
+            }
         } else {
             setVatError("");
         }
@@ -111,20 +129,22 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
     };
 
     const handleSave = async () => {
-        if (Object.values(formData).some(value => !value.trim())) {
-            setErrorMessage("Todos os campos devem ser preenchidos.");
+        if (!formData.companyName) {
+            setErrorMessage("O nome da empresa é obrigatório.");
             return;
         }
 
-        if (formData.country === "PT" && !validatePortugueseVAT(formData.vatNo)) {
-            setErrorMessage("O NIF português está incorreto.");
+        if (!emailRegex.test(formData.emailAddress)) {
+            setErrorMessage("Por favor, insira um e-mail válido.");
             return;
         }
 
         try {
-            await axios.post("/api/reservations/checkins/registrationForm/createOrUpdateCompanyVAT", {
+            await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", {
                 profileID,
                 propertyID,
+                countryID: formData.country,
+                countryName: formData.countryName,
                 ...formData
             });
             setErrorMessage("");
@@ -151,20 +171,89 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
                         <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
                             <div>
                                 <label className="block text-sm font-medium">Company Name:</label>
-                                <input ref={inputRef} type="text" name="companyName" value={formData.companyName} onChange={handleChange} className="w-full border border-gray-300 rounded-md px-2 py-1" />
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    name="companyName"
+                                    value={formData.companyName}
+                                    onChange={handleChange}
+                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium">Email Address:</label>
-                                <input type="text" name="emailAddress" value={formData.emailAddress} onChange={handleChange} className="w-full border border-gray-300 rounded-md px-2 py-1" />
+                                <input
+                                    type="text"
+                                    name="emailAddress"
+                                    value={formData.emailAddress}
+                                    onChange={handleChange}
+                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium">Country:</label>
-                                <Select options={countryOptions} value={countryOptions.find(option => option.value === formData.country)} onChange={handleCountryChange} isSearchable styles={customStyles} />
+                                <Select
+                                    options={countryOptions}
+                                    value={countryOptions.find(option => option.value === formData.country)}
+                                    onChange={handleCountryChange}
+                                    isSearchable
+                                    styles={customStyles}
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium">VAT No.:</label>
-                                <input type="text" name="vatNo" value={formData.vatNo} onChange={handleChange} onBlur={handleBlur} disabled={!formData.country} className="w-full border border-gray-300 rounded-md px-2 py-1" />
+                                <input
+                                    type="text"
+                                    name="vatNo"
+                                    value={formData.vatNo}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    disabled={!formData.country} // Disable if no country selected
+                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                />
                                 {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium">Street Address:</label>
+                                <input
+                                    type="text"
+                                    name="streetAddress"
+                                    value={formData.streetAddress}
+                                    onChange={handleChange}
+                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                />
+                            </div>
+                            <div className="flex space-x-4">
+                                <div className="flex-1">
+                                    <label className="block text-sm font-medium">Zip Code:</label>
+                                    <input
+                                        type="text"
+                                        name="zipCode"
+                                        value={formData.zipCode}
+                                        onChange={handleChange}
+                                        className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-sm font-medium">City:</label>
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        value={formData.city}
+                                        onChange={handleChange}
+                                        className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium">State:</label>
+                                <input
+                                    type="text"
+                                    name="state"
+                                    value={formData.state}
+                                    onChange={handleChange}
+                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                />
                             </div>
                             {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
                             <div className="flex justify-end space-x-2">

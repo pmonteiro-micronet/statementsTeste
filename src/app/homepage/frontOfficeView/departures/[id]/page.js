@@ -430,7 +430,7 @@ export default function Page({ params }) {
                         <DepartureInfoForm
                           buttonName={"Info"}
                           buttonColor={"transparent"}
-                          modalHeader={"Reservation"}
+                          modalHeader={"Res. No.: " + selectedReserva?.ResNo}
                           formTypeModal={11}
                           roomNumber={selectedReserva?.Room}  // Passando o roomNumber
                           dateCO={selectedReserva?.DateCO}  // Passando a data de check-out (dateCO)
