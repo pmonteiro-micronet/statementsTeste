@@ -429,7 +429,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                         <InHousesInfoForm
                           buttonName={t.frontOffice.inHouses.info}
                           buttonColor={"transparent"}
-                          modalHeader={"Reservation"}
+                          modalHeader={"Res. No.: " + selectedReserva?.ResNo}
                           formTypeModal={11}
                           roomNumber={selectedReserva?.Room}
                           dateCI={selectedReserva?.DateCI}
