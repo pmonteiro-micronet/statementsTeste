@@ -162,7 +162,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="lg" hideCloseButton={true}>
             <ModalContent>
-                {(onCloseModal) => (
+                {() => (
                     <>
                         <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white">
                             Criar Novo Número de VAT da Empresa
