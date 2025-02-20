@@ -10,6 +10,8 @@ import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
+import { FaCircleXmark, FaCircleExclamation } from "react-icons/fa6";
+import { FaQuestionCircle, FaCheckCircle } from "react-icons/fa";
 import en from "../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../../public/locales/espanol/common.json";
@@ -299,6 +301,31 @@ export default function Arrivals({ params }) {
     return false;
   };
 
+  const handleCheckIn = async (resNo) => {
+    try {
+      const response = await axios.post(
+        '/api/reservations/checkins/updateCheckin',
+        { resNo }, // Enviando resNo no body
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        console.log('Check-in atualizado com sucesso:', response.data);
+      } else {
+        setErrorMessage("Erro ao atualizar check-in");
+        setIsErrorModalOpen(true);
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      setErrorMessage("Erro ao atualizar check-in");
+      setIsErrorModalOpen(true);
+    }
+  };
+  
   return (
     (<main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       {isLoading && <LoadingBackdrop open={isLoading} />}
@@ -392,6 +419,12 @@ export default function Arrivals({ params }) {
                                 {t.frontOffice.arrivals.info}
                               </DropdownItem>
                               <DropdownItem
+                                key="checkIn"
+                                onClick={() => handleCheckIn(reserva.ResNo)}
+                              >
+                                CheckIn
+                              </DropdownItem>
+                              <DropdownItem
                                 key="show"
                                 onClick={async () => {
                                   // Busca os detalhes da propriedade
@@ -444,7 +477,31 @@ export default function Arrivals({ params }) {
                           />
                         </td>
                         <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.Room}</td>
-                        <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.RoomStatus}</td>
+                        <td className="border-r border-[#e6e6e6] text-center h-full">
+                          <div className="flex items-center justify-center h-full">
+                            {(() => {
+                              let icon;
+                              switch (reserva.RoomStatus) {
+                                case "Dirty":
+                                  icon = <FaCircleXmark color="red" size={15} />;
+                                  break;
+                                case "Touched":
+                                  icon = <FaCircleExclamation color="orange" size={15} />;
+                                  break;
+                                case "Checked":
+                                  icon = <FaQuestionCircle color="#00CED1" size={15} />;
+                                  break;
+                                case "Clean":
+                                  icon = <FaCheckCircle color="lime" size={15} />;
+                                  break;
+                                default:
+                                  icon = <FaCheckCircle color="lime" size={15} />;
+                                  break;
+                              }
+                              return icon;
+                            })()}
+                          </div>
+                        </td>
                         <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
                         <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
                         <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
