@@ -47,7 +47,7 @@ export async function POST(request) {
     console.log("Enviando dados para API externa:", url);
 
     // Enviar para API externa com os dados no HEADER (sem "X-")
-    const response = await axios.post(url, null, {  // O corpo da requisição será `null`
+    const response = await axios.post(url, null, {  
       headers: {
         Authorization: "q4vf9p8n4907895f7m8d24m75c2q947m2398c574q9586c490q756c98q4m705imtugcfecvrhym04capwz3e2ewqaefwegfiuoamv4ros2nuyp0sjc3iutow924bn5ry943utrjmi",
         "Content-Type": "application/json",
@@ -78,9 +78,11 @@ export async function POST(request) {
       );
     }
 
-    // Converter JSONs do banco
-    let requestBody = JSON.parse(record.requestBody);
-    let responseBody = record.responseBody ? JSON.parse(record.responseBody) : [];
+    // Converter JSONs do banco de forma segura
+    let requestBody = typeof record.requestBody === "string" ? JSON.parse(record.requestBody) : record.requestBody;
+    let responseBody = record.responseBody
+      ? (typeof record.responseBody === "string" ? JSON.parse(record.responseBody) : record.responseBody)
+      : [];
 
     // Função para atualizar os dados da empresa dentro do JSON
     const atualizarCamposEmpresa = (json) => {
