@@ -79,7 +79,6 @@ export async function POST(request) {
     }
 
     // Converter JSONs do banco de forma segura
-    let requestBody = typeof record.requestBody === "string" ? JSON.parse(record.requestBody) : record.requestBody;
     let responseBody = record.responseBody
       ? (typeof record.responseBody === "string" ? JSON.parse(record.responseBody) : record.responseBody)
       : [];
