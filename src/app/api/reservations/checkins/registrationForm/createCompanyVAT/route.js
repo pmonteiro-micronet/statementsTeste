@@ -7,61 +7,82 @@ export async function POST(request) {
     const body = await request.json();
     console.log("Dados recebidos para envio:", body);
 
-    const { profileID, propertyID, companyName, vatNo, emailAddress, countryID, countryName, streetAddress, zipCode, city, state } = body;
+    const { 
+      profileID, 
+      propertyID, 
+      companyName, 
+      vatNo, 
+      emailAddress, 
+      countryID, 
+      countryName, 
+      streetAddress, 
+      zipCode, 
+      city, 
+      state 
+    } = body;
 
+    // Verificar se os campos obrigatórios estão presentes
     if (!profileID || !propertyID) {
-      return new NextResponse(JSON.stringify({ error: "profileID e propertyID são obrigatórios." }), { status: 400 });
+      return new NextResponse(
+        JSON.stringify({ error: "profileID e propertyID são obrigatórios." }), 
+        { status: 400 }
+      );
     }
 
-    // Buscar a propriedade para obter o servidor e a porta da API externa
+    // Buscar a propriedade no banco
     const property = await prisma.properties.findUnique({
-      where: { propertyID: parseInt(propertyID, 10) },
+      where: { propertyID: Number(propertyID) },
       select: { propertyServer: true, propertyPort: true },
     });
 
     if (!property) {
-      return new NextResponse(JSON.stringify({ error: "propertyID não encontrado." }), { status: 404 });
+      return new NextResponse(
+        JSON.stringify({ error: "propertyID não encontrado." }), 
+        { status: 404 }
+      );
     }
 
-    // ** Envio para a API externa antes de salvar no banco **
+    // Construir a URL da API externa
     const url = `http://${property.propertyServer}:${property.propertyPort}/insertCompany`;
     console.log("Enviando dados para API externa:", url);
 
-    const dataToSend = {
-      CompanyName: companyName,
-      CountryID: countryID,
-      CountryName: countryName,
-      StreetAddress: streetAddress,
-      ZipCode: zipCode,
-      City: city,
-      State: state,
-      VatNo: vatNo,
-      Email: emailAddress,
-    };
-
-    const response = await axios.post(url, dataToSend, {
+    // Enviar para API externa com os dados no HEADER (sem "X-")
+    const response = await axios.post(url, null, {  // O corpo da requisição será `null`
       headers: {
         Authorization: "q4vf9p8n4907895f7m8d24m75c2q947m2398c574q9586c490q756c98q4m705imtugcfecvrhym04capwz3e2ewqaefwegfiuoamv4ros2nuyp0sjc3iutow924bn5ry943utrjmi",
         "Content-Type": "application/json",
+        CompanyName: companyName,
+        CountryID: countryID,
+        CountryName: countryName,
+        StreetAddress: streetAddress,
+        ZipCode: zipCode,
+        City: city,
+        State: state,
+        VatNo: vatNo,
+        Email: emailAddress,
       },
     });
 
     console.log("Resposta da API externa:", response.data);
 
-    // ** Somente após sucesso, atualizar os dados no banco **
+    // Buscar o registro no banco para atualização
     const record = await prisma.requestRecordsArrivals.findFirst({
-      where: { propertyID: parseInt(propertyID, 10) },
+      where: { propertyID: Number(propertyID) },
       select: { requestBody: true, responseBody: true },
     });
 
     if (!record) {
-      return new NextResponse(JSON.stringify({ error: "Registro não encontrado." }), { status: 404 });
+      return new NextResponse(
+        JSON.stringify({ error: "Registro não encontrado." }), 
+        { status: 404 }
+      );
     }
 
+    // Converter JSONs do banco
     let requestBody = JSON.parse(record.requestBody);
     let responseBody = record.responseBody ? JSON.parse(record.responseBody) : [];
 
-    // Função para atualizar os campos da empresa no JSON
+    // Função para atualizar os dados da empresa dentro do JSON
     const atualizarCamposEmpresa = (json) => {
       json.forEach((reserva) => {
         reserva.ReservationInfo.forEach((reservation) => {
@@ -77,22 +98,18 @@ export async function POST(request) {
           reservation.hasCompanyVAT = 1;
         });
       });
-    };    
+    };
 
-    // Atualizar os campos nos dois JSONs
-    atualizarCamposEmpresa([requestBody]); // Atualiza o requestBody
-    atualizarCamposEmpresa(responseBody); // Atualiza o responseBody (lista)
+    // Atualizar requestBody e responseBody
+    atualizarCamposEmpresa([requestBody]); 
+    atualizarCamposEmpresa(responseBody);
 
-    // Converter os JSONs de volta para string antes de salvar no banco
-    const updatedRequestBody = JSON.stringify(requestBody);
-    const updatedResponseBody = JSON.stringify(responseBody);
-
-    // **Salvar os JSONs atualizados no banco**
+    // Atualizar banco de dados
     await prisma.requestRecordsArrivals.update({
-      where: { propertyID: parseInt(propertyID, 10) },
+      where: { propertyID: Number(propertyID) },
       data: {
-        requestBody: updatedRequestBody,
-        responseBody: updatedResponseBody,
+        requestBody: JSON.stringify(requestBody),
+        responseBody: JSON.stringify(responseBody),
       },
     });
 
@@ -106,9 +123,12 @@ export async function POST(request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Erro ao enviar ou atualizar os dados:", error.response ? error.response.data : error.message);
+    console.error("Erro ao enviar ou atualizar os dados:", error);
+
     return new NextResponse(
-      JSON.stringify({ error: error.response ? error.response.data : "Erro ao enviar ou atualizar os dados" }),
+      JSON.stringify({
+        error: error.response?.data || "Erro ao enviar ou atualizar os dados",
+      }),
       { status: 500 }
     );
   }
