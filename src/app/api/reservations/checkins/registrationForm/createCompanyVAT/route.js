@@ -68,7 +68,7 @@ export async function POST(request) {
     // Buscar o registro no banco para atualização
     const record = await prisma.requestRecordsArrivals.findFirst({
       where: { propertyID: Number(propertyID) },
-      select: { requestBody: true, responseBody: true },
+      select: { requestID: true, requestBody: true, responseBody: true },
     });
 
     if (!record) {
@@ -77,6 +77,9 @@ export async function POST(request) {
         { status: 404 }
       );
     }
+
+    // Agora podemos usar o requestID do registro encontrado
+    const { requestID } = record;
 
     // Converter JSONs do banco de forma segura
     let responseBody = record.responseBody
@@ -106,7 +109,7 @@ export async function POST(request) {
 
     // Atualizar banco de dados com a nova versão do responseBody
     await prisma.requestRecordsArrivals.update({
-      where: { propertyID: Number(propertyID) },
+      where: { requestID: requestID },  // Usando requestID para atualizar o registro
       data: {
         responseBody: JSON.stringify(responseBody),  // Convertendo de volta para string
       },
