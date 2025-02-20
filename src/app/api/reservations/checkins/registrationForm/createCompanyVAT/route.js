@@ -79,13 +79,12 @@ export async function POST(request) {
     }
 
     // Converter JSONs do banco de forma segura
-    let requestBody = typeof record.requestBody === "string" ? JSON.parse(record.requestBody) : record.requestBody;
     let responseBody = record.responseBody
       ? (typeof record.responseBody === "string" ? JSON.parse(record.responseBody) : record.responseBody)
       : [];
 
-    // Função para atualizar os dados da empresa dentro do JSON
-    const atualizarCamposEmpresa = (json) => {
+    // Função para atualizar os dados da empresa dentro do JSON (somente no responseBody)
+    const atualizarCamposEmpresaNoResponseBody = (json) => {
       json.forEach((reserva) => {
         reserva.ReservationInfo.forEach((reservation) => {
           reservation.Company = companyName;
@@ -102,23 +101,20 @@ export async function POST(request) {
       });
     };
 
-    // Atualizar requestBody e responseBody
-    atualizarCamposEmpresa([requestBody]); 
-    atualizarCamposEmpresa(responseBody);
+    // Atualizar somente o responseBody com os dados da empresa
+    atualizarCamposEmpresaNoResponseBody(responseBody);
 
-    // Atualizar banco de dados
+    // Atualizar banco de dados com a nova versão do responseBody
     await prisma.requestRecordsArrivals.update({
       where: { propertyID: Number(propertyID) },
       data: {
-        requestBody: JSON.stringify(requestBody),
-        responseBody: JSON.stringify(responseBody),
+        responseBody: JSON.stringify(responseBody),  // Convertendo de volta para string
       },
     });
 
     return new NextResponse(
       JSON.stringify({
         message: "Dados enviados e armazenados com sucesso",
-        updatedRequestBody: requestBody,
         updatedResponseBody: responseBody,
         externalAPIResponse: response.data,
       }),
