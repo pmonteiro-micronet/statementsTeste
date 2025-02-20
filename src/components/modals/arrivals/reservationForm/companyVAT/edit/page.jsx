@@ -4,6 +4,7 @@ import axios from "axios";
 import Select from "react-select";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
+import LoadingBackdrop from "@/components/Loader/page";
 
 const customStyles = {
     control: (provided) => ({
@@ -134,10 +135,10 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
             return;
         }
 
-        if (!emailRegex.test(formData.emailAddress)) {
+        if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
             setErrorMessage("Por favor, insira um e-mail válido.");
             return;
-        }
+        }        
 
         try {
             await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", {
@@ -155,7 +156,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
         }
     };
 
-    if (loading) return <p>Carregando...</p>;
+    if (loading) return  <LoadingBackdrop open={true} />;
 
     return (
         <Modal isOpen={true} onOpenChange={onClose} className="z-50" size="lg" hideCloseButton={true}>

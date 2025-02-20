@@ -1070,20 +1070,23 @@ export default function Page() {
                                                     reserva.hasCompanyVAT === 1 ? (
                                                         <FaPencilAlt
                                                             size={15}
-                                                            color="#FC9D25"
-                                                            style={{ cursor: "pointer" }}
+                                                            color={reserva.BlockedCVatNO === 1 ? "gray" : "#FC9D25"}
+                                                            style={{ cursor: reserva.BlockedCVatNO === 1 ? "not-allowed" : "pointer" }}
+                                                            title={reserva.BlockedCVatNO === 1 ? "Fiscalizado" : ""}
                                                             onClick={() => {
-                                                                setCompanyVATData({
-                                                                    companyName: reserva.Company || "",
-                                                                    vatNo: reserva.companyVAT || "",
-                                                                    emailAddress: reserva.companyEmail || "",
-                                                                    country: reserva.companyCountry || "",
-                                                                    streetAddress: reserva.companyAddress || "",
-                                                                    zipCode: reserva.companyZip || "",
-                                                                    city: reserva.companyCity || "",
-                                                                    state: reserva.companyState || ""
-                                                                });
-                                                                setIsCVATModalOpen(true);
+                                                                if (reserva.BlockedCVatNO === 0) {
+                                                                    setCompanyVATData({
+                                                                        companyName: reserva.Company || "",
+                                                                        vatNo: reserva.companyVAT || "",
+                                                                        emailAddress: reserva.companyEmail || "",
+                                                                        country: reserva.companyCountry || "",
+                                                                        streetAddress: reserva.companyAddress || "",
+                                                                        zipCode: reserva.companyZip || "",
+                                                                        city: reserva.companyCity || "",
+                                                                        state: reserva.companyState || ""
+                                                                    });
+                                                                    setIsCVATModalOpen(true);
+                                                                }
                                                             }}
                                                         />
                                                     ) : (

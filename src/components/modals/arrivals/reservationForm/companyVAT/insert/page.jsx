@@ -119,10 +119,10 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
             return;
         }
 
-        if (!emailRegex.test(formData.emailAddress)) {
+        if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
             setErrorMessage("Por favor, insira um e-mail válido.");
             return;
-        }
+        }        
 
         try {
             const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVAT", {
