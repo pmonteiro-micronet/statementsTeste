@@ -11,7 +11,8 @@ import { MdOutlineRefresh } from "react-icons/md";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 import { FaCircleXmark, FaCircleExclamation } from "react-icons/fa6";
-import { FaQuestionCircle, FaCheckCircle } from "react-icons/fa";
+import { FaQuestionCircle, FaCheckCircle, FaBed } from "react-icons/fa";
+import { PiBroomFill } from "react-icons/pi";
 import en from "../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../../public/locales/espanol/common.json";
@@ -384,8 +385,8 @@ export default function Arrivals({ params }) {
                 <thead>
                   <tr className="bg-primary text-white h-12">
                     <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6] uppercase"><FaGear size={18} color="white" /></td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.room}</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.roomStatus}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase"><FaBed size={18} color="white"/></td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase"><PiBroomFill size={18} color="white"/></td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.lastName}</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.firstName}</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.travelAgency}</td>
@@ -483,19 +484,19 @@ export default function Arrivals({ params }) {
                               let icon;
                               switch (reserva.RoomStatus) {
                                 case "Dirty":
-                                  icon = <FaCircleXmark color="red" size={15} />;
+                                  icon = <FaCircleXmark color="red" size={18} />;
                                   break;
                                 case "Touched":
-                                  icon = <FaCircleExclamation color="orange" size={15} />;
+                                  icon = <FaCircleExclamation color="orange" size={18} />;
                                   break;
                                 case "Checked":
-                                  icon = <FaQuestionCircle color="#00CED1" size={15} />;
+                                  icon = <FaQuestionCircle color="#00CED1" size={18} />;
                                   break;
                                 case "Clean":
-                                  icon = <FaCheckCircle color="lime" size={15} />;
+                                  icon = <FaCheckCircle color="lime" size={18} />;
                                   break;
                                 default:
-                                  icon = <FaCheckCircle color="lime" size={15} />;
+                                  icon = <FaCheckCircle color="lime" size={18} />;
                                   break;
                               }
                               return icon;

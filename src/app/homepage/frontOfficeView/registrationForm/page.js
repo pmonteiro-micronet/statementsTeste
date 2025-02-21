@@ -1163,6 +1163,7 @@ export default function Page() {
                                             onClose={() => setIsCVATModalOpenInsert(false)}
                                             profileID={guestInfo.ProfileID}
                                             propertyID={propertyID}
+                                            resNo={reserva.ResNo}
                                         />
                                     )}
                                 </div>
