@@ -87,25 +87,32 @@ export async function POST(request) {
       : [];
 
     // Função para atualizar os dados da empresa dentro do JSON (somente no responseBody)
-    const atualizarCamposEmpresaNoResponseBody = (json) => {
+    const atualizarCamposEmpresaNoResponseBody = (json, profileID) => {
       json.forEach((reserva) => {
-        reserva.ReservationInfo.forEach((reservation) => {
-          reservation.Company = companyName;
-          reservation.CompanyEmail = emailAddress;
-          reservation.CompanyVatNo = vatNo;
-          reservation.CompanyState = state;
-          reservation.CompanyCity = city;
-          reservation.CompanyZipCode = zipCode;
-          reservation.CompanyStreetAddress = streetAddress;
-          reservation.CompanyCountryName = countryName;
-          reservation.CompanyCountryID = countryID;
-          reservation.hasCompanyVAT = 1;
-        });
+        // Verifica se há algum hóspede com o profileID correto nesta reserva
+        const hospedeEncontrado = reserva.GuestInfo.some((guest) =>
+          guest.GuestDetails.some((detail) => detail.ProfileID === profileID)
+        );
+    
+        if (hospedeEncontrado) {
+          reserva.ReservationInfo.forEach((reservation) => {
+            reservation.Company = companyName;
+            reservation.CompanyEmail = emailAddress;
+            reservation.CompanyVatNo = vatNo;
+            reservation.CompanyState = state;
+            reservation.CompanyCity = city;
+            reservation.CompanyZipCode = zipCode;
+            reservation.CompanyStreetAddress = streetAddress;
+            reservation.CompanyCountryName = countryName;
+            reservation.CompanyCountryID = countryID;
+            reservation.hasCompanyVAT = 1;
+          });
+        }
       });
-    };
+    };    
 
     // Atualizar somente o responseBody com os dados da empresa
-    atualizarCamposEmpresaNoResponseBody(responseBody);
+    atualizarCamposEmpresaNoResponseBody(responseBody, profileID);
 
     // Atualizar banco de dados com a nova versão do responseBody
     await prisma.requestRecordsArrivals.update({
