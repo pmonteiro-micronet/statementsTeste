@@ -18,7 +18,7 @@ const customStyles = {
     })
 };
 
-const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
+const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
     const [formData, setFormData] = useState({
         companyName: "",
         vatNo: "",
@@ -128,6 +128,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
             const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVAT", {
                 profileID,
                 propertyID,
+                resNo,
                 countryID: formData.country,
                 countryName: formData.countryName,
                 ...formData

@@ -10,6 +10,7 @@ export async function POST(request) {
     const { 
       profileID, 
       propertyID, 
+      resNo,
       companyName, 
       vatNo, 
       emailAddress, 
@@ -22,9 +23,9 @@ export async function POST(request) {
     } = body;
 
     // Verificar se os campos obrigatórios estão presentes
-    if (!profileID || !propertyID) {
+    if (!profileID || !propertyID || !resNo) {
       return new NextResponse(
-        JSON.stringify({ error: "profileID e propertyID são obrigatórios." }), 
+        JSON.stringify({ error: "profileID, propertyID e resNo são obrigatórios." }), 
         { status: 400 }
       );
     }
@@ -60,6 +61,7 @@ export async function POST(request) {
         State: state,
         VatNo: vatNo,
         Email: emailAddress,
+        ResNo : resNo,
       },
     });
 
