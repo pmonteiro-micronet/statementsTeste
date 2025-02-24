@@ -1168,6 +1168,7 @@ export default function Page() {
                                             propertyID={propertyID}
                                             initialData={companyVATData} // Aqui usamos o nome correto da variável
                                             resNo={reserva.ResNo}
+                                            companyVATData={companyVATData}
                                         />
                                     )}
 

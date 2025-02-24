@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
@@ -21,17 +21,18 @@ const customStyles = {
 
 const validatePortugueseVAT = (vat) => /^PT\d{9}$/.test(vat);
 
-const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo }) => {
-    const [formData, setFormData] = useState({
-        companyName: "",
-        vatNo: "",
-        emailAddress: "",
-        country: "",
-        streetAddress: "",
-        zipCode: "",
-        city: "",
-        state: ""
-    });
+const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATData }) => {
+    const [formData, setFormData] = useState(() => ({
+        companyName: companyVATData?.companyName || "",
+        vatNo: companyVATData?.vatNo || "",
+        emailAddress: companyVATData?.emailAddress || "",
+        country: companyVATData?.country || "",
+        streetAddress: companyVATData?.streetAddress || "",
+        zipCode: companyVATData?.zipCode || "",
+        city: companyVATData?.city || "",
+        state: companyVATData?.state || ""
+    }));
+
     const [errorMessage, setErrorMessage] = useState("");
     const [vatError, setVatError] = useState("");
     const [countryOptions, setCountryOptions] = useState([]);
@@ -45,77 +46,40 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo }) => {
     }, []);
 
     // 🔹 Buscar lista de países da API
-    const fetchCountries = async () => {
-        try {
-            const response = await axios.get(`/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`);
-            const nationalities = response.data;
-
-            const formattedOptions = nationalities
-                .map((country) => ({
-                    value: country.codenr, // ID do país
-                    label: country.land    // Nome do país
-                }))
-                .sort((a, b) => a.label.localeCompare(b.label)); // Ordena alfabeticamente
-
-            setCountryOptions(formattedOptions);
-        } catch (error) {
-            console.error("Erro ao buscar nacionalidades:", error);
-            setErrorMessage("Erro ao carregar os países.");
-        }
-    };
-    // 🔹 Buscar os dados da empresa caso existam
-    const fetchCompanyData = async () => {
-        try {
-            const response = await axios.get(`/api/reservations/checkins/registrationForm/getCompanyVAT`, {
-                params: { profileID, propertyID }
-            });
-
-            if (response.data) {
-                setFormData({
-                    companyName: response.data.companyName || "",
-                    vatNo: response.data.vatNo || "",
-                    emailAddress: response.data.emailAddress || "",
-                    country: response.data.country || "",
-                    streetAddress: response.data.streetAddress || "",
-                    zipCode: response.data.zipCode || "",
-                    city: response.data.city || "",
-                    state: response.data.state || ""
-                });
-            }
-        } catch (error) {
-            console.error("Erro ao buscar dados da empresa:", error);
-            setErrorMessage("Não foi possível carregar os dados da empresa.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // 🔹 Buscar os países e os dados da empresa ao carregar o componente
     useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const response = await axios.get(`/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`);
+                const formattedOptions = response.data
+                    .map((country) => ({
+                        value: country.codenr,
+                        label: country.land
+                    }))
+                    .sort((a, b) => a.label.localeCompare(b.label));
+
+                setCountryOptions(formattedOptions);
+                setLoading(false);
+            } catch (error) {
+                console.error("Erro ao buscar países:", error);
+                setErrorMessage("Erro ao carregar os países.");
+                setLoading(false);
+            }
+        };
         fetchCountries();
-        fetchCompanyData();
-    }, []);
+    }, [propertyID]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
 
         if (name === "emailAddress") {
-            if (!emailRegex.test(value)) {
-                setErrorMessage("E-mail inválido.");
-            } else {
-                setErrorMessage("");
-            }
+            setErrorMessage(emailRegex.test(value) ? "" : "E-mail inválido.");
         }
     };
 
     const handleBlur = () => {
         if (formData.country === "Portugal" && !validatePortugueseVAT(formData.vatNo)) {
-            if (!/^\d{9}$/.test(formData.vatNo)) {
-                setVatError("O NIF português deve ter exatamente 9 dígitos.");
-            } else {
-                setVatError("");
-            }
+            setVatError(/^\d{9}$/.test(formData.vatNo) ? "" : "O NIF português deve ter exatamente 9 dígitos.");
         } else {
             setVatError("");
         }
@@ -138,10 +102,10 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo }) => {
         if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
             setErrorMessage("Por favor, insira um e-mail válido.");
             return;
-        }        
+        }
 
         try {
-            const response = await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", {
+            await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", {
                 profileID,
                 propertyID,
                 resNo,
@@ -150,8 +114,6 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo }) => {
                 ...formData
             });
 
-            console.log("Success:", response.data);
-            setErrorMessage("");
             onClose();
         } catch (error) {
             console.error("Erro ao salvar empresa:", error);
@@ -159,7 +121,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo }) => {
         }
     };
 
-    if (loading) return  <LoadingBackdrop open={true} />;
+    if (loading) return <LoadingBackdrop open={true} />;
 
     return (
         <Modal isOpen={true} onOpenChange={onClose} className="z-50" size="lg" hideCloseButton={true}>
@@ -212,7 +174,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo }) => {
                                     value={formData.vatNo}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    disabled={!formData.country} // Disable if no country selected
+                                    disabled={!formData.country}
                                     className="w-full border border-gray-300 rounded-md px-2 py-1"
                                 />
                                 {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
@@ -227,8 +189,9 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo }) => {
                                     className="w-full border border-gray-300 rounded-md px-2 py-1"
                                 />
                             </div>
-                            <div className="flex space-x-4">
-                                <div className="flex-1">
+                            {/* 🔹 Zip Code e City na mesma linha */}
+                            <div className="flex gap-4">
+                                <div className="w-1/2">
                                     <label className="block text-sm font-medium">Zip Code:</label>
                                     <input
                                         type="text"
@@ -238,7 +201,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo }) => {
                                         className="w-full border border-gray-300 rounded-md px-2 py-1"
                                     />
                                 </div>
-                                <div className="flex-1">
+                                <div className="w-1/2">
                                     <label className="block text-sm font-medium">City:</label>
                                     <input
                                         type="text"
