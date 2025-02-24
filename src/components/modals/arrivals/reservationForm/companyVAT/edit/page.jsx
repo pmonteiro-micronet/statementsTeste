@@ -105,7 +105,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
         }
 
         try {
-            await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", {
+            await axios.post("/api/reservations/checkins/registrationForm/updateCompany", {
                 profileID,
                 propertyID,
                 resNo,
