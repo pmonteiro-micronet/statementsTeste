@@ -515,6 +515,13 @@ export default function Page() {
 
     const [activeKey, setActiveKey] = useState("individual");
 
+    useEffect(() => {
+        if (companyVATData && Object.keys(companyVATData).length > 0) {
+            console.log("companyVATData atualizado, abrindo modal...", companyVATData);
+            setIsCVATModalOpen(true);
+        }
+    }, [companyVATData]); 
+
     return (
         <div className='bg-background main-page min-h-screen'>
             {/* Exibe o loader enquanto isLoading for verdadeiro */}
@@ -1074,18 +1081,23 @@ export default function Page() {
                                                             style={{ cursor: reserva.BlockedCVatNO === 1 ? "not-allowed" : "pointer" }}
                                                             title={reserva.BlockedCVatNO === 1 ? "Fiscalizado" : ""}
                                                             onClick={() => {
+                                                                console.log("BlockedCVatNO:", reserva.BlockedCVatNO);
+                                                                console.log("hasCompanyVAT:", reserva.hasCompanyVAT);
                                                                 if (reserva.BlockedCVatNO === 0) {
-                                                                    setCompanyVATData({
+                                                                    const companyData = {
                                                                         companyName: reserva.Company || "",
-                                                                        vatNo: reserva.companyVAT || "",
-                                                                        emailAddress: reserva.companyEmail || "",
-                                                                        country: reserva.companyCountry || "",
-                                                                        streetAddress: reserva.companyAddress || "",
-                                                                        zipCode: reserva.companyZip || "",
-                                                                        city: reserva.companyCity || "",
-                                                                        state: reserva.companyState || ""
-                                                                    });
-                                                                    setIsCVATModalOpen(true);
+                                                                        vatNo: reserva.CompanyVatNo || "",
+                                                                        emailAddress: reserva.CompanyEmail || "",
+                                                                        country: reserva.CompanyCountryName || "",
+                                                                        streetAddress: reserva.CompanyStreetAddress || "",
+                                                                        zipCode: reserva.CompanyZipCode || "",
+                                                                        city: reserva.CompanyCity || "",
+                                                                        state: reserva.CompanyState || ""
+                                                                    };
+                                                            
+                                                                    console.log("Definindo companyVATData:", companyData);
+                                                            
+                                                                    setCompanyVATData(companyData); // Atualiza os dados
                                                                 }
                                                             }}
                                                         />
@@ -1106,7 +1118,7 @@ export default function Page() {
                                             <p className="!text-textLabelColor text-lg">
                                                 {activeKey === "company"
                                                     ? reserva.hasCompanyVAT === 1
-                                                        ? reserva.companyName || "" // Exibe o nome da empresa se disponível
+                                                        ? reserva.Company || "" // Exibe o nome da empresa se disponível
                                                         : ""
                                                     : `${guestInfo.LastName}, ${guestInfo.FirstName}`}
                                             </p>
@@ -1120,7 +1132,7 @@ export default function Page() {
                                                     value={
                                                         activeKey === "company"
                                                             ? reserva.hasCompanyVAT === 1
-                                                                ? reserva.companyVAT || "" // Exibe o VAT da empresa se disponível
+                                                                ? reserva.CompanyVatNo || "" // Exibe o VAT da empresa se disponível
                                                                 : ""
                                                             : reserva.BlockedVatNO === 1 && !vatNo
                                                                 ? "999999990"
@@ -1155,6 +1167,7 @@ export default function Page() {
                                             profileID={guestInfo.ProfileID}
                                             propertyID={propertyID}
                                             initialData={companyVATData} // Aqui usamos o nome correto da variável
+                                            resNo={reserva.ResNo}
                                         />
                                     )}
 

@@ -21,7 +21,7 @@ const customStyles = {
 
 const validatePortugueseVAT = (vat) => /^PT\d{9}$/.test(vat);
 
-const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
+const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo }) => {
     const [formData, setFormData] = useState({
         companyName: "",
         vatNo: "",
@@ -141,13 +141,16 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
         }        
 
         try {
-            await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", {
+            const response = await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", {
                 profileID,
                 propertyID,
+                resNo,
                 countryID: formData.country,
                 countryName: formData.countryName,
                 ...formData
             });
+
+            console.log("Success:", response.data);
             setErrorMessage("");
             onClose();
         } catch (error) {
@@ -269,4 +272,4 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID }) => {
     );
 };
 
-export default CompanyVATFormInsert;
+export default CompanyVATFormEdit;
