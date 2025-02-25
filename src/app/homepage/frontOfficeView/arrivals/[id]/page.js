@@ -8,11 +8,11 @@ import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
-import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import Image from "next/image";
 
 import { FaCircleXmark, FaCircleExclamation } from "react-icons/fa6";
 import { FaQuestionCircle, FaCheckCircle, FaBed } from "react-icons/fa";
-import { PiBroomFill } from "react-icons/pi";
+
 import en from "../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../../public/locales/espanol/common.json";
@@ -313,7 +313,7 @@ export default function Arrivals({ params }) {
           },
         }
       );
-  
+
       if (response.status === 200) {
         console.log('Check-in atualizado com sucesso:', response.data);
       } else {
@@ -326,7 +326,7 @@ export default function Arrivals({ params }) {
       setIsErrorModalOpen(true);
     }
   };
-  
+
   return (
     (<main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       {isLoading && <LoadingBackdrop open={isLoading} />}
@@ -335,30 +335,10 @@ export default function Arrivals({ params }) {
           <div className="header-container flex items-center justify-between w-full">
             {/* Div para o conteúdo centralizado (setas e título dinâmico) */}
             <div className="flex items-center space-x-4 mx-auto">
-              {/* Seta para voltar para o dia de hoje */}
-              {currentDate !== today && (
-                <button
-                  onClick={() => setCurrentDate(today)}
-                  className="p-2 text-gray-500"
-                >
-                  <IoIosArrowBack size={20} />
-                </button>
-              )}
-
               {/* Título dinâmico com a data atual */}
               <h2 className="text-xl text-textPrimaryColor">
                 {currentDate === today ? `${t.frontOffice.arrivals.today}: ${today}` : `${t.frontOffice.arrivals.tomorrow}: ${currentDate}`}
               </h2>
-
-              {/* Seta para avançar para o próximo dia */}
-              {currentDate !== tomorrowDate && (
-                <button
-                  onClick={() => setCurrentDate(tomorrowDate)}
-                  className="p-2 text-textPrimaryColor"
-                >
-                  <IoIosArrowForward size={20} />
-                </button>
-              )}
 
               {/* Título "Arrivals List" separado do título dinâmico */}
               <h2 className="text-xl text-textPrimaryColor">{propertyName} : {t.frontOffice.arrivals.arrivalList}</h2>
@@ -376,6 +356,22 @@ export default function Arrivals({ params }) {
           </div>
         </div>
 
+        {/* Tabs for switching between today and tomorrow */}
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => setCurrentDate(today)}
+            className={`px-4 py-2 ${currentDate === today ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'} rounded-l-lg`}
+          >
+            {new Date(today).toLocaleDateString()} {/* Exibe a data formatada */}
+          </button>
+          <button
+            onClick={() => setCurrentDate(tomorrowDate)}
+            className={`px-4 py-2 ${currentDate === tomorrowDate ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'} rounded-r-lg`}
+          >
+            {new Date(tomorrowDate).toLocaleDateString()} {/* Exibe a data formatada */}
+          </button>
+        </div>
+
         <div className="mt-5">
           {isLoading ? (
             (<LoadingBackdrop open={isLoading} />) // Exibe o carregamento enquanto os dados estão sendo carregados
@@ -385,8 +381,16 @@ export default function Arrivals({ params }) {
                 <thead>
                   <tr className="bg-primary text-white h-12">
                     <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6] uppercase"><FaGear size={18} color="white" /></td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase"><FaBed size={18} color="white"/></td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase"><PiBroomFill size={18} color="white"/></td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
+                      <div className="flex items-center justify-center">
+                        <FaBed size={23} color="white" />
+                      </div>
+                    </td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
+                      <div className="flex items-center justify-center">
+                        <Image src="/tableIcons/janitor.png" width={25} height={25} alt="housekeeper"/>
+                      </div>
+                    </td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.lastName}</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.firstName}</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.travelAgency}</td>
@@ -479,7 +483,10 @@ export default function Arrivals({ params }) {
                         </td>
                         <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.Room}</td>
                         <td className="border-r border-[#e6e6e6] text-center h-full">
-                          <div className="flex items-center justify-center h-full">
+                          <div
+                            className="flex items-center justify-center h-full"
+                            title={reserva.RoomStatus} // Adiciona o tooltip com o status
+                          >
                             {(() => {
                               let icon;
                               switch (reserva.RoomStatus) {
@@ -553,4 +560,4 @@ export default function Arrivals({ params }) {
       )}
     </main>)
   );
-}
+}                  

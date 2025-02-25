@@ -211,22 +211,8 @@ export default function SidebarWrapper({ children }) {
       setIsHotelConfirmed(true);
       localStorage.setItem("isHotelConfirmed", 'true');
 
-      // Verificar se a URL está no contexto do Front Office
-      if (pathname.includes("/frontOfficeView")) {
-        const currentPath = pathname.split('/'); // Divide a URL em partes
-        const isSubsection = currentPath.length === 5; // URL com subseção terá exatamente 5 partes
-
-        if (isSubsection) {
-          // Atualiza apenas o hotelID mantendo a subseção
-          const basePath = currentPath.slice(0, 3).join('/'); // Exemplo: /homepage/frontOfficeView
-          const subsection = currentPath[3]; // Exemplo: 'departures'
-          router.push(`${basePath}/${subsection}/${selectedHotelID}`);
-        } else {
-          // Atualiza a URL para a página principal do front office
-          const basePath = currentPath.slice(0, 3).join('/'); // Exemplo: /homepage/frontOfficeView
-          router.push(`${basePath}/${selectedHotelID}`);
-        }
-      }
+      // Redireciona para a página principal do front office
+      router.push(`/homepage/frontOfficeView/${selectedHotelID}`);
     }
 
     setShowSelectionButtons(false); // Esconde os botões após a confirmação
