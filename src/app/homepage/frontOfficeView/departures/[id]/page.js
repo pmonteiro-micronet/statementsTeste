@@ -8,7 +8,6 @@ import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
-import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 import DepartureInfoForm from "@/components/modals/departures/info/page";
 import "../../table.css";
@@ -65,42 +64,42 @@ export default function Page({ params }) {
   const [propertyName, setPropertyName] = useState([]);
   console.log(postSuccessful);
 
- const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
     try {
       setIsLoading(true); // Inicia o carregamento
-  
+
       const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
-  
+
       if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
         const mpehotel = propertyResponse.data.response[0].mpehotel;
         console.log('Mpehotel encontrado:', mpehotel);
-  
+
         // Faz as requisições com delay
         await axios.get("/api/reservations/checkins/reservations_4_tat", {
           params: { mpehotel, propertyID },
         });
-  
+
         // Aguarda 1 segundo antes de fazer a próxima requisição
-        await sleep(1000); 
-  
+        await sleep(1000);
+
         await axios.get("/api/reservations/inHouses/reservations_4_tat", {
           params: { mpehotel, propertyID },
         });
-  
+
         // Aguarda mais 1 segundo antes de fazer a última requisição
-        await sleep(1000); 
+        await sleep(1000);
         //teste
-  
+
         await axios.get("/api/reservations/info", {
           params: { mpehotel, propertyID },
         });
-  
-        await sleep(1000); 
+
+        await sleep(1000);
         setPostSuccessful(true);
-  
+
       } else {
         console.error('Mpehotel não encontrado para o propertyID:', propertyID);
         setPostSuccessful(false);
@@ -118,7 +117,7 @@ export default function Page({ params }) {
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
 
   // Chama a função sendDataToAPI ao carregar a página
   useEffect(() => {
@@ -329,32 +328,12 @@ export default function Page({ params }) {
           <div className="header-container flex items-center justify-between w-full">
             {/* Div para o conteúdo centralizado (setas e título dinâmico) */}
             <div className="flex items-center space-x-4 mx-auto">
-              {/* Seta para voltar para o dia de hoje */}
-              {currentDate !== today && (
-                <button
-                  onClick={() => setCurrentDate(today)}
-                  className="p-2 text-gray-500 text-textPrimaryColor"
-                >
-                  <IoIosArrowBack size={20} />
-                </button>
-              )}
-
               {/* Título dinâmico com a data atual */}
               <h2 className="text-xl text-textPrimaryColor">
                 {currentDate === today ? `${t.frontOffice.departures.today}: ${today}` : `${t.frontOffice.departures.tomorrow}: ${currentDate}`}
               </h2>
 
-              {/* Seta para avançar para o próximo dia */}
-              {currentDate !== tomorrowDate && (
-                <button
-                  onClick={() => setCurrentDate(tomorrowDate)}
-                  className="p-2 text-gray-500 text-textPrimaryColor"
-                >
-                  <IoIosArrowForward size={20} />
-                </button>
-              )}
-
-              {/* Título "Departure List" separado do título dinâmico */}
+              {/* Título "Departures List" separado do título dinâmico */}
               <h2 className="text-xl text-textPrimaryColor">{propertyName} : {t.frontOffice.departures.departureList}</h2>
             </div>
 
@@ -368,6 +347,22 @@ export default function Page({ params }) {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Tabs for switching between today and tomorrow */}
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => setCurrentDate(today)}
+            className={`px-4 py-2 ${currentDate === today ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'} rounded-l-lg`}
+          >
+            {new Date(today).toLocaleDateString()} {/* Exibe a data formatada */}
+          </button>
+          <button
+            onClick={() => setCurrentDate(tomorrowDate)}
+            className={`px-4 py-2 ${currentDate === tomorrowDate ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'} rounded-r-lg`}
+          >
+            {new Date(tomorrowDate).toLocaleDateString()} {/* Exibe a data formatada */}
+          </button>
         </div>
 
         <div className="mt-5">

@@ -351,16 +351,14 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
       {isLoading && <LoadingBackdrop open={isLoading} />}
       <div className="flex-grow overflow-y-auto p-4">
         <div className="flex justify-between items-center w-full">
-          <div className="header-container flex items-center justify-between w-full">
-            {/* Div para o conteúdo centralizado */}
+        <div className="header-container flex items-center justify-between w-full">
             <div className="flex items-center space-x-4 mx-auto">
               <h2 className="text-xl text-textPrimaryColor">{propertyName} : {t.frontOffice.inHouses.title}</h2>
             </div>
 
-            {/* Botão de refresh alinhado à direita */}
             <div className="flex items-center">
               <button
-                onClick={handleRefreshClick} // Aqui chamamos a função para enviar os dados
+                onClick={handleRefreshClick}
                 className="text-white bg-primary rounded-lg cursor-pointer p-2"
               >
                 <MdOutlineRefresh size={20} />
@@ -369,6 +367,14 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
           </div>
         </div>
 
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => setCurrentDate(today)}
+            className={`px-4 py-2 bg-primary text-white rounded-lg`}
+          >
+            {new Date(today).toLocaleDateString()}
+          </button>
+        </div>
         <div className="mt-5">
           {isLoading ? (
             (<LoadingBackdrop open={isLoading} />) // Exibe o carregamento enquanto os dados estão sendo carregados
