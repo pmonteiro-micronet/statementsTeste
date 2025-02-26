@@ -30,7 +30,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
         streetAddress: companyVATData?.streetAddress || "",
         zipCode: companyVATData?.zipCode || "",
         city: companyVATData?.city || "",
-        state: companyVATData?.state || ""
+        state: companyVATData?.state || "",
+        companyID: companyVATData?.companyID || ""
     }));
 
     const [errorMessage, setErrorMessage] = useState("");

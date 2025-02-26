@@ -47,7 +47,7 @@ export async function POST(request) {
     const url = `http://${property.propertyServer}:${property.propertyPort}/insertCompany`;
     console.log("Enviando dados para API externa:", url);
 
-    // Enviar para API externa com os dados no HEADER (sem "X-")
+    // Enviar para API externa com os dados no HEADER
     const response = await axios.post(url, null, {  
       headers: {
         Authorization: "q4vf9p8n4907895f7m8d24m75c2q947m2398c574q9586c490q756c98q4m705imtugcfecvrhym04capwz3e2ewqaefwegfiuoamv4ros2nuyp0sjc3iutow924bn5ry943utrjmi",
@@ -67,10 +67,20 @@ export async function POST(request) {
 
     console.log("Resposta da API externa:", response.data);
 
+    // Capturar corretamente o CompanyID da resposta da API externa
+    const companyID = response.data?.CompanyID; // Com "C" maiúsculo
+
+    if (!companyID) {
+      return new NextResponse(
+        JSON.stringify({ error: "CompanyID não foi retornado pela API externa." }), 
+        { status: 500 }
+      );
+    }
+
     // Buscar o registro no banco para atualização
     const record = await prisma.requestRecordsArrivals.findFirst({
       where: { propertyID: Number(propertyID) },
-      select: { requestID: true, requestBody: true, responseBody: true },
+      select: { requestID: true, responseBody: true },
     });
 
     if (!record) {
@@ -80,7 +90,6 @@ export async function POST(request) {
       );
     }
 
-    // Agora podemos usar o requestID do registro encontrado
     const { requestID } = record;
 
     // Converter JSONs do banco de forma segura
@@ -89,7 +98,7 @@ export async function POST(request) {
       : [];
 
     // Função para atualizar os dados da empresa dentro do JSON (somente no responseBody)
-    const atualizarCamposEmpresaNoResponseBody = (json, profileID) => {
+    const atualizarCamposEmpresaNoResponseBody = (json, profileID, companyID) => {
       json.forEach((reserva) => {
         // Verifica se há algum hóspede com o profileID correto nesta reserva
         const hospedeEncontrado = reserva.GuestInfo.some((guest) =>
@@ -108,19 +117,20 @@ export async function POST(request) {
             reservation.CompanyCountryName = countryName;
             reservation.CompanyCountryID = countryID;
             reservation.hasCompanyVAT = 1;
+            reservation.CompanyID = companyID;  // Adicionando o novo CompanyID
           });
         }
       });
     };    
 
-    // Atualizar somente o responseBody com os dados da empresa
-    atualizarCamposEmpresaNoResponseBody(responseBody, profileID);
+    // Atualizar somente o responseBody com os dados da empresa e o novo CompanyID
+    atualizarCamposEmpresaNoResponseBody(responseBody, profileID, companyID);
 
     // Atualizar banco de dados com a nova versão do responseBody
     await prisma.requestRecordsArrivals.update({
-      where: { requestID: requestID },  // Usando requestID para atualizar o registro
+      where: { requestID: requestID },  
       data: {
-        responseBody: JSON.stringify(responseBody),  // Convertendo de volta para string
+        responseBody: JSON.stringify(responseBody),
       },
     });
 
