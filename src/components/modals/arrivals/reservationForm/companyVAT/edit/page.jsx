@@ -26,8 +26,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
         companyName: companyVATData?.companyName || "",
         vatNo: companyVATData?.vatNo || "",
         emailAddress: companyVATData?.emailAddress || "",
-        countryID: companyVATData?.countryID || "", // Alterado para armazenar ID
-        countryName: companyVATData?.countryName || "", // Novo campo para armazenar o nome
+        countryName: companyVATData?.countryName || "",
         streetAddress: companyVATData?.streetAddress || "",
         zipCode: companyVATData?.zipCode || "",
         city: companyVATData?.city || "",
@@ -53,7 +52,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                 const response = await axios.get(`/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`);
                 const formattedOptions = response.data
                     .map((country) => ({
-                        value: country.codenr,
+                        value: country.land,
                         label: country.land
                     }))
                     .sort((a, b) => a.label.localeCompare(b.label));
@@ -89,9 +88,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
     const handleCountryChange = (selectedOption) => {
         setFormData(prev => ({
             ...prev,
-            countryID: selectedOption.value,
-            countryName: selectedOption.label, // Agora armazena o nome corretamente
-            vatNo: prev.countryID !== selectedOption.value ? "" : prev.vatNo
+            countryName: selectedOption.label,
+            vatNo: prev.countryName !== selectedOption.label ? "" : prev.vatNo
         }));
     };
 
@@ -111,8 +109,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                 profileID,
                 propertyID,
                 resNo,
-                countryID: formData.countryID, // Enviando o ID do país
-                countryName: formData.countryName, // Enviando o nome do país
+                countryName: formData.countryName,
                 ...formData
             });
 
@@ -162,7 +159,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                                 <label className="block text-sm font-medium">Country:</label>
                                 <Select
                                     options={countryOptions}
-                                    value={countryOptions.find(option => option.value === formData.countryID)}
+                                    value={countryOptions.find(option => option.label === formData.countryName)}
                                     onChange={handleCountryChange}
                                     isSearchable
                                     styles={customStyles}
@@ -176,10 +173,52 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                                     value={formData.vatNo}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    disabled={!formData.countryID}
+                                    disabled={!formData.countryName}
                                     className="w-full border border-gray-300 rounded-md px-2 py-1"
                                 />
                                 {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium">Street Address:</label>
+                                <input
+                                    type="text"
+                                    name="streetAddress"
+                                    value={formData.streetAddress}
+                                    onChange={handleChange}
+                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                />
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="w-1/2">
+                                    <label className="block text-sm font-medium">Zip Code:</label>
+                                    <input
+                                        type="text"
+                                        name="zipCode"
+                                        value={formData.zipCode}
+                                        onChange={handleChange}
+                                        className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                    />
+                                </div>
+                                <div className="w-1/2">
+                                    <label className="block text-sm font-medium">City:</label>
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        value={formData.city}
+                                        onChange={handleChange}
+                                        className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium">State:</label>
+                                <input
+                                    type="text"
+                                    name="state"
+                                    value={formData.state}
+                                    onChange={handleChange}
+                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
+                                />
                             </div>
                             {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
                             <div className="flex justify-end space-x-2">
