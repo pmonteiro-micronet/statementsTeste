@@ -117,7 +117,7 @@ export async function POST(request) {
             reservation.CompanyCountryName = countryName;
             reservation.CompanyCountryID = countryID;
             reservation.hasCompanyVAT = 1;
-            reservation.CompanyID = companyID;  // Adicionando o novo CompanyID
+            reservation.CompanyID = companyID; 
           });
         }
       });
