@@ -1092,7 +1092,8 @@ export default function Page() {
                                                                         streetAddress: reserva.CompanyStreetAddress || "",
                                                                         zipCode: reserva.CompanyZipCode || "",
                                                                         city: reserva.CompanyCity || "",
-                                                                        state: reserva.CompanyState || ""
+                                                                        state: reserva.CompanyState || "",
+                                                                        companyID: reserva.CompanyID || ""
                                                                     };
                                                             
                                                                     console.log("Definindo companyVATData:", companyData);

@@ -491,19 +491,19 @@ export default function Arrivals({ params }) {
                               let icon;
                               switch (reserva.RoomStatus) {
                                 case "Dirty":
-                                  icon = <FaCircleXmark color="red" size={18} />;
+                                  icon = <FaCircleXmark color="red" size={20} />;
                                   break;
                                 case "Touched":
-                                  icon = <FaCircleExclamation color="orange" size={18} />;
+                                  icon = <FaCircleExclamation color="orange" size={20} />;
                                   break;
                                 case "Checked":
-                                  icon = <FaQuestionCircle color="#00CED1" size={18} />;
+                                  icon = <FaQuestionCircle color="#00CED1" size={20} />;
                                   break;
                                 case "Clean":
-                                  icon = <FaCheckCircle color="lime" size={18} />;
+                                  icon = <FaCheckCircle color="lime" size={20} />;
                                   break;
                                 default:
-                                  icon = <FaCheckCircle color="lime" size={18} />;
+                                  icon = <FaCheckCircle color="lime" size={20} />;
                                   break;
                               }
                               return icon;
