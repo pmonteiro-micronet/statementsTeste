@@ -26,7 +26,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
         companyName: companyVATData?.companyName || "",
         vatNo: companyVATData?.vatNo || "",
         emailAddress: companyVATData?.emailAddress || "",
-        countryName: companyVATData?.countryName || "",
+        countryName: companyVATData?.country || "",
         streetAddress: companyVATData?.streetAddress || "",
         zipCode: companyVATData?.zipCode || "",
         city: companyVATData?.city || "",
@@ -46,13 +46,14 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
         if (inputRef.current) inputRef.current.focus();
     }, []);
 
+    // 🔹 Buscar lista de países da API
     useEffect(() => {
         const fetchCountries = async () => {
             try {
                 const response = await axios.get(`/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`);
                 const formattedOptions = response.data
                     .map((country) => ({
-                        value: country.land,
+                        value: country.codenr,
                         label: country.land
                     }))
                     .sort((a, b) => a.label.localeCompare(b.label));
@@ -88,8 +89,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
     const handleCountryChange = (selectedOption) => {
         setFormData(prev => ({
             ...prev,
-            countryName: selectedOption.label,
-            vatNo: prev.countryName !== selectedOption.label ? "" : prev.vatNo
+            countryName: selectedOption.value,
+            vatNo: prev.countryName !== selectedOption.value ? "" : prev.vatNo
         }));
     };
 
@@ -109,6 +110,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                 profileID,
                 propertyID,
                 resNo,
+                countryID: formData.country,
                 countryName: formData.countryName,
                 ...formData
             });
@@ -159,7 +161,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                                 <label className="block text-sm font-medium">Country:</label>
                                 <Select
                                     options={countryOptions}
-                                    value={countryOptions.find(option => option.label === formData.countryName)}
+                                    value={countryOptions.find(option => option.value === formData.countryName)}
                                     onChange={handleCountryChange}
                                     isSearchable
                                     styles={customStyles}
@@ -188,6 +190,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                                     className="w-full border border-gray-300 rounded-md px-2 py-1"
                                 />
                             </div>
+                            {/* 🔹 Zip Code e City na mesma linha */}
                             <div className="flex gap-4">
                                 <div className="w-1/2">
                                     <label className="block text-sm font-medium">Zip Code:</label>
