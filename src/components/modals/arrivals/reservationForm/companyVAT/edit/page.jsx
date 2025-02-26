@@ -26,7 +26,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
         companyName: companyVATData?.companyName || "",
         vatNo: companyVATData?.vatNo || "",
         emailAddress: companyVATData?.emailAddress || "",
-        country: companyVATData?.country || "",
+        countryID: companyVATData?.countryID || "", // Alterado para armazenar ID
+        countryName: companyVATData?.countryName || "", // Novo campo para armazenar o nome
         streetAddress: companyVATData?.streetAddress || "",
         zipCode: companyVATData?.zipCode || "",
         city: companyVATData?.city || "",
@@ -46,7 +47,6 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
         if (inputRef.current) inputRef.current.focus();
     }, []);
 
-    // 🔹 Buscar lista de países da API
     useEffect(() => {
         const fetchCountries = async () => {
             try {
@@ -79,7 +79,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
     };
 
     const handleBlur = () => {
-        if (formData.country === "Portugal" && !validatePortugueseVAT(formData.vatNo)) {
+        if (formData.countryName === "Portugal" && !validatePortugueseVAT(formData.vatNo)) {
             setVatError(/^\d{9}$/.test(formData.vatNo) ? "" : "O NIF português deve ter exatamente 9 dígitos.");
         } else {
             setVatError("");
@@ -89,8 +89,9 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
     const handleCountryChange = (selectedOption) => {
         setFormData(prev => ({
             ...prev,
-            country: selectedOption.value,
-            vatNo: prev.country !== selectedOption.value ? "" : prev.vatNo
+            countryID: selectedOption.value,
+            countryName: selectedOption.label, // Agora armazena o nome corretamente
+            vatNo: prev.countryID !== selectedOption.value ? "" : prev.vatNo
         }));
     };
 
@@ -110,8 +111,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                 profileID,
                 propertyID,
                 resNo,
-                countryID: formData.country,
-                countryName: formData.countryName,
+                countryID: formData.countryID, // Enviando o ID do país
+                countryName: formData.countryName, // Enviando o nome do país
                 ...formData
             });
 
@@ -161,7 +162,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                                 <label className="block text-sm font-medium">Country:</label>
                                 <Select
                                     options={countryOptions}
-                                    value={countryOptions.find(option => option.value === formData.country)}
+                                    value={countryOptions.find(option => option.value === formData.countryID)}
                                     onChange={handleCountryChange}
                                     isSearchable
                                     styles={customStyles}
@@ -175,53 +176,10 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                                     value={formData.vatNo}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    disabled={!formData.country}
+                                    disabled={!formData.countryID}
                                     className="w-full border border-gray-300 rounded-md px-2 py-1"
                                 />
                                 {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium">Street Address:</label>
-                                <input
-                                    type="text"
-                                    name="streetAddress"
-                                    value={formData.streetAddress}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                />
-                            </div>
-                            {/* 🔹 Zip Code e City na mesma linha */}
-                            <div className="flex gap-4">
-                                <div className="w-1/2">
-                                    <label className="block text-sm font-medium">Zip Code:</label>
-                                    <input
-                                        type="text"
-                                        name="zipCode"
-                                        value={formData.zipCode}
-                                        onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                    />
-                                </div>
-                                <div className="w-1/2">
-                                    <label className="block text-sm font-medium">City:</label>
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        value={formData.city}
-                                        onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium">State:</label>
-                                <input
-                                    type="text"
-                                    name="state"
-                                    value={formData.state}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1"
-                                />
                             </div>
                             {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
                             <div className="flex justify-end space-x-2">
