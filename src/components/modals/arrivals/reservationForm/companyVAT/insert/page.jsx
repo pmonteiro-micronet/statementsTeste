@@ -65,7 +65,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
     };
 
     const handleBlur = () => {
-        if (formData.country === "Portugal") {
+        if (formData.country === "Portugal" && formData.vatNo) {
             if (!/^\d{9}$/.test(formData.vatNo)) {
                 setVatError("O NIF português deve ter exatamente 9 dígitos.");
             } else {
@@ -75,6 +75,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
             setVatError("");
         }
     };
+
 
     const handleCountryChange = (selectedOption) => {
         setFormData((prevData) => {
@@ -114,16 +115,21 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
     };
 
     const handleSave = async () => {
-        if (!formData.companyName) {
+        if (!formData.companyName.trim()) {
             setErrorMessage("O nome da empresa é obrigatório.");
             return;
         }
-
+    
         if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
             setErrorMessage("Por favor, insira um e-mail válido.");
             return;
-        }        
-
+        }
+    
+        // Substituir valores vazios por um espaço em branco
+        const formattedData = Object.fromEntries(
+            Object.entries(formData).map(([key, value]) => [key, value.trim() === "" ? " " : value])
+        );
+    
         try {
             const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVAT", {
                 profileID,
@@ -131,18 +137,18 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                 resNo,
                 countryID: formData.country,
                 countryName: formData.countryName,
-                ...formData
+                ...formattedData // Enviar os dados formatados
             });
-
+    
             console.log("Success:", response.data);
             setErrorMessage("");
-            setIsDataModified(false); // Reseta o estado de dados modificados após salvar
+            setIsDataModified(false);
             onClose();
         } catch (error) {
             console.error("Erro ao salvar informações de VAT:", error);
             setErrorMessage("Falha ao salvar. Por favor, tente novamente.");
         }
-    };
+    };    
 
     const handleCloseModal = () => {
         if (isDataModified) {
@@ -211,7 +217,6 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                                     value={formData.vatNo}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    disabled={!formData.country} // Desabilita o campo se o país não for selecionado
                                     className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                 />
                                 {vatError && <p className="text-red-500 text-xs">{vatError}</p>}

@@ -1041,22 +1041,6 @@ export default function Page() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            {/* <div className="flex justify-center">
-                                                <div className="flex flex-row justify-center bg-gray-100 w-34 h-8 rounded-xl items-center">
-                                                    <div
-                                                        onClick={() => setActiveKey("individual")}
-                                                        className={`cursor-pointer p-2 ${activeKey === "individual" ? "h-6 flex items-center bg-white text-black rounded-lg m-0.5 text-xs text-bold border border-gray-200" : "text-gray-500 m-1 text-xs"}`}
-                                                    >
-                                                        Individual
-                                                    </div>
-                                                    <div
-                                                        onClick={() => setActiveKey("company")}
-                                                        className={`cursor-pointer p-2 ${activeKey === "company" ? "h-6 flex items-center bg-white text-black rounded-lg m-0.5 text-xs text-bold border border-gray-200" : "text-gray-500 m-1 text-xs"}`}
-                                                    >
-                                                        Company
-                                                    </div>
-                                                </div>
-                                            </div> */}
                                             <div>
                                                 {activeKey === "individual" && (
                                                     <FaPencilAlt
