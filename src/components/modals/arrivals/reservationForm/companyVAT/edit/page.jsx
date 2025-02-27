@@ -26,12 +26,11 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
         companyName: companyVATData?.companyName || "",
         vatNo: companyVATData?.vatNo || "",
         emailAddress: companyVATData?.emailAddress || "",
-        countryName: companyVATData?.country || "",
+        country: companyVATData?.country || "",
         streetAddress: companyVATData?.streetAddress || "",
         zipCode: companyVATData?.zipCode || "",
         city: companyVATData?.city || "",
-        state: companyVATData?.state || "",
-        companyID: companyVATData?.companyID || ""
+        state: companyVATData?.state || ""
     }));
 
     const [errorMessage, setErrorMessage] = useState("");
@@ -79,7 +78,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
     };
 
     const handleBlur = () => {
-        if (formData.countryName === "Portugal" && !validatePortugueseVAT(formData.vatNo)) {
+        if (formData.country === "Portugal" && !validatePortugueseVAT(formData.vatNo)) {
             setVatError(/^\d{9}$/.test(formData.vatNo) ? "" : "O NIF português deve ter exatamente 9 dígitos.");
         } else {
             setVatError("");
@@ -89,8 +88,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
     const handleCountryChange = (selectedOption) => {
         setFormData(prev => ({
             ...prev,
-            countryName: selectedOption.value,
-            vatNo: prev.countryName !== selectedOption.value ? "" : prev.vatNo
+            country: selectedOption.value,
+            vatNo: prev.country !== selectedOption.value ? "" : prev.vatNo
         }));
     };
 
@@ -161,7 +160,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                                 <label className="block text-sm font-medium">Country:</label>
                                 <Select
                                     options={countryOptions}
-                                    value={countryOptions.find(option => option.value === formData.countryName)}
+                                    value={countryOptions.find(option => option.value === formData.country)}
                                     onChange={handleCountryChange}
                                     isSearchable
                                     styles={customStyles}
@@ -175,7 +174,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                                     value={formData.vatNo}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    disabled={!formData.countryName}
+                                    disabled={!formData.country}
                                     className="w-full border border-gray-300 rounded-md px-2 py-1"
                                 />
                                 {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
