@@ -127,8 +127,8 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
     
         // Substituir valores vazios por um espaço em branco
         const formattedData = Object.fromEntries(
-            Object.entries(formData).map(([key, value]) => [key, value.trim() === "" ? " " : value])
-        );
+            Object.entries(formData).map(([key, value]) => [key, String(value).trim() === "" ? " " : String(value).trim()])
+        );        
     
         try {
             const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVAT", {
