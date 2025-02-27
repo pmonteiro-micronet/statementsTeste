@@ -125,8 +125,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 zipCode: formData.zipCode,
                 city: formData.city,
                 state: formData.state,
-            }).map(([key, value]) => [key, value?.trim() === "" ? " " : value]) // Substitui strings vazias por um espaço
-        );
+            }).map(([key, value]) => [key, String(value || "").trim() === "" ? " " : String(value || "").trim()])
+        );        
 
         try {
             await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", payload);
