@@ -123,16 +123,19 @@ export async function POST(request) {
       });
     };    
 
-    // Atualizar somente o responseBody com os dados da empresa e o novo CompanyID
-    atualizarCamposEmpresaNoResponseBody(responseBody, profileID, companyID);
+    console.log("VAT antes da atualização do responseBody:", vatNo);
 
-    // Atualizar banco de dados com a nova versão do responseBody
+    atualizarCamposEmpresaNoResponseBody(responseBody, profileID, companyID);
+    
+    console.log("responseBody FINAL antes de salvar:", JSON.stringify(responseBody, null, 2));
+    
     await prisma.requestRecordsArrivals.update({
       where: { requestID: requestID },  
       data: {
         responseBody: JSON.stringify(responseBody),
       },
     });
+    
 
     return new NextResponse(
       JSON.stringify({
