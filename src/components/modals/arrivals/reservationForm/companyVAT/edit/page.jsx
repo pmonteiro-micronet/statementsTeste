@@ -78,10 +78,14 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
     };
 
     const handleBlur = () => {
-        if (formData.country === "Portugal" && !validatePortugueseVAT(formData.vatNo)) {
-            setVatError(/^\d{9}$/.test(formData.vatNo) ? "" : "O NIF português deve ter exatamente 9 dígitos.");
+        if (formData.country === "Portugal" && formData.vatNo) {
+            if (!validatePortugueseVAT(formData.vatNo)) {
+                setVatError("O NIF português deve ter exatamente 9 dígitos e começar com 'PT'.");
+            } else {
+                setVatError("");
+            }
         } else {
-            setVatError("");
+            setVatError(""); // Remove erro caso o VAT esteja vazio
         }
     };
 
@@ -105,17 +109,27 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
             return;
         }
 
-        try {
-            await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", {
+        // Substituir campos vazios por um espaço " "
+        const payload = Object.fromEntries(
+            Object.entries({
                 profileID,
                 propertyID,
                 resNo,
                 companyID,
                 countryID: formData.country,
                 countryName: formData.countryName,
-                ...formData
-            });
+                companyName: formData.companyName,
+                vatNo: formData.vatNo,
+                emailAddress: formData.emailAddress,
+                streetAddress: formData.streetAddress,
+                zipCode: formData.zipCode,
+                city: formData.city,
+                state: formData.state,
+            }).map(([key, value]) => [key, value?.trim() === "" ? " " : value]) // Substitui strings vazias por um espaço
+        );
 
+        try {
+            await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", payload);
             onClose();
         } catch (error) {
             console.error("Erro ao salvar empresa:", error);
@@ -162,7 +176,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                 <label className="block text-sm font-medium">Country:</label>
                                 <Select
                                     options={countryOptions}
-                                    value={countryOptions.find(option => option.value === formData.country)}
+                                    value={countryOptions.find(option => option.value === formData.country) || null} 
                                     onChange={handleCountryChange}
                                     isSearchable
                                     styles={customStyles}
@@ -176,7 +190,6 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                     value={formData.vatNo}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    disabled={!formData.country}
                                     className="w-full border border-gray-300 rounded-md px-2 py-1"
                                 />
                                 {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
