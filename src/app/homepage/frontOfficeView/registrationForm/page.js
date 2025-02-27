@@ -1093,7 +1093,6 @@ export default function Page() {
                                                                         zipCode: reserva.CompanyZipCode || "",
                                                                         city: reserva.CompanyCity || "",
                                                                         state: reserva.CompanyState || "",
-                                                                        companyID: reserva.CompanyID || ""
                                                                     };
                                                             
                                                                     console.log("Definindo companyVATData:", companyData);
@@ -1169,6 +1168,7 @@ export default function Page() {
                                             propertyID={propertyID}
                                             initialData={companyVATData} // Aqui usamos o nome correto da variável
                                             resNo={reserva.ResNo}
+                                            companyID={reserva.CompanyID}
                                             companyVATData={companyVATData}
                                         />
                                     )}
