@@ -89,6 +89,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
         setFormData(prev => ({
             ...prev,
             country: selectedOption.value,
+            countryName: selectedOption.label, // Nome do país (land)
             vatNo: prev.country !== selectedOption.value ? "" : prev.vatNo
         }));
     };
