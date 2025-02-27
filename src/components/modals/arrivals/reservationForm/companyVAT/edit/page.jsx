@@ -21,7 +21,7 @@ const customStyles = {
 
 const validatePortugueseVAT = (vat) => /^PT\d{9}$/.test(vat);
 
-const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATData }) => {
+const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData }) => {
     const [formData, setFormData] = useState(() => ({
         companyName: companyVATData?.companyName || "",
         vatNo: companyVATData?.vatNo || "",
@@ -30,7 +30,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
         streetAddress: companyVATData?.streetAddress || "",
         zipCode: companyVATData?.zipCode || "",
         city: companyVATData?.city || "",
-        state: companyVATData?.state || ""
+        state: companyVATData?.state || "",
     }));
 
     const [errorMessage, setErrorMessage] = useState("");
@@ -109,6 +109,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyVATD
                 profileID,
                 propertyID,
                 resNo,
+                companyID,
                 countryID: formData.country,
                 countryName: formData.countryName,
                 ...formData

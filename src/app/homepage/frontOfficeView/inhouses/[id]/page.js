@@ -61,44 +61,44 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   console.log(router);
 
   const [propertyName, setPropertyName] = useState([]);
-  
+
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-  
+
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
     try {
       setIsLoading(true); // Inicia o carregamento
-  
+
       const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
-  
+
       if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
         const mpehotel = propertyResponse.data.response[0].mpehotel;
         console.log('Mpehotel encontrado:', mpehotel);
-  
+
         // Faz as requisições com delay
         await axios.get("/api/reservations/checkins/reservations_4_tat", {
           params: { mpehotel, propertyID },
         });
-  
+
         // Aguarda 1 segundo antes de fazer a próxima requisição
-        await sleep(1000); 
-  
+        await sleep(1000);
+
         await axios.get("/api/reservations/inHouses/reservations_4_tat", {
           params: { mpehotel, propertyID },
         });
-  
+
         // Aguarda mais 1 segundo antes de fazer a última requisição
-        await sleep(1000); 
-  
+        await sleep(1000);
+
         await axios.get("/api/reservations/info", {
           params: { mpehotel, propertyID },
         });
-  
+
         setPostSuccessful(true);
-  
+
         // Aguarda um curto tempo antes de buscar as reservas para garantir que os dados sejam atualizados no backend
         setTimeout(fetchReservas, 1000);
-  
+
       } else {
         console.error('Mpehotel não encontrado para o propertyID:', propertyID);
         setPostSuccessful(false);
@@ -116,7 +116,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
 
 
   // Chama a função sendDataToAPI ao carregar a página
@@ -206,87 +206,87 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   };
 
   // Função para pegar as reservas
-    const fetchReservas = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axios.get(`/api/reservations/inHouses/${propertyID}`);
-        console.log("Response completo:", response);
+  const fetchReservas = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`/api/reservations/inHouses/${propertyID}`);
+      console.log("Response completo:", response);
 
-        // Parse das reservas
-        const reservasArray = response.data.response.flatMap(item => {
-          try {
-            return JSON.parse(item.responseBody);
-          } catch (err) {
-            console.error("Erro ao fazer parse de requestBody:", item.responseBody, err);
-            return [];
-          }
-        });
-
-        console.log("Reservas após parse (todas as linhas):", reservasArray);
-
-        if (reservasArray.length === 0) {
-          console.warn("Nenhuma reserva encontrada após parse.");
-          setIsLoading(false);
-          return; // Interrompe a execução se não houver reservas
+      // Parse das reservas
+      const reservasArray = response.data.response.flatMap(item => {
+        try {
+          return JSON.parse(item.responseBody);
+        } catch (err) {
+          console.error("Erro ao fazer parse de requestBody:", item.responseBody, err);
+          return [];
         }
+      });
 
-        // Obtemos a data atual no formato YYYY-MM-DD
-        const today = dayjs(currentDate, 'YYYY-MM-DD', true);
-        console.log("Data atual formatada:", today.format());
+      console.log("Reservas após parse (todas as linhas):", reservasArray);
 
-        // Filtramos as reservas para pegar apenas as que têm a data no campo requestDateTime igual à data atual
-        const reservasFiltradas = reservasArray.filter(reserva => {
-          const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-
-          // Compara apenas a data, sem considerar a hora
-          const isSameDay = requestDateTime.isSame(today, 'day');
-
-          console.log(`Reserva: ${reserva.LastName}, RequestDateTime: ${requestDateTime.format()}`);
-          return isSameDay;
-        });
-
-        console.log("Reservas filtradas pela data atual:", reservasFiltradas);
-
-        // Agora vamos agrupar as reservas por 'LastName' e 'Room' e pegar a mais recente de cada grupo
-        const reservasMaisRecentes = [];
-
-        // Usando um Map para garantir que, para cada combinação LastName + Room, só a reserva mais recente seja adicionada
-        const seen = new Map();
-
-        reservasFiltradas.forEach(reserva => {
-          const key = `${reserva.LastName}-${reserva.Room}`;
-          const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-
-          if (!seen.has(key)) {
-            seen.set(key, reserva);
-          } else {
-            const existingReserva = seen.get(key);
-            const existingDate = dayjs(existingReserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-
-            // Se a reserva atual for mais recente, substituímos a existente
-            if (requestDateTime.isAfter(existingDate)) {
-              seen.set(key, reserva);
-            }
-          }
-        });
-
-        // Agora, obtemos todas as reservas mais recentes
-        reservasMaisRecentes.push(...seen.values());
-
-        console.log("Reservas mais recentes para o dia de hoje:", reservasMaisRecentes);
-        setReservas(reservasMaisRecentes);
-      } catch (error) {
-        console.error("Erro ao buscar reservas:", error.message);
-      } finally {
+      if (reservasArray.length === 0) {
+        console.warn("Nenhuma reserva encontrada após parse.");
         setIsLoading(false);
+        return; // Interrompe a execução se não houver reservas
       }
-    };
 
-    useEffect(() => {
-      if (postSuccessful) {
-        fetchReservas();
-      }
-    }, [postSuccessful]);
+      // Obtemos a data atual no formato YYYY-MM-DD
+      const today = dayjs(currentDate, 'YYYY-MM-DD', true);
+      console.log("Data atual formatada:", today.format());
+
+      // Filtramos as reservas para pegar apenas as que têm a data no campo requestDateTime igual à data atual
+      const reservasFiltradas = reservasArray.filter(reserva => {
+        const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+
+        // Compara apenas a data, sem considerar a hora
+        const isSameDay = requestDateTime.isSame(today, 'day');
+
+        console.log(`Reserva: ${reserva.LastName}, RequestDateTime: ${requestDateTime.format()}`);
+        return isSameDay;
+      });
+
+      console.log("Reservas filtradas pela data atual:", reservasFiltradas);
+
+      // Agora vamos agrupar as reservas por 'LastName' e 'Room' e pegar a mais recente de cada grupo
+      const reservasMaisRecentes = [];
+
+      // Usando um Map para garantir que, para cada combinação LastName + Room, só a reserva mais recente seja adicionada
+      const seen = new Map();
+
+      reservasFiltradas.forEach(reserva => {
+        const key = `${reserva.LastName}-${reserva.Room}`;
+        const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+
+        if (!seen.has(key)) {
+          seen.set(key, reserva);
+        } else {
+          const existingReserva = seen.get(key);
+          const existingDate = dayjs(existingReserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+
+          // Se a reserva atual for mais recente, substituímos a existente
+          if (requestDateTime.isAfter(existingDate)) {
+            seen.set(key, reserva);
+          }
+        }
+      });
+
+      // Agora, obtemos todas as reservas mais recentes
+      reservasMaisRecentes.push(...seen.values());
+
+      console.log("Reservas mais recentes para o dia de hoje:", reservasMaisRecentes);
+      setReservas(reservasMaisRecentes);
+    } catch (error) {
+      console.error("Erro ao buscar reservas:", error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (postSuccessful) {
+      fetchReservas();
+    }
+  }, [postSuccessful]);
 
 
   useEffect(() => {
@@ -351,7 +351,15 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
       {isLoading && <LoadingBackdrop open={isLoading} />}
       <div className="flex-grow overflow-y-auto p-4">
         <div className="flex justify-between items-center w-full">
-        <div className="header-container flex items-center justify-between w-full">
+          <div className="header-container flex items-center justify-between w-full">
+            <div className="flex">
+              <button
+                onClick={() => setCurrentDate(today)}
+                className={`px-4 py-2 bg-primary text-white rounded-lg`}
+              >
+                {new Date(today).toLocaleDateString()}
+              </button>
+            </div>
             <div className="flex items-center space-x-4 mx-auto">
               <h2 className="text-xl text-textPrimaryColor">{propertyName} : {t.frontOffice.inHouses.title}</h2>
             </div>
@@ -367,14 +375,6 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
           </div>
         </div>
 
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={() => setCurrentDate(today)}
-            className={`px-4 py-2 bg-primary text-white rounded-lg`}
-          >
-            {new Date(today).toLocaleDateString()}
-          </button>
-        </div>
         <div className="mt-5">
           {isLoading ? (
             (<LoadingBackdrop open={isLoading} />) // Exibe o carregamento enquanto os dados estão sendo carregados

@@ -333,13 +333,24 @@ export default function Arrivals({ params }) {
       <div className="flex-grow overflow-y-auto p-4">
         <div className="flex justify-between items-center w-full">
           <div className="header-container flex items-center justify-between w-full">
-            {/* Div para o conteúdo centralizado (setas e título dinâmico) */}
-            <div className="flex items-center space-x-4 mx-auto">
-              {/* Título dinâmico com a data atual */}
-              <h2 className="text-xl text-textPrimaryColor">
-                {currentDate === today ? `${t.frontOffice.arrivals.today}: ${today}` : `${t.frontOffice.arrivals.tomorrow}: ${currentDate}`}
-              </h2>
+            {/* Tabs for switching between today and tomorrow */}
+            <div className="flex justify-center">
+              <button
+                onClick={() => setCurrentDate(today)}
+                className={`px-4 py-2 ${currentDate === today ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'} rounded-l-lg`}
+              >
+                {new Date(today).toLocaleDateString()} {/* Exibe a data formatada */}
+              </button>
+              <button
+                onClick={() => setCurrentDate(tomorrowDate)}
+                className={`px-4 py-2 ${currentDate === tomorrowDate ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'} rounded-r-lg`}
+              >
+                {new Date(tomorrowDate).toLocaleDateString()} {/* Exibe a data formatada */}
+              </button>
+            </div>
 
+            {/* Div para o conteúdo centralizado (setas e título dinâmico) */}
+            <div className="-ml-20">
               {/* Título "Arrivals List" separado do título dinâmico */}
               <h2 className="text-xl text-textPrimaryColor">{propertyName} : {t.frontOffice.arrivals.arrivalList}</h2>
             </div>
@@ -354,22 +365,6 @@ export default function Arrivals({ params }) {
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Tabs for switching between today and tomorrow */}
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={() => setCurrentDate(today)}
-            className={`px-4 py-2 ${currentDate === today ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'} rounded-l-lg`}
-          >
-            {new Date(today).toLocaleDateString()} {/* Exibe a data formatada */}
-          </button>
-          <button
-            onClick={() => setCurrentDate(tomorrowDate)}
-            className={`px-4 py-2 ${currentDate === tomorrowDate ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'} rounded-r-lg`}
-          >
-            {new Date(tomorrowDate).toLocaleDateString()} {/* Exibe a data formatada */}
-          </button>
         </div>
 
         <div className="mt-5">
@@ -388,7 +383,7 @@ export default function Arrivals({ params }) {
                     </td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
                       <div className="flex items-center justify-center">
-                        <Image src="/tableIcons/janitor.png" width={25} height={25} alt="housekeeper"/>
+                        <Image src="/tableIcons/janitor.png" width={25} height={25} alt="housekeeper" />
                       </div>
                     </td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.lastName}</td>
