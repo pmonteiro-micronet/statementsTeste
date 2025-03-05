@@ -14,6 +14,7 @@ import en from "../../../../public/locales/english/common.json";
 import pt from "../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../public/locales/espanol/common.json";
 
+
 const translations = { en, pt, es };
 
 export default function AllProfiles({ }) {
