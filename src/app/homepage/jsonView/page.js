@@ -3,16 +3,21 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import OkPIN from "@/components/modals/pin/ok/page";
+import OkPIN from "@/components/modals/pin/ok/okJson/page";
 import CancelPIN from "@/components/modals/pin/cancel/page";
 import "./styles.css";
 import en from "../../../../public/locales/english/common.json";
 import pt from "../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../public/locales/espanol/common.json";
+import InputFieldControlled from "@/components/input/page";
+import { FaPencilAlt } from "react-icons/fa";
+import { FaPlusCircle } from "react-icons/fa";
+import CompanyVATFormEdit from "@/components/modals/arrivals/reservationForm/companyVAT/edit/page";
+import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insert/page";
+import EditVatNoModal from "@/components/modals/arrivals/reservationForm/vatEdit/page";
 
 const translations = { en, pt, es };
 const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/dp6iart4f/image/upload/hotels/";
-
 const JsonViewPage = () => {
   const [reservationData, setReservationData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,9 +27,21 @@ const JsonViewPage = () => {
   const router = useRouter();
   console.log(userPinHash, showModal);
   const [imageExists, setImageExists] = useState(false);
-
+  console.log(setShowModal);
   const { data: session, status } = useSession();
   const [propertyID, setPropertyID] = useState("");
+
+  const [activeKey, setActiveKey] = useState("individual");
+  const inputStyleFull = "w-full h-4 outline-none my-2 text-sm !text-textLabelColor bg-cardColor input-field"
+
+  const [isModalEditOpen, setIsModalEditOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCVATModalOpen, setIsCVATModalOpen] = useState(false);
+  const [isCVATModalOpenInsert, setIsCVATModalOpenInsert] = useState(false);
+  const [companyVATData, setCompanyVATData] = useState(null);
+  const [vatNo, setVatNo] = useState("");
+  const [initialVatNo, setInitialVatNo] = useState("");
+  const [profileID, setProfileID] = useState(null);
 
   useEffect(() => {
     const preventBackNavigation = () => {
@@ -43,18 +60,18 @@ const JsonViewPage = () => {
     };
   }, []);
 
-      const [locale, setLocale] = useState("pt");
-    
-    useEffect(() => {
-      // Carregar o idioma do localStorage
-      const storedLanguage = localStorage.getItem("language");
-      if (storedLanguage) {
-        setLocale(storedLanguage);
-      }
-    }, []);
-  
-    // Carregar as traduções com base no idioma atual
-    const t = translations[locale] || translations["pt"]; // fallback para "pt"
+  const [locale, setLocale] = useState("pt");
+
+  useEffect(() => {
+    // Carregar o idioma do localStorage
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
+
+  // Carregar as traduções com base no idioma atual
+  const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
 
   useEffect(() => {
@@ -126,13 +143,84 @@ const JsonViewPage = () => {
     checkImage();
   }, [propertyID]);
 
-  const handleOkClick = () => {
-    setShowModal(true);
+  const handleOkClick = async () => {
+    const vatNoToSend = vatNo !== initialVatNo ? vatNo : undefined;
+
+    if (!vatNoToSend) {
+      console.log("Nenhuma alteração no VAT. Apenas abrindo modal...");
+      setIsModalOpen(true); // Use setIsModalOpen para abrir o modal sem enviar dados
+      return;
+    }
+
+    try {
+      const dataToSend = {
+        vatNo: vatNoToSend,
+        registerID: profileID,  // Usamos o profileID armazenado no estado
+        propertyID: propertyID
+      };
+
+      console.log("Enviando dados para a API:", dataToSend);
+
+      const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, dataToSend);
+
+      console.log("Resposta da API:", response.data);
+
+      // Abre o modal APÓS o sucesso no envio dos dados
+      setIsModalOpen(true);  // Abrir o modal após sucesso no envio
+    } catch (error) {
+      console.error("Erro ao enviar os dados:", error);
+      // Aqui você pode definir um estado de erro, caso necessário, ou informar o usuário.
+    }
   };
+
 
   if (status === "loading") {
     return <p>{t.errors.loading}</p>;
   }
+
+  const handleEditClick = async () => {
+    if (!reservationData || !reservationData.requestBody) {
+      console.log("Erro: requestBody não encontrado");
+      return;
+    }
+
+    try {
+      const parsedData = JSON.parse(reservationData.requestBody);
+      const reservations = parsedData[0]?.Reservation;
+      const guestInfo = parsedData[0]?.GuestInfo;
+
+      if (!Array.isArray(reservations) || reservations.length === 0) {
+        console.log("Erro: Nenhuma reserva encontrada");
+        return;
+      }
+
+      const blockedVatNO = reservations[0].BlockedVatNO;
+      console.log("BlockedVatNO encontrado:", blockedVatNO);
+
+      // Pegamos o profileID se GuestInfo existir
+      const profileID = guestInfo?.length > 0 ? guestInfo[0].profileID : null;
+      console.log("ProfileID encontrado:", profileID);
+
+      if (profileID) {
+        // Atualiza o estado de profileID
+        setProfileID(profileID);  // Adiciona essa linha para atualizar o estado do profileID
+      }
+
+      if (blockedVatNO === 0) {
+        console.log("Abrindo modal...");
+
+        setIsModalEditOpen(true)
+        setInitialVatNo(reservations[0].vatNo || ""); // Caso precise setar algum valor no estado
+        setVatNo(reservations[0].vatNo || ""); // Atualiza o estado do VAT, se necessário
+      } else {
+        console.log("Modal não pode ser aberto porque BlockedVatNO não é 0");
+      }
+    } catch (error) {
+      console.error("Erro ao processar o pedido:", error);
+    }
+  };
+
+
 
   return (
     <main className="overflow-y-auto pb-10 bodyContainer">
@@ -164,25 +252,25 @@ const JsonViewPage = () => {
                       (reservation, index) => (
                         <div key={index} className="text-textPrimaryColor">
                           <p className="font-bold text-3xl text-primary roomInfo">
-                          {t.jsonView.room}:{" "}
+                            {t.jsonView.room}:{" "}
                             <span className="font-bold">
                               {reservation.RoomNumber}
                             </span>
                           </p>
                           <p className="textInfo">
-                          {t.jsonView.reservationNumber}:{" "}
+                            {t.jsonView.reservationNumber}:{" "}
                             <span className="font-bold">
                               {reservation.ReservationNumber}
                             </span>
                           </p>
                           <p className="textInfo">
-                          {t.jsonView.checkIn}:{" "}
+                            {t.jsonView.checkIn}:{" "}
                             <span className="font-bold ml-6">
                               {new Date(reservation.DateCI).toLocaleDateString()}
                             </span>
                           </p>
                           <p className="textInfo">
-                          {t.jsonView.checkOut}:{" "}
+                            {t.jsonView.checkOut}:{" "}
                             <span className="font-bold ml-3">
                               {new Date(reservation.DateCO).toLocaleDateString()}
                             </span>
@@ -199,51 +287,192 @@ const JsonViewPage = () => {
               </div>
 
               {/* Detalhes do Hóspede */}
-              <div className="text-left mt-4 text-textPrimaryColor">
-                {reservationData && reservationData.requestBody ? (
-                  Array.isArray(JSON.parse(reservationData.requestBody)[0]?.GuestInfo) ? (
-                    JSON.parse(reservationData.requestBody)[0].GuestInfo.map(
-                      (guest, index) => (
-                        <div key={index}>
-                          <p className="font-bold textInfo">
-                            {guest.Salution} {guest.FirstName} {guest.LastName}
-                          </p>
-                          {guest.Street && <p className="textInfo">{guest.Street}</p>}
-                          {(guest.PostalCode || guest.City || guest.Country) && (
-                            <p className="textInfo">
-                              {guest.PostalCode ? `${guest.PostalCode},` : ""}
-                              {guest.City ? ` ${guest.City},` : ""}
-                              {guest.Country ? ` ${guest.Country}` : ""}
-                            </p>
-                          )}
-                          {guest.VatNo && <p className="textInfo">{t.jsonView.nif}: {guest.VatNo}</p>}
-                        </div>
-                      )
-                    )
-                  ) : (
-                    <p>{t.jsonView.noGuestInformation}</p>
-                  )
-                ) : (
-                  <p>{t.errors.loading}</p>
-                )}
-              </div>
+              <div className="text-left mt-4 text-textPrimaryColor flex flex-col">
+                <div className="flex flex-row justify-between items-center">
+                  <div className="flex justify-start gap-6">
+                    <p className="text-[#f7ba83] mb-1">Invoice Data</p>
+                    <div className="flex flex-row justify-center bg-gray-100 w-34 h-8 rounded-xl items-center -mt-1">
+                      <div
+                        onClick={() => setActiveKey("individual")}
+                        className={`cursor-pointer p-2 ${activeKey === "individual"
+                          ? "h-6 flex items-center bg-white text-black rounded-lg m-0.5 text-xs text-bold border border-gray-200"
+                          : "text-gray-500 m-1 text-xs"
+                          }`}
+                      >
+                        Individual
+                      </div>
+                      <div
+                        onClick={() => setActiveKey("company")}
+                        className={`cursor-pointer p-2 ${activeKey === "company"
+                          ? "h-6 flex items-center bg-white text-black rounded-lg m-0.5 text-xs text-bold border border-gray-200"
+                          : "text-gray-500 m-1 text-xs"
+                          }`}
+                      >
+                        Company
+                      </div>
+                    </div>
+                  </div>
 
+                  {/* Ícone de edição ou adição no mesmo local */}
+                  <div>
+                    {activeKey === "individual" ? (
+                      <FaPencilAlt
+                        size={15}
+                        color={reservationData.BlockedVatNO === 1 ? "gray" : "#FC9D25"}
+                        style={{
+                          cursor: reservationData.BlockedVatNO === 1 ? "not-allowed" : "pointer",
+                        }}
+                        title={reservationData.BlockedVatNO === 1 ? "Fiscalizado" : ""}
+                        onClick={handleEditClick}
+                      />
+                    ) : (
+                      reservationData.hasCompanyVAT === 1 ? (
+                        <FaPencilAlt
+                          size={15}
+                          color={reservationData.BlockedCVatNO === 1 ? "gray" : "#FC9D25"}
+                          style={{
+                            cursor: reservationData.BlockedCVatNO === 1 ? "not-allowed" : "pointer",
+                          }}
+                          title={reservationData.BlockedCVatNO === 1 ? "Fiscalizado" : ""}
+                          onClick={() => {
+                            if (reservationData.BlockedCVatNO === 0) {
+                              const companyData = {
+                                companyName: reservationData.Company || "",
+                                vatNo: reservationData.CompanyVatNo || "",
+                                emailAddress: reservationData.CompanyEmail || "",
+                                country: reservationData.CompanyCountryName || "",
+                                streetAddress: reservationData.CompanyStreetAddress || "",
+                                zipCode: reservationData.CompanyZipCode || "",
+                                city: reservationData.CompanyCity || "",
+                                state: reservationData.CompanyState || "",
+                              };
+
+                              console.log("Definindo companyVATData:", companyData);
+                              setCompanyVATData(companyData);
+                            }
+                          }}
+                        />
+                      ) : (
+                        <FaPlusCircle
+                          size={20}
+                          color="#FC9D25"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {
+                            setIsCVATModalOpenInsert(true);
+                          }}
+                        />
+                      )
+                    )}
+                  </div>
+                </div>
+
+                {/* Informações do hóspede */}
+                <div className="mt-4">
+                  {reservationData && reservationData.requestBody ? (
+                    (() => {
+                      let parsedData = [];
+                      try {
+                        parsedData = JSON.parse(reservationData.requestBody);
+                      } catch (error) {
+                        console.error("Erro ao fazer o parse do JSON:", error);
+                        return <p>{t.errors.loading}</p>;
+                      }
+
+                      const reservation = parsedData[0] || {};
+                      const guests = Array.isArray(reservation.GuestInfo)
+                        ? reservation.GuestInfo
+                        : [];
+                      const guest = guests.length > 0 ? guests[0] : {};
+
+                      return (
+                        <>
+                          {/* Nome da empresa ou hóspede */}
+                          <p className="!text-textLabelColor text-lg">
+                            {activeKey === "company"
+                              ? reservation.hasCompanyVAT === 1
+                                ? reservation.Company || ""
+                                : ""
+                              : `${guest.LastName || ""}, ${guest.FirstName || ""}`}
+                          </p>
+
+                          {/* Campo VAT Nr. aparece para ambos os casos */}
+                          <div className="mt-4">
+                            <InputFieldControlled
+                              type="text"
+                              id="VAT Nr."
+                              name="VAT Nr."
+                              label={t.frontOffice.registrationForm.vatNr}
+                              ariaLabel="VAT Nr.:"
+                              value={
+                                activeKey === "company"
+                                  ? reservation.hasCompanyVAT === 1
+                                    ? reservation.CompanyVatNo || ""
+                                    : ""
+                                  : reservation.BlockedVatNO === 1 && !vatNo
+                                    ? "999999990"
+                                    : vatNo || reservation.vatNo // 🔹 Usa o estado vatNo se já foi alterado
+                              }
+                              style={inputStyleFull}
+                              disabled
+                            />
+
+                          </div>
+                        </>
+                      );
+                    })()
+                  ) : (
+                    <p>{t.errors.loading}</p>
+                  )}
+                </div>
+              </div>
+              {/** Modal Dinâmico */}
+              {isModalEditOpen && (
+                <EditVatNoModal
+                  oldVatNo={vatNo} // Passa o VAT No atual
+                  onSave={(newValue) => {
+                    console.log("Novo VAT No salvo:", newValue);
+                    setVatNo(newValue); // Atualiza o estado corretamente
+                  }}
+                  onClose={() => {
+                    console.log("Fechando modal...");
+                    setIsModalEditOpen(false);
+                  }}
+                />
+              )}
+
+
+              {/** Modal Dinâmico */}
+              {isCVATModalOpen && (
+                <CompanyVATFormEdit
+                  onClose={() => setIsCVATModalOpen(false)}
+                  profileID={reservationData.ProfileID}
+                  propertyID={propertyID}
+                  initialData={companyVATData} // Aqui usamos o nome correto da variável
+                  resNo={reservationData.ResNo}
+                  companyID={reservationData.CompanyID}
+                  companyVATData={companyVATData}
+                />
+              )}
+
+              {isCVATModalOpenInsert && (
+                <CompanyVATFormInsert
+                  onClose={() => setIsCVATModalOpenInsert(false)}
+                  profileID={reservationData.ProfileID}
+                  propertyID={propertyID}
+                  resNo={reservationData.ResNo}
+                />
+              )}
             </div>
+
 
             {/* Tabela de Itens */}
             <table className="w-[80%] border-collapse border border-gray-300 mb-4 mx-auto containerTable">
               <thead>
                 <tr className="text-white bg-primary">
-                  <th className="border border-gray-300 p-2 text-xl h-20 headerTable uppercase">
-                  {t.jsonView.date}
-                  </th>
-                  <th className="border border-gray-300 p-2 text-xl headerTable uppercase">
-                  {t.jsonView.description}
-                  </th>
+                  <th className="border border-gray-300 p-2 text-xl h-20 headerTable uppercase">{t.jsonView.date}</th>
+                  <th className="border border-gray-300 p-2 text-xl headerTable uppercase">{t.jsonView.description}</th>
                   <th className="border border-gray-300 p-2 text-xl headerTable uppercase">{t.jsonView.quantity}</th>
-                  <th className="border border-gray-300 p-2 text-xl headerTable uppercase">
-                  {t.jsonView.unitPrice}
-                  </th>
+                  <th className="border border-gray-300 p-2 text-xl headerTable uppercase">{t.jsonView.unitPrice}</th>
                   <th className="border border-gray-300 p-2 text-xl headerTable uppercase">{t.jsonView.total}</th>
                 </tr>
               </thead>
@@ -266,7 +495,6 @@ const JsonViewPage = () => {
                             {item.Description2 && !item.Description2.startsWith("IN") && <span>{item.Description2}</span>}
                           </div>
                         </td>
-
                         <td className="border border-gray-300 p-2 text-right w-20 text-lg contentTable">
                           {item.Qty}
                         </td>
@@ -276,25 +504,23 @@ const JsonViewPage = () => {
                         <td className="border border-gray-300 p-2 text-right w-32 text-lg contentTable">
                           {isNaN(item.Total) ? 'N/A' : item.Total.toFixed(2)}€
                         </td>
-
                       </tr>
                     ))
                   ) : (
                     <tr>
                       <td colSpan="5" className="text-center p-2">
-                      {t.jsonView.noItems}
+                        {t.jsonView.noItems}
                       </td>
                     </tr>
                   )
                 ) : (
                   <tr>
                     <td colSpan="5" className="text-center p-2">
-                    {t.errors.loading}
+                      {t.errors.loading}
                     </td>
                   </tr>
                 )}
               </tbody>
-
             </table>
 
             <div className="flex justify-end w-[80%] mx-auto">
@@ -304,20 +530,19 @@ const JsonViewPage = () => {
                   const documentTotals = parsedData[0]?.DocumentTotals;
 
                   if (Array.isArray(documentTotals) && documentTotals.length > 0) {
-                    return documentTotals.map((total) => (
-                      <div key={total.ID} className="w-full">
+                    return documentTotals.map((total, index) => (
+                      <div key={index} className="w-full">
                         <p className="mt-4 text-5xl flex font-bold gap-20 justify-end tableTotal text-textPrimaryColor">
                           <span>{t.jsonView.totalBalance}</span>
                           <span>{isNaN(total.Balance) ? 'N/A' : total.Balance.toFixed(2)}€</span>
                         </p>
-
                       </div>
                     ));
                   } else {
                     return (
                       <div className="w-full">
                         <p className="mt-4 text-5xl flex font-bold gap-20 justify-end text-gray-500">
-                        {t.jsonView.noTotalBalance}
+                          {t.jsonView.noTotalBalance}
                         </p>
                       </div>
                     );
@@ -326,7 +551,7 @@ const JsonViewPage = () => {
               ) : (
                 <div className="w-full">
                   <p className="mt-4 text-5xl flex font-bold gap-20 justify-end text-gray-500">
-                  {t.jsonView.noTotalBalance}
+                    {t.jsonView.noTotalBalance}
                   </p>
                 </div>
               )}
@@ -335,8 +560,6 @@ const JsonViewPage = () => {
 
           <div className="mb-4">
             <table className="w-auto border-collapse mb-4 text-xs ml-[18.5%] vatTable">
-              {" "}
-              {/* Mantém a margem alinhada à esquerda */}
               <thead>
                 <tr>
                   <th className="p-2 text-left">{t.jsonView.vat}</th>
@@ -358,14 +581,13 @@ const JsonViewPage = () => {
                           <td className="p-2 text-right">{isNaN(tax.TotalWithTaxes) ? 'N/A' : tax.TotalWithTaxes.toFixed(2)}€</td>
                           <td className="p-2 text-right">{isNaN(tax.TotalWithOutTaxes) ? 'N/A' : tax.TotalWithOutTaxes.toFixed(2)}€</td>
                           <td className="p-2 text-right">{isNaN(tax.TotalTaxes) ? 'N/A' : tax.TotalTaxes.toFixed(2)}€</td>
-
                         </tr>
                       ));
                     } else {
                       return (
                         <tr>
                           <td colSpan={4} className="p-2 text-center text-gray-500">
-                          {t.jsonView.noTax}
+                            {t.jsonView.noTax}
                           </td>
                         </tr>
                       );
@@ -374,7 +596,7 @@ const JsonViewPage = () => {
                 ) : (
                   <tr>
                     <td colSpan={4} className="p-2 text-center text-gray-500">
-                    {t.errors.loading}
+                      {t.errors.loading}
                     </td>
                   </tr>
                 )}
@@ -417,26 +639,24 @@ const JsonViewPage = () => {
                   formTypeModal={11}
                   editor={"teste"}
                 />
-                <button
-                  className="bg-primary text-white font-semibold rounded-lg mb-3"
-                  onClick={handleOkClick}
-                >
-                  <OkPIN
-                    buttonName={"Ok"}
-                    buttonColor={"transparent"}
-                    modalHeader={t.jsonView.insertPin}
-                    formTypeModal={11}
-                    editor={"teste"}
-                  />
-                </button>
+                <OkPIN
+                  buttonName={"OK"}
+                  buttonColor={"transparent"}
+                  modalHeader={t.jsonView.insertPin}
+                  formTypeModal={11}
+                  isModalOpen={isModalOpen}  // Passa o estado que controla a visibilidade do modal
+                  setIsModalOpen={setIsModalOpen}  // Passa a função para controlar a abertura
+                  onClick={handleOkClick}  // Chama handleOkClick para enviar os dados antes de abrir o modal
+                />
               </div>
             </div>
           </div>
         </>
       ) : (
         <p>{t.jsonView.noData}</p>
-      )}
-    </main>
+      )
+      }
+    </main >
   );
 };
 

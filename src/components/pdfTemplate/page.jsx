@@ -24,7 +24,7 @@ const loadImageAsBase64 = async (imagePath) => {
 };
 
 export const generatePDFTemplate = async (reserva, signatureBase64) => {
-    const { Locale } = reserva.Locale; 
+    const { Locale } = reserva.Locale;
 
     // A partir do locale, você pode acessar as traduções
     const t = translations[Locale] || translations["en"];
@@ -40,8 +40,8 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     };
 
     // Defina a URL da imagem no Cloudinary
-    const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/dp6iart4f/image/upload/hotels/";  // Substitua SEU_CLOUD_NAME
-    const logoPath = `${CLOUDINARY_BASE_URL}${reserva.PropertyID}.png`; // URL da imagem no Cloudinary
+    const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/dp6iart4f/image/upload/hotels/";
+    const logoPath = `${CLOUDINARY_BASE_URL}${reserva.PropertyID}.png`;
 
     // Converte a imagem do Cloudinary para base64
     const logoBase64 = await loadImageAsBase64(logoPath);
@@ -49,20 +49,21 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     // Tamanho da página (A4 padrão)
     const pageWidth = doc.internal.pageSize.width;
 
-    // Tamanho da imagem
-    const logoWidth = 60;
-    const logoHeight = 30;
+    // Novo tamanho da imagem
+    const logoWidth = 208; 
+    const logoHeight = 104; 
 
     // Calcular a posição X para centralizar a imagem
     const logoX = (pageWidth - logoWidth) / 2;
 
     // Adiciona o logo ao PDF (caso carregado com sucesso)
     if (logoBase64) {
-        doc.addImage(logoBase64, 'PNG', logoX, 10, logoWidth, logoHeight); // Posição X, Y, largura, altura
+        doc.addImage(logoBase64, 'PNG', logoX, 10, logoWidth, logoHeight);
     }
 
     // Ajuste o conteúdo para não sobrepor a imagem
-    const contentStartY = logoBase64 ? 50 : 10;
+    const contentStartY = logoBase64 ? 120 : 10; // Ajuste para não sobrepor o logo
+
 
     // Adiciona "Registration Form", local e data na mesma linha
     const location = reserva.HotelName || ''; // Local da propriedade
