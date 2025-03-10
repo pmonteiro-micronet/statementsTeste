@@ -199,6 +199,7 @@ const JsonViewPage = () => {
     try {
       const dataToSend = {
         vatNo: vatNoToSend,
+        email: '',
         registerID: String(profileID),
         propertyID: propertyID
       };
