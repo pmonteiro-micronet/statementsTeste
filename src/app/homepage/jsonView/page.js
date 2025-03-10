@@ -190,34 +190,32 @@ const JsonViewPage = () => {
   const handleOkClick = async () => {
     const vatNoToSend = vatNo !== initialVatNo ? vatNo : undefined;
     console.log("cheguei aqui", vatNoToSend);
-    if (!vatNoToSend) {
-      console.log("Nenhuma alteração no VAT. Apenas abrindo modal...");
-      setIsModalOpen(true); // Use setIsModalOpen para abrir o modal sem enviar dados
-      return;
+
+    if (vatNoToSend) {
+      try {
+        const dataToSend = {
+          vatNo: vatNoToSend,
+          email: '',
+          registerID: String(profileID),
+          propertyID: propertyID
+        };
+
+        console.log("Enviando dados para a API:", dataToSend);
+
+        const response = await axios.post(
+          `/api/reservations/checkins/registrationForm/valuesEdited`,
+          dataToSend
+        );
+
+        console.log("Resposta da API:", response.data);
+      } catch (error) {
+        console.error("Erro ao enviar os dados:", error);
+      }
     }
 
-    try {
-      const dataToSend = {
-        vatNo: vatNoToSend,
-        email: '',
-        registerID: String(profileID),
-        propertyID: propertyID
-      };
-
-      console.log("Enviando dados para a API:", dataToSend);
-
-      const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, dataToSend);
-
-      console.log("Resposta da API:", response.data);
-
-      // Abre o modal APÓS o sucesso no envio dos dados
-      setIsModalOpen(true);  // Abrir o modal após sucesso no envio
-    } catch (error) {
-      console.error("Erro ao enviar os dados:", error);
-      // Aqui você pode definir um estado de erro, caso necessário, ou informar o usuário.
-    }
-  };
-
+    // Abre o modal sempre, independentemente do envio de dados
+    setIsModalOpen(true);
+};
 
   if (status === "loading") {
     return <p>{t.errors.loading}</p>;
