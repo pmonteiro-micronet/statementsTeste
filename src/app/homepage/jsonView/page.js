@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import OkPIN from "@/components/modals/pin/ok/okJson/page";
+// import OkPIN from "@/components/modals/pin/ok/okJson/page";
 import CancelPIN from "@/components/modals/pin/cancel/page";
 import "./styles.css";
 import en from "../../../../public/locales/english/common.json";
@@ -36,6 +36,7 @@ const JsonViewPage = () => {
 
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  console.log(isModalOpen);
   const [isCVATModalOpen, setIsCVATModalOpen] = useState(false);
   const [isCVATModalOpenInsert, setIsCVATModalOpenInsert] = useState(false);
   const [companyVATData, setCompanyVATData] = useState(null);
@@ -198,7 +199,7 @@ const JsonViewPage = () => {
     try {
       const dataToSend = {
         vatNo: vatNoToSend,
-        registerID: profileID,  // Usamos o profileID armazenado no estado
+        registerID: String(profileID),
         propertyID: propertyID
       };
 
@@ -212,7 +213,6 @@ const JsonViewPage = () => {
       setIsModalOpen(true);  // Abrir o modal após sucesso no envio
     } catch (error) {
       console.error("Erro ao enviar os dados:", error);
-      setIsModalOpen(true);  // Abrir o modal após sucesso no envio
       // Aqui você pode definir um estado de erro, caso necessário, ou informar o usuário.
     }
   };
@@ -695,7 +695,7 @@ const JsonViewPage = () => {
                 )}
               </div>
               {/* Botões de Ação */}
-              <div className="flex gap-3">
+              <div className="flex gap-3 items-center">
                 <CancelPIN
                   buttonName={t.jsonView.cancel}
                   buttonColor={"transparent"}
@@ -703,7 +703,7 @@ const JsonViewPage = () => {
                   formTypeModal={11}
                   editor={"teste"}
                 />
-                <OkPIN
+                {/* <OkPIN
                   buttonName={"OK"}
                   buttonColor={"transparent"}
                   modalHeader={t.jsonView.insertPin}
@@ -711,9 +711,10 @@ const JsonViewPage = () => {
                   isModalOpen={isModalOpen}  // Passa o estado que controla a visibilidade do modal
                   setIsModalOpen={setIsModalOpen}  // Passa a função para controlar a abertura
                   onClick={handleOkClick}  // Chama handleOkClick para enviar os dados antes de abrir o modal
-                />
+                /> */}
                 <button
                   onClick={handleOkClick}
+                  className="bg-primary w-20 text-white rounded-lg h-8"
                 >
                   Ok
                 </button>
