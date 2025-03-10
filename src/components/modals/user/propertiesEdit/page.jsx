@@ -16,6 +16,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
     const [propertyTag, setPropertyTag] = useState(hotel.propertyTag || "");
     const [propertyServer, setPropertyServer] = useState(hotel.propertyServer || "");
     const [propertyPort, setPropertyPort] = useState(hotel.propertyPort || "");
+    const [propertyPortStay, setPropertyPortStay] = useState(hotel.propertyPortStay || "");
     const [mpehotel, setmpehotel] = useState(hotel.mpehotel || "");
     const [pdfFilePath, setPdfFilePath] = useState(hotel.pdfFilePath || "");
     const [passeIni, setPasseIni] = useState(hotel.passeIni || "");
@@ -73,6 +74,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                 propertyTag,
                 propertyServer,
                 propertyPort: formattedPropertyPort,
+                propertyPortStay,
                 mpehotel: formattedMpehotel,
                 hotelName,
                 hotelTermsEN,
@@ -161,7 +163,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
         >
             <ModalContent>
                 <ModalHeader className="flex flex-row justify-between items-center gap-1 p-2 px-4 bg-primary text-white">
-                    {isEditing ? t.modals.propertiesEdit.editProperty : t.modals.propertiesEdit.viewProperty } {/* Mudança do título com base no modo */}
+                    {isEditing ? t.modals.propertiesEdit.editProperty : t.modals.propertiesEdit.viewProperty} {/* Mudança do título com base no modo */}
                     <Button
                         color="transparent"
                         variant="light"
@@ -228,15 +230,27 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                             disabled={!isEditing} // Desabilita o campo quando não está em edição
                                         />
                                     </div>
-                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.propertyPort}</label>
-                                        <input
-                                            type="text"
-                                            value={propertyPort}
-                                            onChange={(e) => setPropertyPort(e.target.value)}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                        />
+                                    <div className="flex flex-row w-1/2 gap-4"> {/* Cada campo ocupa metade do espaço */}
+                                        <div className="flex flex-col w-1/2">
+                                            <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.extensionsPort}</label>
+                                            <input
+                                                type="text"
+                                                value={propertyPort}
+                                                onChange={(e) => setPropertyPort(e.target.value)}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                            />
+                                        </div>
+                                        <div className="flex flex-col w-1/2">
+                                            <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stayPort}</label>
+                                            <input
+                                                type="text"
+                                                value={propertyPortStay}
+                                                onChange={(e) => setPropertyPortStay(e.target.value)}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -445,7 +459,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
 
                     <div className="flex justify-end space-x-2">
                         <Button color="error" onClick={onClose}>
-                        {t.modals.propertiesEdit.cancel}
+                            {t.modals.propertiesEdit.cancel}
                         </Button>
                         {isEditing ? (
                             <Button color="primary" onClick={handleSave} disabled={loading}>

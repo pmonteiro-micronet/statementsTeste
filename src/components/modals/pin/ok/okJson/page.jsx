@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, Button, useDisclosure } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import axios from "axios";
 import { useSession } from "next-auth/react";
@@ -32,7 +32,8 @@ const OkPIN = ({
     const [propertyID, setPropertyID] = useState("");
     console.log(propertyID);
     const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
-
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    console.log(isOpen, onOpen);
     useEffect(() => {
         // Verifica se é desktop no carregamento da página
         setAutoFocusEnabled(isDesktop());

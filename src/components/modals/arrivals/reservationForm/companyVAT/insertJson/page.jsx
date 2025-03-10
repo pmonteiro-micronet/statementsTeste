@@ -132,7 +132,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
         );        
     
         try {
-            const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVAT", {
+            const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVATJson", {
                 profileID,
                 propertyID,
                 resNo,
