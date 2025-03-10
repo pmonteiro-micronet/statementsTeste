@@ -12,8 +12,8 @@ import es from "../../../../public/locales/espanol/common.json";
 import InputFieldControlled from "@/components/input/page";
 import { FaPencilAlt } from "react-icons/fa";
 import { FaPlusCircle } from "react-icons/fa";
-import CompanyVATFormEdit from "@/components/modals/arrivals/reservationForm/companyVAT/edit/page";
-import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insert/page";
+import CompanyVATFormEdit from "@/components/modals/arrivals/reservationForm/companyVAT/editJson/page";
+import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insertJson/page";
 import EditVatNoModal from "@/components/modals/arrivals/reservationForm/vatEdit/page";
 
 const translations = { en, pt, es };
@@ -40,6 +40,8 @@ const JsonViewPage = () => {
   const [isCVATModalOpenInsert, setIsCVATModalOpenInsert] = useState(false);
   const [companyVATData, setCompanyVATData] = useState(null);
   const [vatNo, setVatNo] = useState("");
+  const [resNo, setResNo] = useState("");
+  const [companyID, setCompanyID] = useState("");
   const [initialVatNo, setInitialVatNo] = useState("");
   const [profileID, setProfileID] = useState(null);
 
@@ -81,10 +83,7 @@ const JsonViewPage = () => {
       if (!session) {
         router.push("/auth");
       } else {
-        // Pega o propertyID e o pin do usuário da sessão
-        const userPropertyID = localStorage.getItem("recordPropertyID");
         const userPinHash = session?.user?.pin; // Supondo que o pin armazenado é o hash
-        setPropertyID(userPropertyID);
         setUserPinHash(userPinHash); // Armazena o hash do pin
       }
     };
@@ -98,7 +97,7 @@ const JsonViewPage = () => {
     const recordID = queryParams.get("recordID");
     const propertyID = queryParams.get("propertyID");
     setPropertyID(propertyID); // Armazena o propertyID
-
+    console.log("PropertyID", propertyID);
     if (recordID && propertyID) {
       const fetchReservation = async () => {
         setLoading(true);
@@ -143,9 +142,53 @@ const JsonViewPage = () => {
     checkImage();
   }, [propertyID]);
 
+  useEffect(() => {
+    const loadVatNo = async () => {
+      if (!reservationData || !reservationData.requestBody) {
+        console.log("Erro: requestBody não encontrado");
+        return;
+      }
+
+      try {
+        const parsedData = JSON.parse(reservationData.requestBody);
+
+        let vatNumber = "";
+        let reservationNumber = "";
+        let profileID = null;
+        let companyID = ""; // Variável para armazenar o CompanyID
+
+        parsedData.forEach((data) => {
+          // Acessa GuestInfo e pega o ProfileID e VatNo
+          if (data.GuestInfo && data.GuestInfo.length > 0) {
+            vatNumber = data.GuestInfo[0].VatNo || "";
+            profileID = data.GuestInfo[0].ProfileID || null;
+          }
+
+          // Acessa Reservation e pega o ReservationNumber e CompanyID
+          if (data.Reservation && data.Reservation.length > 0) {
+            reservationNumber = data.Reservation[0].ReservationNumber || "";
+            companyID = data.Reservation[0].companyVatNO || ""; // Acessa CompanyID (companyVatNO)
+          }
+        });
+
+        // Atualiza os estados com os valores obtidos
+        setInitialVatNo(vatNumber);
+        setVatNo(vatNumber);
+        setResNo(reservationNumber);
+        setProfileID(profileID);
+        setCompanyID(companyID); // Atualiza o estado do CompanyID
+
+      } catch (error) {
+        console.error("Erro ao processar o pedido:", error);
+      }
+    };
+
+    loadVatNo();
+  }, [reservationData]);
+
   const handleOkClick = async () => {
     const vatNoToSend = vatNo !== initialVatNo ? vatNo : undefined;
-
+    console.log("cheguei aqui", vatNoToSend);
     if (!vatNoToSend) {
       console.log("Nenhuma alteração no VAT. Apenas abrindo modal...");
       setIsModalOpen(true); // Use setIsModalOpen para abrir o modal sem enviar dados
@@ -169,6 +212,7 @@ const JsonViewPage = () => {
       setIsModalOpen(true);  // Abrir o modal após sucesso no envio
     } catch (error) {
       console.error("Erro ao enviar os dados:", error);
+      setIsModalOpen(true);  // Abrir o modal após sucesso no envio
       // Aqui você pode definir um estado de erro, caso necessário, ou informar o usuário.
     }
   };
@@ -178,6 +222,7 @@ const JsonViewPage = () => {
     return <p>{t.errors.loading}</p>;
   }
 
+  // Função handleEditClick para o restante da lógica
   const handleEditClick = async () => {
     if (!reservationData || !reservationData.requestBody) {
       console.log("Erro: requestBody não encontrado");
@@ -198,20 +243,17 @@ const JsonViewPage = () => {
       console.log("BlockedVatNO encontrado:", blockedVatNO);
 
       // Pegamos o profileID se GuestInfo existir
-      const profileID = guestInfo?.length > 0 ? guestInfo[0].profileID : null;
+      const profileID = guestInfo?.length > 0 ? guestInfo[0].ProfileID : null;
       console.log("ProfileID encontrado:", profileID);
 
       if (profileID) {
         // Atualiza o estado de profileID
-        setProfileID(profileID);  // Adiciona essa linha para atualizar o estado do profileID
+        setProfileID(profileID);  // Atualiza o estado do profileID
       }
 
       if (blockedVatNO === 0) {
         console.log("Abrindo modal...");
-
-        setIsModalEditOpen(true)
-        setInitialVatNo(reservations[0].vatNo || ""); // Caso precise setar algum valor no estado
-        setVatNo(reservations[0].vatNo || ""); // Atualiza o estado do VAT, se necessário
+        setIsModalEditOpen(true);
       } else {
         console.log("Modal não pode ser aberto porque BlockedVatNO não é 0");
       }
@@ -219,8 +261,6 @@ const JsonViewPage = () => {
       console.error("Erro ao processar o pedido:", error);
     }
   };
-
-
 
   return (
     <main className="overflow-y-auto pb-10 bodyContainer">
@@ -318,11 +358,36 @@ const JsonViewPage = () => {
                     {activeKey === "individual" ? (
                       <FaPencilAlt
                         size={15}
-                        color={reservationData.BlockedVatNO === 1 ? "gray" : "#FC9D25"}
                         style={{
-                          cursor: reservationData.BlockedVatNO === 1 ? "not-allowed" : "pointer",
+                          color: (() => {
+                            try {
+                              const parsedData = JSON.parse(reservationData?.requestBody || "{}");
+                              const blockedVatNO = parsedData[0]?.Reservation?.[0]?.BlockedVatNO;
+                              return blockedVatNO === 1 ? "gray" : "#FC9D25";
+                            } catch {
+                              console.error("Erro ao analisar requestBody:", error);
+                              return "#FC9D25"; // Cor padrão caso haja erro
+                            }
+                          })(),
+                          cursor: (() => {
+                            try {
+                              const parsedData = JSON.parse(reservationData?.requestBody || "{}");
+                              const blockedVatNO = parsedData[0]?.Reservation?.[0]?.BlockedVatNO;
+                              return blockedVatNO === 1 ? "not-allowed" : "pointer";
+                            } catch {
+                              return "pointer"; // Padrão caso haja erro
+                            }
+                          })(),
                         }}
-                        title={reservationData.BlockedVatNO === 1 ? "Fiscalizado" : ""}
+                        title={(() => {
+                          try {
+                            const parsedData = JSON.parse(reservationData?.requestBody || "{}");
+                            const blockedVatNO = parsedData[0]?.Reservation?.[0]?.BlockedVatNO;
+                            return blockedVatNO === 1 ? "Fiscalizado" : "";
+                          } catch {
+                            return "";
+                          }
+                        })()}
                         onClick={handleEditClick}
                       />
                     ) : (
@@ -410,12 +475,11 @@ const JsonViewPage = () => {
                                     : ""
                                   : reservation.BlockedVatNO === 1 && !vatNo
                                     ? "999999990"
-                                    : vatNo || reservation.vatNo // 🔹 Usa o estado vatNo se já foi alterado
+                                    : vatNo
                               }
                               style={inputStyleFull}
                               disabled
                             />
-
                           </div>
                         </>
                       );
@@ -445,11 +509,11 @@ const JsonViewPage = () => {
               {isCVATModalOpen && (
                 <CompanyVATFormEdit
                   onClose={() => setIsCVATModalOpen(false)}
-                  profileID={reservationData.ProfileID}
+                  profileID={profileID}
                   propertyID={propertyID}
-                  initialData={companyVATData} // Aqui usamos o nome correto da variável
-                  resNo={reservationData.ResNo}
-                  companyID={reservationData.CompanyID}
+                  initialData={companyVATData}
+                  resNo={resNo}
+                  companyID={companyID}
                   companyVATData={companyVATData}
                 />
               )}
@@ -457,9 +521,9 @@ const JsonViewPage = () => {
               {isCVATModalOpenInsert && (
                 <CompanyVATFormInsert
                   onClose={() => setIsCVATModalOpenInsert(false)}
-                  profileID={reservationData.ProfileID}
+                  profileID={profileID}
                   propertyID={propertyID}
-                  resNo={reservationData.ResNo}
+                  resNo={resNo}
                 />
               )}
             </div>
@@ -648,6 +712,11 @@ const JsonViewPage = () => {
                   setIsModalOpen={setIsModalOpen}  // Passa a função para controlar a abertura
                   onClick={handleOkClick}  // Chama handleOkClick para enviar os dados antes de abrir o modal
                 />
+                <button
+                  onClick={handleOkClick}
+                >
+                  Ok
+                </button>
               </div>
             </div>
           </div>
