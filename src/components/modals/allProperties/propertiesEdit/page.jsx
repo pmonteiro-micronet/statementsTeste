@@ -37,7 +37,7 @@ const PropertiesEditForm = ({
     const [hotelRNET, setHotelRNET] = useState(hotel.hotelRNET || "");
     const [hotelNIF, setHotelNIF] = useState(hotel.hotelNIF || "");
     const [hasStay, setHasStay] = useState(hotel.hasStay || "");
-
+    console.log(setHasStay);
     const [replyEmail, setReplyEmail] = useState(hotel.replyEmail || "");
     const [replyPassword, setReplyPassword] = useState(hotel.replyPassword || "");
     const [sendingServer, setSendingServer] = useState(hotel.sendingServer || "");

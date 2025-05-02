@@ -13,6 +13,7 @@ const Homepage = () => {
   const [locale, setLocale] = useState("pt");
 const { data: session, status } = useSession();
     console.log("USER", session?.user?.isInternalUser === true);
+    console.log(status);
   useEffect(() => {
     // Carregar o idioma do localStorage
     const storedLanguage = localStorage.getItem("language");

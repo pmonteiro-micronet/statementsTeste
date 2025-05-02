@@ -38,7 +38,7 @@
     "tailwind.config.js",
     "src/app/layout.tsx",
     "src/app/page.js"
-  ],
+, "src/app/qrcode_user/page.js", "src/app/qrcode_user/QrCodeUser.js"  ],
   "exclude": [
     "node_modules"
   ]
