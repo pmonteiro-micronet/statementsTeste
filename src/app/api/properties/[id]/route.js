@@ -48,6 +48,11 @@ export async function PATCH(request, context) {
       hotelNIF,
       passeIni,
       pdfFilePath,
+      replyEmail,
+      replyPassword,
+      sendingServer,
+      sendingPort,
+      infoEmail,
   } = await request.json();
 
   try {
@@ -62,6 +67,7 @@ export async function PATCH(request, context) {
       // Verifique se mpehotel e propertyPort são números inteiros
       const formattedMpehotel = parseInt(mpehotel, 10);
       const formattedPropertyPort = parseInt(propertyPort, 10);
+      const formattedSendingPort = parseInt(sendingPort, 10);
 
       if (isNaN(formattedMpehotel) || isNaN(formattedPropertyPort)) {
           return new NextResponse(
@@ -93,6 +99,11 @@ export async function PATCH(request, context) {
               hotelNIF,
               passeIni,
               pdfFilePath,
+              replyEmail,
+              replyPassword,
+              sendingServer,
+              sendingPort: formattedSendingPort,
+              infoEmail,
           },
       });
 

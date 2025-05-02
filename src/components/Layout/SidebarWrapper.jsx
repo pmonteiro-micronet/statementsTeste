@@ -184,6 +184,7 @@ export default function SidebarWrapper({ children }) {
     }
   }, [selectedHotelID, pendingCount, session]);
 
+
   const handleHotelSelect = (hotelID) => {
     setSelectedHotelID(hotelID);
     localStorage.setItem("selectedHotelID", hotelID);
@@ -220,8 +221,8 @@ export default function SidebarWrapper({ children }) {
 
 
   const showConfirmationModal = selectedHotelID && !isHotelConfirmed;
-  const showSidebar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth") && !pathname.includes("/homepage/frontOfficeView/registrationForm");
-  const showNavBar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth") && !pathname.includes("/homepage/frontOfficeView/registrationForm");
+  const showSidebar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth") && !pathname.includes("/homepage/frontOfficeView/registrationForm") && !pathname.includes("/qrcode_user");
+  const showNavBar = pathname && !pathname.includes("/homepage/jsonView") && !pathname.includes("/auth") && !pathname.includes("/homepage/frontOfficeView/registrationForm") && !pathname.includes("/qrcode_user");
 
   return (
     <div className="min-h-screen flex flex-col">

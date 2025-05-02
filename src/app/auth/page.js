@@ -1,9 +1,10 @@
 "use client"; // Importante para usar hooks no Next.js
 
 import { signIn } from "next-auth/react";
-import { useState, useEffect } from "react"; // Adicionando useEffect
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { Html5QrcodeScanner } from "html5-qrcode"; // Biblioteca de leitura de QR Code
 import "./styles.css";
 import en from "../../../public/locales/english/common.json";
 import pt from "../../../public/locales/portuguesPortugal/common.json";
@@ -11,30 +12,54 @@ import es from "../../../public/locales/espanol/common.json";
 
 const translations = { en, pt, es };
 
+import CryptoJS from "crypto-js";
+
+// Função para descriptografar os dados
+const decryptData = (encryptedText) => {
+  try {
+    const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
+
+    // Descriptografando os dados
+    const bytes = CryptoJS.AES.decrypt(encryptedText, secretKey);
+
+    // Verificando se a descriptografia retornou um resultado válido
+    const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+
+    if (!decryptedData) {
+      throw new Error("Falha na descriptografia, dados inválidos.");
+    }
+
+    return JSON.parse(decryptedData);
+  } catch (error) {
+    console.error("Erro ao tentar descriptografar:", error.message);
+    return null; // ou você pode retornar um valor padrão ou tratar o erro de outra forma
+  }
+};
+
+
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [scanning, setScanning] = useState(false); // Estado para controlar o scanner
   const router = useRouter();
-  const { data: session } = useSession(); // Acessa a sessão do usuário
-  const [selectedHotelID, setSelectedHotelID] = useState(""); // Estado do Hotel ID
-  console.log(router);
+  const { data: session } = useSession();
+  const [selectedHotelID, setSelectedHotelID] = useState("");
+
+  const [isQrLogin, setIsQrLogin] = useState(false);
+
   const locale = "en"; // Substitua pelo valor dinâmico do idioma (e.g., router.locale)
   const t = translations[locale];
 
-  // Recupera o Hotel ID do localStorage ou usa o ID da primeira propriedade do usuário
   useEffect(() => {
-    // Tenta obter o ID do hotel do localStorage
     const savedHotelID = localStorage.getItem("selectedHotelID");
 
     if (savedHotelID) {
-      // Se o ID estiver no localStorage, define ele no estado
       setSelectedHotelID(savedHotelID);
     } else if (session?.user?.propertyIDs && session.user.propertyIDs.length > 0) {
-      // Caso contrário, usa o primeiro propertyID da sessão do usuário
       setSelectedHotelID(session.user.propertyIDs[0]);
     }
-  }, [session]); // Dependência para executar a lógica quando a sessão for carregada
+  }, [session]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,21 +69,80 @@ const SignIn = () => {
       redirect: false,
       email,
       password,
-    });
+      internal: isQrLogin,
+    });    
 
     if (result?.error) {
       setError(result.error);
     } else {
-      // Após o login bem-sucedido, verifica o ID do hotel
-      if (selectedHotelID) {
-        // Se o Hotel ID estiver disponível, redireciona para a página do hotel
+      if (isQrLogin) {
+        const qrLoginUrl = document.getElementById("loginButton").getAttribute("data-url");
+        router.push(qrLoginUrl);
+      } else if (selectedHotelID) {
         router.push(`/homepage/frontOfficeView/${selectedHotelID}`);
       } else {
-        // Caso contrário, redireciona para a página inicial
         router.push("/homepage/statements");
       }
     }
   };
+
+  // Função para ativar a leitura do QR Code
+  useEffect(() => {
+    if (scanning) {
+      const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+  
+      scanner.render(async (decodedText) => {
+        try {
+          // Descriptografando os dados do QR Code
+          const decryptedData = decryptData(decodedText);
+  
+          if (
+            decryptedData?.email &&
+            decryptedData?.password &&
+            decryptedData?.propertyID &&
+            decryptedData?.requestID &&
+            decryptedData?.resNo &&
+            decryptedData?.profileID
+          ) {
+            // Atualiza o estado com os dados extraídos do QR Code
+            setEmail(decryptedData.email);
+            setPassword(decryptedData.password);
+            setIsQrLogin(true);  // Marca que estamos fazendo login via QR Code
+  
+            // Realiza o login automaticamente
+            const result = await signIn("credentials", {
+              redirect: false,
+              email: decryptedData.email,
+              password: decryptedData.password,
+              internal: true,  // Marca o login como interno
+            });
+  
+            if (result?.error) {
+              setError(result.error);  // Se ocorrer um erro, mostramos
+            } else {
+              // Se o login for bem-sucedido, redireciona para a página do QR Code
+              const queryParams = new URLSearchParams({
+                email: decryptedData.email,
+                resNo: decryptedData.resNo,
+                propertyID: decryptedData.propertyID,
+                requestID: decryptedData.requestID,
+                profileID: decryptedData.profileID,
+              }).toString();
+  
+              setScanning(false);  // Desativa o scanner
+              scanner.clear();  // Limpa o scanner
+              router.push(`/qrcode_user?${queryParams}`);  // Redireciona para a página de QR Code
+            }
+          }
+        } catch (error) {
+          console.error("Erro ao processar QR Code", error);
+        }
+      });
+  
+      return () => scanner.clear();
+    }
+  }, [scanning]);  // Dependência do estado `scanning`  
+
 
   return (
     <div className="flex min-h-screen">
@@ -98,11 +182,23 @@ const SignIn = () => {
               </div>
             </div>
             <button
+              id="loginButton"
               type="submit"
               className="w-full border border-gray-300 rounded-2xl h-10 text-sm text-gray-500 hover:bg-primary-50"
             >
               {t.auth.login}
             </button>
+
+            {/*<button
+              type="button"
+              className="w-full mt-2 border border-gray-300 rounded-2xl h-10 text-sm text-gray-500 hover:bg-primary-50"
+              onClick={() => setScanning(true)}
+            >
+              Entrar com QR Code
+            </button>*/}
+
+            {scanning && <div id="reader" className="mt-4"></div>}
+
             {error && <p style={{ color: "red" }}>{error}</p>}
             <div className="mt-10 flex flex-col gap-4 text-sm text-gray-400">
               <p>{t.auth.instruction2}</p>

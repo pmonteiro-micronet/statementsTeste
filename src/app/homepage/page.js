@@ -5,13 +5,15 @@ import "./styles.css";
 import en from "../../../public/locales/english/common.json";
 import pt from "../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../public/locales/espanol/common.json";
-
+import { useSession } from "next-auth/react";
 const translations = { en, pt, es };
 
 const Homepage = () => {
 
   const [locale, setLocale] = useState("pt");
-
+const { data: session, status } = useSession();
+    console.log("USER", session?.user?.isInternalUser === true);
+    console.log(status);
   useEffect(() => {
     // Carregar o idioma do localStorage
     const storedLanguage = localStorage.getItem("language");

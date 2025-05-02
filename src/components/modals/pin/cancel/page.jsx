@@ -116,7 +116,7 @@ const CancelPIN = ({
                         fullWidth={true}
                         color={buttonColor}
                         size="ms"
-                        onPress={onOpen}
+                        onClick={onOpen}
                         className={`font-semibold p-2 rounded-lg w-2 text-black ${buttonColor || "bg-gray-300"} ${buttonStyle}`}
                     >
                         {buttonName} {buttonIcon}

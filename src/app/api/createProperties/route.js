@@ -19,7 +19,6 @@ export async function POST(req) {
       propertyName,
       propertyServer,
       propertyPort,
-      propertyConnectionString,
       mpehotel, 
       hotelName,
       hotelTermsEN,
@@ -30,7 +29,19 @@ export async function POST(req) {
       hotelAddress,
       hotelPostalCode,
       hotelRNET,
-      hotelNIF
+      hotelNIF,
+      
+      propertyPortStay,
+      hasStay,
+      replyEmail,
+      replyPassword,
+      sendingServer,
+      sendingPort,
+      infoEmail,
+      emailBody,
+      emailSubject,
+      privacyPolicyEN,
+      privacyPolicyPT
     } = await req.json();
 
     // Verificar se todos os campos obrigatórios estão presentes
@@ -50,7 +61,6 @@ export async function POST(req) {
         propertyName: propertyName,
         propertyServer: propertyServer,
         propertyPort: propertyPort || null,
-        propertyConnectionString: propertyConnectionString || null,
         mpehotel: mpehotel,
         hotelName: hotelName || null,
         hotelTermsEN: hotelTermsEN || null,
@@ -62,6 +72,18 @@ export async function POST(req) {
         hotelPostalCode: hotelPostalCode || null,
         hotelRNET: hotelRNET || null,
         hotelNIF: hotelNIF || null,
+
+        propertyPortStay: propertyPortStay || null,
+        hasStay: hasStay || null,
+        replyEmail: replyEmail || null,
+        replyPassword: replyPassword || null,
+        sendingServer: sendingServer || null,
+        sendingPort: sendingPort || null,
+        infoEmail: infoEmail || null,
+        emailBody: emailBody || null,
+        emailSubject: emailSubject || null,
+        privacyPolicyEN: privacyPolicyEN || null,
+        privacyPolicyPT: privacyPolicyPT || null
       },
     });
 

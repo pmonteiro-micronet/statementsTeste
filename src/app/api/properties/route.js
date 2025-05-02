@@ -28,6 +28,7 @@ export async function PUT(req) {
       propertyTag,
       propertyServer,
       propertyPort,
+      propertyPortStay,
       mpehotel,
       pdfFilePath,
       passeIni,
@@ -41,6 +42,15 @@ export async function PUT(req) {
       hotelPostalCode,
       hotelRNET,
       hotelNIF,
+
+      hasStay,
+      replyEmail,
+      replyPassword,
+      sendingServer,
+      sendingPort,
+      emailSubject,
+      emailBody,
+      infoEmail
     } = body;
 
     // Verificar campos obrigatórios
@@ -53,8 +63,8 @@ export async function PUT(req) {
     }
 
     console.log("Validando tipos de dados");
-    if (typeof propertyPort !== "number" || typeof mpehotel !== "number") {
-      console.error("propertyPort e mpehotel devem ser números");
+    if (typeof mpehotel !== "number") {
+      console.error("mpehotel devem ser números");
       return new NextResponse(
         JSON.stringify({
           error: "propertyPort and mpehotel must be numbers.",
@@ -78,6 +88,7 @@ export async function PUT(req) {
           propertyName,
           propertyServer,
           propertyPort,
+          propertyPortStay,
           mpehotel,
           pdfFilePath,
           passeIni,
@@ -91,6 +102,15 @@ export async function PUT(req) {
           hotelPostalCode,
           hotelRNET,
           hotelNIF,
+
+          hasStay,
+          replyEmail,
+          replyPassword,
+          sendingServer,
+          sendingPort,
+          emailSubject,
+          emailBody,
+          infoEmail
         },
       });
     } else {
@@ -100,6 +120,7 @@ export async function PUT(req) {
           propertyTag,
           propertyServer,
           propertyPort,
+          propertyPortStay,
           mpehotel,
           pdfFilePath,
           passeIni,
@@ -113,6 +134,14 @@ export async function PUT(req) {
           hotelPostalCode,
           hotelRNET,
           hotelNIF,
+
+          replyEmail,
+          replyPassword,
+          sendingServer,
+          sendingPort,
+          emailSubject,
+          emailBody,
+          infoEmail
         },
       });
     }
