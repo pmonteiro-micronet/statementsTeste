@@ -1,40 +1,30 @@
-# Etapa 1: Builder
-FROM node:18-alpine AS builder
+# Use an official Node.js runtime as a base image
+FROM node:18-buster
 
-# Definir diretório de trabalho
+# Set the working directory in the container
 WORKDIR /app
 
-# Copiar arquivos de dependências
-COPY package.json package-lock.json ./
+# Copy the entire project to the container
+COPY package*.json ./
 
-# Instalar dependências do projeto (inclusive Prisma)
+# Install dependencies
 RUN npm install
 
-# Copiar o esquema do Prisma e gerar o cliente
+# Copy Prisma schema file
 COPY prisma ./prisma/
+
+# Install Prisma CLI
+RUN npm install prisma --save-dev
+
+# Generate Prisma client
 RUN npx prisma generate
 
-# Copiar o restante do código para a etapa de build
 COPY . .
 
-# Construir a aplicação Next.js
+# Build your Next.js application
 RUN npm run build
 
-# Etapa 2: Runtime (Imagem final)
-FROM node:18-alpine AS runner
-
-# Definir diretório de trabalho
-WORKDIR /app
-
-# Copiar apenas os arquivos necessários da etapa builder
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-
-# Expor a porta do Next.js
 EXPOSE 3000
 
-# Comando para iniciar a aplicação
+# Command to run your Next.js application
 CMD npm run start
