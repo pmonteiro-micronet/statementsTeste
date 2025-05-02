@@ -26,11 +26,13 @@ import pt from "../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../public/locales/espanol/common.json";
 
 const translations = { en, pt, es };
-
+import { useSession } from "next-auth/react";
 import { MdSunny } from "react-icons/md";
 import { FaMoon } from "react-icons/fa";
 
 import pako from 'pako'; // Adicione pako para compressão gzip
+
+import { useRouter } from "next/navigation";
 
 export default function Page() {
     const [reserva, setReserva] = useState(null);
@@ -59,11 +61,43 @@ export default function Page() {
     const [hotelAddress, setHotelAddress] = useState('');
     const [hotelPostalCode, setHotelPostalCode] = useState('');
     const [hotelRNET, setHotelRNET] = useState('');
-
+    const [isInternalUser, setIsInternalUser] = useState(false);
     const canvasRef = useRef(null);
     const signaturePadRef = useRef(null);
 
     const [locale, setLocale] = useState("pt");
+    const router = useRouter();
+
+    const { data: session, status } = useSession();
+
+    useEffect(() => {
+        if (status === "authenticated") {
+            const internalUser = session?.user?.isInternalUser === true;
+            setIsInternalUser(internalUser);
+    
+            const lockedPath = "/homepage/frontOfficeView/registrationForm";
+            const currentPath = window.location.pathname;
+    
+            if (internalUser && currentPath !== lockedPath) {
+                router.replace(lockedPath); // Redireciona silenciosamente sem adicionar no histórico
+            }
+    
+            // Observa alterações manuais na URL (como digitar outra rota)
+            const handlePopState = () => {
+                const newPath = window.location.pathname;
+                if (internalUser && newPath !== lockedPath) {
+                    router.replace(lockedPath);
+                }
+            };
+    
+            window.addEventListener("popstate", handlePopState);
+    
+            return () => {
+                window.removeEventListener("popstate", handlePopState);
+            };
+        }
+    }, [session, status]);    
+
 
     const handleLanguageChange = (lang) => {
         setLocale(lang);
@@ -520,8 +554,11 @@ export default function Page() {
             console.log("companyVATData atualizado, abrindo modal...", companyVATData);
             setIsCVATModalOpen(true);
         }
-    }, [companyVATData]); 
+    }, [companyVATData]);
 
+    const handleLogout = () => {
+        router.push("/auth");
+    };
     return (
         <div className='bg-background main-page min-h-screen'>
             {/* Exibe o loader enquanto isLoading for verdadeiro */}
@@ -1078,9 +1115,9 @@ export default function Page() {
                                                                         city: reserva.CompanyCity || "",
                                                                         state: reserva.CompanyState || "",
                                                                     };
-                                                            
+
                                                                     console.log("Definindo companyVATData:", companyData);
-                                                            
+
                                                                     setCompanyVATData(companyData); // Atualiza os dados
                                                                 }
                                                             }}
@@ -1295,37 +1332,59 @@ export default function Page() {
                                     </span>
                                 </button>
 
-                                <div className='flex flex-row gap-4 justify-end px-4 buttons-style items-center'>
-                                    {/** Botão de cancelar */}
-                                    <CancelPIN
-                                        buttonName={t.frontOffice.registrationForm.cancel}
-                                        modalHeader={"Insert PIN"}
-                                        formTypeModal={11}
-                                        editor={"teste"}
-                                    />
+                                {isInternalUser ? (
+                                    <div className='flex flex-row gap-4 justify-end px-4 buttons-style items-center'>
+                                        {/** Botão de cancelar - Faz logout ao clicar */}
+                                        <button
+                                            className='bg-danger font-semibold text-white py-2 px-2 rounded-lg w-20 h-10'
+                                            onClick={handleLogout}
+                                        >
+                                            Cancelar
+                                        </button>
 
-                                    {/** Botão de aceitar */}
-                                    <button
-                                        className='bg-primary font-semibold text-white py-2 px-2 rounded-lg w-20 h-10'
-                                        onClick={handleOkClick}>
-                                        Ok
-                                    </button>
-                                    {/** Modal de erro */}
-                                    {isErrorModalOpen && errorMessage && (
-                                        <ErrorRegistrationForm
-                                            modalHeader={t.frontOffice.registrationForm.attention}
-                                            errorMessage={errorMessage}
-                                            onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
+                                        {/** Botão de aceitar - Faz logout ao clicar */}
+                                        <button
+                                            className='bg-primary font-semibold text-white py-2 px-2 rounded-lg w-20 h-10'
+                                            onClick={handleLogout}
+                                        >
+                                            Ok
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className='flex flex-row gap-4 justify-end px-4 buttons-style items-center'>
+                                        {/** Botão de cancelar */}
+                                        <CancelPIN
+                                            buttonName={t.frontOffice.registrationForm.cancel}
+                                            modalHeader={"Insert PIN"}
+                                            formTypeModal={11}
+                                            editor={"teste"}
                                         />
-                                    )}
-                                    {/** Modal de sucesso */}
-                                    {isSuccessModalOpen && successMessage && (
-                                        <SuccessRegistrationForm
-                                            modalHeader={t.frontOffice.registrationForm.attention}
-                                            successMessage={successMessage}
-                                        />
-                                    )}
-                                </div>
+
+                                        {/** Botão de aceitar */}
+                                        <button
+                                            className='bg-primary font-semibold text-white py-2 px-2 rounded-lg w-20 h-10'
+                                            onClick={handleOkClick}>
+                                            Ok
+                                        </button>
+
+                                        {/** Modal de erro */}
+                                        {isErrorModalOpen && errorMessage && (
+                                            <ErrorRegistrationForm
+                                                modalHeader={t.frontOffice.registrationForm.attention}
+                                                errorMessage={errorMessage}
+                                                onClose={() => setIsErrorModalOpen(false)}
+                                            />
+                                        )}
+
+                                        {/** Modal de sucesso */}
+                                        {isSuccessModalOpen && successMessage && (
+                                            <SuccessRegistrationForm
+                                                modalHeader={t.frontOffice.registrationForm.attention}
+                                                successMessage={successMessage}
+                                            />
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

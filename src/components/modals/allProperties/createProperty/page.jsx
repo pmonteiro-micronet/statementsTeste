@@ -33,6 +33,8 @@ const CreatePropertyModal = ({
     const [propertyTag, setPropertyTag] = useState("");
     const [propertyServer, setPropertyServer] = useState("");
     const [propertyPort, setPropertyPort] = useState("");
+    const [propertyPortStay, setPropertyPortStay] = useState("");
+
     const [mpehotel, setmpehotel] = useState("");
     const [pdfFilePath, setPdfFilePath] = useState("");
     const [passeIni, setPasseIni] = useState("");
@@ -47,6 +49,15 @@ const CreatePropertyModal = ({
     const [hotelPostalCode, setHotelPostalCode] = useState("");
     const [hotelRNET, setHotelRNET] = useState("");
     const [hotelNIF, setHotelNIF] = useState("");
+
+    const [hasStay, setHasStay] = useState(false);
+    const [replyEmail, setReplyEmail] = useState("");
+    const [replyPassword, setReplyPassword] = useState("");
+    const [sendingServer, setSendingServer] = useState("");
+    const [sendingPort, setSendingPort] = useState("");
+    const [emailSubject, setEmailSubject] = useState("");
+    const [emailBody, setEmailBody] = useState("");
+    const [infoEmail, setInfoEmail] = useState("");
 
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
@@ -80,7 +91,8 @@ const CreatePropertyModal = ({
                 propertyName,
                 propertyTag,
                 propertyServer,
-                propertyPort: parseInt(propertyPort, 10),
+                propertyPort: propertyPort,
+                propertyPortStay: parseInt(propertyPortStay, 10),
                 mpehotel: parseInt(mpehotel, 10),
                 pdfFilePath,
                 passeIni,
@@ -94,6 +106,15 @@ const CreatePropertyModal = ({
                 hotelPostalCode,
                 hotelRNET,
                 hotelNIF,
+
+                hasStay: parseInt(hasStay, 10),
+                replyEmail,
+                replyPassword,
+                sendingServer,
+                sendingPort: parseInt(sendingPort, 10),
+                emailSubject,
+                emailBody,
+                infoEmail
             });
 
             if (propertyResponse.status === 201) {
@@ -118,6 +139,8 @@ const CreatePropertyModal = ({
         setPropertyTag("");
         setPropertyServer("");
         setPropertyPort("");
+        setPropertyPortStay("");
+
         setmpehotel("");
         setPdfFilePath("");
         setPasseIni("");
@@ -131,6 +154,14 @@ const CreatePropertyModal = ({
         setHotelPostalCode("");
         setHotelRNET("");
         setHotelNIF("");
+
+        setReplyEmail("");
+        setReplyPassword("");
+        setSendingServer("");
+        setSendingPort("");
+        setEmailSubject("");
+        setEmailBody("");
+        setInfoEmail("");
     };
 
     const handleImageChange = (event) => {
@@ -265,14 +296,25 @@ const CreatePropertyModal = ({
                                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                         />
                                                     </div>
-                                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.propertyPort}</label>
-                                                        <input
-                                                            type="text"
-                                                            value={propertyPort}
-                                                            onChange={(e) => setPropertyPort(e.target.value)}
-                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                        />
+                                                    <div className="flex w-1/2 gap-4">
+                                                        <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                            <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.extensionsPort}</label>
+                                                            <input
+                                                                type="text"
+                                                                value={propertyPort}
+                                                                onChange={(e) => setPropertyPort(e.target.value)}
+                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            />
+                                                        </div>
+                                                        <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                            <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.stayPort}</label>
+                                                            <input
+                                                                type="text"
+                                                                value={propertyPortStay}
+                                                                onChange={(e) => setPropertyPortStay(e.target.value)}
+                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
@@ -460,6 +502,89 @@ const CreatePropertyModal = ({
                                                             </div>
                                                         )}
                                                     </div>
+                                                </div>
+                                            </div>
+                                        </Tab>
+                                        <Tab key="stay" title="Stay">
+                                            <div>
+                                                <div className="flex items-center gap-2 -mt-6 mb-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="hasStay"
+                                                        checked={hasStay}
+                                                        onChange={(e) => setHasStay(e.target.checked)}
+                                                        className="w-4 h-4"
+                                                    />
+                                                    <label htmlFor="hasStay" className="text-sm">Tem stay?</label>
+                                                </div>
+                                                <p className="bg-gray-200 p-1 mb-2">Send SMTP</p>
+                                                <div className="flex flex-row gap-2 w-full">
+                                                    <div className="w-1/2 flex flex-col text-xs">
+                                                        <p>Email</p>
+                                                        <input
+                                                            type="text"
+                                                            value={replyEmail}
+                                                            onChange={(e) => setReplyEmail(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        />
+                                                    </div>
+                                                    <div className="w-1/2 flex flex-col text-xs">
+                                                        <p>Email password</p>
+                                                        <input
+                                                            type="text"
+                                                            value={replyPassword}
+                                                            onChange={(e) => setReplyPassword(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-row gap-2 w-full">
+                                                    <div className="w-1/2 flex flex-col text-xs">
+                                                        <p>Server SMTP</p>
+                                                        <input
+                                                            type="text"
+                                                            value={sendingServer}
+                                                            onChange={(e) => setSendingServer(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        />
+                                                    </div>
+                                                    <div className="w-1/2 flex flex-col text-xs">
+                                                        <p>Port SMTP</p>
+                                                        <input
+                                                            type="text"
+                                                            value={sendingPort}
+                                                            onChange={(e) => setSendingPort(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <p className="bg-gray-200 p-1 mt-2 mb-2">Email</p>
+                                                <div className="w-1/2 flex flex-col text-xs">
+                                                    <p>Email Subject</p>
+                                                    <input
+                                                        type="text"
+                                                        value={emailSubject}
+                                                        onChange={(e) => setEmailSubject(e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                    />
+                                                </div>
+                                                <div className="w-full flex flex-col text-xs mt-2">
+                                                    <p>Email Body</p>
+                                                    <textarea
+                                                        value={emailBody}
+                                                        onChange={(e) => setEmailBody(e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none h-20 resize-none"
+                                                    />
+                                                </div>
+                                                <p className="bg-gray-200 p-1 mt-2 mb-2">Receipt of shipment</p>
+                                                <div className="flex flex-col w-full text-xs">
+                                                    <p>Email</p>
+                                                    <input
+                                                        type="text"
+                                                        value={infoEmail}
+                                                        onChange={(e) => setInfoEmail(e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                    />
                                                 </div>
                                             </div>
                                         </Tab>

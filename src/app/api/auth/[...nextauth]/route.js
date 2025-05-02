@@ -10,37 +10,53 @@ const handler = NextAuth({
       credentials: {
         email: { label: "Email", type: "text", placeholder: "email@example.com" },
         password: { label: "Password", type: "password" },
+        internal: { label: "Internal", type: "hidden" },
       },
       async authorize(credentials) {
-        // Buscar o usuário pelo email
-        const user = await prisma.users.findUnique({
-          where: { email: credentials.email },
-        });
+        let user;
+        let isInternalUser = false;
 
-        if (user && (await bcrypt.compare(credentials.password, user.password))) {
-          // Buscar todos os propertyIDs associados ao usuário
-          const userProperties = await prisma.usersProperties.findMany({
-            where: { userID: user.userID },
-            select: { propertyID: true },
+        if (credentials.internal === "true") {
+          // Login via QR Code (usa internalUser e internalPassword)
+          user = await prisma.users.findFirst({
+            where: { internalUser: credentials.email },
           });
 
-          // Extrair apenas os propertyIDs como um array
-          const propertyIDs = userProperties.map((p) => p.propertyID);
+          if (!user || !(await bcrypt.compare(credentials.password, user.internalPassword))) {
+            return null;
+          }
 
-          // Retornar os dados do usuário com os propertyIDs e permissions
-          return {
-            id: user.userID,
-            email: user.email,
-            firstName: user.firstName,
-            secondName: user.secondName,
-            propertyIDs, // Adicionar os propertyIDs associados
-            pin: user.pin,
-            permission: user.permissions, // Adicionar o campo `permissions`
-            expirationDate: user.expirationDate
-          };
+          isInternalUser = true;
         } else {
-          return null;
+          // Login normal (usa email e password)
+          user = await prisma.users.findUnique({
+            where: { email: credentials.email },
+          });
+
+          if (!user || !(await bcrypt.compare(credentials.password, user.password))) {
+            return null;
+          }
         }
+
+        // Buscar todos os propertyIDs associados ao usuário
+        const userProperties = await prisma.usersProperties.findMany({
+          where: { userID: user.userID },
+          select: { propertyID: true },
+        });
+
+        const propertyIDs = userProperties.map((p) => p.propertyID);
+
+        return {
+          id: user.userID,
+          email: user.email,
+          firstName: user.firstName,
+          secondName: user.secondName,
+          propertyIDs,
+          pin: user.pin,
+          permission: user.permissions,
+          expirationDate: user.expirationDate,
+          isInternalUser, // <- Adicionado aqui
+        };
       },
     }),
   ],
@@ -58,10 +74,11 @@ const handler = NextAuth({
         token.email = user.email;
         token.firstName = user.firstName;
         token.secondName = user.secondName;
-        token.propertyIDs = user.propertyIDs; // Adicionar os propertyIDs ao token
+        token.propertyIDs = user.propertyIDs;
         token.pin = user.pin;
-        token.permission = user.permission; // Adicionar o campo permissions ao token
+        token.permission = user.permission;
         token.expirationDate = user.expirationDate;
+        token.isInternalUser = user.isInternalUser ?? false; // <- Aqui
       }
       return token;
     },
@@ -70,10 +87,11 @@ const handler = NextAuth({
       session.user.email = token.email;
       session.user.firstName = token.firstName;
       session.user.secondName = token.secondName;
-      session.user.propertyIDs = token.propertyIDs; // Adicionar os propertyIDs à sessão
+      session.user.propertyIDs = token.propertyIDs;
       session.user.pin = token.pin;
-      session.user.permission = token.permission; // Adicionar o campo permissions à sessão
+      session.user.permission = token.permission;
       session.user.expirationDate = token.expirationDate;
+      session.user.isInternalUser = token.isInternalUser ?? false; // <- Aqui
       return session;
     },
   },

@@ -36,6 +36,15 @@ const PropertiesEditForm = ({
     const [hotelPostalCode, setHotelPostalCode] = useState(hotel.hotelPostalCode || "");
     const [hotelRNET, setHotelRNET] = useState(hotel.hotelRNET || "");
     const [hotelNIF, setHotelNIF] = useState(hotel.hotelNIF || "");
+    const [hasStay, setHasStay] = useState(hotel.hasStay || "");
+
+    const [replyEmail, setReplyEmail] = useState(hotel.replyEmail || "");
+    const [replyPassword, setReplyPassword] = useState(hotel.replyPassword || "");
+    const [sendingServer, setSendingServer] = useState(hotel.sendingServer || "");
+    const [sendingPort, setSendingPort] = useState(hotel.sendingPort || "");
+    const [emailSubject, setEmailSubject] = useState(hotel.emailSubject || "");
+    const [emailBody, setEmailBody] = useState(hotel.emailBody || "");
+    const [infoEmail, setInfoEmail] = useState(hotel.infoEmail || "");
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -125,7 +134,12 @@ const PropertiesEditForm = ({
                 hotelRNET,
                 hotelNIF,
                 passeIni,
-                pdfFilePath
+                pdfFilePath,
+                replyEmail,
+                replyPassword,
+                sendingServer,
+                sendingPort,
+                infoEmail,
             });
 
             if (response.status === 200) {
@@ -273,25 +287,25 @@ const PropertiesEditForm = ({
                                                 </div>
                                                 <div className="flex flex-row w-1/2 gap-4"> {/* Cada campo ocupa metade do espaço */}
                                                     <div className="flex flex-col w-1/2">
-                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.extensionsPort}</label>
-                                                    <input
-                                                        type="text"
-                                                        value={propertyPort}
-                                                        onChange={(e) => setPropertyPort(e.target.value)}
-                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                    />
-                                                </div>
-                                                <div className="flex flex-col w-1/2">
-                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stayPort}</label>
-                                                    <input
-                                                        type="text"
-                                                        value={propertyPortStay}
-                                                        onChange={(e) => setPropertyPortStay(e.target.value)}
-                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                    />
-                                                </div>
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.extensionsPort}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={propertyPort}
+                                                            onChange={(e) => setPropertyPort(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col w-1/2">
+                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stayPort}</label>
+                                                        <input
+                                                            type="text"
+                                                            value={propertyPortStay}
+                                                            onChange={(e) => setPropertyPortStay(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
                                                 </div>
 
                                             </div>
@@ -494,6 +508,89 @@ const PropertiesEditForm = ({
                                             </div>
                                         </div>
                                     </Tab>
+                                    {hasStay && (
+                                        <Tab key="stay" title="Stay">
+                                            <div>
+                                                <p className="bg-gray-200 p-1 mb-2">Send SMTP</p>
+                                                <div className="flex flex-row gap-2 w-full">
+                                                    <div className="w-1/2 flex flex-col text-xs">
+                                                        <p>Email</p>
+                                                        <input
+                                                            type="text"
+                                                            value={replyEmail}
+                                                            onChange={(e) => setReplyEmail(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                    <div className="w-1/2 flex flex-col text-xs">
+                                                        <p>Email password</p>
+                                                        <input
+                                                            type="text"
+                                                            value={replyPassword}
+                                                            onChange={(e) => setReplyPassword(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-row gap-2 w-full">
+                                                    <div className="w-1/2 flex flex-col text-xs">
+                                                        <p>Server SMTP</p>
+                                                        <input
+                                                            type="text"
+                                                            value={sendingServer}
+                                                            onChange={(e) => setSendingServer(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                    <div className="w-1/2 flex flex-col text-xs">
+                                                        <p>Port SMTP</p>
+                                                        <input
+                                                            type="text"
+                                                            value={sendingPort}
+                                                            onChange={(e) => setSendingPort(e.target.value)}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <p className="bg-gray-200 p-1 mt-2 mb-2">Email</p>
+                                                <div className="w-1/2 flex flex-col text-xs">
+                                                    <p>Email Subject</p>
+                                                    <input
+                                                        type="text"
+                                                        value={emailSubject}
+                                                        onChange={(e) => setEmailSubject(e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                    />
+                                                </div>
+                                                <div className="w-full flex flex-col text-xs mt-2">
+                                                    <p>Email Body</p>
+                                                    <textarea
+                                                        value={emailBody}
+                                                        onChange={(e) => setEmailBody(e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none h-20 resize-none"
+                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                    />
+                                                </div>
+                                                <p className="bg-gray-200 p-1 mt-2 mb-2">Receipt of shipment</p>
+                                                <div className="flex flex-col w-full text-xs">
+                                                    <p>Email</p>
+                                                    <input
+                                                        type="text"
+                                                        value={infoEmail}
+                                                        onChange={(e) => setInfoEmail(e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                    />
+
+                                                </div>
+                                            </div>
+                                        </Tab>
+                                    )}
                                 </Tabs>
 
                                 {/* Exibição de erro */}
@@ -501,7 +598,7 @@ const PropertiesEditForm = ({
 
                                 <div className="flex justify-end space-x-2">
                                     <Button color="error" onClick={onClose}>
-                                    {t.modals.propertiesEdit.cancel}
+                                        {t.modals.propertiesEdit.cancel}
                                     </Button>
                                     {isEditing ? (
                                         <Button color="primary" onClick={handleSave} disabled={loading}>
