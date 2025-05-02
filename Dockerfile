@@ -4,27 +4,21 @@ FROM node:18-buster
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the entire project to the container
+# Copy package files and install dependencies
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy Prisma schema file
-COPY prisma ./prisma/
-
-# Install Prisma CLI
-RUN npm install prisma --save-dev
+# Copy entire project (including server.js and prisma folder)
+COPY . .
 
 # Generate Prisma client
 RUN npx prisma generate
 
-COPY . .
-
 # Build your Next.js application
 RUN npm run build
 
+# Expose the app port
 EXPOSE 3000
 
-# Command to run your Next.js application
-CMD npm run start
+# Start the application using your custom Express server
+CMD ["npm", "run", "start"]
