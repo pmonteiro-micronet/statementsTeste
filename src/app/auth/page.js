@@ -118,22 +118,24 @@ const SignIn = () => {
             });
   
             if (result?.error) {
-              setError(result.error);  // Se ocorrer um erro, mostramos
+              setError(result.error);
             } else {
-              // Se o login for bem-sucedido, redireciona para a página do QR Code
-              const queryParams = new URLSearchParams({
+              // Armazena os dados no sessionStorage
+              sessionStorage.setItem("qrUserData", JSON.stringify({
                 email: decryptedData.email,
                 resNo: decryptedData.resNo,
                 propertyID: decryptedData.propertyID,
                 requestID: decryptedData.requestID,
                 profileID: decryptedData.profileID,
-              }).toString();
-  
-              setScanning(false);  // Desativa o scanner
-              scanner.clear();  // Limpa o scanner
-              router.push(`/qrcode_user?${queryParams}`);  // Redireciona para a página de QR Code
-            }
-          }
+              }));
+            
+              setScanning(false);
+              scanner.clear();
+            
+              // Redireciona sem parâmetros
+              router.push("/qrcode_user");
+            }            
+          }            
         } catch (error) {
           console.error("Erro ao processar QR Code", error);
         }
@@ -189,13 +191,13 @@ const SignIn = () => {
               {t.auth.login}
             </button>
 
-            {/*<button
+            <button
               type="button"
               className="w-full mt-2 border border-gray-300 rounded-2xl h-10 text-sm text-gray-500 hover:bg-primary-50"
               onClick={() => setScanning(true)}
             >
               Entrar com QR Code
-            </button>*/}
+            </button>
 
             {scanning && <div id="reader" className="mt-4"></div>}
 
