@@ -68,9 +68,9 @@ export async function PATCH(request, context) {
       const formattedMpehotel = parseInt(mpehotel, 10);
       const formattedSendingPort = parseInt(sendingPort, 10);
 
-      if (isNaN(formattedMpehotel) || isNaN(formattedPropertyPort)) {
+      if (isNaN(formattedMpehotel)) {
           return new NextResponse(
-              JSON.stringify({ error: "mpehotel and propertyPort must be valid integers" }),
+              JSON.stringify({ error: "mpehotel must be valid integers" }),
               { status: 400 }
           );
       }
