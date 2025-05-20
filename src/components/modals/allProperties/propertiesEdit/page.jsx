@@ -139,6 +139,8 @@ const PropertiesEditForm = ({
                 replyPassword,
                 sendingServer,
                 sendingPort,
+                emailSubject,
+                emailBody,
                 infoEmail,
             });
 
