@@ -52,6 +52,8 @@ export async function PATCH(request, context) {
       replyPassword,
       sendingServer,
       sendingPort,
+      emailSubject,
+      emailBody,
       infoEmail,
   } = await request.json();
 
@@ -102,6 +104,8 @@ export async function PATCH(request, context) {
               replyPassword,
               sendingServer,
               sendingPort: formattedSendingPort,
+              emailSubject,
+              emailBody,
               infoEmail,
           },
       });
