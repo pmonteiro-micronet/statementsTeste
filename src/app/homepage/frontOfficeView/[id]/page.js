@@ -149,7 +149,6 @@ const FrontOffice = () => {
     sendDataToAPI();
   }, [selectedHotelID]);
 
-
   return (
     <div className="min-h-screen flex bg-primaryBackground">
       {isLoading && <LoadingBackdrop open={isLoading} />} {/* Indicador de carregamento */}

@@ -11,7 +11,7 @@ import es from "../../../../../public/locales/espanol/common.json";
 
 const translations = { en, pt, es };
 
-const PropertiesEditForm = ({ hotel, onClose }) => {
+const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
     const [propertyName, setPropertyName] = useState(hotel.propertyName || "");
     const [propertyTag, setPropertyTag] = useState(hotel.propertyTag || "");
     const [propertyServer, setPropertyServer] = useState(hotel.propertyServer || "");
@@ -38,6 +38,14 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
 
     const [locale, setLocale] = useState("pt");
 
+    const [activeContent, setActiveContent] = useState("terms");
+    const [activeKey, setActiveKey] = useState("EN");
+
+
+    const [privacyPolicyEN, setPrivacyPolicyEN] = useState(hotelTerms[0]?.privacyPolicyEN || "");
+    const [privacyPolicyPT, setPrivacyPolicyPT] = useState(hotelTerms[0]?.privacyPolicyPT || "");
+    const [privacyPolicyES, setPrivacyPolicyES] = useState(hotelTerms[0]?.privacyPolicyES || "");
+
     useEffect(() => {
         // Carregar o idioma do localStorage
         const storedLanguage = localStorage.getItem("language");
@@ -60,10 +68,9 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
 
             // Converta campos para inteiros, se necessário
             const formattedMpehotel = parseInt(mpehotel, 10);
-            const formattedPropertyPort = parseInt(propertyPort, 10);
 
-            if (isNaN(formattedMpehotel) || isNaN(formattedPropertyPort)) {
-                setError("mpehotel and propertyPort must be valid numbers.");
+            if (isNaN(formattedMpehotel)) {
+                setError("mpehotel must be valid numbers.");
                 setLoading(false);
                 return;
             }
@@ -73,7 +80,7 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                 propertyName,
                 propertyTag,
                 propertyServer,
-                propertyPort: formattedPropertyPort,
+                propertyPort,
                 propertyPortStay,
                 mpehotel: formattedMpehotel,
                 hotelName,
@@ -90,10 +97,25 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                 pdfFilePath,
             });
 
-            if (response.status === 200) {
+           // Se a propriedade foi atualizada com sucesso, salva os termos
+        if (response.status === 200) {
+            const hotelTermsResponse = await axios.post(`/api/properties/hotelTerms`, {
+                propertyID: hotel.propertyID,
+                termsAndCondEN: hotelTermsEN,
+                termsAndCondPT: hotelTermsPT,
+                termsAndCondES: hotelTermsES,
+                privacyPolicyEN,
+                privacyPolicyPT,
+                privacyPolicyES
+            });
+
+            if (hotelTermsResponse.status === 200 || hotelTermsResponse.status === 201) {
                 setIsEditing(false);
-                onClose();
+                onClose(); // Fecha o modal
+            } else {
+                setError("Failed to save hotel terms.");
             }
+        }
         } catch (error) {
             console.error("Error updating property:", error);
             setError("Failed to update property. Please try again.");
@@ -149,8 +171,6 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
             setLoading(false);
         }
     };
-
-    const [activeKey, setActiveKey] = useState("EN"); // Estado de controle da aba ativa
 
     return (
         <Modal
@@ -356,61 +376,96 @@ const PropertiesEditForm = ({ hotel, onClose }) => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelTerms}</label>
-
-                                    <div className="mb-2">
-                                        <div className="flex flex-row justify-center bg-gray-100 w-32 h-8 rounded-xl items-center">
-                                            <div
-                                                onClick={() => setActiveKey("EN")}
-                                                className={`cursor-pointer p-1 ${activeKey === "EN" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
-                                            >
-                                                EN
-                                            </div>
-                                            <div
-                                                onClick={() => setActiveKey("PT")}
-                                                className={`cursor-pointer p-1 ${activeKey === "PT" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
-                                            >
-                                                PT
-                                            </div>
-                                            <div
-                                                onClick={() => setActiveKey("ES")}
-                                                className={`cursor-pointer p-1 ${activeKey === "ES" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
-                                            >
-                                                ES
-                                            </div>
+                                    {/* Tabs: Hotel Terms vs Privacy Policy (como label) */}
+                                    <div className="flex flex-row bg-gray-100 w-full rounded-xl items-center mb-4 mt-4">
+                                        <div
+                                            onClick={() => setActiveContent("terms")}
+                                            className={`cursor-pointer px-4 py-2 ${activeContent === "terms"
+                                                ? "bg-white text-black rounded-t-md border border-b-0 border-gray-300"
+                                                : "text-gray-500 text-sm"
+                                                }`}
+                                        >
+                                            {t.modals.propertiesEdit.hotelTerms}
+                                        </div>
+                                        <div
+                                            onClick={() => setActiveContent("privacy")}
+                                            className={`cursor-pointer px-4 py-2 ${activeContent === "privacy"
+                                                ? "bg-white text-black rounded-t-md border border-b-0 border-gray-300"
+                                                : "text-gray-500 text-sm"
+                                                }`}
+                                        >
+                                            {t.modals.createProperty.privacyPolicy}
                                         </div>
                                     </div>
 
+                                    {/* Language Tabs */}
+                                    <div className="flex flex-row justify-center bg-gray-100 w-32 h-8 rounded-xl items-center mb-4">
+                                        {["EN", "PT", "ES"].map((lang) => (
+                                            <div
+                                                key={lang}
+                                                onClick={() => setActiveKey(lang)}
+                                                className={`cursor-pointer p-1 ${activeKey === lang
+                                                    ? "bg-white text-black rounded-lg m-1 text-sm border border-gray-200"
+                                                    : "text-gray-500 m-1 text-sm"
+                                                    }`}
+                                            >
+                                                {lang}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Textarea content */}
                                     <div>
-                                        {activeKey === "EN" && (
-                                            <div>
-                                                <textarea
-                                                    value={hotelTermsEN}
-                                                    onChange={(e) => setHotelTermsEN(e.target.value)}
-                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                />
-                                            </div>
+                                        {activeContent === "terms" && (
+                                            <>
+                                                {activeKey === "EN" && (
+                                                    <textarea
+                                                        value={hotelTermsEN}
+                                                        onChange={(e) => setHotelTermsEN(e.target.value)}
+                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                    />
+                                                )}
+                                                {activeKey === "PT" && (
+                                                    <textarea
+                                                        value={hotelTermsPT}
+                                                        onChange={(e) => setHotelTermsPT(e.target.value)}
+                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                    />
+                                                )}
+                                                {activeKey === "ES" && (
+                                                    <textarea
+                                                        value={hotelTermsES}
+                                                        onChange={(e) => setHotelTermsES(e.target.value)}
+                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                    />
+                                                )}
+                                            </>
                                         )}
-                                        {activeKey === "PT" && (
-                                            <div>
-                                                <textarea
-                                                    value={hotelTermsPT}
-                                                    onChange={(e) => setHotelTermsPT(e.target.value)}
-                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                />
-                                            </div>
-                                        )}
-                                        {activeKey === "ES" && (
-                                            <div>
-                                                <textarea
-                                                    value={hotelTermsES}
-                                                    onChange={(e) => setHotelTermsES(e.target.value)}
-                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                />
-                                            </div>
+
+                                        {activeContent === "privacy" && (
+                                            <>
+                                                {activeKey === "EN" && (
+                                                    <textarea
+                                                        value={privacyPolicyEN}
+                                                        onChange={(e) => setPrivacyPolicyEN(e.target.value)}
+                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                    />
+                                                )}
+                                                {activeKey === "PT" && (
+                                                    <textarea
+                                                        value={privacyPolicyPT}
+                                                        onChange={(e) => setPrivacyPolicyPT(e.target.value)}
+                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                    />
+                                                )}
+                                                {activeKey === "ES" && (
+                                                    <textarea
+                                                        value={privacyPolicyES}
+                                                        onChange={(e) => setPrivacyPolicyES(e.target.value)}
+                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                    />
+                                                )}
+                                            </>
                                         )}
                                     </div>
                                 </div>

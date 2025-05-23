@@ -74,14 +74,14 @@ export default function Page() {
         if (status === "authenticated") {
             const internalUser = session?.user?.isInternalUser === true;
             setIsInternalUser(internalUser);
-    
+
             const lockedPath = "/homepage/frontOfficeView/registrationForm";
             const currentPath = window.location.pathname;
-    
+
             if (internalUser && currentPath !== lockedPath) {
                 router.replace(lockedPath); // Redireciona silenciosamente sem adicionar no histórico
             }
-    
+
             // Observa alterações manuais na URL (como digitar outra rota)
             const handlePopState = () => {
                 const newPath = window.location.pathname;
@@ -89,14 +89,14 @@ export default function Page() {
                     router.replace(lockedPath);
                 }
             };
-    
+
             window.addEventListener("popstate", handlePopState);
-    
+
             return () => {
                 window.removeEventListener("popstate", handlePopState);
             };
         }
-    }, [session, status]);    
+    }, [session, status]);
 
 
     const handleLanguageChange = (lang) => {
@@ -559,6 +559,71 @@ export default function Page() {
     const handleLogout = () => {
         router.push("/auth");
     };
+
+    const [termsAndCondPT, setTermsAndCondPT] = useState("");
+    const [termsAndCondEN, setTermsAndCondEN] = useState("");
+    const [termsAndCondES, setTermsAndCondES] = useState("");
+
+    const [privacyPolicyPT, setPrivacyPolicyPT] = useState("");
+    const [privacyPolicyEN, setPrivacyPolicyEN] = useState("");
+    const [privacyPolicyES, setPrivacyPolicyES] = useState("");
+
+    console.log(termsAndCondPT, termsAndCondEN, termsAndCondES, privacyPolicyPT, privacyPolicyEN, privacyPolicyES);
+    // Novos estados dinâmicos para exibir o conteúdo com base no idioma
+    const [termsToDisplay, setTermsToDisplay] = useState("");
+    const [privacyToDisplay, setPrivacyToDisplay] = useState("");
+
+    useEffect(() => {
+        const fetchPropertyDetails = async () => {
+            console.log("PROPERTYID: ", propertyID);
+            if (!propertyID) return;
+
+            console.log("Idioma atual (locale):", locale);
+
+            try {
+                const response = await axios.get(`/api/properties/hotelTerms/${propertyID}`);
+                const property = response.data.response[0];
+
+                if (property) {
+                    const {
+                        termsAndCondPT,
+                        termsAndCondEN,
+                        termsAndCondES,
+                        privacyPolicyPT,
+                        privacyPolicyEN,
+                        privacyPolicyES,
+                    } = property;
+
+                    // Atualiza os estados base (caso precise)
+                    setTermsAndCondPT(termsAndCondPT);
+                    setTermsAndCondEN(termsAndCondEN);
+                    setTermsAndCondES(termsAndCondES);
+                    setPrivacyPolicyPT(privacyPolicyPT);
+                    setPrivacyPolicyEN(privacyPolicyEN);
+                    setPrivacyPolicyES(privacyPolicyES);
+
+                    // Atualiza os textos com base no idioma
+                    const terms =
+                        locale === "en" ? termsAndCondEN :
+                            locale === "es" ? termsAndCondES :
+                                termsAndCondPT;
+
+                    const privacy =
+                        locale === "en" ? privacyPolicyEN :
+                            locale === "es" ? privacyPolicyES :
+                                privacyPolicyPT;
+
+                    setTermsToDisplay(terms);
+                    setPrivacyToDisplay(privacy);
+                }
+            } catch (error) {
+                console.error("Erro ao buscar detalhes da propriedade:", error.message);
+            }
+        };
+
+        fetchPropertyDetails();
+    }, [propertyID, locale]);
+
     return (
         <div className='bg-background main-page min-h-screen'>
             {/* Exibe o loader enquanto isLoading for verdadeiro */}
@@ -1239,6 +1304,7 @@ export default function Page() {
                                                 buttonName={t.frontOffice.registrationForm.readMore}
                                                 modalHeader={t.frontOffice.registrationForm.termsModalHeader}
                                                 formTypeModal={11}
+                                                content={termsToDisplay}
                                             />
                                         </div>
                                     </div>
@@ -1270,6 +1336,7 @@ export default function Page() {
                                                 buttonName={t.frontOffice.registrationForm.readMore}
                                                 modalHeader={t.frontOffice.registrationForm.dataModalHeader}
                                                 formTypeModal={11}
+                                                content={privacyToDisplay}
                                             />
                                         </div>
                                     </div>

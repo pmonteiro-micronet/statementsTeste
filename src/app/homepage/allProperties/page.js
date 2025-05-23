@@ -26,6 +26,7 @@ export default function AllProfiles({ }) {
     const [rowsPerPage, setRowsPerPage] = useState(25);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProperty, setSelectedProperty] = useState(null);
+const [selectedHotelTerms, setSelectedHotelTerms] = useState(null);
 
     const [locale, setLocale] = useState("pt");
 
@@ -81,14 +82,32 @@ export default function AllProfiles({ }) {
         setPage(1);
     };
 
-    const handleOpenModal = (property) => {
-        setSelectedProperty(property); // Define o usuário selecionado
-        setIsModalOpen(true); // Abre o modal
-    };
+    const handleOpenModal = async (property) => {
+    setSelectedProperty(property);
+
+    try {
+      // Buscar termos específicos da propriedade pela propertyID
+     const response = await axios.get(`/api/properties/hotelTerms/${property.propertyID}`);
+
+      // Supondo que a API retorna algo tipo { response: { hotelTermsEN: "...", hotelTermsPT: "...", ... } }
+      if (response.data && response.data.response) {
+        setSelectedHotelTerms(response.data.response);
+      } else {
+        setSelectedHotelTerms(null);
+        console.error("Resposta inesperada para hotelTerms:", response.data);
+      }
+    } catch (error) {
+      setSelectedHotelTerms(null);
+      console.error("Erro ao buscar termos do hotel:", error);
+    }
+
+    setIsModalOpen(true);
+  };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setSelectedProperty(null); // Limpa o usuário selecionado
+        setSelectedHotelTerms(null);
         window.location.reload(); // Recarrega a página
     };
 
@@ -192,6 +211,7 @@ export default function AllProfiles({ }) {
                         formTypeModal={11}
                         propertyID={selectedProperty.propertyID}
                         hotel={selectedProperty}
+                        hotelTerms={selectedHotelTerms}
                     />
                 </>
             )}

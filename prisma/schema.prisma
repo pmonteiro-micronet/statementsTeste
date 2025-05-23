@@ -129,3 +129,13 @@ model stayRecords {
   token           String?  @db.VarChar(512)
   companionsIDS   String?  @db.VarChar(255)
 }
+
+model hotelTerms {
+  propertyID      Int     @id
+  termsAndCondPT  String? @db.VarChar(2000)
+  termsAndCondEN  String? @db.VarChar(2000)
+  termsAndCondES  String? @db.VarChar(2000)
+  privacyPolicyPT String? @db.VarChar(2000)
+  privacyPolicyEN String? @db.VarChar(2000)
+  privacyPolicyES String? @db.VarChar(2000)
+}
