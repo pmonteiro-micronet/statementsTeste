@@ -54,6 +54,7 @@ const ProfileModalForm = ({
     const isAdmin = user?.permission === 1; // Verifica se o usuário é admin
     const [locale, setLocale] = useState("pt");
 
+    const [selectedHotelTerms, setSelectedHotelTerms] = useState(null);
     useEffect(() => {
         // Carregar o idioma do localStorage
         const storedLanguage = localStorage.getItem("language");
@@ -86,9 +87,25 @@ const ProfileModalForm = ({
         fetchHotels();
     }, [user]);
 
-    const handleEditClick = (hotel) => {
+    const handleEditClick = async (hotel) => {
         if (isAdmin) {
             setSelectedHotel(hotel); // Armazena a propriedade clicada
+
+            try {
+                // Buscar termos específicos da propriedade pela propertyID
+                const response = await axios.get(`/api/properties/hotelTerms/${hotel.propertyID}`);
+
+                if (response.data && response.data.response) {
+                    setSelectedHotelTerms(response.data.response);
+                } else {
+                    setSelectedHotelTerms(null);
+                    console.error("Resposta inesperada para hotelTerms:", response.data);
+                }
+            } catch (error) {
+                setSelectedHotelTerms(null);
+                console.error("Erro ao buscar termos do hotel:", error);
+            }
+
             setIsModalOpen(true); // Abre o modal de edição de propriedade
         }
     };
@@ -435,6 +452,7 @@ const ProfileModalForm = ({
             {isModalOpen && selectedHotel && (
                 <PropertiesEditForm
                     hotel={selectedHotel}
+                    hotelTerms={selectedHotelTerms}
                     onClose={() => setIsModalOpen(false)}
                 />
             )}
