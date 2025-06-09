@@ -51,7 +51,7 @@ const ProfileModalForm = ({
     const user = session?.user || {};
     const { firstName, secondName, email, expirationDate } = user;
 
-    const isAdmin = user?.permission === 1; // Verifica se o usuário é admin
+    // const isAdmin = user?.permission === 1; // Verifica se o usuário é admin
     const [locale, setLocale] = useState("pt");
 
     const [selectedHotelTerms, setSelectedHotelTerms] = useState(null);
@@ -88,7 +88,6 @@ const ProfileModalForm = ({
     }, [user]);
 
     const handleEditClick = async (hotel) => {
-        if (isAdmin) {
             setSelectedHotel(hotel); // Armazena a propriedade clicada
 
             try {
@@ -107,7 +106,6 @@ const ProfileModalForm = ({
             }
 
             setIsModalOpen(true); // Abre o modal de edição de propriedade
-        }
     };
 
     const handleSubmit = async (e) => {
@@ -429,9 +427,9 @@ const ProfileModalForm = ({
                                                                     </div>
                                                                 )}
                                                                 <FaPencilAlt
-                                                                    className={`cursor-pointer ${isAdmin ? "text-primary" : "text-gray-400"}`}
+                                                                    className={`cursor-pointer text-primary`}
                                                                     onClick={() => handleEditClick(hotel)}
-                                                                    style={{ pointerEvents: isAdmin ? "auto" : "none" }}
+                                                                    style={{ pointerEvents: "auto"}}
                                                                 />
                                                             </div>
                                                         </div>
