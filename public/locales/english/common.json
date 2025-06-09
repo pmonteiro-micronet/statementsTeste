@@ -324,7 +324,43 @@
             "cancel": "Cancel",
             "edit": "Edit",
             "save": "Save",
-            "saving": "Saving..."
+            "saving": "Saving...",
+            "stay": {
+                "sendSMTP": "Send SMTP",
+                "email": "Email",
+                "emailPassword": "Email password",
+                "serverSMTP": "SMTP Server",
+                "portSMTP": "SMTP Port",
+                "receiptShipment": "Receipt of shipment",
+                "emailSubject": "Email subject",
+                "emailBody": "Email body",
+                "variable": "Variable",
+                "description": "Description",
+                "displayedElements": "Displayed elements",
+                "reservationDetails": {
+                    "title": "Reservation Details",
+                    "room": "Room",
+                    "reservationNumber": "Res. Number",
+                    "arrival": "Arrival",
+                    "departure": "Departure",
+                    "adults": "Adults",
+                    "childs": "Childs",
+                    "stayLink": "Stay Link"
+                },
+                "hotelDetails": {
+                    "title": "Hotel Details",
+                    "hotelName": "Hotel Name",
+                    "hotelEmail": "Hotel Email",
+                    "hotelPhone": "Hotel Phone"
+                },
+                "guestDetails": {
+                    "title": "Guest Details",
+                    "Name": "Name",
+                    "Surname": "Surname",
+                    "Phone": "Phone",
+                    "Email": "Email"
+                }
+            }
         }
     },
     "pagination": {

@@ -324,7 +324,43 @@
             "cancel": "Cancelar",
             "edit": "Editar",
             "save": "Guardar",
-            "saving": "A guardar..."
+            "saving": "A guardar...",
+            "stay": {
+                "sendSMTP": "Enviar SMTP",
+                "email": "Email",
+                "emailPassword": "Palavra-passe do email",
+                "serverSMTP": "Servidor SMTP",
+                "portSMTP": "Porta SMTP",
+                "receiptShipment": "Receção do envio",
+                "emailSubject": "Assunto do email",
+                "emailBody": "Corpo do email",
+                "variable": "Variável",
+                "description": "Descrição",
+                "displayedElements": "Elementos exibidos",
+                "reservationDetails": {
+                    "title": "Detalhes da reserva",
+                    "room": "Quarto",
+                    "reservationNumber": "N.º da reserva",
+                    "arrival": "Chegada",
+                    "departure": "Partida",
+                    "adults": "Adultos",
+                    "childs": "Crianças",
+                    "stayLink": "Link da estadia"
+                },
+                "hotelDetails": {
+                    "title": "Detalhes do hotel",
+                    "hotelName": "Nome do hotel",
+                    "hotelEmail": "Email do hotel",
+                    "hotelPhone": "Telefone do hotel"
+                },
+                "guestDetails": {
+                    "title": "Detalhes do hóspede",
+                    "Name": "Nome",
+                    "Surname": "Apelido",
+                    "Phone": "Telefone",
+                    "Email": "Email"
+                }
+            }
         }
     },
     "pagination": {
