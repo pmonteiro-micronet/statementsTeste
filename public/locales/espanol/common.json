@@ -306,7 +306,7 @@
             "propertyTag": "Etiqueta de propiedad:",
             "mpeHotel": "Hotel MPE:",
             "propertyServer": "Servidor de propiedades:",
-            "extensionsPort": "Puerta de extensions:",
+            "extensionsPort": "Puerta de ext.:",
             "stayPort": "Puerta de stay:",
             "iniPath": "Camino  Ini:",
             "pdfFile": "Camino PDF:",
@@ -324,7 +324,43 @@
             "cancel": "Cancelar",
             "edit": "Editar",
             "save": "Ahorrar",
-            "saving": "Ahorro..."
+            "saving": "Ahorro...",
+            "stay": {
+                "sendSMTP": "Enviar SMTP",
+                "email": "Correo electrónico",
+                "emailPassword": "Contraseña del correo",
+                "serverSMTP": "Servidor SMTP",
+                "portSMTP": "Puerto SMTP",
+                "receiptShipment": "Recepción del envío",
+                "emailSubject": "Asunto del correo",
+                "emailBody": "Cuerpo del correo",
+                "variable": "Variable",
+                "description": "Descripción",
+                "displayedElements": "Elementos mostrados",
+                "reservationDetails": {
+                    "title": "Detalles de la reserva",
+                    "room": "Habitación",
+                    "reservationNumber": "N.º de reserva",
+                    "arrival": "Llegada",
+                    "departure": "Salida",
+                    "adults": "Adultos",
+                    "childs": "Niños",
+                    "stayLink": "Enlace de estancia"
+                },
+                "hotelDetails": {
+                    "title": "Detalles del hotel",
+                    "hotelName": "Nombre del hotel",
+                    "hotelEmail": "Correo del hotel",
+                    "hotelPhone": "Teléfono del hotel"
+                },
+                "guestDetails": {
+                    "title": "Detalles del huésped",
+                    "Name": "Nombre",
+                    "Surname": "Apellido",
+                    "Phone": "Teléfono",
+                    "Email": "Correo electrónico"
+                }
+            }
         }
     },
     "pagination": {

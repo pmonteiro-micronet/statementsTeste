@@ -191,7 +191,7 @@ const SignIn = () => {
               {t.auth.login}
             </button>
 
-            <button
+            {/* <button
               type="button"
               className="w-full mt-2 border border-gray-300 rounded-2xl h-10 text-sm text-gray-500 hover:bg-primary-50"
               onClick={() => setScanning(true)}
@@ -199,7 +199,7 @@ const SignIn = () => {
               Entrar com QR Code
             </button>
 
-            {scanning && <div id="reader" className="mt-4"></div>}
+            {scanning && <div id="reader" className="mt-4"></div>} */}
 
             {error && <p style={{ color: "red" }}>{error}</p>}
             <div className="mt-10 flex flex-col gap-4 text-sm text-gray-400">
