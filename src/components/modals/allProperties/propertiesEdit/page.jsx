@@ -5,7 +5,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/rea
 import { MdClose } from "react-icons/md";
 import axios from "axios";
 import { Tabs, Tab } from "@heroui/react";
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 
 import { FaGripLines } from "react-icons/fa";
 import { IoCopy } from "react-icons/io5";
@@ -70,7 +70,7 @@ const PropertiesEditForm = ({
 
     const [activeTab, setActiveTab] = useState("propertyDetails");
 
-    const router = useRouter();
+    // const router = useRouter();
     // Função para buscar os dados de uma propriedade pelo ID
     // const fetchPropertyData = async (propertyID) => {
     //     try {
@@ -332,17 +332,17 @@ const PropertiesEditForm = ({
 
     const [selectedBold, setSelectedBold] = React.useState(false);
 
-    const checkIfSelectedBold = () => {
-        const textarea = textareaRef.current;
-        if (!textarea || !isEditing) return false;
+    // const checkIfSelectedBold = () => {
+    //     const textarea = textareaRef.current;
+    //     if (!textarea || !isEditing) return false;
 
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        const selectedText = emailBody.slice(start, end);
+    //     const start = textarea.selectionStart;
+    //     const end = textarea.selectionEnd;
+    //     const selectedText = emailBody.slice(start, end);
 
-        // Verifica se a seleção está exatamente entre dois pares de **
-        return selectedText.startsWith("**") && selectedText.endsWith("**");
-    };
+    //     // Verifica se a seleção está exatamente entre dois pares de **
+    //     return selectedText.startsWith("**") && selectedText.endsWith("**");
+    // };
 
     const handleBoldClick = () => {
         const textarea = textareaRef.current;
