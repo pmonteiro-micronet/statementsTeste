@@ -1,9 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRef } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import axios from "axios";
 import { Tabs, Tab } from "@heroui/react";
+
+import { FaGripLines } from "react-icons/fa";
+import { IoCopy } from "react-icons/io5";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -31,6 +35,15 @@ const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
     const [hotelPostalCode, setHotelPostalCode] = useState(hotel.hotelPostalCode || "");
     const [hotelRNET, setHotelRNET] = useState(hotel.hotelRNET || "");
     const [hotelNIF, setHotelNIF] = useState(hotel.hotelNIF || "");
+    const [hasStay, setHasStay] = useState(hotel.hasStay || "");
+    console.log(setHasStay);
+    const [replyEmail, setReplyEmail] = useState(hotel.replyEmail || "");
+    const [replyPassword, setReplyPassword] = useState(hotel.replyPassword || "");
+    const [sendingServer, setSendingServer] = useState(hotel.sendingServer || "");
+    const [sendingPort, setSendingPort] = useState(hotel.sendingPort || "");
+    const [emailSubject, setEmailSubject] = useState(hotel.emailSubject || "");
+    const [emailBody, setEmailBody] = useState(hotel.emailBody || "");
+    const [infoEmail, setInfoEmail] = useState(hotel.infoEmail || "");
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -45,6 +58,11 @@ const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
     const [privacyPolicyEN, setPrivacyPolicyEN] = useState(hotelTerms[0]?.privacyPolicyEN || "");
     const [privacyPolicyPT, setPrivacyPolicyPT] = useState(hotelTerms[0]?.privacyPolicyPT || "");
     const [privacyPolicyES, setPrivacyPolicyES] = useState(hotelTerms[0]?.privacyPolicyES || "");
+
+    const [showVariablesbar, setShowVariablesbar] = useState(false);
+    const [hoveredVar, setHoveredVar] = useState(null);
+
+    const [activeTab, setActiveTab] = useState("propertyDetails");
 
     useEffect(() => {
         // Carregar o idioma do localStorage
@@ -95,27 +113,34 @@ const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
                 hotelNIF,
                 passeIni,
                 pdfFilePath,
+                replyEmail,
+                replyPassword,
+                sendingServer,
+                sendingPort,
+                emailSubject,
+                emailBody,
+                infoEmail,
             });
 
-           // Se a propriedade foi atualizada com sucesso, salva os termos
-        if (response.status === 200) {
-            const hotelTermsResponse = await axios.post(`/api/properties/hotelTerms`, {
-                propertyID: hotel.propertyID,
-                termsAndCondEN: hotelTermsEN,
-                termsAndCondPT: hotelTermsPT,
-                termsAndCondES: hotelTermsES,
-                privacyPolicyEN,
-                privacyPolicyPT,
-                privacyPolicyES
-            });
+            // Se a propriedade foi atualizada com sucesso, salva os termos
+            if (response.status === 200) {
+                const hotelTermsResponse = await axios.post(`/api/properties/hotelTerms`, {
+                    propertyID: hotel.propertyID,
+                    termsAndCondEN: hotelTermsEN,
+                    termsAndCondPT: hotelTermsPT,
+                    termsAndCondES: hotelTermsES,
+                    privacyPolicyEN,
+                    privacyPolicyPT,
+                    privacyPolicyES
+                });
 
-            if (hotelTermsResponse.status === 200 || hotelTermsResponse.status === 201) {
-                setIsEditing(false);
-                onClose(); // Fecha o modal
-            } else {
-                setError("Failed to save hotel terms.");
+                if (hotelTermsResponse.status === 200 || hotelTermsResponse.status === 201) {
+                    setIsEditing(false);
+                    onClose(); // Fecha o modal
+                } else {
+                    setError("Failed to save hotel terms.");
+                }
             }
-        }
         } catch (error) {
             console.error("Error updating property:", error);
             setError("Failed to update property. Please try again.");
@@ -172,6 +197,158 @@ const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
         }
     };
 
+    const [copiedVar, setCopiedVar] = useState(null);
+
+    // Dentro do seu componente:
+    const textareaRef = useRef(null);
+    const subjectInputRef = useRef(null);
+
+    const handleDoubleClick = () => {
+        if (copiedVar && textareaRef.current) {
+            const textarea = textareaRef.current;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = emailBody;
+
+            const newText =
+                text.substring(0, start) + copiedVar + text.substring(end);
+
+            setEmailBody(newText);
+
+            // Atualiza o cursor após a inserção
+            setTimeout(() => {
+                textarea.focus();
+                textarea.setSelectionRange(start + copiedVar.length, start + copiedVar.length);
+            }, 0);
+        }
+    };
+
+    const handleDoubleClickSubject = () => {
+        if (copiedVar && subjectInputRef.current) {
+            const input = subjectInputRef.current;
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const text = emailSubject;
+
+            const newText = text.substring(0, start) + copiedVar + text.substring(end);
+
+            setEmailSubject(newText);
+
+            setTimeout(() => {
+                input.focus();
+                input.setSelectionRange(start + copiedVar.length, start + copiedVar.length);
+            }, 0);
+        }
+    };
+
+    const copyToClipboard = (text) => {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                setCopiedVar(text);
+                setTimeout(() => setCopiedVar(null), 2000);
+            });
+        } else {
+            // fallback antigo para navegadores mais antigos
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                console.log(`Copiado: ${text}`);
+            } catch {
+                console.log('Erro ao copiar para área de transferência');
+            }
+            document.body.removeChild(textarea);
+        }
+    };
+
+    const guestDetails = [
+        { key: '{{protelGuestFirstName}}', desc: t.modals.propertiesEdit.stay.guestDetails.Name },
+        { key: '{{protelGuestLastName}}', desc: t.modals.propertiesEdit.stay.guestDetails.Surname },
+        { key: '{{protelGuestMobilePhone}}', desc: t.modals.propertiesEdit.stay.guestDetails.Phone },
+        { key: '{{email}}', desc: t.modals.propertiesEdit.stay.guestDetails.Email },
+    ];
+
+    const reservationDetails = [
+        { key: '{{protelRoomID}}', desc: t.modals.propertiesEdit.stay.reservationDetails.room },
+        { key: '{{protelReservationID}}', desc: t.modals.propertiesEdit.stay.reservationDetails.reservationNumber },
+        { key: '{{protelValidFrom}}', desc: t.modals.propertiesEdit.stay.reservationDetails.arrival },
+        { key: '{{protelValidUntil}}', desc: t.modals.propertiesEdit.stay.reservationDetails.departure },
+        { key: '{{adult}}', desc: t.modals.propertiesEdit.stay.reservationDetails.adults },
+        { key: '{{child}}', desc: t.modals.propertiesEdit.stay.reservationDetails.childs },
+        { key: '{{STAY_LINK}}', desc: t.modals.propertiesEdit.stay.reservationDetails.stayLink },
+    ];
+
+    const hotelDetails = [
+        { key: '{{hotel_name}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelName },
+        { key: '{{hotel_email}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelEmail },
+        { key: '{{hotel_phone}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelPhone },
+    ];
+
+    const [selectedBold, setSelectedBold] = React.useState(false);
+
+    const handleBoldClick = () => {
+        const textarea = textareaRef.current;
+        if (!textarea || !isEditing) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = emailBody.slice(start, end);
+        const before = emailBody.slice(0, start);
+        const after = emailBody.slice(end);
+
+        // Salva a posição do scroll antes da atualização
+        const scrollPos = textarea.scrollTop;
+
+        let newText;
+        if (selectedText.startsWith("**") && selectedText.endsWith("**")) {
+            // Remove os **
+            const unbolded = selectedText.slice(2, -2);
+            newText = before + unbolded + after;
+            setSelectedBold(false);
+        } else {
+            // Adiciona os **
+            const bolded = `**${selectedText || ' '}**`;
+            newText = before + bolded + after;
+            setSelectedBold(true);
+        }
+
+        setEmailBody(newText);
+
+        // Restaurar foco, seleção e scroll após o texto atualizar
+        setTimeout(() => {
+            textarea.focus();
+
+            if (selectedText.startsWith("**") && selectedText.endsWith("**")) {
+                // Ajusta a seleção para o texto sem os **
+                textarea.setSelectionRange(start, end - 4);
+            } else {
+                // Ajusta a seleção para o texto com os **
+                textarea.setSelectionRange(start + 2, end + 2);
+            }
+
+            textarea.scrollTop = scrollPos; // restaura scroll
+
+        }, 0);
+    };
+
+    // Atualiza o estado do botão toda vez que a seleção mudar
+    const handleSelectionChange = () => {
+        const textarea = textareaRef.current;
+        if (!textarea || !isEditing) {
+            setSelectedBold(false);
+            return;
+        }
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = emailBody.slice(start, end);
+
+        const isBold = selectedText.startsWith("**") && selectedText.endsWith("**");
+        setSelectedBold(isBold);
+    };
+
     return (
         <Modal
             isOpen={true}
@@ -194,7 +371,7 @@ const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
                     </Button>
                 </ModalHeader>
                 <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor">
-                    <Tabs aria-label="Options" className="flex justify-center">
+                    <Tabs aria-label="Options" className="flex justify-center" selectedKey={activeTab} onSelectionChange={setActiveTab}>
                         <Tab key="propertyDetails" title={t.modals.propertiesEdit.settings}>
                             <div className="-mt-4 flex flex-col gap-2">
                                 <div>
@@ -507,6 +684,200 @@ const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
                                 </div>
                             </div>
                         </Tab>
+                        {hasStay && (
+                            <Tab key="stay" title="Stay">
+                                <div>
+                                    <p className="bg-gray-200 p-1 mb-2">{t.modals.propertiesEdit.stay.sendSMTP}</p>
+                                    <div className="flex flex-row gap-2 w-full">
+                                        <div className="w-1/2 flex flex-col text-xs">
+                                            <p>{t.modals.propertiesEdit.stay.email}</p>
+                                            <input
+                                                type="text"
+                                                value={replyEmail}
+                                                onChange={(e) => setReplyEmail(e.target.value)}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                            />
+                                        </div>
+                                        <div className="w-1/2 flex flex-col text-xs">
+                                            <p>{t.modals.propertiesEdit.stay.emailPassword}</p>
+                                            <input
+                                                type="text"
+                                                value={replyPassword}
+                                                onChange={(e) => setReplyPassword(e.target.value)}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-row gap-2 w-full">
+                                        <div className="w-1/2 flex flex-col text-xs">
+                                            <p>{t.modals.propertiesEdit.stay.serverSMTP}</p>
+                                            <input
+                                                type="text"
+                                                value={sendingServer}
+                                                onChange={(e) => setSendingServer(e.target.value)}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                            />
+                                        </div>
+                                        <div className="w-1/2 flex flex-col text-xs">
+                                            <p>{t.modals.propertiesEdit.stay.portSMTP}</p>
+                                            <input
+                                                type="text"
+                                                value={sendingPort}
+                                                onChange={(e) => setSendingPort(e.target.value)}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                            />
+                                        </div>
+                                    </div>
+                                    <p className="bg-gray-200 p-1 mt-2 mb-2">{t.modals.propertiesEdit.stay.receiptShipment}</p>
+                                    <div className="flex flex-col w-full text-xs">
+                                        <p>{t.modals.propertiesEdit.stay.email}</p>
+                                        <input
+                                            type="text"
+                                            value={infoEmail}
+                                            onChange={(e) => setInfoEmail(e.target.value)}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                        />
+
+                                    </div>
+                                </div>
+                            </Tab>
+                        )}
+                        {hasStay && (
+                            <Tab key="stayEmail" title="Stay Email">
+                                <p className="bg-gray-200 p-1 -mt-4 mb-2">{t.modals.propertiesEdit.stay.email}</p>
+                                <div className="w-1/2 flex flex-col text-xs">
+                                    <p>{t.modals.propertiesEdit.stay.emailSubject}</p>
+                                    <input
+                                        ref={subjectInputRef}
+                                        type="text"
+                                        value={emailSubject}
+                                        onChange={(e) => setEmailSubject(e.target.value)}
+                                        onDoubleClick={handleDoubleClickSubject}
+                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                        disabled={!isEditing}
+                                    />
+                                </div>
+                                {/* Botão de Negrito */}
+                                <div className="mt-2">
+                                    <button
+                                        type="button"
+                                        className={`px-2 py-1 rounded-md text-xs font-bold border ${selectedBold ? 'bg-[#FC9D25] text-white border-[#FC9D25]' : 'bg-transparent text-[#FC9D25] border-[#FC9D25]'
+                                            }`}
+                                        onClick={handleBoldClick}
+                                    >
+                                        B
+                                    </button>
+                                </div>
+                                <div className="w-full flex flex-col text-xs mt-2 -mb-8">
+                                    <div className="flex flex-row justify-between items-center mb-1 cursor-pointer">
+                                        <div>
+                                            <p>{t.modals.propertiesEdit.stay.emailBody}</p>
+                                        </div>
+                                        <div
+                                            className="bg-[#FC9D25] p-1 rounded-lg"
+                                            onClick={() => setShowVariablesbar(!showVariablesbar)}>
+                                            <FaGripLines color="white" size={15} />
+                                        </div>
+                                    </div>
+                                    <textarea
+                                        ref={textareaRef}
+                                        onDoubleClick={handleDoubleClick}
+                                        value={emailBody}
+                                        onChange={(e) => setEmailBody(e.target.value)}
+                                        onSelect={handleSelectionChange}
+                                        className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none resize-none"
+                                        disabled={!isEditing}
+                                    />
+                                </div>
+                                {showVariablesbar && (
+                                    <div className="fixed top-0 right-0 h-full w-72 bg-white shadow-lg p-4 z-50 flex flex-col">
+                                        <div className="flex justify-between items-center mb-4 flex-shrink-0">
+                                            <h2 className="text-sm font-bold">{t.modals.propertiesEdit.stay.displayedElements}</h2>
+                                            <button onClick={() => setShowVariablesbar(false)} className="text-gray-500 text-lg">&times;</button>
+                                        </div>
+
+                                        <div className="flex-shrink-0 font-bold flex justify-between border-b pb-1 mb-2 text-xs">
+                                            <span>{t.modals.propertiesEdit.stay.variable}</span>
+                                            <span>{t.modals.propertiesEdit.stay.description}</span>
+                                        </div>
+
+                                        <div className="flex-grow overflow-y-auto text-xs space-y-6">
+                                            {/* Detalhes do hóspede */}
+                                            <div>
+                                                <h3 className="font-semibold mb-2">{t.modals.propertiesEdit.stay.guestDetails.title}</h3>
+                                                <ul className="space-y-2">
+                                                    {guestDetails.map(({ key, desc }) => (
+                                                        <li key={key} className="flex justify-between">
+                                                            <span
+                                                                className="flex items-center cursor-pointer hover:text-[#FC9D25] space-x-1"
+                                                                onClick={() => copyToClipboard(key)}
+                                                                onMouseEnter={() => setHoveredVar(key)}
+                                                                onMouseLeave={() => setHoveredVar(null)}
+                                                                title="Clique para copiar"
+                                                            >
+                                                                <span>{key}</span>
+                                                                {hoveredVar === key && <IoCopy size={16} />}
+                                                            </span>
+                                                            <span>{desc}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+
+                                            {/* Detalhes da reserva */}
+                                            <div>
+                                                <h3 className="font-semibold mb-2">{t.modals.propertiesEdit.stay.reservationDetails.title}</h3>
+                                                <ul className="space-y-2">
+                                                    {reservationDetails.map(({ key, desc }) => (
+                                                        <li key={key} className="flex justify-between">
+                                                            <span
+                                                                className="flex items-center cursor-pointer hover:text-[#FC9D25] space-x-1"
+                                                                onClick={() => copyToClipboard(key)}
+                                                                onMouseEnter={() => setHoveredVar(key)}
+                                                                onMouseLeave={() => setHoveredVar(null)}
+                                                                title="Clique para copiar"
+                                                            >
+                                                                <span>{key}</span>
+                                                                {hoveredVar === key && <IoCopy size={16} />}
+                                                            </span>
+                                                            <span>{desc}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+
+                                            {/* Detalhes do hotel */}
+                                            <div>
+                                                <h3 className="font-semibold mb-2">{t.modals.propertiesEdit.stay.hotelDetails.title}</h3>
+                                                <ul className="space-y-2">
+                                                    {hotelDetails.map(({ key, desc }) => (
+                                                        <li key={key} className="flex justify-between">
+                                                            <span
+                                                                className="flex items-center cursor-pointer hover:text-[#FC9D25] space-x-1"
+                                                                onClick={() => copyToClipboard(key)}
+                                                                onMouseEnter={() => setHoveredVar(key)}
+                                                                onMouseLeave={() => setHoveredVar(null)}
+                                                                title="Clique para copiar"
+                                                            >
+                                                                <span>{key}</span>
+                                                                {hoveredVar === key && <IoCopy size={16} />}
+                                                            </span>
+                                                            <span>{desc}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                            </Tab>
+                        )}
                     </Tabs>
 
                     {/* Exibição de erro */}
