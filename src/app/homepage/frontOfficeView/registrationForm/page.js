@@ -55,6 +55,8 @@ export default function Page() {
     const [hotelTermsES, setHotelTermsES] = useState("");
     const [hotelTerms, setHotelTerms] = useState(""); // Estado dinâmico para exibição
 
+    console.log(hotelTermsEN, hotelTermsPT, hotelTermsES);
+    
     const [hotelNIF, setHotelNIF] = useState('');
     const [hotelPhone, setHotelPhone] = useState('');
     const [hotelEmail, setHotelEmail] = useState('');
@@ -562,6 +564,7 @@ export default function Page() {
     const [miniTermsEN, setMiniTermsEN] = useState("");
     const [miniTermsES, setMiniTermsES] = useState("");
 
+    console.log(termsAndCondEN, termsAndCondES, termsAndCondPT, privacyPolicyEN, privacyPolicyES, privacyPolicyPT);
     // Novos estados dinâmicos para exibir o conteúdo com base no idioma
     const [termsToDisplay, setTermsToDisplay] = useState("");
     const [privacyToDisplay, setPrivacyToDisplay] = useState("");
