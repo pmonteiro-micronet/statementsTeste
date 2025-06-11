@@ -55,6 +55,8 @@ export default function Page() {
     const [hotelTermsES, setHotelTermsES] = useState("");
     const [hotelTerms, setHotelTerms] = useState(""); // Estado dinâmico para exibição
 
+    console.log(hotelTermsEN, hotelTermsPT, hotelTermsES);
+    
     const [hotelNIF, setHotelNIF] = useState('');
     const [hotelPhone, setHotelPhone] = useState('');
     const [hotelEmail, setHotelEmail] = useState('');
@@ -106,9 +108,9 @@ export default function Page() {
 
         // Atualiza os termos do hotel conforme o idioma selecionado
         setHotelTerms(
-            lang === "en" ? hotelTermsEN :
-                lang === "pt" ? hotelTermsPT :
-                    hotelTermsES
+            lang === "en" ? miniTermsEN :
+                lang === "pt" ? miniTermsPT :
+                    miniTermsES
         );
     };
 
@@ -162,10 +164,10 @@ export default function Page() {
         : '-';
 
     //botoes que mudam de cor
-    const halfInputStyle = "w-10 h-4 outline-none my-2 text-sm !text-textLabelColor bg-cardColor input-field"
-    const inputStyle = "w-32 h-4 outline-none my-2 text-sm !text-textLabelColor bg-cardColor input-field"
-    const inputStyleFull = "w-full h-4 outline-none my-2 text-sm !text-textLabelColor bg-cardColor input-field"
-    const inputStyleFullWithLine = "w-full border-b-2 border-gray-200 px-1 h-4 outline-none my-2 text-sm !text-textLabelColor bg-cardColor input-field"
+    const halfInputStyle = "w-10 h-4 outline-none my-2 text-sm !text-textLabelColor bg-transparent input-field"
+    const inputStyle = "w-32 h-4 outline-none my-2 text-sm !text-textLabelColor bg-transparent input-field"
+    const inputStyleFull = "w-full h-4 outline-none my-2 text-sm !text-textLabelColor bg-transparent input-field"
+    const inputStyleFullWithLine = "w-full border-b-2 border-gray-200 px-1 h-4 outline-none my-2 text-sm !text-textLabelColor bg-transparent input-field"
 
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search);
@@ -537,16 +539,6 @@ export default function Page() {
         setIsModalOpen(false);
     };
 
-    useEffect(() => {
-        if (locale === "en") {
-            setHotelTerms(hotelTermsEN);
-        } else if (locale === "pt") {
-            setHotelTerms(hotelTermsPT);
-        } else {
-            setHotelTerms(hotelTermsES);
-        }
-    }, [locale, hotelTermsEN, hotelTermsPT, hotelTermsES]);
-
     const [activeKey, setActiveKey] = useState("individual");
 
     useEffect(() => {
@@ -568,7 +560,11 @@ export default function Page() {
     const [privacyPolicyEN, setPrivacyPolicyEN] = useState("");
     const [privacyPolicyES, setPrivacyPolicyES] = useState("");
 
-    console.log(termsAndCondPT, termsAndCondEN, termsAndCondES, privacyPolicyPT, privacyPolicyEN, privacyPolicyES);
+    const [miniTermsPT, setMiniTermsPT] = useState("");
+    const [miniTermsEN, setMiniTermsEN] = useState("");
+    const [miniTermsES, setMiniTermsES] = useState("");
+
+    console.log(termsAndCondEN, termsAndCondES, termsAndCondPT, privacyPolicyEN, privacyPolicyES, privacyPolicyPT);
     // Novos estados dinâmicos para exibir o conteúdo com base no idioma
     const [termsToDisplay, setTermsToDisplay] = useState("");
     const [privacyToDisplay, setPrivacyToDisplay] = useState("");
@@ -583,7 +579,7 @@ export default function Page() {
             try {
                 const response = await axios.get(`/api/properties/hotelTerms/${propertyID}`);
                 const property = response.data.response[0];
-
+                console.log("Detalhes da propriedade:", property);
                 if (property) {
                     const {
                         termsAndCondPT,
@@ -592,6 +588,9 @@ export default function Page() {
                         privacyPolicyPT,
                         privacyPolicyEN,
                         privacyPolicyES,
+                        miniTermsPT,
+                        miniTermsEN,
+                        miniTermsES,
                     } = property;
 
                     // Atualiza os estados base (caso precise)
@@ -601,6 +600,9 @@ export default function Page() {
                     setPrivacyPolicyPT(privacyPolicyPT);
                     setPrivacyPolicyEN(privacyPolicyEN);
                     setPrivacyPolicyES(privacyPolicyES);
+                    setMiniTermsPT(miniTermsPT);
+                    setMiniTermsEN(miniTermsEN);
+                    setMiniTermsES(miniTermsES);
 
                     // Atualiza os textos com base no idioma
                     const terms =
@@ -623,6 +625,16 @@ export default function Page() {
 
         fetchPropertyDetails();
     }, [propertyID, locale]);
+
+    useEffect(() => {
+        if (locale === "en") {
+            setHotelTerms(miniTermsEN);
+        } else if (locale === "pt") {
+            setHotelTerms(miniTermsPT);
+        } else {
+            setHotelTerms(miniTermsES);
+        }
+    }, [locale, miniTermsEN, miniTermsPT, miniTermsES]);
 
     return (
         <div className='bg-background main-page min-h-screen'>

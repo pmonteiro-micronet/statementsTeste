@@ -54,6 +54,7 @@ module.exports = {
           primaryBackground: "#141414",
           background: "#1a1a1a",
           textPrimaryColor: "#FAFAFA",
+          buttonModalPrimaryColor: "#000000",
           textLabelColor: "#ebebeb",
           textSecondaryLabelColor: "#f5f5f5",
           cardColor: "#403f3f",
