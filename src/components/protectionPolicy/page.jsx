@@ -18,7 +18,7 @@ const ProtectionPolicyForm = ({
     return (<>
         {formTypeModal === 11 && ( //characteristics insert
             (<>
-                <Button onPress={onOpen} color={buttonColor} className="w-fit h-6 bg-[#DFEDB6]">
+                <Button onPress={onOpen} color={buttonColor} className="w-fit h-6 bg-[#DFEDB6] text-buttonModalPrimaryColor">
                     {buttonName} {buttonIcon}
                 </Button>
                 <Modal
@@ -40,11 +40,10 @@ const ProtectionPolicyForm = ({
                                             <Button color="transparent" variant="light" className={"w-auto min-w-0 p-0 m-0 -pr-4"} onClick={() => { onClose() }}><MdClose size={30} /></Button>
                                         </div>
                                     </ModalHeader>
-                                    <ModalBody className="flex flex-col mx-5 my-5 space-y-8 max-h-96 overflow-y-auto bg-white text-textPrimaryColor">
+                                    <ModalBody className="flex flex-col mx-5 my-5 space-y-8 max-h-96 overflow-y-auto bg-background text-textPrimaryColor">
                                         <p>{content}</p>
                                     </ModalBody>
                                 </form>
-
                             </>
                         )}
                     </ModalContent>

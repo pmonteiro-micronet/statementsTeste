@@ -15,7 +15,7 @@ model properties {
   propertyServer   String            @db.VarChar(40)
   propertyPort     String?           @db.VarChar(10)
   mpehotel         Int?
-  hotelName        String?           @db.VarChar(255)
+  hotelName        String?           @db.VarChar(100)
   hotelTermsEN     String?           @db.VarChar(2048)
   hotelPhone       String?           @db.VarChar(20)
   hotelEmail       String?           @db.VarChar(255)
@@ -31,10 +31,10 @@ model properties {
   hasStay          Boolean           @default(false)
   replyEmail       String?           @db.VarChar(255)
   replyPassword    String?           @db.VarChar(255)
-  sendingServer    String?           @db.VarChar(2048)
+  sendingServer    String?           @db.VarChar(100)
   sendingPort      Int?
   infoEmail        String?           @db.VarChar(255)
-  emailBody        String?           @default("") @db.VarChar(1055)
+  emailBody        String?           @default("") @db.VarChar(4000)
   emailSubject     String?           @default("") @db.VarChar(255)
   privacyPolicyEN  String?           @default("") @db.VarChar(1000)
   privacyPolicyPT  String?           @default("") @db.VarChar(1000)
@@ -138,4 +138,7 @@ model hotelTerms {
   privacyPolicyPT String? @db.VarChar(2000)
   privacyPolicyEN String? @db.VarChar(2000)
   privacyPolicyES String? @db.VarChar(2000)
+  miniTermsPT     String? @db.VarChar(1200)
+  miniTermsEN     String? @db.VarChar(1200)
+  miniTermsES     String? @db.VarChar(1200)
 }
