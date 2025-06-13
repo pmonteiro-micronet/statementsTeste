@@ -120,17 +120,17 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
             setErrorMessage("O nome da empresa é obrigatório.");
             return;
         }
-    
+
         if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
             setErrorMessage("Por favor, insira um e-mail válido.");
             return;
         }
-    
+
         // Substituir valores vazios por um espaço em branco
         const formattedData = Object.fromEntries(
             Object.entries(formData).map(([key, value]) => [key, String(value).trim() === "" ? " " : String(value).trim()])
-        );        
-    
+        );
+
         try {
             const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVAT", {
                 profileID,
@@ -140,7 +140,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                 countryName: formData.countryName,
                 ...formattedData // Enviar os dados formatados
             });
-    
+
             console.log("Success:", response.data);
             setErrorMessage("");
             setIsDataModified(false);
@@ -149,7 +149,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
             console.error("Erro ao salvar informações de VAT:", error);
             setErrorMessage("Falha ao salvar. Por favor, tente novamente.");
         }
-    };    
+    };
 
     const handleCloseModal = () => {
         if (isDataModified) {
@@ -168,104 +168,115 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
     }, []); // Chamar apenas uma vez ao montar o componente
 
     return (
-        <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="lg" hideCloseButton={true}>
+        <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
             <ModalContent>
                 {() => (
                     <>
-                        <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white">
+                        <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white h-12">
                             Criar Novo Número de VAT da Empresa
                             <Button color="transparent" variant="light" onClick={handleCloseModal} className="w-auto min-w-0 p-0 m-0">
                                 <MdClose size={30} />
                             </Button>
                         </ModalHeader>
                         <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
-                            <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">Company Name:</label>
-                                <input
-                                    ref={inputRef}
-                                    type="text"
-                                    name="companyName"
-                                    value={formData.companyName}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">E-mail:</label>
-                                <input
-                                    type="text"
-                                    name="emailAddress"
-                                    value={formData.emailAddress}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium">Country:</label>
-                                <Select
-                                    options={countryOptions}
-                                    value={countryOptions.find(option => option.value === formData.country)}
-                                    onChange={handleCountryChange}
-                                    isSearchable
-                                    styles={customStyles}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">VAT No.:</label>
-                                <input
-                                    type="text"
-                                    name="vatNo"
-                                    value={formData.vatNo}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                />
-                                {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">Street Address:</label>
-                                <input
-                                    type="text"
-                                    name="streetAddress"
-                                    value={formData.streetAddress}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                />
-                            </div>
-                            <div className="flex space-x-4">
-                                <div className="flex-1">
-                                    <label className="block text-sm font-medium text-textPrimaryColor">Zip Code:</label>
-                                    <input
-                                        type="text"
-                                        name="zipCode"
-                                        value={formData.zipCode}
-                                        onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                    />
+                            <div className="grid grid-cols-3 gap-4 items-start">
+                                <div className="flex flex-col gap-2">
+                                    <div>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">Company Name:</label>
+                                        <input
+                                            ref={inputRef}
+                                            type="text"
+                                            name="companyName"
+                                            value={formData.companyName}
+                                            onChange={handleChange}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">E-mail:</label>
+                                        <input
+                                            type="text"
+                                            name="emailAddress"
+                                            value={formData.emailAddress}
+                                            onChange={handleChange}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium">Country:</label>
+                                        <Select
+                                            options={countryOptions}
+                                            value={countryOptions.find(option => option.value === formData.country)}
+                                            onChange={handleCountryChange}
+                                            isSearchable
+                                            styles={customStyles}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="flex-1">
-                                    <label className="block text-sm font-medium text-textPrimaryColor">City:</label>
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        value={formData.city}
-                                        onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                    />
+
+                               <div className="flex flex-col gap-2">
+                                    <div>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">VAT No.:</label>
+                                        <input
+                                            type="text"
+                                            name="vatNo"
+                                            value={formData.vatNo}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                        />
+                                        {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">Street Address:</label>
+                                        <input
+                                            type="text"
+                                            name="streetAddress"
+                                            value={formData.streetAddress}
+                                            onChange={handleChange}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                        />
+                                    </div>
+
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-medium text-textPrimaryColor">Zip Code:</label>
+                                        <input
+                                            type="text"
+                                            name="zipCode"
+                                            value={formData.zipCode}
+                                            onChange={handleChange}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col gap-2">
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-medium text-textPrimaryColor">City:</label>
+                                        <input
+                                            type="text"
+                                            name="city"
+                                            value={formData.city}
+                                            onChange={handleChange}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">State:</label>
+                                        <input
+                                            type="text"
+                                            name="state"
+                                            value={formData.state}
+                                            onChange={handleChange}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-textPrimaryColor">State:</label>
-                                <input
-                                    type="text"
-                                    name="state"
-                                    value={formData.state}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                />
-                            </div>
-                            {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
-                            <div className="flex justify-end space-x-2">
+
+                            {errorMessage && <p className="text-red-500 text-xs -mt-4">{errorMessage}</p>}
+                            <div className="flex justify-end space-x-2 -mt-4">
                                 <Button color="error" onClick={handleCloseModal}>Cancelar</Button>
                                 <Button color="primary" onClick={handleSave}>Salvar</Button>
                             </div>

@@ -132,7 +132,7 @@
         },
         "registrationForm": {
             "title": "Formulario de Registro",
-            "stayDetails": "Detalles de la Estancia",
+            "stayDetails": "Detalles",
             "resNo": "N.º Res.",
             "room": "Habitación",
             "roomType": "Tipo de Habitación",

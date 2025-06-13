@@ -697,7 +697,7 @@ const JsonViewPage = () => {
               <div className="flex gap-3 items-center">
                 <CancelPIN
                   buttonName={t.jsonView.cancel}
-                  buttonColor={"transparent"}
+                  buttonColor={"background"}
                   modalHeader={t.jsonView.insertPin}
                   formTypeModal={11}
                   editor={"teste"}

@@ -62,13 +62,14 @@ const EditRegistrationForm = ({ currentLabel, currentValue, onSave, onClose, val
             isOpen={true}
             onOpenChange={onClose}
             className="z-50"
-            size="lg"
+            size="xl"
             hideCloseButton={true}
+            isDismissable={false}
         >
             <ModalContent>
                 {(onCloseModal) => (
                     <>
-                        <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white">
+                        <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white h-12">
                             Edit {currentLabel}
                             <Button
                                 color="transparent"
@@ -79,7 +80,7 @@ const EditRegistrationForm = ({ currentLabel, currentValue, onSave, onClose, val
                                 <MdClose size={30} />
                             </Button>
                         </ModalHeader>
-                        <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor">
+                        <ModalBody className="flex flex-col mx-2 my-2 space-y-2 text-textPrimaryColor">
                             <div>
                                 <label className="block text-sm font-medium text-gray-400">{`Current ${currentLabel}:`}</label>
                                 <input
