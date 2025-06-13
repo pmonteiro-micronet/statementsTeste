@@ -165,7 +165,7 @@ export default function Page() {
 
     //botoes que mudam de cor
     const halfInputStyle = "w-10 h-4 outline-none my-2 text-sm !text-textLabelColor bg-transparent input-field"
-    const inputStyle = "w-32 h-4 outline-none my-2 text-sm !text-textLabelColor bg-transparent input-field"
+    // const inputStyle = "w-32 h-4 outline-none my-2 text-sm !text-textLabelColor bg-transparent input-field"
     const inputStyleFull = "w-full h-4 outline-none my-2 text-sm !text-textLabelColor bg-transparent input-field"
     const inputStyleFullWithLine = "w-full border-b-2 border-gray-200 px-1 h-4 outline-none my-2 text-sm !text-textLabelColor bg-transparent input-field"
 
