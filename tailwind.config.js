@@ -28,6 +28,7 @@ module.exports = {
           background: "#FAFAFA",
           foreground: "#001517",
           textPrimaryColor: "#000000",
+          buttonModalPrimaryColor: "#000000",
           textLabelColor: "#404040",
           textSecondaryLabelColor: "#363636",
           cardColor: "#FFFFFF",

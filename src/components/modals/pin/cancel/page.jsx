@@ -117,7 +117,7 @@ const CancelPIN = ({
                         color={buttonColor}
                         size="ms"
                         onClick={onOpen}
-                        className={`font-semibold p-2 rounded-lg w-2 text-black ${buttonColor || "bg-gray-300"} ${buttonStyle}`}
+                        className={`font-semibold p-2 rounded-lg w-2 text-buttonModalPrimaryColor ${buttonColor || "bg-gray-300"} ${buttonStyle}`}
                     >
                         {buttonName} {buttonIcon}
                     </Button>
@@ -125,7 +125,7 @@ const CancelPIN = ({
                         isOpen={isOpen}
                         hideCloseButton={true}
                         onOpenChange={handleModalOpenChange}
-                        isDismissable={true}
+                        isDismissable={false}
                         isKeyboardDismissDisabled={false}
                         className="z-50"
                         size="sm"
@@ -144,17 +144,26 @@ const CancelPIN = ({
                                         </div>
                                     </ModalHeader>
                                     <ModalBody className="flex flex-col mx-5 my-2">
-                                        <input
-                                            type="password"
-                                            value={pin}
-                                            autoFocus={autoFocusEnabled}
-                                            onChange={(e) => {
-                                                setPin(e.target.value);
-                                                setIsPinError(false); // Reseta o erro ao digitar
-                                            }}
-                                            className="border border-gray-300 p-2 w-full text-center mb-4 text-textPrimaryColor"
-                                            placeholder="• • • •"
-                                        />
+                                        <div className="flex flex-row gap-2">
+                                            <input
+                                                type="password"
+                                                value={pin}
+                                                autoFocus={autoFocusEnabled}
+                                                onChange={(e) => {
+                                                    setPin(e.target.value);
+                                                    setIsPinError(false); // Reseta o erro ao digitar
+                                                }}
+                                                className="border border-gray-300 p-2 w-full text-center mb-4 text-textPrimaryColor"
+                                                placeholder="• • • •"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={handleCancelPinSubmit}
+                                                className="w-24 h-10 rounded bg-primary text-white text-center font-bold"
+                                            >
+                                                OK
+                                            </button>
+                                        </div>
 
                                         {isPinError && (
                                             <p className="text-red-500 -mt-4">
@@ -162,7 +171,7 @@ const CancelPIN = ({
                                             </p>
                                         )}
 
-                                        <div className="grid grid-cols-3 gap-2">
+                                        {/* <div className="grid grid-cols-3 gap-2">
                                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "OK"].map((key) => (
                                                 <button
                                                     key={key}
@@ -178,13 +187,13 @@ const CancelPIN = ({
                                                             setIsPinError(false);
                                                         }
                                                     }}
-                                                    className={`p-4 rounded ${key === "C" ? "bg-mediumGray text-textPrimaryColor" : key === "OK" ? "bg-primary text-white" : "bg-lightGray text-textPrimaryColor"
+                                                    className={`w-24 h-24 rounded ${key === "C" ? "bg-mediumGray text-textPrimaryColor" : key === "OK" ? "bg-primary text-white" : "bg-lightGray text-textPrimaryColor"
                                                         } text-center font-bold`}
                                                 >
                                                     {key}
                                                 </button>
                                             ))}
-                                        </div>
+                                        </div> */}
                                     </ModalBody>
                                 </form>
                             )}

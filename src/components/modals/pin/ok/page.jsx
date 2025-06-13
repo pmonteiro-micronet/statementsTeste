@@ -56,18 +56,18 @@ const OkPIN = ({
         checkSession();
     }, [session, status, router]);
 
-      const [selectedHotelID, setSelectedHotelID] = useState(""); // Estado do Hotel ID
-    
-        // Recupera o Hotel ID do localStorage ao carregar a página
-        useEffect(() => {
-            const savedHotelID = localStorage.getItem("selectedHotelID"); // Busca o ID salvo
-            if (savedHotelID) {
-                setSelectedHotelID(savedHotelID); // Define o ID no estado
-            } else {
-                setSelectedHotelID("defaultHotelID"); // ID padrão, caso não haja nenhum salvo
-            }
-        }, []); // Executa apenas uma vez no carregamento
-        
+    const [selectedHotelID, setSelectedHotelID] = useState(""); // Estado do Hotel ID
+
+    // Recupera o Hotel ID do localStorage ao carregar a página
+    useEffect(() => {
+        const savedHotelID = localStorage.getItem("selectedHotelID"); // Busca o ID salvo
+        if (savedHotelID) {
+            setSelectedHotelID(savedHotelID); // Define o ID no estado
+        } else {
+            setSelectedHotelID("defaultHotelID"); // ID padrão, caso não haja nenhum salvo
+        }
+    }, []); // Executa apenas uma vez no carregamento
+
     const handlePinSubmit = async (e) => {
         if (e) e.preventDefault();
         // Captura os parâmetros da URL
@@ -122,7 +122,7 @@ const OkPIN = ({
                         isOpen={isOpen}
                         hideCloseButton={true}
                         onOpenChange={handleModalOpenChange}
-                        isDismissable={true}
+                        isDismissable={false}
                         isKeyboardDismissDisabled={false}
                         className="z-50"
                         size="sm"
@@ -141,29 +141,40 @@ const OkPIN = ({
                                         </div>
                                     </ModalHeader>
                                     <ModalBody className="flex flex-col mx-5 my-2">
-                                        <input
-                                            type="password"
-                                            value={pin}
-                                            autoFocus={autoFocusEnabled}
-                                            onChange={(e) => {
-                                                setPin(e.target.value);
-                                                setIsPinError(false); // Reseta o erro ao digitar
-                                            }}
-                                            className="border border-gray-300 p-2 w-full text-center mb-4 text-textPrimaryColor"
-                                            placeholder="• • • •"
-                                        />
+                                        <div className="flex flex-row gap-2">
+                                            <input
+                                                type="password"
+                                                value={pin}
+                                                autoFocus={autoFocusEnabled}
+                                                onChange={(e) => {
+                                                    setPin(e.target.value);
+                                                    setIsPinError(false); // Reseta o erro ao digitar
+                                                }}
+                                                className="border border-gray-300 p-2 w-full text-center mb-4 text-textPrimaryColor"
+                                                placeholder="• • • •"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={handlePinSubmit}
+                                                className="w-24 h-10 rounded bg-primary text-white text-center font-bold"
+                                            >
+                                                OK
+                                            </button>
+                                        </div>
+
                                         {isPinError && (
                                             <p className="text-red-500 -mt-4">
                                                 Incorrect PIN. Try again.
                                             </p>
                                         )}
 
-                                        <div className="grid grid-cols-3 gap-2">
+                                        {/* <div className="grid grid-cols-3 gap-2">
                                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, "C", 0, "OK"].map((key) => (
                                                 <button
                                                     key={key}
                                                     type="button"
-                                                    onClick={() => {
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // Evita que o clique "suba" e seja ignorado
                                                         if (key === "C") {
                                                             setPin("");
                                                             setIsPinError(false);
@@ -180,7 +191,7 @@ const OkPIN = ({
                                                     {key}
                                                 </button>
                                             ))}
-                                        </div>
+                                        </div> */}
                                     </ModalBody>
                                 </form>
                             )}

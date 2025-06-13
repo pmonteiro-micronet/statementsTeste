@@ -56,7 +56,7 @@ export default function Page() {
     const [hotelTerms, setHotelTerms] = useState(""); // Estado dinâmico para exibição
 
     console.log(hotelTermsEN, hotelTermsPT, hotelTermsES);
-    
+
     const [hotelNIF, setHotelNIF] = useState('');
     const [hotelPhone, setHotelPhone] = useState('');
     const [hotelEmail, setHotelEmail] = useState('');
@@ -748,15 +748,15 @@ export default function Page() {
                                             <h3 className='text-[#f7ba83]'>{t.frontOffice.registrationForm.resNo}: {reserva.ResNo}</h3>
                                         </div>
                                         {/** Info do quarto */}
-                                        <div className='flex flex-row gap-5 mt-2'>
+                                        <div className='flex flex-row gap-4 mt-2'>
                                             <InputFieldControlled
                                                 type={"text"}
-                                                id={"de"}
-                                                name={"De"}
+                                                id={"room"}
+                                                name={"Room"}
                                                 label={t.frontOffice.registrationForm.room}
-                                                ariaLabel={"De:"}
+                                                ariaLabel={"Room:"}
                                                 value={reserva.Room}
-                                                style={inputStyle}
+                                                style={halfInputStyle}
                                             />
                                             <InputFieldControlled
                                                 type={"text"}
@@ -788,7 +788,7 @@ export default function Page() {
                                                 />
                                             </div>
                                         </div>
-                                        <div className='flex flex-row justify-start gap-5 mt-2'>
+                                        <div className='flex flex-row justify-between mt-2'>
                                             <InputFieldControlled
                                                 type={"date"}
                                                 id={"Arrival"}
@@ -796,7 +796,7 @@ export default function Page() {
                                                 label={t.frontOffice.registrationForm.arrival}
                                                 ariaLabel={"Arrival:"}
                                                 value={reserva.DateCI}
-                                                style={inputStyle}
+                                                style={inputStyleFull}
                                             />
                                             <InputFieldControlled
                                                 type={"text"}
@@ -814,7 +814,7 @@ export default function Page() {
                                                 label={t.frontOffice.registrationForm.departure}
                                                 ariaLabel={"Departure:"}
                                                 value={reserva.DateCO}
-                                                style={inputStyle}
+                                                style={inputStyleFull}
                                             />
                                         </div>
                                     </div>
