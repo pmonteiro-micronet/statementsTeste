@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import { Tabs, Tab } from "@heroui/react";
