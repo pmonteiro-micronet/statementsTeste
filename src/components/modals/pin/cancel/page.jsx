@@ -153,7 +153,7 @@ const CancelPIN = ({
                                     <ModalBody className="flex flex-col mx-5 my-2">
                                         <div className="flex flex-row gap-2">
                                             <input
-                                                type="tel"
+                                                type="password"
                                                 inputMode="numeric"
                                                 pattern="[0-9]*"
                                                 ref={inputRef}

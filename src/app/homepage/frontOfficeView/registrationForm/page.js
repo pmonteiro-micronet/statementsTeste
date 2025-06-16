@@ -1279,12 +1279,6 @@ export default function Page() {
                                             resNo={reserva.ResNo}
                                         />
                                     )}
-                                    <CompanyVATFormInsert
-                                            onClose={() => setIsCVATModalOpenInsert(false)}
-                                            profileID={guestInfo.ProfileID}
-                                            propertyID={propertyID}
-                                            resNo={reserva.ResNo}
-                                        />
                                 </div>
                             </div>
                         )}
