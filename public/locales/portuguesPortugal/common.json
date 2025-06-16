@@ -401,6 +401,21 @@
                     "Email": "Email"
                 }
             }
+        },
+        "companyInfo": {
+            "insert": "Criar novo número de IVA da empresa",
+            "update": "Atualizar empresa",
+            "companyName": "Nome da empresa:",
+            "vatNO": "N.º de IVA:",
+            "streetAddress": "Morada:",
+            "zipCode": "Código postal:",
+            "city": "Cidade:",
+            "state": "Distrito:",
+            "country": "País:",
+            "email": "E-mail:",
+            "cancel": "Cancelar",
+            "save": "Guardar",
+            "countryError": "Erro ao carregar os países."
         }
     },
     "pagination": {

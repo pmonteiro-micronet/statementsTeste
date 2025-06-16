@@ -400,6 +400,21 @@
                     "Email": "Email"
                 }
             }
+        },
+        "companyInfo": {
+            "insert": "Create New Company VAT Number",
+            "update": "Update Company",
+            "companyName": "Company Name:",
+            "vatNO": "VAT No.:",
+            "streetAddress": "Street Address:",
+            "zipCode": "Zip Code:",
+            "city": "City:",
+            "state": "State:",
+            "country": "Country:",
+            "email": "E-mail:",
+            "cancel": "Cancel",
+            "save": "Save",
+            "countryError": "Error loading countries."
         }
     },
     "pagination": {

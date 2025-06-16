@@ -6,6 +6,12 @@ import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/rea
 import { MdClose } from "react-icons/md";
 import LoadingBackdrop from "@/components/Loader/page";
 
+import en from "../../../../../../../public/locales/english/common.json";
+import pt from "../../../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
+
 const customStyles = {
     control: (provided) => ({
         ...provided,
@@ -44,6 +50,19 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
     useEffect(() => {
         if (inputRef.current) inputRef.current.focus();
     }, []);
+
+     const [locale, setLocale] = useState("pt");
+    
+        useEffect(() => {
+            // Carregar o idioma do localStorage
+            const storedLanguage = localStorage.getItem("language");
+            if (storedLanguage) {
+                setLocale(storedLanguage);
+            }
+        }, []);
+    
+        // Carregar as traduções com base no idioma atual
+        const t = translations[locale] || translations["pt"];
 
     // 🔹 Buscar lista de países da API
     useEffect(() => {
@@ -145,7 +164,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 {(onCloseModal) => (
                     <>
                         <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white">
-                            Atualizar Empresa
+                            {t.modals.companyInfo.update}
                             <Button color="transparent" variant="light" onClick={onCloseModal} className="w-auto min-w-0 p-0 m-0">
                                 <MdClose size={30} />
                             </Button>
@@ -154,7 +173,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                             <div className="flex flex-col">
                                 <div className="flex flex-row gap-2 mb-0.5 items-center">
                                     <div className="w-2/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">Company Name:</label>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.companyName}</label>
                                         <input
                                             ref={inputRef}
                                             type="text"
@@ -165,7 +184,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                         />
                                     </div>
                                     <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">VAT No.:</label>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.vatNO}</label>
                                         <input
                                             type="text"
                                             name="vatNo"
@@ -180,7 +199,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
 
                                 <div className="flex flex-row gap-2 mb-0.5 items-center">
                                     <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">Street Address:</label>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.streetAddress}</label>
                                         <input
                                             type="text"
                                             name="streetAddress"
@@ -191,7 +210,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                     </div>
 
                                     <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">Zip Code:</label>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.zipCode}</label>
                                         <input
                                             type="text"
                                             name="zipCode"
@@ -201,7 +220,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                         />
                                     </div>
                                     <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">City:</label>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.city}</label>
                                         <input
                                             type="text"
                                             name="city"
@@ -214,7 +233,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                     <div className="flex flex-row gap-2 mb-0.5 items-center">
 
                                         <div className="w-1/3">
-                                            <label className="block text-sm font-medium text-textPrimaryColor">State:</label>
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.state}</label>
                                             <input
                                                 type="text"
                                                 name="state"
@@ -224,7 +243,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                             />
                                         </div>
                                         <div className="w-1/3">
-                                            <label className="block text-sm font-medium">Country:</label>
+                                            <label className="block text-sm font-medium">{t.modals.companyInfo.country}</label>
                                             <Select
                                                 options={countryOptions}
                                                 value={countryOptions.find(option => option.value === formData.country) || null}
@@ -237,7 +256,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
 
                                     <div className="flex flex-row">
                                         <div className="w-full">
-                                            <label className="block text-sm font-medium text-textPrimaryColor">E-mail:</label>
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.email}</label>
                                             <input
                                                 type="text"
                                                 name="emailAddress"
@@ -252,8 +271,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
 
                             {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
                             <div className="flex justify-end space-x-2">
-                                <Button color="error" onClick={onCloseModal}>Cancelar</Button>
-                                <Button color="primary" onClick={handleSave}>Salvar</Button>
+                                <Button color="error" onClick={onCloseModal}>{t.modals.companyInfo.cancel}</Button>
+                                <Button color="primary" onClick={handleSave}>{t.modals.companyInfo.save}</Button>
                             </div>
                         </ModalBody>
                     </>
