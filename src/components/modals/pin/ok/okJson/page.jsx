@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button, useDisclosure } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import axios from "axios";
@@ -6,12 +6,12 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import bcrypt from "bcryptjs";
 
-const isDesktop = () => {
-    if (typeof window !== "undefined") {
-        return window.innerWidth >= 2000;
-    }
-    return false;
-};
+// const isDesktop = () => {
+//     if (typeof window !== "undefined") {
+//         return window.innerWidth >= 2000;
+//     }
+//     return false;
+// };
 
 const OkPIN = ({ isModalOpen, setIsModalOpen }) => {
     const [pin, setPin] = useState("");
@@ -20,12 +20,14 @@ const OkPIN = ({ isModalOpen, setIsModalOpen }) => {
     const router = useRouter();
     const { data: session, status } = useSession();
     const [propertyID, setPropertyID] = useState("");
-    const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
+    // const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
     const { onOpenChange } = useDisclosure();
     console.log(propertyID, onOpenChange);
-    useEffect(() => {
-        setAutoFocusEnabled(isDesktop());
-    }, []);
+    const inputRef = useRef(null);
+
+    // useEffect(() => {
+    //     setAutoFocusEnabled(isDesktop());
+    // }, []);
 
     useEffect(() => {
         const checkSession = async () => {
@@ -76,6 +78,12 @@ const OkPIN = ({ isModalOpen, setIsModalOpen }) => {
         setIsPinError(false);
     };
 
+    useEffect(() => {
+        if (isOpen && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [isOpen]);
+
     return (
         isModalOpen && (
             <Modal
@@ -108,12 +116,14 @@ const OkPIN = ({ isModalOpen, setIsModalOpen }) => {
                             <ModalBody className="flex flex-col mx-5 my-2">
                                 <div className="flex flex-row gap-2">
                                     <input
-                                        type="password"
+                                        type="tel"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        ref={inputRef}
                                         value={pin}
-                                        autoFocus={autoFocusEnabled}
                                         onChange={(e) => {
                                             setPin(e.target.value);
-                                            setIsPinError(false); // Reseta o erro ao digitar
+                                            setIsPinError(false);
                                         }}
                                         className="border border-gray-300 p-2 w-full text-center mb-4 text-textPrimaryColor"
                                         placeholder="• • • •"

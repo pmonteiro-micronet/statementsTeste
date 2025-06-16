@@ -8,7 +8,6 @@ import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
-import Image from "next/image";
 
 import { FaCircleXmark, FaCircleExclamation } from "react-icons/fa6";
 import { FaQuestionCircle, FaCheckCircle, FaBed } from "react-icons/fa";
@@ -25,6 +24,8 @@ import { useRouter } from "next/navigation";
 import dayjs from 'dayjs';
 
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
+
+import { MdCleanHands } from "react-icons/md";
 
 const translations = { en, pt, es };
 
@@ -382,9 +383,7 @@ export default function Arrivals({ params }) {
                       </div>
                     </td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
-                      <div className="flex items-center justify-center">
-                        <Image src="/tableIcons/janitor.png" width={25} height={25} alt="housekeeper" />
-                      </div>
+                      <MdCleanHands size={18} color="white" />
                     </td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.lastName}</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.firstName}</td>
@@ -400,14 +399,14 @@ export default function Arrivals({ params }) {
                   {items.map((reserva, index) => {
                     return (
                       <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
-                        <td className="pl-1 flex items-start border-r border-[#e6e6e6] relative z-10">
+                        <td className="pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center cursor-pointer">
                           <Dropdown>
                             <DropdownTrigger>
                               <Button
                                 variant="light"
-                                className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
+                                className="flex justify-center items-center w-full h-full min-w-0 p-0 m-0"
                               >
-                                <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
+                                <BsThreeDotsVertical size={25} className="text-textPrimaryColor" />
                               </Button>
                             </DropdownTrigger>
                             <DropdownMenu
@@ -458,7 +457,7 @@ export default function Arrivals({ params }) {
                           <ArrivalInfoForm
                             buttonName={"Info"}
                             buttonColor={"transparent"}
-                            modalHeader={"Reservation"}
+                            modalHeader={t.frontOffice.infoModal.arrival.reservation.title}
                             formTypeModal={11}
                             roomNumber={reserva.Room}  // Passando o roomNumber
                             dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)

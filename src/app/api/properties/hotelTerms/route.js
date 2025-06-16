@@ -28,7 +28,10 @@ export async function POST(req) {
       termsAndCondES,
       privacyPolicyEN,
       privacyPolicyPT,
-      privacyPolicyES
+      privacyPolicyES,
+      miniTermsEN,
+      miniTermsPT,
+      miniTermsES
     } = body;
 
     if (!propertyID) {
@@ -55,7 +58,10 @@ export async function POST(req) {
           termsAndCondES,
           privacyPolicyEN,
           privacyPolicyPT,
-          privacyPolicyES
+          privacyPolicyES,
+          miniTermsEN,
+          miniTermsPT,
+          miniTermsES
         },
       });
     } else {
@@ -68,7 +74,10 @@ export async function POST(req) {
           termsAndCondES,
           privacyPolicyEN,
           privacyPolicyPT,
-          privacyPolicyES
+          privacyPolicyES,
+          miniTermsEN,
+          miniTermsPT,
+          miniTermsES
         },
       });
     }
