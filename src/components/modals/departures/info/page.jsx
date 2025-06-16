@@ -1,8 +1,14 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import { Tabs, Tab } from "@heroui/react";
+
+import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
 
 const DepartureInfoForm = ({
     modalHeader,
@@ -25,6 +31,20 @@ const DepartureInfoForm = ({
     isOpen,
     onClose,
 }) => {
+
+    const [locale, setLocale] = useState("pt");
+
+    useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+        }
+    }, []);
+
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
+
     return (
         <>
             {formTypeModal === 11 && (
@@ -36,7 +56,7 @@ const DepartureInfoForm = ({
                     isKeyboardDismissDisabled={true}
                     className="z-50"
                     size="sm"
-                    backdrop="transparent"
+                    backdrop={false}
                 >
                     <ModalContent>
                         {(onClose) => (
@@ -62,48 +82,48 @@ const DepartureInfoForm = ({
 
                                 <ModalBody className="flex flex-col bg-background min-h-[400px]">
                                     <Tabs aria-label="Options" className="flex flex-col flex-grow">
-                                        <Tab key="reservation" title="Reservation">
+                                        <Tab key="reservation" title={t.frontOffice.infoModal.departure.reservation.title}>
                                             {/* Definindo altura mínima com flex para impedir que o modal diminua */}
                                             <div className="min-h-[300px] flex flex-col gap-5">
                                                 <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>Room</strong></p>
+                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.room}</strong></p>
                                                     <p>{roomNumber}</p>
                                                 </div>
                                                 <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>RoomType</strong></p>
+                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.roomType}</strong></p>
                                                     <p>{roomType}</p>
                                                 </div>
                                                 <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>Status</strong></p>
+                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.status}</strong></p>
                                                     <p>{resStatus}</p>
                                                 </div>
                                                 <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>Departure</strong></p>
+                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.departure}</strong></p>
                                                     <p>{dateCO}</p>
                                                 </div>
                                                 <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>Adults</strong></p>
+                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.adults}</strong></p>
                                                     <p>{adults}</p>
                                                 </div>
                                                 <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>Childs</strong></p>
+                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.childs}</strong></p>
                                                     <p>{childs}</p>
                                                 </div>
                                                 <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>Balance</strong></p>
+                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.balance}</strong></p>
                                                     <p>{balance}</p>
                                                 </div>
                                             </div>
                                         </Tab>
-                                        <Tab key="profiles" title="Profiles">
+                                        <Tab key="profiles" title={t.frontOffice.infoModal.departure.profile.title}>
                                             <div className="min-h-[300px] flex flex-col gap-4">
-                                                <p className="text-gray-400">TRAVEL AGENCY</p>
+                                                <p className="text-gray-400">{t.frontOffice.infoModal.departure.profile.travelAgency}</p>
                                                 <p className="text-textPrimaryColor">{booker}</p>
 
-                                                <p className="text-gray-400">COUNTRY</p>
+                                                <p className="text-gray-400">{t.frontOffice.infoModal.departure.profile.country}</p>
                                                 <p className="text-textPrimaryColor">{country}</p>
 
-                                                <p className="text-gray-400">GUESTS</p>
+                                                <p className="text-gray-400">{t.frontOffice.infoModal.departure.profile.guests}</p>
                                                 <p className="text-textPrimaryColor">
                                                     {salutation} {lastName && firstName
                                                         ? `${lastName}, ${firstName}`

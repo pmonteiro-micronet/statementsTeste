@@ -1,5 +1,5 @@
 "use client";
-import { useContext, createContext, useState, useEffect } from "react";
+import { useContext, createContext, useState, useEffect, useRef } from "react";
 import { TbLayoutSidebarLeftExpand } from "react-icons/tb";
 import Link from "next/link"; // Importando o Link do Next.js
 import { signOut, useSession } from "next-auth/react"; // Importando a função de logout
@@ -28,6 +28,8 @@ export default function Sidebar({ children, setExpanded }) {
   const router = useRouter(); // Obtém o router
   const [warningVisible, setWarningVisible] = useState(false);
   const [countdown, setCountdown] = useState(60);
+  const dropdownRef = useRef(null);
+// const modalRef = useRef(null); // Novo ref para o modal
 
   const [locale, setLocale] = useState("pt");
 
@@ -251,7 +253,7 @@ export default function Sidebar({ children, setExpanded }) {
 
             {/* Dropdown */}
             {isDropdownOpen && (
-              <div className="absolute bottom-14 right-0 bg-background shadow-lg rounded-md p-3 w-56 z-50 text-textPrimaryColor">
+              <div ref={dropdownRef} className="absolute bottom-14 right-0 bg-background shadow-lg rounded-md p-3 w-56 z-50 text-textPrimaryColor border border-gray-200">
                 <ul>
                   <li
                     className={isAdmin ? "" : "disabled"} // Aplica uma classe de estilo "disabled" se não for admin
@@ -261,7 +263,7 @@ export default function Sidebar({ children, setExpanded }) {
                     }}
                   >
                     <div className="flex flex-row gap-4 px-3 text-sm mb-3">
-                      <RiHotelFill size={15}/>
+                      <RiHotelFill size={15} />
                       <Link href="/homepage/allProperties">All Properties</Link>
                     </div>
                   </li>
@@ -311,7 +313,7 @@ export default function Sidebar({ children, setExpanded }) {
 
                       {/* Botão deslizante */}
                       <span
-                        className={`absolute w-6 h-6 bg-white rounded-full shadow-md transform transition ${isDarkMode ? "translate-x-12" : "translate-x-0"
+                        className={`absolute w-6 h-6 bg-white rounded-full shadow-md transform transition ${isDarkMode ? "translate-x-8" : "translate-x-0"
                           } flex items-center justify-center z-10`}
                       >
                         {isDarkMode ? (

@@ -383,14 +383,14 @@ export default function Page({ params }) {
                   // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                   return (
                     <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
-                      <td className="pl-1 flex items-start border-r border-[#e6e6e6] relative z-10">
+                      <td className="pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center cursor-pointer">
                         <Dropdown>
                           <DropdownTrigger>
                             <Button
                               variant="light"
-                              className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
+                              className="flex justify-center items-center w-full h-full min-w-0 p-0 m-0"
                             >
-                              <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
+                              <BsThreeDotsVertical size={25} className="text-textPrimaryColor" />
                             </Button>
                           </DropdownTrigger>
                           <DropdownMenu
@@ -419,7 +419,7 @@ export default function Page({ params }) {
                         <DepartureInfoForm
                           buttonName={"Info"}
                           buttonColor={"transparent"}
-                          modalHeader={"Res. No.: " + selectedReserva?.ResNo}
+                          modalHeader={`${t.frontOffice.infoModal.departure.title} ${selectedReserva?.ResNo}`}
                           formTypeModal={11}
                           roomNumber={selectedReserva?.Room}  // Passando o roomNumber
                           dateCO={selectedReserva?.DateCO}  // Passando a data de check-out (dateCO)

@@ -180,6 +180,45 @@
             "cancel": "Cancelar",
             "insertPin": "Inserir PIN",
             "attention": "Atenção"
+        },
+        "infoModal": {
+            "arrival": {
+                "title": "Reserva",
+                "reservation": {
+                    "title": "Reserva",
+                    "room": "Quarto",
+                    "roomType": "Tipo de Quarto",
+                    "status": "Estado",
+                    "arrival": "Chegada",
+                    "pax": "Pessoas",
+                    "balance": "Saldo"
+                },
+                "profile": {
+                    "title": "Perfis",
+                    "travelAgency": "Agência de Viagens",
+                    "country": "País",
+                    "guests": "Hóspedes"
+                }
+            },
+            "departure": {
+                "title": "Reserva.:",
+                "reservation": {
+                    "title": "Reserva",
+                    "room": "Quarto",
+                    "roomType": "Tipo de Quarto",
+                    "status": "Estado",
+                    "departure": "Partida",
+                    "adults": "Adultos",
+                    "childs": "Crianças",
+                    "balance": "Saldo"
+                },
+                "profile": {
+                    "title": "Perfis",
+                    "travelAgency": "Agência de Viagens",
+                    "country": "País",
+                    "guests": "Hóspedes"
+                }
+            }
         }
     },
     "jsonView": {
@@ -289,6 +328,7 @@
             "hotelNIF": "Hotel NIF:",
             "hotelTerms": "Termos do Hotel",
             "privacyPolicy": "Politica de Privacidade",
+            "miniTerms": "Mini Termos",
             "hotelImage": "Logo do Hotel:",
             "selected": "Selecionado:",
             "cancel": "Cancelar",

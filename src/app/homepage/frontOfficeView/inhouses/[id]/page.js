@@ -346,6 +346,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     }
   };
 
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+
   return (
     (<main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       {isLoading && <LoadingBackdrop open={isLoading} />}
@@ -395,64 +397,71 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
               </thead>
               <tbody>
                 {reservas.map((reserva, index) => {
+                  const isOpen = openDropdownIndex === index;
                   // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                   return (
-                    <tr key={index} className="h-10 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">
-                      <td className="pl-1 flex items-start border-r border-[#e6e6e6] relative z-10">
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <Button
-                              variant="light"
-                              className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
+                    <tr key={index} onClick={() => setOpenDropdownIndex(index)} className="h-10 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">
+                      <td className="pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center">
+                        <div className="flex items-center justify-center w-full h-full">
+                          <Dropdown isOpen={isOpen} onOpenChange={(open) => setOpenDropdownIndex(open ? index : null)}>
+                            <DropdownTrigger>
+                              <Button
+                                variant="light"
+                                className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenDropdownIndex(index);
+                                }}
+                              >
+                                <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
+                              </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu
+                              aria-label="Static Actions"
+                              closeOnSelect={true}
+                              isOpen={true}
+                              className="relative z-10 text-textPrimaryColor"
                             >
-                              <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
-                            </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu
-                            aria-label="Static Actions"
-                            closeOnSelect={true}
-                            isOpen={true}
-                            className="relative z-10 text-textPrimaryColor"
-                          >
-                            <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
-                              {t.frontOffice.inHouses.info}
-                            </DropdownItem>
-                            <DropdownItem
-                              key="show"
-                              onClick={() => {
-                                if (reserva.ResNo) {
-                                  sendResToAPI(reserva.ResNo);
-                                } else {
-                                  console.warn("ReservationNumber não encontrado.");
-                                }
-                              }}
-                            >
-                              {t.frontOffice.inHouses.statement}
-                            </DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
+                              <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
+                                {t.frontOffice.inHouses.info}
+                              </DropdownItem>
+                              <DropdownItem
+                                key="show"
+                                onClick={() => {
+                                  if (reserva.ResNo) {
+                                    sendResToAPI(reserva.ResNo);
+                                  } else {
+                                    console.warn("ReservationNumber não encontrado.");
+                                  }
+                                }}
+                              >
+                                {t.frontOffice.inHouses.statement}
+                              </DropdownItem>
+                            </DropdownMenu>
+                          </Dropdown>
+                          </div>
 
-                        <InHousesInfoForm
-                          buttonName={t.frontOffice.inHouses.info}
-                          buttonColor={"transparent"}
-                          modalHeader={"Res. No.: " + selectedReserva?.ResNo}
-                          formTypeModal={11}
-                          roomNumber={selectedReserva?.Room}
-                          dateCI={selectedReserva?.DateCI}
-                          booker={selectedReserva?.Booker}
-                          salutation={selectedReserva?.Salutation}
-                          lastName={selectedReserva?.LastName}
-                          firstName={selectedReserva?.FirstName}
-                          roomType={selectedReserva?.RoomType}
-                          resStatus={selectedReserva?.resStatus}
-                          childs={selectedReserva?.Childs}
-                          adults={selectedReserva?.Adults}
-                          balance={selectedReserva?.Balance}
-                          country={selectedReserva?.Country}
-                          isBackdropVisible={true}
-                          isOpen={isModalOpen}
-                          onClose={handleCloseModal}
-                        />
+                          <InHousesInfoForm
+                            buttonName={t.frontOffice.inHouses.info}
+                            buttonColor={"transparent"}
+                            modalHeader={"Res. No.: " + selectedReserva?.ResNo}
+                            formTypeModal={11}
+                            roomNumber={selectedReserva?.Room}
+                            dateCI={selectedReserva?.DateCI}
+                            booker={selectedReserva?.Booker}
+                            salutation={selectedReserva?.Salutation}
+                            lastName={selectedReserva?.LastName}
+                            firstName={selectedReserva?.FirstName}
+                            roomType={selectedReserva?.RoomType}
+                            resStatus={selectedReserva?.resStatus}
+                            childs={selectedReserva?.Childs}
+                            adults={selectedReserva?.Adults}
+                            balance={selectedReserva?.Balance}
+                            country={selectedReserva?.Country}
+                            isBackdropVisible={true}
+                            isOpen={isModalOpen}
+                            onClose={handleCloseModal}
+                          />
 
                       </td>
                       <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCI}</td>

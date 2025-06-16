@@ -179,9 +179,9 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                             </Button>
                         </ModalHeader>
                         <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
-                            <div className="grid grid-cols-3 gap-4 items-start">
-                                <div className="flex flex-col gap-2">
-                                    <div>
+                            <div className="flex flex-col">
+                                <div className="flex flex-row gap-2 mb-2 items-center">
+                                    <div className="w-2/3">
                                         <label className="block text-sm font-medium text-textPrimaryColor">Company Name:</label>
                                         <input
                                             ref={inputRef}
@@ -192,30 +192,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-textPrimaryColor">E-mail:</label>
-                                        <input
-                                            type="text"
-                                            name="emailAddress"
-                                            value={formData.emailAddress}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">Country:</label>
-                                        <Select
-                                            options={countryOptions}
-                                            value={countryOptions.find(option => option.value === formData.country)}
-                                            onChange={handleCountryChange}
-                                            isSearchable
-                                            styles={customStyles}
-                                        />
-                                    </div>
-                                </div>
-
-                               <div className="flex flex-col gap-2">
-                                    <div>
+                                    <div className="w-1/3">
                                         <label className="block text-sm font-medium text-textPrimaryColor">VAT No.:</label>
                                         <input
                                             type="text"
@@ -227,7 +204,10 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                                         />
                                         {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
                                     </div>
-                                    <div>
+                                </div>
+
+                                <div className="flex flex-row gap-2 mb-2 items-center">
+                                    <div className="w-1/3">
                                         <label className="block text-sm font-medium text-textPrimaryColor">Street Address:</label>
                                         <input
                                             type="text"
@@ -238,7 +218,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                                         />
                                     </div>
 
-                                    <div className="flex-1">
+                                    <div className="w-1/3">
                                         <label className="block text-sm font-medium text-textPrimaryColor">Zip Code:</label>
                                         <input
                                             type="text"
@@ -248,10 +228,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
-                                </div>
-
-                                <div className="flex flex-col gap-2">
-                                    <div className="flex-1">
+                                    <div className="w-1/3">
                                         <label className="block text-sm font-medium text-textPrimaryColor">City:</label>
                                         <input
                                             type="text"
@@ -261,13 +238,39 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
+                                </div>
 
-                                    <div>
+                                <div className="flex flex-row gap-2 mb-2 items-center">
+
+                                    <div className="w-1/3">
                                         <label className="block text-sm font-medium text-textPrimaryColor">State:</label>
                                         <input
                                             type="text"
                                             name="state"
                                             value={formData.state}
+                                            onChange={handleChange}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                        />
+                                    </div>
+                                    <div className="w-1/3">
+                                        <label className="block text-sm font-medium">Country:</label>
+                                        <Select
+                                            options={countryOptions}
+                                            value={countryOptions.find(option => option.value === formData.country)}
+                                            onChange={handleCountryChange}
+                                            isSearchable
+                                            styles={customStyles}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-row w-full">
+                                    <div>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">E-mail:</label>
+                                        <input
+                                            type="text"
+                                            name="emailAddress"
+                                            value={formData.emailAddress}
                                             onChange={handleChange}
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />

@@ -65,6 +65,10 @@ const PropertiesEditForm = ({
     const [privacyPolicyPT, setPrivacyPolicyPT] = useState(hotelTerms[0]?.privacyPolicyPT || "");
     const [privacyPolicyES, setPrivacyPolicyES] = useState(hotelTerms[0]?.privacyPolicyES || "");
 
+    const [miniTermsEN, setMiniTermsEN] = useState(hotelTerms[0]?.miniTermsEN || "");
+    const [miniTermsPT, setMiniTermsPT] = useState(hotelTerms[0]?.miniTermsPT || "");
+    const [miniTermsES, setMiniTermsES] = useState(hotelTerms[0]?.miniTermsES || "");
+
     const [showVariablesbar, setShowVariablesbar] = useState(false);
     const [hoveredVar, setHoveredVar] = useState(null);
 
@@ -174,7 +178,10 @@ const PropertiesEditForm = ({
                     termsAndCondES: hotelTermsES,
                     privacyPolicyEN,
                     privacyPolicyPT,
-                    privacyPolicyES
+                    privacyPolicyES,
+                    miniTermsEN,
+                    miniTermsPT,
+                    miniTermsES,
                 });
 
                 if (hotelTermsResponse.status === 200 || hotelTermsResponse.status === 201) {
@@ -669,6 +676,15 @@ const PropertiesEditForm = ({
                                                     >
                                                         {t.modals.createProperty.privacyPolicy}
                                                     </div>
+                                                    <div
+                                                        onClick={() => setActiveContent("miniTerms")}
+                                                        className={`cursor-pointer px-4 py-2 ${activeContent === "miniTerms"
+                                                            ? "bg-white text-black rounded-t-md border border-b-0 border-gray-300"
+                                                            : "text-gray-500 text-sm"
+                                                            }`}
+                                                    >
+                                                        {t.modals.createProperty.miniTerms}
+                                                    </div>
                                                 </div>
 
                                                 {/* Language Tabs */}
@@ -735,6 +751,32 @@ const PropertiesEditForm = ({
                                                                 <textarea
                                                                     value={privacyPolicyES}
                                                                     onChange={(e) => setPrivacyPolicyES(e.target.value)}
+                                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            )}
+                                                        </>
+                                                    )}
+
+                                                    {activeContent === "miniTerms" && (
+                                                        <>
+                                                            {activeKey === "EN" && (
+                                                                <textarea
+                                                                    value={miniTermsEN}
+                                                                    onChange={(e) => setMiniTermsEN(e.target.value)}
+                                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            )}
+                                                            {activeKey === "PT" && (
+                                                                <textarea
+                                                                    value={miniTermsPT}
+                                                                    onChange={(e) => setMiniTermsPT(e.target.value)}
+                                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            )}
+                                                            {activeKey === "ES" && (
+                                                                <textarea
+                                                                    value={miniTermsES}
+                                                                    onChange={(e) => setMiniTermsES(e.target.value)}
                                                                     className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                 />
                                                             )}

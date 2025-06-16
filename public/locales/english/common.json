@@ -178,6 +178,45 @@
             "cancel": "Cancel",
             "insertPin": "Insert PIN",
             "attention": "Attention"
+        },
+        "infoModal": {
+            "arrival": {
+                "title": "Reservation",
+                "reservation": {
+                    "title": "Reservation",
+                    "room": "Room",
+                    "roomType": "Room Type",
+                    "status": "Status",
+                    "arrival": "Arrival",
+                    "pax": "Pax",
+                    "balance": "Balance"
+                },
+                "profile": {
+                    "title": "Profiles",
+                    "travelAgency": "Travel Agency",
+                    "country": "Country",
+                    "guests": "Guests"
+                }
+            },
+            "departure": {
+                "title": "Reservation.:",
+                "reservation": {
+                    "title": "Reservation",
+                    "room": "Room",
+                    "roomType": "Room Type",
+                    "status": "Status",
+                    "departure": "Departure",
+                    "adults": "Adults",
+                    "childs": "Childs",
+                    "balance": "Balance"
+                },
+                "profile": {
+                    "title": "Profiles",
+                    "travelAgency": "Travel Agency",
+                    "country": "Country",
+                    "guests": "Guests"
+                }
+            }
         }
     },
     "jsonView": {
@@ -286,15 +325,15 @@
             "hotelPCode": "Hotel Postal-Code:",
             "hotelRNET": "Hotel RNET:",
             "hotelNIF": "Hotel NIF:",
-            "hotelTerms": "Hotel Terms:",
+            "hotelTerms": "Hotel Terms",
             "privacyPolicy": "Privacy Policy",
+            "miniTerms": "Mini Terms",
             "hotelImage": "Hotel Image:",
             "selected": "Selected:",
             "cancel": "Cancel",
             "edit": "Edit",
             "save": "Save",
             "saving": "Saving..."
-
         },
         "propertiesEdit": {
             "propertyDetails": "Property Details",

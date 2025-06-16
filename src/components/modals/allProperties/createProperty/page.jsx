@@ -74,6 +74,10 @@ const CreatePropertyModal = ({
     const [privacyPolicyPT, setPrivacyPolicyPT] = useState("");
     const [privacyPolicyES, setPrivacyPolicyES] = useState("");
 
+    const [miniTermsEN, setMiniTermsEN] = useState("");
+    const [miniTermsPT, setMiniTermsPT] = useState("");
+    const [miniTermsES, setMiniTermsES] = useState("");
+
     const [locale, setLocale] = useState("pt");
 
     useEffect(() => {
@@ -87,75 +91,78 @@ const CreatePropertyModal = ({
     // Carregar as traduções com base no idioma atual
     const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
- const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setSuccessMessage("");
-    setErrorMessage("");
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setSuccessMessage("");
+        setErrorMessage("");
 
-    try {
-        // Envio dos dados da propriedade
-        const propertyResponse = await axios.put(`/api/properties`, {
-            propertyName,
-            propertyTag,
-            propertyServer,
-            propertyPort,
-            propertyPortStay: parseInt(propertyPortStay, 10),
-            mpehotel: parseInt(mpehotel, 10),
-            pdfFilePath,
-            passeIni,
-            hotelName,
-            hotelPhone,
-            hotelEmail,
-            hotelAddress,
-            hotelPostalCode,
-            hotelRNET,
-            hotelNIF,
-            hotelTermsEN,
-            hotelTermsPT,
-            hotelTermsES,
-            hasStay: parseInt(hasStay, 10),
-            replyEmail,
-            replyPassword,
-            sendingServer,
-            sendingPort: parseInt(sendingPort, 10),
-            emailSubject,
-            emailBody,
-            infoEmail
-        });
-
-        if (propertyResponse.status === 201 || propertyResponse.status === 200) {
-            const propertyID = propertyResponse.data.updatedProperties.propertyID;
-
-            // Agora envia os termos e política de privacidade
-            const hotelTermsResponse = await axios.post(`/api/properties/hotelTerms`, {
-                propertyID,
-                termsAndCondEN: hotelTermsEN,
-                termsAndCondPT: hotelTermsPT,
-                termsAndCondES: hotelTermsES,
-                privacyPolicyEN,
-                privacyPolicyPT,
-                privacyPolicyES
+        try {
+            // Envio dos dados da propriedade
+            const propertyResponse = await axios.put(`/api/properties`, {
+                propertyName,
+                propertyTag,
+                propertyServer,
+                propertyPort,
+                propertyPortStay: parseInt(propertyPortStay, 10),
+                mpehotel: parseInt(mpehotel, 10),
+                pdfFilePath,
+                passeIni,
+                hotelName,
+                hotelPhone,
+                hotelEmail,
+                hotelAddress,
+                hotelPostalCode,
+                hotelRNET,
+                hotelNIF,
+                hotelTermsEN,
+                hotelTermsPT,
+                hotelTermsES,
+                hasStay: parseInt(hasStay, 10),
+                replyEmail,
+                replyPassword,
+                sendingServer,
+                sendingPort: parseInt(sendingPort, 10),
+                emailSubject,
+                emailBody,
+                infoEmail
             });
 
-            if (hotelTermsResponse.status === 200 || hotelTermsResponse.status === 201) {
-                setSuccessMessage("Property and hotel terms updated successfully.");
-                resetForm();
+            if (propertyResponse.status === 201 || propertyResponse.status === 200) {
+                const propertyID = propertyResponse.data.updatedProperties.propertyID;
+
+                // Agora envia os termos e política de privacidade
+                const hotelTermsResponse = await axios.post(`/api/properties/hotelTerms`, {
+                    propertyID,
+                    termsAndCondEN: hotelTermsEN,
+                    termsAndCondPT: hotelTermsPT,
+                    termsAndCondES: hotelTermsES,
+                    privacyPolicyEN,
+                    privacyPolicyPT,
+                    privacyPolicyES,
+                    miniTermsEN,
+                    miniTermsPT,
+                    miniTermsES
+                });
+
+                if (hotelTermsResponse.status === 200 || hotelTermsResponse.status === 201) {
+                    setSuccessMessage("Property and hotel terms updated successfully.");
+                    resetForm();
+                } else {
+                    setErrorMessage(`Failed to save hotel terms. Status: ${hotelTermsResponse.status}`);
+                }
             } else {
-                setErrorMessage(`Failed to save hotel terms. Status: ${hotelTermsResponse.status}`);
+                setErrorMessage(`Failed to update properties. Status: ${propertyResponse.status}`);
             }
-        } else {
-            setErrorMessage(`Failed to update properties. Status: ${propertyResponse.status}`);
+        } catch (error) {
+            console.error("Error during the process:", error);
+            setErrorMessage(
+                error.response?.data?.message || "An error occurred. Please try again."
+            );
+        } finally {
+            setLoading(false);
         }
-    } catch (error) {
-        console.error("Error during the process:", error);
-        setErrorMessage(
-            error.response?.data?.message || "An error occurred. Please try again."
-        );
-    } finally {
-        setLoading(false);
-    }
-};
+    };
 
 
     const resetForm = () => {
@@ -490,6 +497,15 @@ const CreatePropertyModal = ({
                                                         >
                                                             {t.modals.createProperty.privacyPolicy}
                                                         </div>
+                                                         <div
+                                                        onClick={() => setActiveContent("miniTerms")}
+                                                        className={`cursor-pointer px-4 py-2 ${activeContent === "miniTerms"
+                                                            ? "bg-white text-black rounded-t-md border border-b-0 border-gray-300"
+                                                            : "text-gray-500 text-sm"
+                                                            }`}
+                                                    >
+                                                        {t.modals.createProperty.miniTerms}
+                                                    </div>
                                                     </div>
 
                                                     {/* Language Tabs */}
@@ -561,6 +577,32 @@ const CreatePropertyModal = ({
                                                                 )}
                                                             </>
                                                         )}
+                                                        
+                                                         {activeContent === "miniTerms" && (
+                                                        <>
+                                                            {activeKey === "EN" && (
+                                                                <textarea
+                                                                    value={miniTermsEN}
+                                                                    onChange={(e) => setMiniTermsEN(e.target.value)}
+                                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            )}
+                                                            {activeKey === "PT" && (
+                                                                <textarea
+                                                                    value={miniTermsPT}
+                                                                    onChange={(e) => setMiniTermsPT(e.target.value)}
+                                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            )}
+                                                            {activeKey === "ES" && (
+                                                                <textarea
+                                                                    value={miniTermsES}
+                                                                    onChange={(e) => setMiniTermsES(e.target.value)}
+                                                                    className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            )}
+                                                        </>
+                                                    )}
                                                     </div>
                                                 </div>
                                             </div>

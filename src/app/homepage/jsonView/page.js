@@ -694,7 +694,7 @@ const JsonViewPage = () => {
                 )}
               </div>
               {/* Botões de Ação */}
-              <div className="flex gap-3 items-center">
+              <div className="flex gap-3 items-center mb-4">
                 <CancelPIN
                   buttonName={t.jsonView.cancel}
                   buttonColor={"background"}

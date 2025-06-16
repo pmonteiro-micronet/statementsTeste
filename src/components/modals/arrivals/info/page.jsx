@@ -1,8 +1,14 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 //imports de icons
 import { MdClose } from "react-icons/md";
+
+import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
 
 const ArrivalInfoForm = ({
     modalHeader,
@@ -26,6 +32,20 @@ const ArrivalInfoForm = ({
 }) => {
 
     const [activeKey, setActiveKey] = useState("reservation"); // Estado de controle da aba ativa
+    
+     const [locale, setLocale] = useState("pt");
+    
+      useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+          setLocale(storedLanguage);
+        }
+      }, []);
+    
+      // Carregar as traduções com base no idioma atual
+      const t = translations[locale] || translations["pt"]; // fallback para "pt"
+
     return (
         <>
             {formTypeModal === 11 && (
@@ -36,9 +56,7 @@ const ArrivalInfoForm = ({
                         onOpenChange={onClose}
                         isDismissable={false}
                         isKeyboardDismissDisabled={true}
-                        className="z-50"
                         size="sm"
-                        backdrop="transparent"
                     >
                         <ModalContent>
                             {(onClose) => (
@@ -60,13 +78,13 @@ const ArrivalInfoForm = ({
                                                         onClick={() => setActiveKey("reservation")}
                                                         className={`cursor-pointer p-2 ${activeKey === "reservation" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
                                                     >
-                                                        Reservation
+                                                        {t.frontOffice.infoModal.arrival.reservation.title}
                                                     </div>
                                                     <div
                                                         onClick={() => setActiveKey("profiles")}
                                                         className={`cursor-pointer p-2 ${activeKey === "profiles" ? "bg-white text-black rounded-lg m-1 text-sm text-bold border border-gray-200" : "text-gray-500 m-1 text-sm"}`}
                                                     >
-                                                        Profiles
+                                                        {t.frontOffice.infoModal.arrival.profile.title}
                                                     </div>
                                                 </div>
                                             </div>
@@ -74,27 +92,27 @@ const ArrivalInfoForm = ({
                                                 {activeKey === "reservation" && (
                                                     <div className="-mt-8 flex flex-col gap-5">
                                                         <div className="flex justify-between text-textPrimaryColor">
-                                                            <p><strong>Room</strong></p>
+                                                            <p><strong>{t.frontOffice.infoModal.arrival.reservation.room}</strong></p>
                                                             <p>{roomNumber}</p>
                                                         </div>
                                                         <div className="flex justify-between text-textPrimaryColor">
-                                                            <p><strong>RoomType</strong></p>
+                                                            <p><strong>{t.frontOffice.infoModal.arrival.reservation.roomType}</strong></p>
                                                             <p>{roomType}</p>
                                                         </div>
                                                         <div className="flex justify-between text-textPrimaryColor">
-                                                            <p><strong>Status</strong></p>
+                                                            <p><strong>{t.frontOffice.infoModal.arrival.reservation.status}</strong></p>
                                                             <p>{resStatus}</p>
                                                         </div>
                                                         <div className="flex justify-between text-textPrimaryColor">
-                                                            <p><strong>Arrival</strong></p>
+                                                            <p><strong>{t.frontOffice.infoModal.arrival.reservation.arrival}</strong></p>
                                                             <p>{dateCI}</p>
                                                         </div>
                                                         <div className="flex justify-between text-textPrimaryColor">
-                                                            <p><strong>Pax</strong></p>
+                                                            <p><strong>{t.frontOffice.infoModal.arrival.reservation.pax}</strong></p>
                                                             <p>{totalPax}</p>
                                                         </div>
                                                         <div className="flex justify-between text-textPrimaryColor">
-                                                            <p><strong>Balance</strong></p>
+                                                            <p><strong>{t.frontOffice.infoModal.arrival.reservation.balance}</strong></p>
                                                             <p>{balance}</p>
                                                         </div>
                                                     </div>
@@ -102,15 +120,15 @@ const ArrivalInfoForm = ({
                                                 {activeKey === "profiles" && (
                                                     <div>
                                                         <div className="-mt-8 flex flex-col gap-4">
-                                                            <p className="text-gray-400">TRAVEL AGENCY</p>
+                                                            <p className="text-gray-400">{t.frontOffice.infoModal.arrival.profile.travelAgency}</p>
                                                             <p className="text-textPrimaryColor">{booker}</p>
                                                         </div>
                                                         <div className="mt-10 flex flex-col gap-4">
-                                                            <p className="text-gray-400">COUNTRY</p>
+                                                            <p className="text-gray-400">{t.frontOffice.infoModal.arrival.profile.country}</p>
                                                             <p className="text-textPrimaryColor">{country}</p>
                                                         </div>
                                                         <div className="mt-10 flex flex-col gap-4">
-                                                            <p className="text-gray-400">GUESTS</p>
+                                                            <p className="text-gray-400">{t.frontOffice.infoModal.arrival.profile.guests}</p>
                                                             <p className="text-textPrimaryColor">{salutation}
                                                                 {lastName && firstName
                                                                     ? `${lastName}, ${firstName}`
