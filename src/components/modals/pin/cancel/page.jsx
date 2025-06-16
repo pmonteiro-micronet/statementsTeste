@@ -141,7 +141,7 @@ const CancelPIN = ({
                             {(onClose) => (
                                 <form onSubmit={handleCancelPinSubmit}>
                                     <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white p-2">
-                                        <div className="flex flex-row justify-start gap-4 pl-4">
+                                        <div className="flex flex-row justify-start gap-4 pl-4 text-white">
                                             {editIcon} {modalHeader} {modalEditArrow} {modalEdit}
                                         </div>
                                         <div className="flex flex-row items-center justify-end">

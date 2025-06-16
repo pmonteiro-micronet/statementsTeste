@@ -180,7 +180,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                         </ModalHeader>
                         <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
                             <div className="flex flex-col">
-                                <div className="flex flex-row gap-2 mb-2 items-center">
+                                <div className="flex flex-row gap-2 mb-0.5 items-center">
                                     <div className="w-2/3">
                                         <label className="block text-sm font-medium text-textPrimaryColor">Company Name:</label>
                                         <input
@@ -206,7 +206,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-row gap-2 mb-2 items-center">
+                                <div className="flex flex-row gap-2 mb-0.5 items-center">
                                     <div className="w-1/3">
                                         <label className="block text-sm font-medium text-textPrimaryColor">Street Address:</label>
                                         <input
@@ -240,7 +240,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-row gap-2 mb-2 items-center">
+                                <div className="flex flex-row gap-2 mb-0.5 items-center">
 
                                     <div className="w-1/3">
                                         <label className="block text-sm font-medium text-textPrimaryColor">State:</label>
@@ -264,8 +264,8 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-row w-full">
-                                    <div>
+                                <div className="flex flex-row">
+                                    <div className="w-full">
                                         <label className="block text-sm font-medium text-textPrimaryColor">E-mail:</label>
                                         <input
                                             type="text"
