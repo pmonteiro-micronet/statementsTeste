@@ -218,7 +218,8 @@
                     "country": "País",
                     "guests": "Huéspedes"
                 }
-            }        }
+            }
+        }
     },
     "jsonView": {
         "room": "Habitación",
@@ -400,6 +401,21 @@
                     "Email": "Correo electrónico"
                 }
             }
+        },
+        "companyInfo": {
+            "insert": "Crear nuevo número de IVA de la empresa",
+            "update": "Actualizar empresa",
+            "companyName": "Nombre de la empresa:",
+            "vatNO": "N.º de IVA:",
+            "streetAddress": "Dirección:",
+            "zipCode": "Código postal:",
+            "city": "Ciudad:",
+            "state": "Provincia:",
+            "country": "País:",
+            "email": "Correo electrónico:",
+            "cancel": "Cancelar",
+            "save": "Guardar",
+            "countryError": "Error al cargar los países."
         }
     },
     "pagination": {
