@@ -68,6 +68,8 @@ const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
 
     const [activeTab, setActiveTab] = useState("propertyDetails");
 
+    const [showTemplatesModal, setShowTemplatesModal] = useState(false);
+ const [smallTab, setSmallTab] = useState("details"); // ou "reviews" como valor inicial
     useEffect(() => {
         // Carregar o idioma do localStorage
         const storedLanguage = localStorage.getItem("language");
@@ -356,6 +358,36 @@ const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
         setSelectedBold(isBold);
     };
 
+    const [templates, setTemplates] = useState([]);
+
+    // Função que busca os templates da API
+    const fetchTemplates = async () => {
+        try {
+            const response = await axios.get('/api/stay/templates'); // ajusta a URL da API conforme seu backend
+            if (response.data && response.data.response) {
+                setTemplates(response.data.response);
+            } else {
+                setTemplates([]);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar templates:', error);
+            setTemplates([]);
+        }
+    };
+
+    // Quando o modal abrir, faz a requisição
+    useEffect(() => {
+        if (showTemplatesModal) {
+            fetchTemplates();
+        }
+    }, [showTemplatesModal]);
+
+    const handleSelectTemplate = (template) => {
+        setEmailSubject(template.emailSubject);
+        setEmailBody(template.emailBody);
+        setShowTemplatesModal(false); // fecha modal após seleção
+    };
+
     return (
         <Modal
             isOpen={true}
@@ -480,216 +512,106 @@ const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
                                 </div>
                             </div>
                         </Tab>
-                        <Tab key="hotelDetails" title={t.modals.propertiesEdit.details}>
-                            <div className="-mt-4 flex flex-col gap-2 -ml-8 -mr-8">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelName}</label>
-                                    <input
-                                        type="text"
-                                        value={hotelName}
-                                        onChange={(e) => setHotelName(e.target.value)}
-                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                    />
-                                </div>
-                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
-                                    <div className="flex flex-col w-2/3"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelEmail}</label>
-                                        <input
-                                            type="text"
-                                            value={hotelEmail}
-                                            onChange={(e) => setHotelEmail(e.target.value)}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                        />
-                                    </div>
-                                    <div className="flex flex-col w-1/3"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelPhone}</label>
-                                        <input
-                                            type="text"
-                                            value={hotelPhone}
-                                            onChange={(e) => setHotelPhone(e.target.value)}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                        />
-                                    </div>
-                                </div>
-                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
-                                    <div className="flex flex-col w-2/3"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelAddress}</label>
-                                        <input
-                                            type="text"
-                                            value={hotelAddress}
-                                            onChange={(e) => setHotelAddress(e.target.value)}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                        />
-                                    </div>
-                                    <div className="flex flex-col w-1/3"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelPCode}</label>
-                                        <input
-                                            type="text"
-                                            value={hotelPostalCode}
-                                            onChange={(e) => setHotelPostalCode(e.target.value)}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                        />
-                                    </div>
-                                </div>
-                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
-                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelRNET}</label>
-                                        <input
-                                            type="text"
-                                            value={hotelRNET}
-                                            onChange={(e) => setHotelRNET(e.target.value)}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                        />
-                                    </div>
-                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelNIF}</label>
-                                        <input
-                                            type="text"
-                                            value={hotelNIF}
-                                            onChange={(e) => setHotelNIF(e.target.value)}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    {/* Tabs: Hotel Terms vs Privacy Policy (como label) */}
-                                    <div className="flex flex-row bg-gray-100 w-full rounded-xl items-center mb-4 mt-4">
-                                        <div
-                                            onClick={() => setActiveContent("terms")}
-                                            className={`cursor-pointer px-4 py-2 ${activeContent === "terms"
-                                                ? "bg-white text-black rounded-t-md border border-b-0 border-gray-300"
-                                                : "text-gray-500 text-sm"
-                                                }`}
-                                        >
-                                            {t.modals.propertiesEdit.hotelTerms}
-                                        </div>
-                                        <div
-                                            onClick={() => setActiveContent("privacy")}
-                                            className={`cursor-pointer px-4 py-2 ${activeContent === "privacy"
-                                                ? "bg-white text-black rounded-t-md border border-b-0 border-gray-300"
-                                                : "text-gray-500 text-sm"
-                                                }`}
-                                        >
-                                            {t.modals.createProperty.privacyPolicy}
-                                        </div>
-                                        <div
-                                            onClick={() => setActiveContent("miniTerms")}
-                                            className={`cursor-pointer px-4 py-2 ${activeContent === "miniTerms"
-                                                ? "bg-white text-black rounded-t-md border border-b-0 border-gray-300"
-                                                : "text-gray-500 text-sm"
-                                                }`}
-                                        >
-                                            {t.modals.createProperty.miniTerms}
-                                        </div>
-                                    </div>
-
-                                    {/* Language Tabs */}
-                                    <div className="flex flex-row justify-center bg-gray-100 w-32 h-8 rounded-xl items-center mb-4">
-                                        {["EN", "PT", "ES"].map((lang) => (
-                                            <div
-                                                key={lang}
-                                                onClick={() => setActiveKey(lang)}
-                                                className={`cursor-pointer p-1 ${activeKey === lang
-                                                    ? "bg-white text-black rounded-lg m-1 text-sm border border-gray-200"
-                                                    : "text-gray-500 m-1 text-sm"
-                                                    }`}
-                                            >
-                                                {lang}
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Textarea content */}
-                                    <div>
-                                        {activeContent === "terms" && (
-                                            <>
-                                                {activeKey === "EN" && (
-                                                    <textarea
-                                                        value={hotelTermsEN}
-                                                        onChange={(e) => setHotelTermsEN(e.target.value)}
-                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    />
-                                                )}
-                                                {activeKey === "PT" && (
-                                                    <textarea
-                                                        value={hotelTermsPT}
-                                                        onChange={(e) => setHotelTermsPT(e.target.value)}
-                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    />
-                                                )}
-                                                {activeKey === "ES" && (
-                                                    <textarea
-                                                        value={hotelTermsES}
-                                                        onChange={(e) => setHotelTermsES(e.target.value)}
-                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    />
-                                                )}
-                                            </>
-                                        )}
-
-                                        {activeContent === "privacy" && (
-                                            <>
-                                                {activeKey === "EN" && (
-                                                    <textarea
-                                                        value={privacyPolicyEN}
-                                                        onChange={(e) => setPrivacyPolicyEN(e.target.value)}
-                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    />
-                                                )}
-                                                {activeKey === "PT" && (
-                                                    <textarea
-                                                        value={privacyPolicyPT}
-                                                        onChange={(e) => setPrivacyPolicyPT(e.target.value)}
-                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    />
-                                                )}
-                                                {activeKey === "ES" && (
-                                                    <textarea
-                                                        value={privacyPolicyES}
-                                                        onChange={(e) => setPrivacyPolicyES(e.target.value)}
-                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    />
-                                                )}
-                                            </>
-                                        )}
-
-                                        {activeContent === "miniTerms" && (
-                                            <>
-                                                {activeKey === "EN" && (
-                                                    <textarea
-                                                        value={miniTermsEN}
-                                                        onChange={(e) => setMiniTermsEN(e.target.value)}
-                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    />
-                                                )}
-                                                {activeKey === "PT" && (
-                                                    <textarea
-                                                        value={miniTermsPT}
-                                                        onChange={(e) => setMiniTermsPT(e.target.value)}
-                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    />
-                                                )}
-                                                {activeKey === "ES" && (
-                                                    <textarea
-                                                        value={miniTermsES}
-                                                        onChange={(e) => setMiniTermsES(e.target.value)}
-                                                        className="w-full h-20 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    />
-                                                )}
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div>
+                        <Tab key="hotelDetails" title="Hotel Details">
+                                                                {/* Abas de raiz menores após a principal */}
+                                                                <div className="-mt-4">
+                                                                    <div className="flex space-x-2 text-sm">
+                                                                        <button
+                                                                            onClick={() => setSmallTab("details")}
+                                                                            className={`px-3 py-1 rounded-md border ${smallTab === "details" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"
+                                                                                }`}
+                                                                        >
+                                                                            Info
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => setSmallTab("terms")}
+                                                                            className={`px-3 py-1 rounded-md border ${smallTab === "terms" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"
+                                                                                }`}
+                                                                        >
+                                                                            Terms
+                                                                        </button>
+                                                                    </div>
+                        
+                                                                    <div className="">
+                                                                        {smallTab === "details" &&
+                                                                            <div className="mt-4 flex flex-col gap-2 -ml-8 -mr-8">
+                                                                                <div>
+                                                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelName}</label>
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        value={hotelName}
+                                                                                        onChange={(e) => setHotelName(e.target.value)}
+                                                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                                                    />
+                                                                                </div>
+                                                                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                                                                    <div className="flex flex-col w-2/3"> {/* Cada campo ocupa metade do espaço */}
+                                                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelEmail}</label>
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            value={hotelEmail}
+                                                                                            onChange={(e) => setHotelEmail(e.target.value)}
+                                                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                                                        />
+                                                                                    </div>
+                                                                                    <div className="flex flex-col w-1/3"> {/* Cada campo ocupa metade do espaço */}
+                                                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelPhone}</label>
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            value={hotelPhone}
+                                                                                            onChange={(e) => setHotelPhone(e.target.value)}
+                                                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                                                                    <div className="flex flex-col w-2/3"> {/* Cada campo ocupa metade do espaço */}
+                                                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelAddress}</label>
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            value={hotelAddress}
+                                                                                            onChange={(e) => setHotelAddress(e.target.value)}
+                                                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                                                        />
+                                                                                    </div>
+                                                                                    <div className="flex flex-col w-1/3"> {/* Cada campo ocupa metade do espaço */}
+                                                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelPCode}</label>
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            value={hotelPostalCode}
+                                                                                            onChange={(e) => setHotelPostalCode(e.target.value)}
+                                                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                                                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelRNET}</label>
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            value={hotelRNET}
+                                                                                            onChange={(e) => setHotelRNET(e.target.value)}
+                                                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                                                        />
+                                                                                    </div>
+                                                                                    <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelNIF}</label>
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            value={hotelNIF}
+                                                                                            onChange={(e) => setHotelNIF(e.target.value)}
+                                                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div>
                                     <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelImage}</label>
                                     <div className="flex flex-col gap-2">
                                         <input
@@ -724,8 +646,203 @@ const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
                                         )}
                                     </div>
                                 </div>
-                            </div>
-                        </Tab>
+                                                                            </div>
+                                                                        }
+                        
+                                                                        {smallTab === "terms" &&
+                                                                            <div className=" flex flex-col gap-2 -ml-8 -mr-8">
+                                                                                <div>
+                                                                                    {/* Tabs: Hotel Terms vs Privacy Policy (como label) */}
+                                                                                    <div className="flex flex-row bg-gray-100 w-full rounded-xl items-center mb-4 mt-4">
+                                                                                        <div
+                                                                                            onClick={() => setActiveContent("terms")}
+                                                                                            className={`cursor-pointer px-4 py-2 ${activeContent === "terms"
+                                                                                                ? "bg-white text-black rounded-t-md border border-b-0 border-gray-300"
+                                                                                                : "text-gray-500 text-sm"
+                                                                                                }`}
+                                                                                        >
+                                                                                            {t.modals.propertiesEdit.hotelTerms}
+                                                                                        </div>
+                                                                                        <div
+                                                                                            onClick={() => setActiveContent("privacy")}
+                                                                                            className={`cursor-pointer px-4 py-2 ${activeContent === "privacy"
+                                                                                                ? "bg-white text-black rounded-t-md border border-b-0 border-gray-300"
+                                                                                                : "text-gray-500 text-sm"
+                                                                                                }`}
+                                                                                        >
+                                                                                            {t.modals.createProperty.privacyPolicy}
+                                                                                        </div>
+                                                                                        <div
+                                                                                            onClick={() => setActiveContent("miniTerms")}
+                                                                                            className={`cursor-pointer px-4 py-2 ${activeContent === "miniTerms"
+                                                                                                ? "bg-white text-black rounded-t-md border border-b-0 border-gray-300"
+                                                                                                : "text-gray-500 text-sm"
+                                                                                                }`}
+                                                                                        >
+                                                                                            {t.modals.createProperty.miniTerms}
+                                                                                        </div>
+                                                                                    </div>
+                        
+                                                                                    {/* Language Tabs */}
+                                                                                    <div className="flex flex-row justify-center bg-gray-100 w-32 h-8 rounded-xl items-center mb-4">
+                                                                                        {["EN", "PT", "ES"].map((lang) => (
+                                                                                            <div
+                                                                                                key={lang}
+                                                                                                onClick={() => setActiveKey(lang)}
+                                                                                                className={`cursor-pointer p-1 ${activeKey === lang
+                                                                                                    ? "bg-white text-black rounded-lg m-1 text-sm border border-gray-200"
+                                                                                                    : "text-gray-500 m-1 text-sm"
+                                                                                                    }`}
+                                                                                            >
+                                                                                                {lang}
+                                                                                            </div>
+                                                                                        ))}
+                                                                                    </div>
+                        
+                                                                                    {/* Textarea content */}
+                                                                                    <div>
+                                                                                        {activeContent === "terms" && (
+                                                                                            <>
+                                                                                                {activeKey === "EN" && (
+                                                                                                    <div>
+                                                                                                        <textarea
+                                                                                                            value={hotelTermsEN}
+                                                                                                            onChange={(e) => setHotelTermsEN(e.target.value)}
+                                                                                                            className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                                            maxLength={2000}
+                                                                                                        />
+                                                                                                        <div className="text-right text-xs text-gray-500 mt-1">
+                                                                                                            {hotelTermsEN.length} / 2000
+                                                                                                        </div>
+                                                                                                    </div>
+                        
+                                                                                                )}
+                                                                                                {activeKey === "PT" && (
+                                                                                                    <div>
+                                                                                                        <textarea
+                                                                                                            value={hotelTermsPT}
+                                                                                                            onChange={(e) => setHotelTermsPT(e.target.value)}
+                                                                                                            className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                                            maxLength={2000}
+                                                                                                        />
+                                                                                                        <div className="text-right text-xs text-gray-500 mt-1">
+                                                                                                            {hotelTermsPT.length} / 2000
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                )}
+                                                                                                {activeKey === "ES" && (
+                                                                                                    <div>
+                                                                                                        <textarea
+                                                                                                            value={hotelTermsES}
+                                                                                                            onChange={(e) => setHotelTermsES(e.target.value)}
+                                                                                                            className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                                            maxLength={2000}
+                                                                                                        />
+                                                                                                        <div className="text-right text-xs text-gray-500 mt-1">
+                                                                                                            {hotelTermsES.length} / 2000
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                )}
+                                                                                            </>
+                                                                                        )}
+                        
+                                                                                        {activeContent === "privacy" && (
+                                                                                            <>
+                                                                                                {activeKey === "EN" && (
+                                                                                                    <div>
+                                                                                                        <textarea
+                                                                                                            value={privacyPolicyEN}
+                                                                                                            onChange={(e) => setPrivacyPolicyEN(e.target.value)}
+                                                                                                            className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                                            maxLength={2000}
+                                                                                                        />
+                                                                                                        <div className="text-right text-xs text-gray-500 mt-1">
+                                                                                                            {privacyPolicyEN.length} / 2000
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                )}
+                                                                                                {activeKey === "PT" && (
+                                                                                                    <div>
+                                                                                                        <textarea
+                                                                                                            value={privacyPolicyPT}
+                                                                                                            onChange={(e) => setPrivacyPolicyPT(e.target.value)}
+                                                                                                            className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                                            maxLength={2000}
+                                                                                                        />
+                                                                                                        <div className="text-right text-xs text-gray-500 mt-1">
+                                                                                                            {privacyPolicyPT.length} / 2000
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                )}
+                                                                                                {activeKey === "ES" && (
+                                                                                                    <div>
+                                                                                                        <textarea
+                                                                                                            value={privacyPolicyES}
+                                                                                                            onChange={(e) => setPrivacyPolicyES(e.target.value)}
+                                                                                                            className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                                            maxLength={2000}
+                                                                                                        />
+                                                                                                        <div className="text-right text-xs text-gray-500 mt-1">
+                                                                                                            {privacyPolicyES.length} / 2000
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                )}
+                                                                                            </>
+                                                                                        )}
+                        
+                                                                                        {activeContent === "miniTerms" && (
+                                                                                            <>
+                                                                                                {activeKey === "EN" && (
+                                                                                                    <div>
+                                                                                                        <textarea
+                                                                                                            value={miniTermsEN}
+                                                                                                            onChange={(e) => setMiniTermsEN(e.target.value)}
+                                                                                                            className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                                            maxLength={1000}
+                                                                                                        />
+                                                                                                        <div className="text-right text-xs text-gray-500 mt-1">
+                                                                                                            {miniTermsEN.length} / 1000
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                )}
+                                                                                                {activeKey === "PT" && (
+                                                                                                    <div>
+                                                                                                        <textarea
+                                                                                                            value={miniTermsPT}
+                                                                                                            onChange={(e) => setMiniTermsPT(e.target.value)}
+                                                                                                            className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                                            maxLength={1000}
+                                                                                                        />
+                                                                                                        <div className="text-right text-xs text-gray-500 mt-1">
+                                                                                                            {miniTermsPT.length} / 1000
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                )}
+                                                                                                {activeKey === "ES" && (
+                                                                                                    <div>
+                                                                                                        <textarea
+                                                                                                            value={miniTermsES}
+                                                                                                            onChange={(e) => setMiniTermsES(e.target.value)}
+                                                                                                            className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                                                            maxLength={1000}
+                                                                                                        />
+                                                                                                        <div className="text-right text-xs text-gray-500 mt-1">
+                                                                                                            {miniTermsES.length} / 1000
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                )}
+                                                                                            </>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </Tab>
+
+                                
+          
                         {hasStay && (
                             <Tab key="stay" title="Stay">
                                 <div>
@@ -820,10 +937,14 @@ const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
                                         <div>
                                             <p>{t.modals.propertiesEdit.stay.emailBody}</p>
                                         </div>
-                                        <div
-                                            className="bg-[#FC9D25] p-1 rounded-lg"
-                                            onClick={() => setShowVariablesbar(!showVariablesbar)}>
-                                            <FaGripLines color="white" size={15} />
+                                        <div className="flex flex-row gap-2 items-center hover:text-blue-600">
+                                            <p onClick={() => setShowTemplatesModal(true)} className="cursor-pointer">Templates</p>
+                                            <div
+                                                className="bg-[#FC9D25] p-1 rounded-lg"
+                                                onClick={() => setShowVariablesbar(!showVariablesbar)}
+                                            >
+                                                <FaGripLines color="white" size={15} />
+                                            </div>
                                         </div>
                                     </div>
                                     <textarea
@@ -918,6 +1039,35 @@ const PropertiesEditForm = ({ hotel, hotelTerms, onClose }) => {
                                     </div>
                                 )}
 
+                                {showTemplatesModal && (
+                                    <div className="fixed top-0 right-0 h-full w-72 bg-white shadow-lg p-4 z-50 flex flex-col overflow-auto">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h2 className="text-sm font-bold">Templates</h2>
+                                            <button
+                                                onClick={() => setShowTemplatesModal(false)}
+                                                className="text-gray-500 text-lg"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                        <div className="text-xs flex flex-col gap-2">
+                                            {templates.length > 0 ? (
+                                                templates.map((template) => (
+                                                    <div
+                                                        key={template.templateID}
+                                                        onClick={() => handleSelectTemplate(template)}
+                                                        className="cursor-pointer p-2 border rounded hover:bg-gray-100"
+                                                    >
+                                                        <strong>Template #{template.templateID}</strong>
+                                                        <p className="text-gray-600 text-xs truncate">{template.emailSubject}</p>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <p>Nenhum template encontrado.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </Tab>
                         )}
                     </Tabs>

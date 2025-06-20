@@ -380,6 +380,28 @@ export default function Page() {
         if (email.endsWith("@guest.booking.com")) {
             errors.push("The e-mail cannot end with @guest.booking.com.");
         }
+        let missingFields = [];
+
+        if (!guestInfo.FirstName) missingFields.push("First Name");
+        if (!guestInfo.LastName) missingFields.push("Last Name");
+        if (!address.Country) missingFields.push("Country");
+        if (!personalID.IDDoc) missingFields.push("Document Type");
+        if (!personalID.NrDoc) missingFields.push("Document Number");
+        if (!personalID.CountryOfBirth) missingFields.push("Country of Birth");
+        if (!personalID.ExpDate) missingFields.push("Document Expiry Date");
+
+        if (missingFields.length > 0) {
+            setErrorMessage(
+                `Please fill in the following required field(s):\n- ${missingFields.join("\n- ")}`
+            );
+            setIsErrorModalOpen(true);
+            return;
+        }
+        if (!contacts.Email) {
+            const proceed = window.confirm("O campo de e-mail está vazio. Deseja continuar mesmo assim?");
+            if (!proceed) return;
+        }
+
         if (errors.length > 0) {
             setErrorMessage(errors.join("\n"));
             setIsErrorModalOpen(true);
@@ -913,7 +935,7 @@ export default function Page() {
                                                     type={"text"}
                                                     id={"Last Name"}
                                                     name={"Last Name"}
-                                                    label={t.frontOffice.registrationForm.lastName}
+                                                    label={`${t.frontOffice.registrationForm.lastName} *`}
                                                     ariaLabel={"Last Name:"}
                                                     value={guestInfo.LastName}
                                                     style={"w-72 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
@@ -924,7 +946,7 @@ export default function Page() {
                                                     type={"text"}
                                                     id={"First Name"}
                                                     name={"First Name"}
-                                                    label={t.frontOffice.registrationForm.firstName}
+                                                    label={`${t.frontOffice.registrationForm.firstName} *`}
                                                     ariaLabel={"First Name:"}
                                                     value={guestInfo.FirstName}
                                                     style={"w-full h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
@@ -943,7 +965,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"Country"}
                                                 name={"Country"}
-                                                label={t.frontOffice.registrationForm.country}
+                                                label={`${t.frontOffice.registrationForm.country} *`}
                                                 ariaLabel={"Country:"}
                                                 value={address.Country}
                                                 style={inputStyleFull}
@@ -1013,7 +1035,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"Country of Birth"}
                                                 name={"Country of Birth"}
-                                                label={t.frontOffice.registrationForm.countryOfBirth}
+                                                label={`${t.frontOffice.registrationForm.countryOfBirth} *`}
                                                 ariaLabel={"Country of Birth:"}
                                                 value={personalID.CountryOfBirth}
                                                 style={`${inputStyleFullWithLine}`}
@@ -1043,7 +1065,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"ID Doc"}
                                                 name={"ID Doc"}
-                                                label={t.frontOffice.registrationForm.idDoc}
+                                                label={`${t.frontOffice.registrationForm.idDoc} *`}
                                                 ariaLabel={"ID Doc:"}
                                                 value={personalID.IDDoc}
                                                 style={`${inputStyleFullWithLine}`}
@@ -1052,7 +1074,7 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"ID Doc Nr."}
                                                 name={"ID Doc Nr."}
-                                                label={t.frontOffice.registrationForm.idDocNumber}
+                                                label={`${t.frontOffice.registrationForm.idDocNumber} *`}
                                                 ariaLabel={"ID Doc Nr.:"}
                                                 value={personalID.NrDoc}
                                                 style={`${inputStyleFullWithLine}`}
@@ -1067,7 +1089,7 @@ export default function Page() {
                                                 }
                                                 id={"Exp. Date"}
                                                 name={"Exp. Date"}
-                                                label={t.frontOffice.registrationForm.expDate}
+                                                label={`${t.frontOffice.registrationForm.expDate} *`}
                                                 ariaLabel={"Exp. Date:"}
                                                 value={
                                                     personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
@@ -1137,7 +1159,7 @@ export default function Page() {
 
                                     {/** Dados de faturação */}
                                     <div className="w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 details-on-screen-card">
-                                        <div className="flex flex-row justify-between">
+                                        <div className="flex flex-row justify-between gap-4">
                                             <div className='flex justify-start gap-6'>
                                                 <p className="text-[#f7ba83] mb-1">{t.frontOffice.registrationForm.invoiceData}</p>
                                                 <div className="flex flex-row justify-center bg-gray-100 w-34 h-8 rounded-xl items-center -mt-1">
@@ -1373,7 +1395,7 @@ export default function Page() {
                                 {/* Mensagem de Erro */}
                                 {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
                             </div>
-                            <p className='text-xs text-gray-500 mt-4 text-justify text-style'>
+                            <p className='text-xs text-gray-500 mt-4 text-justify text-style mr-4'>
                                 {hotelTerms}
                             </p>
                             <div className='flex flex-row justify-between items-center mt-4 buttons-style'>

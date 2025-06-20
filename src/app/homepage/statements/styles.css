@@ -25,12 +25,17 @@
   }
   
   /* 4 cards per row on large screens (1025px and up) */
-  @media (min-width: 1025px) {
+  @media (min-width: 1050px) {
     .grid-container {
       grid-template-columns: repeat(4, 1fr);
     }
   }
   
+    @media (min-width: 900px) {
+    .grid-container {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
   /* Card styling */
   .card {
     background-color: #fff;
@@ -43,5 +48,6 @@
     justify-content: center;
     align-items: center;
     min-height: 16rem;
+    min-width: 16rem;
   }
   

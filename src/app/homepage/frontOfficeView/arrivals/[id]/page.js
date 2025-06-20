@@ -11,6 +11,7 @@ import { MdOutlineRefresh } from "react-icons/md";
 
 import { FaCircleXmark, FaCircleExclamation } from "react-icons/fa6";
 import { FaQuestionCircle, FaCheckCircle, FaBed } from "react-icons/fa";
+import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
 
 import en from "../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
@@ -328,6 +329,29 @@ export default function Arrivals({ params }) {
     }
   };
 
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortField, setSortField] = useState('');
+
+  const sortedItems = [...items].sort((a, b) => {
+    if (sortField === 'guestName') {
+      const nameA = `${a.LastName}, ${a.FirstName}`.toLowerCase();
+      const nameB = `${b.LastName}, ${b.FirstName}`.toLowerCase();
+
+      if (sortOrder === 'asc') return nameA.localeCompare(nameB);
+      else return nameB.localeCompare(nameA);
+    }
+    return 0; // padrão se nenhum campo for selecionado
+  });
+
+  const toggleSort = (field) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
   return (
     (<main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       {isLoading && <LoadingBackdrop open={isLoading} />}
@@ -350,12 +374,6 @@ export default function Arrivals({ params }) {
               </button>
             </div>
 
-            {/* Div para o conteúdo centralizado (setas e título dinâmico) */}
-            <div className="-ml-20">
-              {/* Título "Arrivals List" separado do título dinâmico */}
-              <h2 className="text-xl text-textPrimaryColor">{propertyName} : {t.frontOffice.arrivals.arrivalList}</h2>
-            </div>
-
             {/* Botão de refresh alinhado à direita */}
             <div className="flex items-center">
               <button
@@ -367,13 +385,17 @@ export default function Arrivals({ params }) {
             </div>
           </div>
         </div>
-
+        {/* Div para o conteúdo centralizado (setas e título dinâmico) */}
+        <div className="mt-4">
+          {/* Título "Arrivals List" separado do título dinâmico */}
+          <h2 className="text-lg text-textPrimaryColor">{propertyName} : {t.frontOffice.arrivals.arrivalList}</h2>
+        </div>
         <div className="mt-5">
           {isLoading ? (
             (<LoadingBackdrop open={isLoading} />) // Exibe o carregamento enquanto os dados estão sendo carregados
           ) : reservas.length > 0 ? (
-            <div className="overflow-auto md:overflow-visible">
-              <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left mb-5 min-w-max border-collapse">
                 <thead>
                   <tr className="bg-primary text-white h-12">
                     <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6] uppercase"><FaGear size={18} color="white" /></td>
@@ -385,10 +407,25 @@ export default function Arrivals({ params }) {
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
                       <MdCleanHands size={18} color="white" />
                     </td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.lastName}</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.firstName}</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.travelAgency}</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.company}</td>
+                    <td
+                      className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase cursor-pointer select-none"
+                      onClick={() => toggleSort("guestName")}
+                    >
+                      <div className="flex justify-between items-center gap-1">
+                        {t.frontOffice.arrivals.guestName}
+                        {sortField === "guestName" ? (
+                          sortOrder === "asc" ? (
+                            <FaArrowUp size={16} />
+                          ) : (
+                            <FaArrowDown size={16} />
+                          )
+                        ) : (
+                          <FaArrowDown size={16} />
+                        )}
+                      </div>
+                    </td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase w-64">{t.frontOffice.arrivals.travelAgency}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase w-64">{t.frontOffice.arrivals.company}</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.group}</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.notes}</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.arrivals.resNo}</td>
@@ -396,7 +433,7 @@ export default function Arrivals({ params }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((reserva, index) => {
+                  {sortedItems.map((reserva, index) => {
                     return (
                       <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
                         <td className="pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center cursor-pointer">
@@ -504,8 +541,9 @@ export default function Arrivals({ params }) {
                             })()}
                           </div>
                         </td>
-                        <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.LastName}</td>
-                        <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.FirstName}</td>
+                        <td className="pl-2 pr-2 border-r border-[#e6e6e6]">
+                          {`${reserva.LastName}, ${reserva.FirstName}`}
+                        </td>
                         <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
                         <td className="pl-2 pr-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
                         <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
