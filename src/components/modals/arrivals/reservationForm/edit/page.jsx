@@ -93,8 +93,8 @@ const EditRegistrationForm = ({ currentLabel, currentValue, onSave, onClose, val
                             <div>
                                 <label className="block text-sm font-medium text-textPrimaryColor">{`New ${currentLabel}:`}</label>
                                 <input
-                                    ref={inputRef} // Referencia o input
-                                    type="text"
+                                    ref={inputRef}
+                                    type={currentLabel.toLowerCase() === "vat no." ? "number" : "text"}
                                     value={newValue}
                                     onChange={(e) => setNewValue(e.target.value)}
                                     className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"

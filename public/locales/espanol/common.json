@@ -80,10 +80,9 @@
         "departures": {
             "today": "Hoy",
             "tomorrow": "Mañana",
-            "departureList": "Lista de Salidas",
+            "departureList": "Salidas",
             "room": "Habitación",
-            "lastName": "Apellido",
-            "firstName": "Nombre",
+            "guestName": "Nombre del invitado",
             "travelAgency": "Agencia de Viajes",
             "company": "Empresa",
             "group": "Grupo",
@@ -98,11 +97,10 @@
         "arrivals": {
             "today": "Hoy",
             "tomorrow": "Mañana",
-            "arrivalList": "Lista de Llegadas",
+            "arrivalList": "Llegadas",
             "room": "Habitación",
             "roomStatus": "Estado de la Habitación",
-            "lastName": "Apellido",
-            "firstName": "Nombre",
+            "guestName": "Nombre del invitado",
             "travelAgency": "Agencia de Viajes",
             "company": "Empresa",
             "group": "Grupo",
@@ -117,8 +115,7 @@
         "inHouses": {
             "title": "InHouses",
             "room": "Habitación",
-            "lastName": "Apellido",
-            "firstName": "Nombre",
+            "guestName": "Nombre del invitado",
             "travelAgency": "Agencia de Viajes",
             "company": "Empresa",
             "group": "Grupo",
@@ -416,6 +413,12 @@
             "cancel": "Cancelar",
             "save": "Guardar",
             "countryError": "Error al cargar los países."
+        },
+        "userLogout": {
+            "title": "Confirmar cierre de sesión",
+            "message": "¿Está seguro de que desea terminar la sesión?",
+            "cancel": "Cancelar",
+            "yes": "Sí"
         }
     },
     "pagination": {

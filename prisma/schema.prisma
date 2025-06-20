@@ -142,3 +142,9 @@ model hotelTerms {
   miniTermsEN     String? @db.VarChar(1200)
   miniTermsES     String? @db.VarChar(1200)
 }
+
+model stayTemplates {
+  templateID   Int     @id @default(autoincrement())
+  emailSubject String? @default("") @db.VarChar(500)
+  emailBody    String? @default("") @db.VarChar(8000)
+}

@@ -14,6 +14,9 @@ import es from "../../../public/locales/espanol/common.json";
 
 import { MdSunny } from "react-icons/md";
 import { FaMoon, FaGlobe, FaChevronDown, FaChevronUp } from "react-icons/fa"; // Novos ícones adicionados
+import { IoMdClose } from "react-icons/io";
+
+import { Dialog } from "@headlessui/react";
 
 import ProfileModalForm from "@/components/modals/user/profileModal";
 
@@ -29,7 +32,7 @@ export default function Sidebar({ children, setExpanded }) {
   const [warningVisible, setWarningVisible] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const dropdownRef = useRef(null);
-// const modalRef = useRef(null); // Novo ref para o modal
+  // const modalRef = useRef(null); // Novo ref para o modal
 
   const [locale, setLocale] = useState("pt");
 
@@ -59,8 +62,15 @@ export default function Sidebar({ children, setExpanded }) {
     setExpanded((curr) => !curr); // Atualiza o estado externo
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleLogout = () => {
-    signOut({ callbackUrl: "/auth" }); // Redireciona para a página de login após logout
+    setIsModalOpen(true);
+  };
+
+  const confirmLogout = () => {
+    setIsModalOpen(false);
+    signOut({ callbackUrl: "/auth" });
   };
 
   const resetInactivityTimer = () => {
@@ -254,6 +264,13 @@ export default function Sidebar({ children, setExpanded }) {
             {/* Dropdown */}
             {isDropdownOpen && (
               <div ref={dropdownRef} className="absolute bottom-14 right-0 bg-background shadow-lg rounded-md p-3 w-56 z-50 text-textPrimaryColor border border-gray-200">
+                <button
+                  onClick={() => setDropdownOpen(false)} // ou a função que você usa para fechar o dropdown
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg font-bold"
+                  aria-label="Close"
+                >
+                  <IoMdClose size={20}/>
+                </button>
                 <ul>
                   <li
                     className={isAdmin ? "" : "disabled"} // Aplica uma classe de estilo "disabled" se não for admin
@@ -262,7 +279,7 @@ export default function Sidebar({ children, setExpanded }) {
                       opacity: isAdmin ? 1 : 0.5, // Reduz a opacidade para criar efeito visual de desabilitado
                     }}
                   >
-                    <div className="flex flex-row gap-4 px-3 text-sm mb-3">
+                    <div className="flex flex-row gap-4 px-3 text-sm mb-3 mt-2">
                       <RiHotelFill size={15} />
                       <Link href="/homepage/allProperties">All Properties</Link>
                     </div>
@@ -342,14 +359,31 @@ export default function Sidebar({ children, setExpanded }) {
                     </select>
                   </li>
 
-                  {/* Logout */}
-                  <li
-                    className="flex items-center py-2 px-3 rounded-md text-red-500 hover:bg-background cursor-pointer"
-                    onClick={handleLogout}
-                  >
-                    <FaSignOutAlt className="mr-2" />
-                    {t.navbar.text.logout}
-                  </li>
+       
+                  {/* Logout item */}
+      <li
+        className="flex items-center py-2 px-3 rounded-md text-red-500 hover:bg-background cursor-pointer"
+        onClick={handleLogout}
+      >
+        <FaSignOutAlt className="mr-2" />
+        {t.navbar.text.logout}
+      </li>
+
+      {/* Modal de confirmação */}
+      <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white rounded-lg p-6 w-full max-w-sm">
+          <h2 className="text-lg font-semibold mb-4">{t.modals.userLogout.title}</h2>
+          <p className="mb-6">{t.modals.userLogout.message}</p>
+          <div className="flex justify-end space-x-2">
+            <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+              {t.modals.userLogout.cancel}
+            </button>
+            <button onClick={confirmLogout} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+              {t.modals.userLogout.yes}
+            </button>
+          </div>
+        </div>
+      </Dialog>
                 </ul>
               </div>
             )}

@@ -8,6 +8,7 @@ import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
+import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
 
 import InHousesInfoForm from "@/components/modals/inhouses/info/page";
 import "../../table.css";
@@ -348,6 +349,29 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
 
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortField, setSortField] = useState('');
+
+  const sortedItems = [...reservas].sort((a, b) => {
+    if (sortField === 'guestName') {
+      const nameA = `${a.LastName}, ${a.FirstName}`.toLowerCase();
+      const nameB = `${b.LastName}, ${b.FirstName}`.toLowerCase();
+
+      if (sortOrder === 'asc') return nameA.localeCompare(nameB);
+      else return nameB.localeCompare(nameA);
+    }
+    return 0; // padrão se nenhum campo for selecionado
+  });
+
+  const toggleSort = (field) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
   return (
     (<main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       {isLoading && <LoadingBackdrop open={isLoading} />}
@@ -362,9 +386,6 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                 {new Date(today).toLocaleDateString()}
               </button>
             </div>
-            <div className="flex items-center space-x-4 mx-auto">
-              <h2 className="text-xl text-textPrimaryColor">{propertyName} : {t.frontOffice.inHouses.title}</h2>
-            </div>
 
             <div className="flex items-center">
               <button
@@ -377,26 +398,46 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
           </div>
         </div>
 
+        <div className="mt-4">
+          <h2 className="text-lg text-textPrimaryColor">{propertyName} : {t.frontOffice.inHouses.title}</h2>
+        </div>
+
         <div className="mt-5">
           {isLoading ? (
             (<LoadingBackdrop open={isLoading} />) // Exibe o carregamento enquanto os dados estão sendo carregados
           ) : reservas.length > 0 ? (
-            <table className="w-full text-left mb-5 min-w-full md:min-w-0 border-collapse">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left mb-5 min-w-max border-collapse">
               <thead>
                 <tr className="bg-primary text-white h-12">
                   <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.arrival}</td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.departure}</td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.room}</td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.lastName}</td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.firstName}</td>
+                  <td
+                      className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase cursor-pointer select-none"
+                      onClick={() => toggleSort("guestName")}
+                    >
+                      <div className="flex justify-between items-center gap-1">
+                        {t.frontOffice.arrivals.guestName}
+                        {sortField === "guestName" ? (
+                          sortOrder === "asc" ? (
+                            <FaArrowUp size={16} />
+                          ) : (
+                            <FaArrowDown size={16} />
+                          )
+                        ) : (
+                          <FaArrowDown size={16} />
+                        )}
+                      </div>
+                    </td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.company}</td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.notes}</td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.resNo}</td>
                 </tr>
               </thead>
               <tbody>
-                {reservas.map((reserva, index) => {
+                {sortedItems.map((reserva, index) => {
                   const isOpen = openDropdownIndex === index;
                   // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                   return (
@@ -439,36 +480,37 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                               </DropdownItem>
                             </DropdownMenu>
                           </Dropdown>
-                          </div>
+                        </div>
 
-                          <InHousesInfoForm
-                            buttonName={t.frontOffice.inHouses.info}
-                            buttonColor={"transparent"}
-                            modalHeader={"Res. No.: " + selectedReserva?.ResNo}
-                            formTypeModal={11}
-                            roomNumber={selectedReserva?.Room}
-                            dateCI={selectedReserva?.DateCI}
-                            booker={selectedReserva?.Booker}
-                            salutation={selectedReserva?.Salutation}
-                            lastName={selectedReserva?.LastName}
-                            firstName={selectedReserva?.FirstName}
-                            roomType={selectedReserva?.RoomType}
-                            resStatus={selectedReserva?.resStatus}
-                            childs={selectedReserva?.Childs}
-                            adults={selectedReserva?.Adults}
-                            balance={selectedReserva?.Balance}
-                            country={selectedReserva?.Country}
-                            isBackdropVisible={true}
-                            isOpen={isModalOpen}
-                            onClose={handleCloseModal}
-                          />
+                        <InHousesInfoForm
+                          buttonName={t.frontOffice.inHouses.info}
+                          buttonColor={"transparent"}
+                          modalHeader={"Res. No.: " + selectedReserva?.ResNo}
+                          formTypeModal={11}
+                          roomNumber={selectedReserva?.Room}
+                          dateCI={selectedReserva?.DateCI}
+                          booker={selectedReserva?.Booker}
+                          salutation={selectedReserva?.Salutation}
+                          lastName={selectedReserva?.LastName}
+                          firstName={selectedReserva?.FirstName}
+                          roomType={selectedReserva?.RoomType}
+                          resStatus={selectedReserva?.resStatus}
+                          childs={selectedReserva?.Childs}
+                          adults={selectedReserva?.Adults}
+                          balance={selectedReserva?.Balance}
+                          country={selectedReserva?.Country}
+                          isBackdropVisible={true}
+                          isOpen={isModalOpen}
+                          onClose={handleCloseModal}
+                        />
 
                       </td>
                       <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCI}</td>
                       <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCO}</td>
                       <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.Room}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.LastName}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.FirstName}</td>
+                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">
+                          {`${reserva.LastName}, ${reserva.FirstName}`}
+                        </td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-32">{reserva.Company}</td>
                       <td className="pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate">{reserva.Notes}</td>
                       <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right w-20">{reserva.ResNo}</td>
@@ -477,6 +519,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                 })}
               </tbody>
             </table>
+            </div>
           ) : (
             <p className="text-textLabelColor">{t.frontOffice.inHouses.noReservations}</p>
           )}

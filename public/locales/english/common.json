@@ -82,8 +82,7 @@
             "tomorrow": "Tomorrow",
             "departureList": "Departure",
             "room": "Room",
-            "lastName": "Last Name",
-            "firstName": "First Name",
+            "guestName": "Guest Name",
             "travelAgency": "Travel Agency",
             "company": "Company",
             "group": "Group",
@@ -98,11 +97,10 @@
         "arrivals": {
             "today": "Today",
             "tomorrow": "Tomorrow",
-            "arrivalList": "Arrival List",
+            "arrivalList": "Arrival",
             "room": "Room",
             "roomStatus": "ST",
-            "lastName": "Last Name",
-            "firstName": "First Name",
+            "guestName": "Guest Name",
             "travelAgency": "Travel Agency",
             "company": "Company",
             "group": "Group",
@@ -118,8 +116,7 @@
             "title": "In Houses",
             "arrival": "Arrival",
             "departure": "Departure",
-            "lastName": "Last Name",
-            "firstName": "First Name",
+            "guestName": "Guest Name",
             "company": "Company",
             "notes": "Notes",
             "resNo": "Res. No.",
@@ -415,6 +412,12 @@
             "cancel": "Cancel",
             "save": "Save",
             "countryError": "Error loading countries."
+        },
+        "userLogout": {
+            "title": "Confirm Logout",
+            "message": "Are you sure you want to end the session?",
+            "cancel": "Cancel",
+            "yes": "Yes"
         }
     },
     "pagination": {
