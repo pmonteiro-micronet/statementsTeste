@@ -57,6 +57,7 @@ const ArrivalInfoForm = ({
                         isDismissable={false}
                         isKeyboardDismissDisabled={true}
                         size="sm"
+                        backdrop="transparent"
                     >
                         <ModalContent>
                             {(onClose) => (
