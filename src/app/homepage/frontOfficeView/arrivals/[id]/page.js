@@ -497,7 +497,7 @@ export default function Arrivals({ params }) {
                             modalHeader={t.frontOffice.infoModal.arrival.reservation.title}
                             formTypeModal={11}
                             roomNumber={reserva.Room}  // Passando o roomNumber
-                            dateCO={reserva.DateCI} 
+                            dateCI={reserva.DateCI} 
                             booker={reserva.Booker}
                             salutation={reserva.Salutation}
                             lastName={reserva.LastName}
