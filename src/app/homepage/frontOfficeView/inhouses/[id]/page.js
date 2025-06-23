@@ -409,7 +409,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
             <div className="overflow-x-auto">
               <table className="w-full text-left mb-5 min-w-max border-collapse">
               <thead>
-                <tr className="bg-primary text-white h-12">
+                <tr className="bg-primary text-white h-16">
                   <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.arrival}</td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.departure}</td>
@@ -441,7 +441,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                   const isOpen = openDropdownIndex === index;
                   // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                   return (
-                    <tr key={index} onClick={() => setOpenDropdownIndex(index)} className="h-10 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">
+                    <tr key={index} onClick={() => setOpenDropdownIndex(index)} className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">
                       <td className="pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center">
                         <div className="flex items-center justify-center w-full h-full">
                           <Dropdown isOpen={isOpen} onOpenChange={(open) => setOpenDropdownIndex(open ? index : null)}>
@@ -505,15 +505,15 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                         />
 
                       </td>
-                      <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCI}</td>
-                      <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCO}</td>
-                      <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.Room}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">
+                      <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.DateCI}</td>
+                      <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.DateCO}</td>
+                      <td className="text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.Room}</td>
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">
                           {`${reserva.LastName}, ${reserva.FirstName}`}
                         </td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-32">{reserva.Company}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate">{reserva.Notes}</td>
-                      <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right w-20">{reserva.ResNo}</td>
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-32 truncate whitespace-nowrap overflow-hidden">{reserva.Company}</td>
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate whitespace-nowrap overflow-hidden">{reserva.Notes}</td>
+                      <td className="h-14 pr-2 pr-2 border-r border-[#e6e6e6] text-right w-20 truncate whitespace-nowrap overflow-hidden">{reserva.ResNo}</td>
                     </tr>
                   );
                 })}

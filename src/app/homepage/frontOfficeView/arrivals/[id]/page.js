@@ -397,7 +397,7 @@ export default function Arrivals({ params }) {
             <div className="overflow-x-auto">
               <table className="w-full text-left mb-5 min-w-max border-collapse">
                 <thead>
-                  <tr className="bg-primary text-white h-12">
+                  <tr className="bg-primary text-white h-16">
                     <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6] uppercase"><FaGear size={18} color="white" /></td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
                       <div className="flex items-center justify-center">
@@ -435,7 +435,7 @@ export default function Arrivals({ params }) {
                 <tbody>
                   {sortedItems.map((reserva, index) => {
                     return (
-                      <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
+                      <tr key={index} className="min-h-14 h-14 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
                         <td className="pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center cursor-pointer">
                           <Dropdown>
                             <DropdownTrigger>
@@ -497,15 +497,15 @@ export default function Arrivals({ params }) {
                             modalHeader={t.frontOffice.infoModal.arrival.reservation.title}
                             formTypeModal={11}
                             roomNumber={reserva.Room}  // Passando o roomNumber
-                            dateCO={reserva.DateCO}  // Passando a data de check-out (dateCO)
+                            dateCO={reserva.DateCI} 
                             booker={reserva.Booker}
                             salutation={reserva.Salutation}
                             lastName={reserva.LastName}
                             firstName={reserva.FirstName}
                             roomType={reserva.RoomType}
-                            resStatus={reserva.ResStatus}
+                            resStatus={reserva.RoomStatus}
                             totalPax={reserva.TotalPax}
-                            balance={reserva.Balance}
+                            balance={reserva.Total}
                             country={reserva.Country}
                             isBackdropVisible={true}
                             isOpen={isModalOpen}
@@ -541,15 +541,15 @@ export default function Arrivals({ params }) {
                             })()}
                           </div>
                         </td>
-                        <td className="pl-2 pr-2 border-r border-[#e6e6e6]">
+                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">
                           {`${reserva.LastName}, ${reserva.FirstName}`}
                         </td>
-                        <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
-                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
-                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
-                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-52 max-w-xs truncate">{reserva.Notes}</td>
-                        <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
-                        <td className="text-right pr-2 w-28 whitespace-nowrap">{reserva.DateCI}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva.Booker}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva.Company}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-40 truncate whitespace-nowrap overflow-hidden">{reserva.Group}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-52 max-w-xs truncate whitespace-nowrap overflow-hidden">{reserva.Notes}</td>
+                        <td className="h-14 pr-2 pr-2 border-r border-[#e6e6e6] text-right truncate whitespace-nowrap overflow-hidden">{reserva.ResNo}</td>
+                        <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.DateCI}</td>
                       </tr>
                     );
                   })}

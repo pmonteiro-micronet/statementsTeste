@@ -390,7 +390,7 @@ export default function Page({ params }) {
             <div className="overflow-x-auto">
               <table className="w-full text-left mb-5 min-w-max border-collapse">
               <thead>
-                <tr className="bg-primary text-white h-12">
+                <tr className="bg-primary text-white h-16">
                   <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
                   <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.room}</td>
                   <td
@@ -422,8 +422,8 @@ export default function Page({ params }) {
                 {sortedItems.map((reserva, index) => {
                   // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                   return (
-                    <tr key={index} className="h-10 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
-                      <td className="pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center cursor-pointer">
+                    <tr key={index} className="min-h-14 h-14 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
+                      <td className="h-14 pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center cursor-pointer">
                         <Dropdown>
                           <DropdownTrigger>
                             <Button
@@ -478,16 +478,16 @@ export default function Page({ params }) {
                           onClose={handleCloseModal}
                         />
                       </td>
-                      <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.Room}</td>
-                       <td className="pl-2 pr-2 border-r border-[#e6e6e6]">
+                      <td className="h-14 pr-2 border-r border-[#e6e6e6] text-right truncate whitespace-nowrap overflow-hidden">{reserva.Room}</td>
+                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">
                           {`${reserva.LastName}, ${reserva.FirstName}`}
                         </td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{reserva.Booker}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] ">{reserva.Company}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-40">{reserva.Group}</td>
-                      <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-64 max-w-xs truncate">{reserva.Notes}</td>
-                      <td className="pr-2 pr-2 border-r border-[#e6e6e6] text-right">{reserva.ResNo}</td>
-                      <td className="text-right pr-2 whitespace-nowrap">{reserva.DateCO}</td>
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva.Booker}</td>
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva.Company}</td>
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-40truncate whitespace-nowrap overflow-hidden">{reserva.Group}</td>
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-64 max-w-xs truncate whitespace-nowrap overflow-hidden">{reserva.Notes}</td>
+                      <td className="h-14 pr-2 pr-2 border-r border-[#e6e6e6] text-righttruncate whitespace-nowrap overflow-hidden">{reserva.ResNo}</td>
+                      <td className="h-14 text-right pr-2 truncate whitespace-nowrap overflow-hidden">{reserva.DateCO}</td>
                     </tr>
                   );
                 })}
