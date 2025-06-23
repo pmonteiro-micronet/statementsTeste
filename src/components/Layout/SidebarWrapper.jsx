@@ -17,9 +17,8 @@ const translations = { en, pt, es };
 import { TbLayoutDashboardFilled } from "react-icons/tb";
 import { MdOutlinePendingActions } from "react-icons/md";
 import { AiOutlineFileDone } from "react-icons/ai";
-import { LiaPlaneDepartureSolid } from "react-icons/lia";
-import { LiaPlaneArrivalSolid } from "react-icons/lia";
 import { LuMapPinHouse } from "react-icons/lu";
+import { RxEnter, RxExit } from "react-icons/rx";
 
 export default function SidebarWrapper({ children }) {
   const { data: session } = useSession();
@@ -162,7 +161,7 @@ export default function SidebarWrapper({ children }) {
               ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
               label: `${t.navbar.text.arrivals}`,
               onClick: () => handleRedirect("arrivals"),
-              icon: <LiaPlaneArrivalSolid />,
+              icon: <RxEnter />,
             },
             {
               ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
@@ -174,7 +173,7 @@ export default function SidebarWrapper({ children }) {
               ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
               label: `${t.navbar.text.departures}`,
               onClick: () => handleRedirect("departures"),
-              icon: <LiaPlaneDepartureSolid />,
+              icon: <RxExit />,
             },
           ],
         },        

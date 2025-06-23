@@ -9,6 +9,8 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
+import { IoMdInformationCircle } from "react-icons/io";
+import { CgFormatIndentIncrease } from "react-icons/cg";
 
 import DepartureInfoForm from "@/components/modals/departures/info/page";
 import "../../table.css";
@@ -440,7 +442,9 @@ export default function Page({ params }) {
                             className="relative z-10 text-textPrimaryColor"
                           >
                             <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
-                              {t.frontOffice.departures.info}
+                              <div className="flex flex-row gap-2">
+                              <IoMdInformationCircle size={15}/> {t.frontOffice.departures.info}
+                              </div>
                             </DropdownItem>
                             <DropdownItem
                               key="show"
@@ -452,7 +456,9 @@ export default function Page({ params }) {
                                 }
                               }}
                             >
-                              {t.frontOffice.departures.statement}
+                              <div className="flex flex-row gap-2">
+                              <CgFormatIndentIncrease size={15}/> {t.frontOffice.departures.statement}
+                              </div>
                             </DropdownItem>
                           </DropdownMenu>
                         </Dropdown>

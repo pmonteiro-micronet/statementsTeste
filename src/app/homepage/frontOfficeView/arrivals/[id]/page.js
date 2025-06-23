@@ -8,6 +8,9 @@ import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
+import { IoMdInformationCircle } from "react-icons/io";
+import { RxEnter } from "react-icons/rx";
+import { CgFormatIndentIncrease } from "react-icons/cg";
 
 import { FaCircleXmark, FaCircleExclamation } from "react-icons/fa6";
 import { FaQuestionCircle, FaCheckCircle, FaBed } from "react-icons/fa";
@@ -452,13 +455,17 @@ export default function Arrivals({ params }) {
                               className="relative z-10 text-textPrimaryColor"
                             >
                               <DropdownItem key="edit" onClick={() => handleOpenModal()}>
-                                {t.frontOffice.arrivals.info}
+                                <div className="flex flex-row gap-2">
+                                  <IoMdInformationCircle size={15} /> {t.frontOffice.arrivals.info}
+                                </div>
                               </DropdownItem>
                               <DropdownItem
                                 key="checkIn"
                                 onClick={() => handleCheckIn(reserva.ResNo)}
                               >
-                                CheckIn
+                                <div className="flex flex-row gap-2">
+                                  <RxEnter size={15} /> CheckIn
+                                </div>
                               </DropdownItem>
                               <DropdownItem
                                 key="show"
@@ -486,7 +493,9 @@ export default function Arrivals({ params }) {
                                   }
                                 }}
                               >
-                                {t.frontOffice.arrivals.registrationForm}
+                                <div className="flex flex-row gap-2">
+                                  <CgFormatIndentIncrease size={16}/> {t.frontOffice.arrivals.registrationForm}
+                                </div>
                               </DropdownItem>
                             </DropdownMenu>
                           </Dropdown>
@@ -497,7 +506,7 @@ export default function Arrivals({ params }) {
                             modalHeader={t.frontOffice.infoModal.arrival.reservation.title}
                             formTypeModal={11}
                             roomNumber={reserva.Room}  // Passando o roomNumber
-                            dateCI={reserva.DateCI} 
+                            dateCI={reserva.DateCI}
                             booker={reserva.Booker}
                             salutation={reserva.Salutation}
                             lastName={reserva.LastName}
