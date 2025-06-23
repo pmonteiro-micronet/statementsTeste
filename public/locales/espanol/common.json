@@ -1,10 +1,12 @@
 {
     "auth": {
-        "instruction1": "Para acceder a Extensions myPMS, introduzca su correo electrónico y contraseña.",
+        "instruction0": "Bienvenido",
+        "instruction1": "Inicia sesión en Mypms para continuar a extensiones.",
         "instruction2": "¿Olvidó su correo electrónico o contraseña?",
         "instruction3": "Ya soy cliente, pero no tengo acceso. ¿Cómo puedo unirme a Extensions myPMS?",
         "email": "Correo electrónico",
         "password": "Contraseña",
+        "continue": "Continuar",
         "login": "Iniciar sesión",
         "footer": {
             "callCost": "Costo de una llamada a la red fija nacional.",

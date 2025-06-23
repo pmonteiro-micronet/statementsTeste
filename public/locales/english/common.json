@@ -1,10 +1,12 @@
 {
     "auth": {
-        "instruction1": "To access Extensions myPMS, enter your Email and Password.",
+        "instruction0": "Welcome",
+        "instruction1": "Sign in to Mypms to continue to extensions.",
         "instruction2": "Forgot your Email or Password?",
         "instruction3": "I am already a customer but do not have access. How can I join Extensions myPMS?",
         "email": "E-mail",
         "password": "Password",
+        "continue": "Continue",
         "login": "Login",
         "footer": {
             "callCost": "Cost of a call to the national fixed-line network.",

@@ -14,6 +14,9 @@ const translations = { en, pt, es };
 
 import CryptoJS from "crypto-js";
 
+import { FaRegEye, FaEyeSlash } from "react-icons/fa";
+
+
 // Função para descriptografar os dados
 const decryptData = (encryptedText) => {
   try {
@@ -50,6 +53,8 @@ const SignIn = () => {
 
   const locale = "en"; // Substitua pelo valor dinâmico do idioma (e.g., router.locale)
   const t = translations[locale];
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordText, setShowPasswordText] = useState(false);
 
   useEffect(() => {
     const savedHotelID = localStorage.getItem("selectedHotelID");
@@ -70,7 +75,7 @@ const SignIn = () => {
       email,
       password,
       internal: isQrLogin,
-    });    
+    });
 
     if (result?.error) {
       setError(result.error);
@@ -90,12 +95,12 @@ const SignIn = () => {
   useEffect(() => {
     if (scanning) {
       const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-  
+
       scanner.render(async (decodedText) => {
         try {
           // Descriptografando os dados do QR Code
           const decryptedData = decryptData(decodedText);
-  
+
           if (
             decryptedData?.email &&
             decryptedData?.password &&
@@ -108,7 +113,7 @@ const SignIn = () => {
             setEmail(decryptedData.email);
             setPassword(decryptedData.password);
             setIsQrLogin(true);  // Marca que estamos fazendo login via QR Code
-  
+
             // Realiza o login automaticamente
             const result = await signIn("credentials", {
               redirect: false,
@@ -116,7 +121,7 @@ const SignIn = () => {
               password: decryptedData.password,
               internal: true,  // Marca o login como interno
             });
-  
+
             if (result?.error) {
               setError(result.error);
             } else {
@@ -128,27 +133,96 @@ const SignIn = () => {
                 requestID: decryptedData.requestID,
                 profileID: decryptedData.profileID,
               }));
-            
+
               setScanning(false);
               scanner.clear();
-            
+
               // Redireciona sem parâmetros
               router.push("/qrcode_user");
-            }            
-          }            
+            }
+          }
         } catch (error) {
           console.error("Erro ao processar QR Code", error);
         }
       });
-  
+
       return () => scanner.clear();
     }
   }, [scanning]);  // Dependência do estado `scanning`  
 
-
   return (
-    <div className="flex min-h-screen">
-      {/* Metade esquerda (Conteúdo de login) */}
+    <div className="min-h-screen bg-gradient-to-tr from-orange-500 via-black to-black flex justify-center items-center">
+      <div className="w-[23rem] bg-white rounded-3xl p-4">
+        <div className="flex flex-col mt-4 gap-4">
+          <div className="font-bold text-2xl flex justify-center">
+            extensions
+          </div>
+          <div className="flex justify-center">
+            <img src="/icon/extensions_logo.png" alt="logo" width={40}/>
+          </div>
+        </div>
+
+        <div className="mt-4 text-sm text-gray-700 flex flex-col gap-2 justify-center items-center">
+          <div>{t.auth.instruction0}</div>
+          <div>{t.auth.instruction1}</div>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="mt-4">
+            <input
+              type="email"
+              placeholder={t.auth.email}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="border border-black w-full rounded-lg p-2 outline-none"
+            />
+          </div>
+
+          {!showPassword && (
+            <div
+              className="w-full rounded-lg bg-primary text-white flex justify-center mt-4 p-2 cursor-pointer"
+              onClick={() => {
+                if (email.trim()) {
+                  setShowPassword(true);
+                }
+              }}
+            >
+              {t.auth.continue}
+            </div>
+          )}
+
+          {showPassword && (
+            <>
+              <div className="mt-4 relative">
+                <input
+                  type={showPasswordText ? "text" : "password"}
+                  placeholder={t.auth.password}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="border border-black w-full rounded-lg p-2 outline-none pr-10"
+                />
+                <div
+                  onClick={() => setShowPasswordText(!showPasswordText)}
+                  className="absolute right-3 top-2.5 cursor-pointer text-gray-600"
+                >
+                  {showPasswordText ? <FaEyeSlash /> : <FaRegEye />}
+                </div>
+              </div>
+              <div className="mt-4 flex justify-center text-xs text-gray-500">
+                <p>{t.auth.instruction2}</p>
+              </div>
+              <button
+                id="loginButton"
+                type="submit"
+                className="w-full rounded-lg bg-primary text-white flex justify-center mt-4 p-2"
+              >
+                {t.auth.login}
+              </button>
+              {error && <p className="text-red-600 mt-2">{error}</p>}
+            </>
+          )}
+        </form>
+      </div>
+      {/* Metade esquerda (Conteúdo de login)
       <div className="p-8 flex items-center justify-center login-container">
         <div className="flex flex-col items-start w-full md:w-80">
           <div className="hide-on-computer show-on-phone">
@@ -189,9 +263,9 @@ const SignIn = () => {
               className="w-full border border-gray-300 rounded-2xl h-10 text-sm text-gray-500 hover:bg-primary-50"
             >
               {t.auth.login}
-            </button>
+            </button> */}
 
-            {/* <button
+      {/* <button
               type="button"
               className="w-full mt-2 border border-gray-300 rounded-2xl h-10 text-sm text-gray-500 hover:bg-primary-50"
               onClick={() => setScanning(true)}
@@ -201,26 +275,26 @@ const SignIn = () => {
 
             {scanning && <div id="reader" className="mt-4"></div>} */}
 
-            {error && <p style={{ color: "red" }}>{error}</p>}
+      {/* {error && <p style={{ color: "red" }}>{error}</p>}
             <div className="mt-10 flex flex-col gap-4 text-sm text-gray-400">
               <p>{t.auth.instruction2}</p>
               <p>{t.auth.instruction3}</p>
             </div>
           </form>
         </div>
-      </div>
+      </div> */}
 
       {/* Metade direita (Imagem) */}
-      <div className="p-0 relative right-image hide-on-mobile">
+      {/* <div className="p-0 relative right-image hide-on-mobile">
         <img
           src="login/cover.jpg"
           alt="Imagem na metade direita"
           className="w-full h-full object-cover"
         />
-      </div>
+      </div> */}
 
       {/* Footer */}
-      <div className="bg-gray-100 h-40 footer flex flex-row gap-5 items-center z-10 hide-on-mobile">
+      {/* <div className="bg-gray-100 h-40 footer flex flex-row gap-5 items-center z-10 hide-on-mobile">
         <div>
           <img src="login/logo_Hits.png" width={180} className="ml-6" />
         </div>
@@ -240,7 +314,7 @@ const SignIn = () => {
             suporte@hitsnorte.pt
           </p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

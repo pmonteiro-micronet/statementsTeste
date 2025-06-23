@@ -1,10 +1,12 @@
 {
     "auth": {
-        "instruction1": "Para aceder ao Extensions myPMS, insira o seu E-mail e Palavra-passe.",
+        "instruction0": "Bem-vindo",
+        "instruction1": "Inicie a sessão em Mypms para continuar para extensions.",
         "instruction2": "Esqueceu-se do seu E-mail ou Palavra-passe?",
         "instruction3": "Já sou cliente, mas não tenho acesso. Como posso aderir ao Extensions myPMS?",
         "email": "E-mail",
         "password": "Palavra-passe",
+        "continue": "Continuar",
         "login": "Entrar",
         "footer": {
             "callCost": "Custo de uma chamada para a rede fixa nacional.",
