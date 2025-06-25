@@ -99,7 +99,7 @@
         "arrivals": {
             "today": "Today",
             "tomorrow": "Tomorrow",
-            "arrivalList": "Arrival",
+            "arrivalList": "Arrivals",
             "room": "Room",
             "roomStatus": "ST",
             "guestName": "Guest Name",
@@ -117,7 +117,7 @@
         "inHouses": {
             "title": "In Houses",
             "arrival": "Arrival",
-            "departure": "Departure",
+            "departure": "Departures",
             "guestName": "Guest Name",
             "company": "Company",
             "notes": "Notes",
