@@ -379,23 +379,23 @@ export default function Page({ params }) {
           </div>
         </div>
 
-            {/* Div para o conteúdo centralizado (setas e título dinâmico) */}
-            <div className="mt-4">
-              {/* Título "Departures List" separado do título dinâmico */}
-              <h2 className="text-lg text-textPrimaryColor">{propertyName} : {t.frontOffice.departures.departureList}</h2>
-            </div>
+        {/* Div para o conteúdo centralizado (setas e título dinâmico) */}
+        <div className="mt-4">
+          {/* Título "Departures List" separado do título dinâmico */}
+          <h2 className="text-lg text-textPrimaryColor">{propertyName} : {t.frontOffice.departures.departureList}</h2>
+        </div>
 
-        <div className="mt-5">
+        <div className="mt-5 flex flex-col h-[calc(100vh-210px)]">
           {isLoading ? (
-            (<LoadingBackdrop open={isLoading} />) // Exibe o carregamento enquanto os dados estão sendo carregados
+            (<LoadingBackdrop open={isLoading} />) 
           ) : reservas.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left mb-5 min-w-max border-collapse">
-              <thead>
-                <tr className="bg-primary text-white h-16">
-                  <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.room}</td>
-                  <td
+            <div className="overflow-auto flex-grow border rounded-lg">
+              <table className="w-full text-left min-w-max border-collapse">
+                <thead className="sticky top-0 z-30">
+                  <tr className="bg-primary text-white h-16">
+                    <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.room}</td>
+                    <td
                       className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase cursor-pointer select-none"
                       onClick={() => toggleSort("guestName")}
                     >
@@ -412,93 +412,93 @@ export default function Page({ params }) {
                         )}
                       </div>
                     </td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.travelAgency}</td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase w-64">{t.frontOffice.arrivals.company}</td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.group}</td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.notes}</td>
-                  <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.resNo}</td>
-                  <td className="pl-2 uppercase">{t.frontOffice.departures.departure}</td>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedItems.map((reserva, index) => {
-                  // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
-                  return (
-                    <tr key={index} className="min-h-14 h-14 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
-                      <td className="h-14 pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center cursor-pointer">
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <Button
-                              variant="light"
-                              className="flex justify-center items-center w-full h-full min-w-0 p-0 m-0"
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.travelAgency}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase w-64">{t.frontOffice.arrivals.company}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.group}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.notes}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.departures.resNo}</td>
+                    <td className="pl-2 uppercase">{t.frontOffice.departures.departure}</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedItems.map((reserva, index) => {
+                    // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
+                    return (
+                      <tr key={index} className="min-h-14 h-14 border-b border-[#e8e6e6] text-left text-textPrimaryColor hover:bg-primary-50">
+                        <td className="h-14 pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center cursor-pointer">
+                          <Dropdown>
+                            <DropdownTrigger>
+                              <Button
+                                variant="light"
+                                className="flex justify-center items-center w-full h-full min-w-0 p-0 m-0 z-10"
+                              >
+                                <BsThreeDotsVertical size={25} className="text-textPrimaryColor" />
+                              </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu
+                              aria-label="Static Actions"
+                              closeOnSelect={true}
+                              isOpen={true}
+                              className="relative z-10 text-textPrimaryColor"
                             >
-                              <BsThreeDotsVertical size={25} className="text-textPrimaryColor" />
-                            </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu
-                            aria-label="Static Actions"
-                            closeOnSelect={true}
-                            isOpen={true}
-                            className="relative z-10 text-textPrimaryColor"
-                          >
-                            <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
-                              <div className="flex flex-row gap-2">
-                              <IoMdInformationCircle size={15}/> {t.frontOffice.departures.info}
-                              </div>
-                            </DropdownItem>
-                            <DropdownItem
-                              key="show"
-                              onClick={() => {
-                                if (reserva.ResNo) {
-                                  sendResToAPI(reserva.ResNo);
-                                } else {
-                                  console.warn("ReservationNumber não encontrado.");
-                                }
-                              }}
-                            >
-                              <div className="flex flex-row gap-2">
-                              <CgFormatIndentIncrease size={15}/> {t.frontOffice.departures.statement}
-                              </div>
-                            </DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
-                        <DepartureInfoForm
-                          buttonName={"Info"}
-                          buttonColor={"transparent"}
-                          modalHeader={`${t.frontOffice.infoModal.departure.title} ${selectedReserva?.ResNo}`}
-                          formTypeModal={11}
-                          roomNumber={selectedReserva?.Room}  // Passando o roomNumber
-                          dateCO={selectedReserva?.DateCO}  // Passando a data de check-out (dateCO)
-                          booker={selectedReserva?.Booker}
-                          salutation={selectedReserva?.Salutation}
-                          lastName={selectedReserva?.LastName}
-                          firstName={selectedReserva?.FirstName}
-                          roomType={selectedReserva?.RoomType}
-                          resStatus={selectedReserva?.resStatus}
-                          childs={selectedReserva?.Childs}
-                          adults={selectedReserva?.Adults}
-                          balance={selectedReserva?.balance}
-                          country={selectedReserva?.Country}
-                          isBackdropVisible={true}
-                          isOpen={isModalOpen}
-                          onClose={handleCloseModal}
-                        />
-                      </td>
-                      <td className="h-14 pr-2 border-r border-[#e6e6e6] text-right truncate whitespace-nowrap overflow-hidden">{reserva.Room}</td>
-                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">
+                              <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
+                                <div className="flex flex-row gap-2">
+                                  <IoMdInformationCircle size={15} /> {t.frontOffice.departures.info}
+                                </div>
+                              </DropdownItem>
+                              <DropdownItem
+                                key="show"
+                                onClick={() => {
+                                  if (reserva.ResNo) {
+                                    sendResToAPI(reserva.ResNo);
+                                  } else {
+                                    console.warn("ReservationNumber não encontrado.");
+                                  }
+                                }}
+                              >
+                                <div className="flex flex-row gap-2">
+                                  <CgFormatIndentIncrease size={15} /> {t.frontOffice.departures.statement}
+                                </div>
+                              </DropdownItem>
+                            </DropdownMenu>
+                          </Dropdown>
+                          <DepartureInfoForm
+                            buttonName={"Info"}
+                            buttonColor={"transparent"}
+                            modalHeader={`${t.frontOffice.infoModal.departure.title} ${selectedReserva?.ResNo}`}
+                            formTypeModal={11}
+                            roomNumber={selectedReserva?.Room}  // Passando o roomNumber
+                            dateCO={selectedReserva?.DateCO}  // Passando a data de check-out (dateCO)
+                            booker={selectedReserva?.Booker}
+                            salutation={selectedReserva?.Salutation}
+                            lastName={selectedReserva?.LastName}
+                            firstName={selectedReserva?.FirstName}
+                            roomType={selectedReserva?.RoomType}
+                            resStatus={selectedReserva?.resStatus}
+                            childs={selectedReserva?.Childs}
+                            adults={selectedReserva?.Adults}
+                            balance={selectedReserva?.balance}
+                            country={selectedReserva?.Country}
+                            isBackdropVisible={true}
+                            isOpen={isModalOpen}
+                            onClose={handleCloseModal}
+                          />
+                        </td>
+                        <td className="h-14 pr-2 border-r border-[#e6e6e6] text-right truncate whitespace-nowrap overflow-hidden">{reserva.Room}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">
                           {`${reserva.LastName}, ${reserva.FirstName}`}
                         </td>
-                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva.Booker}</td>
-                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva.Company}</td>
-                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-40truncate whitespace-nowrap overflow-hidden">{reserva.Group}</td>
-                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-64 max-w-xs truncate whitespace-nowrap overflow-hidden">{reserva.Notes}</td>
-                      <td className="h-14 pr-2 pr-2 border-r border-[#e6e6e6] text-righttruncate whitespace-nowrap overflow-hidden">{reserva.ResNo}</td>
-                      <td className="h-14 text-right pr-2 truncate whitespace-nowrap overflow-hidden">{reserva.DateCO}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva.Booker}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva.Company}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-40truncate whitespace-nowrap overflow-hidden">{reserva.Group}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-64 max-w-xs truncate whitespace-nowrap overflow-hidden">{reserva.Notes}</td>
+                        <td className="h-14 pr-2 pr-2 border-r border-[#e6e6e6] text-righttruncate whitespace-nowrap overflow-hidden">{reserva.ResNo}</td>
+                        <td className="h-14 text-right pr-2 truncate whitespace-nowrap overflow-hidden">{reserva.DateCO}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           ) : (
             <p className="text-textLabelColor">{t.frontOffice.departures.noReservations}</p>

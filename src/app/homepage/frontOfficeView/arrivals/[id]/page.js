@@ -393,15 +393,14 @@ export default function Arrivals({ params }) {
           {/* Título "Arrivals List" separado do título dinâmico */}
           <h2 className="text-lg text-textPrimaryColor">{propertyName} : {t.frontOffice.arrivals.arrivalList}</h2>
         </div>
-       <div className="mt-5 flex flex-col h-[calc(100vh-210px)]">
+        <div className="mt-5 flex flex-col h-[calc(100vh-210px)]">
 
-  {isLoading ? (
-    <LoadingBackdrop open={isLoading} />
-  ) : reservas.length > 0 ? (
-    <div className="overflow-auto flex-grow border rounded-lg">
+          {isLoading ? (
+            <LoadingBackdrop open={isLoading} />
+          ) : reservas.length > 0 ? (
+            <div className="overflow-auto flex-grow border rounded-lg">
               <table className="w-full text-left min-w-max border-collapse">
-                <thead className="sticky top-0 z-10 bg-primary text-white z-30">
-
+                <thead className="sticky top-0 z-30">
                   <tr className="bg-primary text-white h-16">
                     <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6] uppercase"><FaGear size={18} color="white" /></td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
@@ -496,7 +495,7 @@ export default function Arrivals({ params }) {
                                 }}
                               >
                                 <div className="flex flex-row gap-2">
-                                  <CgFormatIndentIncrease size={16}/> {t.frontOffice.arrivals.registrationForm}
+                                  <CgFormatIndentIncrease size={16} /> {t.frontOffice.arrivals.registrationForm}
                                 </div>
                               </DropdownItem>
                             </DropdownMenu>
