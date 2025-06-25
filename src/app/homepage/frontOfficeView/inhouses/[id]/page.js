@@ -408,7 +408,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
           {isLoading ? (
             (<LoadingBackdrop open={isLoading} />) // Exibe o carregamento enquanto os dados estão sendo carregados
           ) : reservas.length > 0 ? (
-            <div className="overflow-auto flex-grow border rounded-lg">
+            <div className="overflow-auto flex-grow">
               <table className="w-full text-left min-w-max border-collapse">
                 <thead className="sticky top-0 z-30">
                   <tr className="bg-primary text-white h-16">

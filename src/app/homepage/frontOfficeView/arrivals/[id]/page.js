@@ -398,7 +398,7 @@ export default function Arrivals({ params }) {
           {isLoading ? (
             <LoadingBackdrop open={isLoading} />
           ) : reservas.length > 0 ? (
-            <div className="overflow-auto flex-grow border rounded-lg">
+            <div className="overflow-auto flex-grow">
               <table className="w-full text-left min-w-max border-collapse">
                 <thead className="sticky top-0 z-30">
                   <tr className="bg-primary text-white h-16">
