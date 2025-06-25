@@ -154,8 +154,8 @@ const SignIn = () => {
     <div className="min-h-screen bg-gradient-to-tr from-orange-500 via-black to-black flex justify-center items-center">
       <div className="w-[23rem] bg-white rounded-3xl p-4">
         <div className="flex flex-col mt-4 gap-4">
-          <div className="font-bold text-2xl flex justify-center">
-            extensions
+          <div className="font-extrabold text-3xl flex justify-center">
+            Extensions
           </div>
           <div className="flex justify-center">
             <img src="/icon/extensions_logo.png" alt="logo" width={40}/>
