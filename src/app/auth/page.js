@@ -155,7 +155,7 @@ const SignIn = () => {
       <div className="w-[23rem] bg-white rounded-3xl p-4">
         <div className="flex flex-col mt-4 gap-4">
           <div className="font-extrabold text-3xl flex justify-center">
-            Extensions
+            extensions
           </div>
           <div className="flex justify-center">
             <img src="/icon/extensions_logo.png" alt="logo" width={40}/>
