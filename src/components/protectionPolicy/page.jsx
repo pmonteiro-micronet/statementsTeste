@@ -18,7 +18,7 @@ const ProtectionPolicyForm = ({
     return (<>
         {formTypeModal === 11 && ( //characteristics insert
             (<>
-                <Button onPress={onOpen} color={buttonColor} className="w-fit h-6 bg-[#DFEDB6] text-buttonModalPrimaryColor">
+                <Button onPress={onOpen} color={buttonColor} className="w-fit h-6 bg-[#DFEDB6] text-[#000000]">
                     {buttonName} {buttonIcon}
                 </Button>
                 <Modal
