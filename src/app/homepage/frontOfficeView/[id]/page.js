@@ -28,68 +28,56 @@ const FrontOffice = () => {
   const [postSuccessful, setPostSuccessful] = useState(false);
   console.log(errorMessage, isErrorModalOpen, postSuccessful);
   useEffect(() => {
-    const storedLanguage = localStorage.getItem("language");
-    if (storedLanguage) {
-      setLocale(storedLanguage);
-    }
+  const storedLanguage = localStorage.getItem("language");
+  if (storedLanguage) {
+    setLocale(storedLanguage);
+  }
 
-    // Função para buscar os contadores
-    const fetchCountersPeriodically = async () => {
-      if (session?.user?.propertyIDs && selectedHotelID) {
-        await fetchCounters();
-      }
-    };
-
-    // Chama fetchCounters imediatamente ao carregar e depois a cada 30 segundos (30000ms)
-    fetchCountersPeriodically();
-    const intervalId = setInterval(fetchCountersPeriodically, 30000); // 30 segundos
-
-    // Limpeza do intervalo quando o componente for desmontado ou quando mudar a página
-    return () => clearInterval(intervalId);
-
-  }, [session?.user?.propertyIDs, selectedHotelID]);
-
-  const [firstLoad, setFirstLoad] = useState(true);  // Controla se é a primeira carga
-
-  const fetchCounters = async () => {
-    try {
-      if (firstLoad) setIsLoading(true); // Mostra o loading apenas na primeira vez
-
-      const response = await fetch("/api/counter");
-      const data = await response.json();
-
-      if (response.ok) {
-        const arrivalsData = data.response.find(
-          (item) => item.counterName === "arrivals" && String(item.propertyID) === String(selectedHotelID)
-        );
-        const inhousesData = data.response.find(
-          (item) => item.counterName === "inhouses" && String(item.propertyID) === String(selectedHotelID)
-        );
-        const departuresData = data.response.find(
-          (item) => item.counterName === "departures" && String(item.propertyID) === String(selectedHotelID)
-        );
-
-        setArrivals(arrivalsData ? arrivalsData.count : 0);
-        setInhouses(inhousesData ? inhousesData.count : 0);
-        setDepartures(departuresData ? departuresData.count : 0);
-      } else {
-        console.error("Erro ao buscar dados:", data.error);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar dados da API:", error);
-    } finally {
-      setIsLoading(false);
-      setFirstLoad(false); // Nunca mais exibe o loading após a primeira chamada
+  const fetchCountersPeriodically = async () => {
+    if (session?.user?.propertyIDs && selectedHotelID) {
+      await fetchCounters(firstLoad); // Só mostra loading na primeira
     }
   };
 
-  useEffect(() => {
-    if (session?.user?.propertyIDs && selectedHotelID) {
-      fetchCounters();
-      const intervalId = setInterval(fetchCounters, 30000); // Atualiza a cada 30s sem loading
-      return () => clearInterval(intervalId);
+  fetchCountersPeriodically();
+  const intervalId = setInterval(() => fetchCounters(false), 30000); // Sem loading depois
+  return () => clearInterval(intervalId);
+}, [session?.user?.propertyIDs, selectedHotelID]);
+
+
+  const [firstLoad, setFirstLoad] = useState(true);  // Controla se é a primeira carga
+
+  const fetchCounters = async (showLoading = false) => {
+  try {
+    if (showLoading) setIsLoading(true); // Só ativa loading se for pedido explicitamente
+
+    const response = await fetch("/api/counter");
+    const data = await response.json();
+
+    if (response.ok) {
+      const arrivalsData = data.response.find(
+        (item) => item.counterName === "arrivals" && String(item.propertyID) === String(selectedHotelID)
+      );
+      const inhousesData = data.response.find(
+        (item) => item.counterName === "inhouses" && String(item.propertyID) === String(selectedHotelID)
+      );
+      const departuresData = data.response.find(
+        (item) => item.counterName === "departures" && String(item.propertyID) === String(selectedHotelID)
+      );
+
+      setArrivals(arrivalsData ? arrivalsData.count : 0);
+      setInhouses(inhousesData ? inhousesData.count : 0);
+      setDepartures(departuresData ? departuresData.count : 0);
+    } else {
+      console.error("Erro ao buscar dados:", data.error);
     }
-  }, [session?.user?.propertyIDs, selectedHotelID]);
+  } catch (error) {
+    console.error("Erro ao buscar dados da API:", error);
+  } finally {
+    if (showLoading) setIsLoading(false);
+    setFirstLoad(false); // Marca que a primeira execução já ocorreu
+  }
+};
 
   const handleRedirect = async (type) => {
     if (isLoading) return;
