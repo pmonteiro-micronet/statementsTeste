@@ -503,7 +503,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                             resStatus={selectedReserva?.resStatus}
                             childs={selectedReserva?.Childs}
                             adults={selectedReserva?.Adults}
-                            balance={selectedReserva?.Balance}
+                            balance={selectedReserva?.balance}
                             country={selectedReserva?.Country}
                             isBackdropVisible={true}
                             isOpen={isModalOpen}
