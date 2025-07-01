@@ -97,7 +97,7 @@ const InHousesInfoForm = ({
                                                     <p>{resStatus}</p>
                                                 </div>
                                                 <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.departure}</strong></p>
+                                                    <p><strong>{t.frontOffice.infoModal.arrival.reservation.arrival}</strong></p>
                                                     <p>{dateCI}</p>
                                                 </div>
                                                 <div className="flex justify-between text-textPrimaryColor">
