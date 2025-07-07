@@ -2,13 +2,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
-import LoadingBackdrop from "@/components/Loader/page";
-
-import en from "../../../../../../public/locales/english/common.json";
-import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
-import es from "../../../../../../public/locales/espanol/common.json";
-
-const translations = { en, pt, es };git 
 
 const PersonalIDForm = ({ onClose, personalID, t }) => {
     const [formData, setFormData] = useState(() => ({
