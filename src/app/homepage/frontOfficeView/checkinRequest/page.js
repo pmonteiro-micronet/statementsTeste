@@ -6,12 +6,31 @@ import { useRouter } from "next/navigation";
 import { useSession } from 'next-auth/react';
 import "./style.css";
 
+import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
+
 export default function CheckinRequester() {
     const [checkins, setCheckins] = useState([]);
     const [propertyNames, setPropertyNames] = useState({});
     const router = useRouter();
     const { data: session } = useSession();
     const propertyIDs = session?.user?.propertyIDs || [];
+
+    const [locale, setLocale] = useState("pt");
+
+  useEffect(() => {
+    // Carregar o idioma do localStorage
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
+
+  // Carregar as traduções com base no idioma atual
+  const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
     const fixInvalidJSON = (raw) => {
         const fixed = `[${raw.replace(/}\s*{/g, '},{')}]`;
@@ -79,7 +98,7 @@ export default function CheckinRequester() {
                 const promises = uniquePropertyIDs.map(id =>
                     axios.get(`/api/properties/${id}`).then(res => {
                         const property = res.data.response?.[0];
-                        return { id, name: property?.propertyName || 'Nome não encontrado' };
+                        return { id, name: property?.propertyName };
                     })
                 );
 
@@ -105,7 +124,7 @@ export default function CheckinRequester() {
 
     return (
         <main className="min-h-screen flex flex-col p-8 bg-background">
-            <div className="font-semibold text-2xl mb-6 text-textPrimaryColor">Registration Form</div>
+            <div className="font-semibold text-2xl mb-6 text-textPrimaryColor">{t.frontOffice.registrationRequests.title}</div>
 
             <div className="grid-container gap-6">
                 {filteredCheckins.map(({ parsedBody, propertyID, requestID }, index) => {
@@ -136,19 +155,19 @@ export default function CheckinRequester() {
                             <div className="gap-4 text-sm">
                                 <div className="space-y-2">
                                     <div className="flex justify-between">
-                                        <p className="font-semibold">Reservation</p>
+                                        <p className="font-semibold">{t.frontOffice.registrationRequests.reservation}</p>
                                         <span>{reservation.ResNo}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <p className="font-semibold">Check-in</p>
+                                        <p className="font-semibold">{t.frontOffice.registrationRequests.checkin}</p>
                                         <span>{reservation.DateCI}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <p className="font-semibold">Check-out</p>
+                                        <p className="font-semibold">{t.frontOffice.registrationRequests.checkout}</p>
                                         <span>{reservation.DateCO}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <p className="font-semibold">Guest Email</p>
+                                        <p className="font-semibold">{t.frontOffice.registrationRequests.guestEmail}</p>
                                         <span className="truncate">{guest.Contacts?.[0]?.Email}</span>
                                     </div>
                                 </div>
@@ -163,7 +182,7 @@ export default function CheckinRequester() {
                                         );
                                     }}
                                 >
-                                    View Details
+                                    {t.frontOffice.registrationRequests.ViewDetails}
                                 </button>
                             </div>
                         </div>

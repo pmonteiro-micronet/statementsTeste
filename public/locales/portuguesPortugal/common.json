@@ -79,6 +79,14 @@
             "cardInHouses": "InHouses",
             "cardDepartures": "Partidas"
         },
+        "registrationRequests": {
+            "title": "Formulário de Registo",
+            "reservation": "Reserva",
+            "checkin": "Check-in",
+            "checkout": "Check-out",
+            "guestEmail": "Email do Hóspede",
+            "ViewDetails": "Ver Detalhes"
+        },
         "departures": {
             "today": "Hoje",
             "tomorrow": "Amanhã",
