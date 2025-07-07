@@ -233,7 +233,6 @@ export default function Page() {
             }
         };
 
-
         const fetchReservaByRequestID = async () => {
             if (!requestID || !resNo) {
                 console.warn("Parâmetros ausentes na URL: requestID ou resNo");
@@ -250,35 +249,53 @@ export default function Page() {
                     const reservas = JSON.parse(requestBody);
                     console.log("Reservas encontradas no responseBody:", reservas);
 
-                    const reservaSelecionada = reservas.find(r =>
-                        r.ReservationInfo.some(info => `${info.ResNo}` === `${resNo}`)
-                    );
+                    let reservaSelecionada = null;
+                    let guestInfo = null;
+                    let address = null;
+                    let personalID = null;
+                    let contacts = null;
+
+                    if (Array.isArray(reservas)) {
+                        // Caso seja array: percorre o array procurando a reserva pelo resNo dentro de ReservationInfo
+                        for (const reservaObj of reservas) {
+                            if (reservaObj.ReservationInfo?.some(info => `${info.ResNo}` === `${resNo}`)) {
+                                reservaSelecionada = reservaObj.ReservationInfo.find(info => `${info.ResNo}` === `${resNo}`);
+
+                                guestInfo = reservaObj.GuestInfo?.[0]?.GuestDetails?.[0] || null;
+                                address = reservaObj.GuestInfo?.[0]?.Address?.[0] || null;
+                                personalID = reservaObj.GuestInfo?.[0]?.PersonalID?.[0] || null;
+                                contacts = reservaObj.GuestInfo?.[0]?.Contacts?.[0] || null;
+
+                                break;
+                            }
+                        }
+                    } else if (typeof reservas === 'object' && reservas !== null) {
+                        // Caso seja objeto: busca diretamente em ReservationInfo
+                        reservaSelecionada = reservas.ReservationInfo?.find(info => `${info.ResNo}` === `${resNo}`);
+
+                        guestInfo = reservas.GuestInfo?.[0]?.GuestDetails?.[0] || null;
+                        address = reservas.GuestInfo?.[0]?.Address?.[0] || null;
+                        personalID = reservas.GuestInfo?.[0]?.PersonalID?.[0] || null;
+                        contacts = reservas.GuestInfo?.[0]?.Contacts?.[0] || null;
+                    }
 
                     if (reservaSelecionada) {
                         console.log("Reserva encontrada:", reservaSelecionada);
-
-                        // Acessando informações diretamente do primeiro índice de GuestInfo
-                        const guestInfo = reservaSelecionada.GuestInfo?.[0]?.GuestDetails?.[0] || null;
-                        const address = reservaSelecionada.GuestInfo?.[0]?.Address?.[0] || null;
-                        const personalID = reservaSelecionada.GuestInfo?.[0]?.PersonalID?.[0] || null;
-                        const contacts = reservaSelecionada.GuestInfo?.[0]?.Contacts?.[0] || null;
-
                         console.log("Informações do hóspede:", guestInfo);
                         console.log("Informações do endereço:", address);
                         console.log("Informações do PersonalID:", personalID);
                         console.log("Informações de contato:", contacts);
 
-                        setReserva(reservaSelecionada.ReservationInfo.find(info => `${info.ResNo}` === `${resNo}`));
+                        setReserva(reservaSelecionada);
                         setGuestInfo(guestInfo);
                         setAddress(address);
                         setPersonalID(personalID);
                         setContacts(contacts);
 
-                        // Verifica se o e-mail termina com "@guest.booking.com"
                         if (contacts?.Email?.endsWith('@guest.booking.com')) {
                             setErrorMessage('Email inválido. O email não pode terminar em guest.booking.com');
                         } else {
-                            setErrorMessage(''); // Limpa a mensagem de erro se o e-mail for válido
+                            setErrorMessage('');
                         }
                     } else {
                         console.warn(`Nenhuma reserva encontrada com ResNo: ${resNo}`);
@@ -297,8 +314,8 @@ export default function Page() {
             fetchReservaByRequestID();
             fetchPropertyDetails();
         }
-    }, []);
 
+    }, []);
 
     const initializeSignaturePad = () => {
         const canvas = canvasRef.current;
