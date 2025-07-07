@@ -421,6 +421,15 @@
             "message": "¿Está seguro de que desea terminar la sesión?",
             "cancel": "Cancelar",
             "yes": "Sí"
+        },
+        "PersonalID": {
+            "dateofBirth": "Fecha de nacimiento",
+            "countryofBirth": "País de nacimiento",
+            "nationality": "Nacionalidad",
+            "idDoc": "Documento de identificacíon",
+            "idDocNumber": "Nr.",
+            "expDate": "Fecha de Caducidad",
+            "issue": "Error"
         }
     },
     "pagination": {

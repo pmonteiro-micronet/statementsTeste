@@ -420,6 +420,15 @@
             "message": "Are you sure you want to end the session?",
             "cancel": "Cancel",
             "yes": "Yes"
+        },
+        "PersonalID": {
+            "dateofBirth": "Date of birth",
+            "countryofBirth": "Country of birth",
+            "nationality": "Nationality",
+            "idDoc": "ID DOC",
+            "idDocNumber": "Nr.",
+            "expDate": "Exp Date",
+            "issue": "Issue"
         }
     },
     "pagination": {
