@@ -79,6 +79,14 @@
             "cardInHouses": "InHouses",
             "cardDepartures": "Departures"
         },
+        "registrationRequests": {
+            "title": "Registration Form",
+            "reservation": "Reservation",
+            "checkin": "Check-in",
+            "checkout": "Check-out",
+            "guestEmail": "Guest Email",
+            "ViewDetails": "View Details"
+        },
         "departures": {
             "today": "Today",
             "tomorrow": "Tomorrow",
