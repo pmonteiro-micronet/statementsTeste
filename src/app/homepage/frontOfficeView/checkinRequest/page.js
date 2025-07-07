@@ -1,79 +1,114 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useRouter } from "next/navigation";
+import { useSession } from 'next-auth/react';
 import "./style.css";
 
 export default function CheckinRequester() {
     const [checkins, setCheckins] = useState([]);
     const [propertyNames, setPropertyNames] = useState({});
     const router = useRouter();
+    const { data: session } = useSession();
+    const propertyIDs = session?.user?.propertyIDs || [];
 
     const fixInvalidJSON = (raw) => {
         const fixed = `[${raw.replace(/}\s*{/g, '},{')}]`;
         return JSON.parse(fixed);
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get('/api/reservations/checkins/checkin_requests');
-                const parsedCheckins = response.data.response.map((item) => {
+    const fetchData = useCallback(async () => {
+        try {
+            const response = await axios.get('/api/reservations/checkins/checkin_requests');
+            let parsedCheckins = response.data.response.map((item) => {
+                try {
+                    const parsedBody = fixInvalidJSON(item.requestBody);
+                    return { ...item, parsedBody };
+                } catch (err) {
+                    console.error('Erro ao parsear requestBody:', err);
+                    return { ...item, parsedBody: null };
+                }
+            });
+
+            // Ordena do mais recente para o mais antigo pelo campo requestDateTime
+            parsedCheckins.sort((a, b) => {
+                if (a.requestDateTime > b.requestDateTime) return -1;
+                if (a.requestDateTime < b.requestDateTime) return 1;
+                return 0;
+            });
+
+            // Limita a 6 checkins, removendo os mais antigos se necessário
+            if (parsedCheckins.length > 6) {
+                const toRemove = parsedCheckins.slice(6);
+
+                // Apaga TODOS os removidos da base, independente do campo seen
+                await Promise.all(toRemove.map(async (item) => {
                     try {
-                        const parsedBody = fixInvalidJSON(item.requestBody);
-                        return { ...item, parsedBody };
+                        await axios.delete(`/api/reservations/checkins/checkin_requests/${item.requestID}`);
                     } catch (err) {
-                        console.error('Erro ao parsear requestBody:', err);
-                        return { ...item, parsedBody: null };
+                        console.error(`Erro ao apagar checkin ${item.requestID}:`, err);
                     }
+                }));
+
+                parsedCheckins = parsedCheckins.slice(0, 6);
+            }
+
+            setCheckins(parsedCheckins);
+
+        } catch (error) {
+            console.error('Erro ao buscar os dados:', error);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData(); // Busca inicial
+
+        const intervalId = setInterval(() => {
+            fetchData(); // Busca periódica a cada 15s
+        }, 15000);
+
+        return () => clearInterval(intervalId); // Limpa intervalo ao desmontar componente
+    }, [fetchData]);
+
+    useEffect(() => {
+        const fetchPropertyNames = async () => {
+            try {
+                const uniquePropertyIDs = [...new Set(checkins.map(c => c.propertyID))];
+
+                const promises = uniquePropertyIDs.map(id =>
+                    axios.get(`/api/properties/${id}`).then(res => {
+                        const property = res.data.response?.[0];
+                        return { id, name: property?.propertyName || 'Nome não encontrado' };
+                    })
+                );
+
+                const results = await Promise.all(promises);
+
+                const namesMap = {};
+                results.forEach(({ id, name }) => {
+                    namesMap[id] = name;
                 });
-                setCheckins(parsedCheckins);
-            } catch (error) {
-                console.error('Erro ao buscar os dados:', error);
+
+                setPropertyNames(namesMap);
+            } catch (err) {
+                console.error('Erro ao buscar nomes das propriedades:', err);
             }
         };
 
-        fetchData();
-    }, []);
+        if (checkins.length > 0) {
+            fetchPropertyNames();
+        }
+    }, [checkins]);
 
-   useEffect(() => {
-  const fetchPropertyNames = async () => {
-    try {
-      const uniquePropertyIDs = [...new Set(checkins.map(c => c.propertyID))];
-
-      const promises = uniquePropertyIDs.map(id =>
-        axios.get(`/api/properties/${id}`).then(res => {
-          const property = res.data.response?.[0];
-          return { id, name: property?.propertyName || 'Nome não encontrado' };
-        })
-      );
-
-      const results = await Promise.all(promises);
-
-      const namesMap = {};
-      results.forEach(({ id, name }) => {
-        namesMap[id] = name;
-      });
-
-      setPropertyNames(namesMap);
-    } catch (err) {
-      console.error('Erro ao buscar nomes das propriedades:', err);
-    }
-  };
-
-  if (checkins.length > 0) {
-    fetchPropertyNames();
-  }
-}, [checkins]);
-
+    const filteredCheckins = checkins.filter(item => propertyIDs.includes(item.propertyID));
 
     return (
         <main className="min-h-screen flex flex-col p-8 bg-background">
             <div className="font-semibold text-2xl mb-6 text-textPrimaryColor">Registration Form</div>
 
             <div className="grid-container gap-6">
-                {checkins.map(({ parsedBody, propertyID, requestID }, index) => {
+                {filteredCheckins.map(({ parsedBody, propertyID, requestID }, index) => {
                     const reservation = parsedBody?.[0]?.ReservationInfo?.[0];
                     const guest = parsedBody?.[0]?.GuestInfo?.[0];
 
