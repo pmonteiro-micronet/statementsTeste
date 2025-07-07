@@ -19,6 +19,7 @@ import { MdOutlinePendingActions } from "react-icons/md";
 import { AiOutlineFileDone } from "react-icons/ai";
 import { LuMapPinHouse } from "react-icons/lu";
 import { RxEnter, RxExit } from "react-icons/rx";
+import { FaRegAddressCard } from "react-icons/fa";
 
 export default function SidebarWrapper({ children }) {
   const { data: session } = useSession();
@@ -156,6 +157,11 @@ export default function SidebarWrapper({ children }) {
               label: `${t.navbar.text.dashboard}`,
               onClick: () => router.push(`/homepage/frontOfficeView/${selectedHotelID}`),
               icon: <TbLayoutDashboardFilled />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/checkinRequest`,
+              label: `Registration Form`,
+              icon: <FaRegAddressCard />,
             },
             {
               ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
