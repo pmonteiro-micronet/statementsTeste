@@ -21,16 +21,16 @@ export default function CheckinRequester() {
 
     const [locale, setLocale] = useState("pt");
 
-  useEffect(() => {
-    // Carregar o idioma do localStorage
-    const storedLanguage = localStorage.getItem("language");
-    if (storedLanguage) {
-      setLocale(storedLanguage);
-    }
-  }, []);
+    useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+        }
+    }, []);
 
-  // Carregar as traduções com base no idioma atual
-  const t = translations[locale] || translations["pt"]; // fallback para "pt"
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
     const fixInvalidJSON = (raw) => {
         const fixed = `[${raw.replace(/}\s*{/g, '},{')}]`;
@@ -40,15 +40,19 @@ export default function CheckinRequester() {
     const fetchData = useCallback(async () => {
         try {
             const response = await axios.get('/api/reservations/checkins/checkin_requests');
-            let parsedCheckins = response.data.response.map((item) => {
-                try {
-                    const parsedBody = fixInvalidJSON(item.requestBody);
-                    return { ...item, parsedBody };
-                } catch (err) {
-                    console.error('Erro ao parsear requestBody:', err);
-                    return { ...item, parsedBody: null };
-                }
-            });
+            let parsedCheckins = response.data.response
+               .filter(item => Number(item.seen) !== 1)
+
+                .map((item) => {
+                    try {
+                        const parsedBody = fixInvalidJSON(item.requestBody);
+                        return { ...item, parsedBody };
+                    } catch (err) {
+                        console.error('Erro ao parsear requestBody:', err);
+                        return { ...item, parsedBody: null };
+                    }
+                });
+
 
             // Ordena do mais recente para o mais antigo pelo campo requestDateTime
             parsedCheckins.sort((a, b) => {

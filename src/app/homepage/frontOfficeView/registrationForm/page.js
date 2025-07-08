@@ -513,6 +513,16 @@ export default function Page() {
             );
 
             console.log('Resposta da API:', response.data);
+            // Atualiza o campo 'seen' no backend
+            try {
+                await axios.post('/api/reservations/checkins/registrationForm/updateSeen', {
+                    requestID: requestID
+                });
+                console.log("Campo 'seen' atualizado com sucesso.");
+            } catch (err) {
+                console.error("Erro ao atualizar campo 'seen':", err);
+            }
+
             setSuccessMessage("Registration sent successfully");
             setIsSuccessModalOpen(true);
         } catch (error) {

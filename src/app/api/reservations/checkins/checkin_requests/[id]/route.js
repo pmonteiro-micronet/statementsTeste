@@ -41,3 +41,35 @@ export async function DELETE(req, { params }) {
     await prisma.$disconnect();
   }
 }
+
+// POST: Atualiza campo 'seen' com base no requestID
+export async function POST(req) {
+  try {
+    const { requestID } = await req.json();
+
+    if (!requestID || isNaN(parseInt(requestID))) {
+      return NextResponse.json(
+        { message: "Parâmetro 'requestID' inválido ou ausente." },
+        { status: 400 }
+      );
+    }
+
+    const updated = await prisma.registrationRecords.update({
+      where: { requestID: parseInt(requestID) },
+      data: { seen: true },
+    });
+
+    return NextResponse.json(
+      { message: `'seen' atualizado com sucesso`, data: updated },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Erro ao atualizar o campo 'seen':", error);
+    return NextResponse.json(
+      { message: 'Erro ao atualizar o campo seen', error: error.message },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
