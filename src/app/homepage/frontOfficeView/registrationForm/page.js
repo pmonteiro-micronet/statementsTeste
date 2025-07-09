@@ -1029,6 +1029,7 @@ export default function Page() {
                                                 <PersonalIDForm
                                                     onClose={() => setisPersonalIDModalOpen(false)}
                                                     personalID={personalID}
+                                                    propertyID={propertyID}
                                                     t={t}
                                                 />
                                             )}

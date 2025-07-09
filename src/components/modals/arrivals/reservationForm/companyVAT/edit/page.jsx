@@ -170,7 +170,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 zipCode: formData.zipCode,
                 city: formData.city,
                 state: formData.state,
-            }).map(([key, value]) => [key, String(value || "").trim() === "" ? " " : String(value || "").trim()])
+            }).map(([key, value]) => [key, String(value || "").trim() === "" ? "" : String(value || "").trim()])
         );
 
         try {

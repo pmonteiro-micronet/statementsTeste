@@ -5,8 +5,10 @@ import { MdClose } from "react-icons/md";
 import Select from "react-select";
 import axios from "axios";
 
+
 const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
     const [countryOptions, setCountryOptions] = useState([]);
+    const [docTypeOptions , setDocTypeOptions] = useState([]);
     const [formData, setFormData] = useState(() => ({
         DateOfBirth: personalID?.DateOfBirth || "",
         CountryOfBirth: personalID?.CountryOfBirth || "",
@@ -17,6 +19,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
         Issue: personalID?.Issue || "",
     }));
 
+    console.log("ID" , propertyID);
     const [isDataModified, setIsDataModified] = useState(false);
     const inputRef = useRef(null);
 
@@ -47,6 +50,10 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
     useEffect(() => {
         const fetchCountries = async () => {
             try {
+
+                if(!propertyID) {
+                    console.log("Não há propertyID associado"  , propertyID);
+                }
                 const response = await axios.get(`/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`);
                 const formattedOptions = response.data
                     .map((country) => ({
@@ -61,6 +68,38 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
         };
         fetchCountries();
     }, [propertyID]);
+
+    useEffect(() => {
+        const fetchDocTypes = async () => {
+            try {
+                if (!propertyID) {
+                    console.log("Não há propertyID associado", propertyID);
+                    return;
+                }
+
+                const response = await axios.get(
+                    `/api/reservations/checkins/registrationForm/doctypes?propertyID=${propertyID}`
+                );
+
+                const formattedOptions = response.data
+                    .map((doc) => ({
+                        value: doc.value,
+                        label: doc.label,
+                    }))
+                    .sort((a, b) => a.label.localeCompare(b.label));
+
+                setDocTypeOptions(formattedOptions);
+
+            } catch (error) {
+                console.error("Erro ao buscar tipos de documentos:", error);
+            }
+        };
+
+        fetchDocTypes();
+    }, [propertyID]);
+
+
+
 
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
@@ -131,13 +170,17 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                 <div className="flex gap-4">
                                     <div className="w-1/2">
                                         <label className="block text-sm font-medium">{t.modals.PersonalID.idDoc} *</label>
-                                        <input
-                                            type="text"
-                                            name="IDDoc"
-                                            value={formData.IDDoc}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                        <Select
+                                            options={docTypeOptions}
+                                            value={docTypeOptions.find(option => option.value === String(formData.IDDoc)) || null}
+                                            onChange={(selectedOption) => {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    IDDoc: selectedOption.value,
+                                                }));
+                                                setIsDataModified(true);
+                                            }}
+                                            isSearchable
                                         />
                                     </div>
                                     <div className="w-1/2">
