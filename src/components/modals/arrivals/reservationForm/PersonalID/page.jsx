@@ -2,8 +2,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
+import Select from "react-select";
+import axios from "axios";
 
-const PersonalIDForm = ({ onClose, personalID, t }) => {
+const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
+    const [countryOptions, setCountryOptions] = useState([]);
     const [formData, setFormData] = useState(() => ({
         DateOfBirth: personalID?.DateOfBirth || "",
         CountryOfBirth: personalID?.CountryOfBirth || "",
@@ -26,10 +29,6 @@ const PersonalIDForm = ({ onClose, personalID, t }) => {
         }
     };
 
-    useEffect(() => {
-        if (inputRef.current) inputRef.current.focus();
-    }, []);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -40,6 +39,28 @@ const PersonalIDForm = ({ onClose, personalID, t }) => {
         if (!dateStr || dateStr === defaultStr) return "";
         return dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
     };
+
+    useEffect(() => {
+        if (inputRef.current) inputRef.current.focus();
+    }, []);
+
+    useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const response = await axios.get(`/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`);
+                const formattedOptions = response.data
+                    .map((country) => ({
+                        value: country.codenr,
+                        label: country.land,
+                    }))
+                    .sort((a, b) => a.label.localeCompare(b.label));
+                setCountryOptions(formattedOptions);
+            } catch (error) {
+                console.error("Erro ao buscar países:", error);
+            }
+        };
+        fetchCountries();
+    }, [propertyID]);
 
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
@@ -71,7 +92,7 @@ const PersonalIDForm = ({ onClose, personalID, t }) => {
                                             name="DateOfBirth"
                                             value={getDateValue(formData.DateOfBirth, "1900-01-01")}
                                             onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-[0.375rem] appearance-none focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            className="w-full border border-gray-300 rounded-md px-2 py-[0.375rem] focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
 
@@ -79,12 +100,17 @@ const PersonalIDForm = ({ onClose, personalID, t }) => {
                                         <label className="block text-sm font-medium">
                                             {t.modals.PersonalID.countryofBirth || "Country of Birth"} *
                                         </label>
-                                        <input
-                                            type="text"
-                                            name="CountryOfBirth"
-                                            value={formData.CountryOfBirth}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-[0.375rem] appearance-none focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                        <Select
+                                            options={countryOptions}
+                                            value={countryOptions.find(option => option.value === formData.CountryOfBirth)}
+                                            onChange={(selectedOption) => {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    CountryOfBirth: selectedOption.value,
+                                                }));
+                                                setIsDataModified(true);
+                                            }}
+                                            isSearchable
                                         />
                                     </div>
 
@@ -97,7 +123,7 @@ const PersonalIDForm = ({ onClose, personalID, t }) => {
                                             name="Nationality"
                                             value={formData.Nationality}
                                             onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-[0.375rem] appearance-none focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            className="w-full border border-gray-300 rounded-md px-2 py-[0.375rem] focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
                                 </div>
@@ -110,6 +136,7 @@ const PersonalIDForm = ({ onClose, personalID, t }) => {
                                             name="IDDoc"
                                             value={formData.IDDoc}
                                             onChange={handleChange}
+                                            required
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
@@ -120,6 +147,7 @@ const PersonalIDForm = ({ onClose, personalID, t }) => {
                                             name="NrDoc"
                                             value={formData.NrDoc}
                                             onChange={handleChange}
+                                            required
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
@@ -133,6 +161,7 @@ const PersonalIDForm = ({ onClose, personalID, t }) => {
                                             name="ExpDate"
                                             value={getDateValue(formData.ExpDate, "2050-12-31")}
                                             onChange={handleChange}
+                                            required
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
