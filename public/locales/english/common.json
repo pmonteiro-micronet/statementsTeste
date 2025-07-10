@@ -421,6 +421,7 @@
             "email": "E-mail:",
             "cancel": "Cancel",
             "save": "Save",
+            "edit": "Edit",
             "countryError": "Error loading countries."
         },
         "userLogout": {

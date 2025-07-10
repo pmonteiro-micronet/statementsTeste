@@ -15,7 +15,8 @@ import TermsConditionsForm from "@/components/terms&conditions/page";
 import ProtectionPolicyForm from "@/components/protectionPolicy/page";
 import EditRegistrationForm from "@/components/modals/arrivals/reservationForm/edit/page";
 import CompanyVATFormEdit from "@/components/modals/arrivals/reservationForm/companyVAT/edit/page";
-import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insert/page";
+// import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insert/page";
+import BeforeCompanyVat from "@/components/modals/arrivals/reservationForm/companyVAT/beforeInfo/page";
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
 import SuccessRegistrationForm from "@/components/modals/arrivals/reservationForm/success/page";
 import LoadingBackdrop from "@/components/Loader/page";
@@ -430,6 +431,7 @@ export default function Page() {
 
         let emailToSend = email !== initialEmail ? email : initialEmail; // Envia undefined se não houver alteração
         let vatNoToSend = vatNo !== initialVatNo ? vatNo : initialVatNo; // Envia undefined se não houver alteração
+        let phoneToSend = phone !== initialPhone ? phone : initialPhone;
 
         // Se houver alterações (ou valores a serem enviados), envia para a API
         if (emailToSend || vatNoToSend) {
@@ -437,6 +439,7 @@ export default function Page() {
                 const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
                     email: emailToSend,
                     vatNo: vatNoToSend,
+                    phone: phoneToSend,
                     registerID: profileID,
                     propertyID: propertyID
                 });
@@ -554,6 +557,7 @@ export default function Page() {
     };
 
     const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
     const [vatNo, setVatNo] = useState(""); // Novo estado para VAT No.
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCVATModalOpen, setIsCVATModalOpen] = useState(false);
@@ -562,6 +566,8 @@ export default function Page() {
     const [modalField, setModalField] = useState(null); // Para identificar o campo em edição
 
     const [initialEmail, setInitialEmail] = useState("");
+    const [initialPhone, setInitialPhone] = useState("");
+
     const [initialVatNo, setInitialVatNo] = useState("");
 
     useEffect(() => {
@@ -569,22 +575,37 @@ export default function Page() {
             setEmail(contacts.Email);
             setInitialEmail(contacts.Email); // Armazena o valor inicial
         }
+        if (contacts?.PhoneNumber && initialPhone == "") {
+            setPhone(contacts.PhoneNumber);
+            setInitialPhone(contacts.PhoneNumber);
+        }
         if (contacts?.VatNo && initialVatNo === "") {
             setVatNo(contacts.VatNo);
             setInitialVatNo(contacts.VatNo); // Armazena o valor inicial
         }
-    }, [contacts, initialEmail, initialVatNo]);
+    }, [contacts, initialEmail, initialPhone, initialVatNo]);
 
 
     const handleModalSave = (newValue) => {
-        // Verifica qual campo está sendo editado
         if (modalField === "Email") {
-            setEmail(newValue); // Atualiza o estado de email
-        } else if (modalField === "VatNo") {
-            setVatNo(newValue); // Atualiza o estado de VAT No
+            if (typeof newValue === "object") {
+                const { email: newEmail, phoneNumber: newPhone } = newValue;
+
+                if (newEmail) {
+                    setEmail(newEmail);
+                    setInitialEmail(newEmail); // atualiza valor inicial também
+                }
+
+                if (newPhone) {
+                    setPhone(newPhone);
+                    setInitialPhone(newPhone);
+                }
+            }
+        } else if (modalField === "VAT No.") {
+            setVatNo(newValue);
+            setInitialVatNo(newValue);
         }
 
-        // Fechar o modal após salvar
         setIsModalOpen(false);
     };
 
@@ -1116,7 +1137,7 @@ export default function Page() {
                                                 }
                                                 id={"Exp. Date"}
                                                 name={"Exp. Date"}
-                                                label={`${t.frontOffice.registrationForm.expDate} *`}
+                                                label={`${t.frontOffice.registrationForm.expDate}`}
                                                 ariaLabel={"Exp. Date:"}
                                                 value={
                                                     personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
@@ -1177,7 +1198,7 @@ export default function Page() {
                                                 name="PhoneNumber"
                                                 label={t.frontOffice.registrationForm.phoneNumber}
                                                 ariaLabel="PhoneNumber:"
-                                                value={contacts.PhoneNumber}
+                                                value={phone}
                                                 style={inputStyleFull}
                                                 disabled
                                             />
@@ -1213,7 +1234,7 @@ export default function Page() {
                                                         title={reserva.BlockedVatNO === 1 ? "Fiscalizado" : ""}
                                                         onClick={() => {
                                                             if (reserva.BlockedVatNO === 0) {
-                                                                setModalField("VatNo"); // Define o campo em edição
+                                                                setModalField("VAT No."); // Define o campo em edição
                                                                 setIsModalOpen(true); // Abre o modal
                                                             }
                                                         }}
@@ -1297,12 +1318,13 @@ export default function Page() {
                                         <EditRegistrationForm
                                             currentLabel={modalField === "Email" ? "E-mail" : "VAT No."}
                                             currentValue={modalField === "Email" ? email : vatNo}
+                                            additionalValue={modalField === "Email" ? phone : undefined}
                                             validation={
                                                 modalField === "Email"
                                                     ? (value) => !value.endsWith("@guest.booking.com")
-                                                    : null // Adicione validações específicas para VAT No., se necessário
+                                                    : null
                                             }
-                                            onSave={(newValue) => handleModalSave(newValue)}
+                                            onSave={handleModalSave}
                                             onClose={() => setIsModalOpen(false)}
                                         />
                                     )}
@@ -1321,7 +1343,7 @@ export default function Page() {
                                     )}
 
                                     {isCVATModalOpenInsert && (
-                                        <CompanyVATFormInsert
+                                        <BeforeCompanyVat
                                             onClose={() => setIsCVATModalOpenInsert(false)}
                                             profileID={guestInfo.ProfileID}
                                             propertyID={propertyID}
