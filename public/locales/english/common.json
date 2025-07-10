@@ -422,6 +422,7 @@
             "yes": "Yes"
         },
         "PersonalID": {
+            "title": "Personal information",
             "dateofBirth": "Date of birth",
             "countryofBirth": "Country of birth",
             "nationality": "Nationality",
@@ -429,6 +430,14 @@
             "idDocNumber": "Nr.",
             "expDate": "Exp Date",
             "issue": "Issue"
+        },
+        "Address": {
+            "title": "Address Information",
+            "country": "Country",
+            "streetAdress": "Address",
+            "zipCode":"Zip code",
+            "city": "City",
+            "SPR": "State/Province/Region"
         }
     },
     "pagination": {

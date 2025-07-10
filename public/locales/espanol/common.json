@@ -423,6 +423,7 @@
             "yes": "Sí"
         },
         "PersonalID": {
+            "title": "Infromacíon personal",
             "dateofBirth": "Fecha de nacimiento",
             "countryofBirth": "País de nacimiento",
             "nationality": "Nacionalidad",
@@ -430,6 +431,14 @@
             "idDocNumber": "Nr.",
             "expDate": "Fecha de Caducidad",
             "issue": "Error"
+        },
+        "Address": {
+            "title":"Informacíon de direccíon" ,
+            "country": "País",
+            "streetAdress": "Direccíon",
+            "zipCode":"Código Postal",
+            "city": "Ciudad",
+            "SPR": "Estado/Provincia/Regíon"
         }
     },
     "pagination": {

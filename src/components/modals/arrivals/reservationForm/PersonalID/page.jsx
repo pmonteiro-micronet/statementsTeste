@@ -7,8 +7,11 @@ import axios from "axios";
 
 
 const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
+    //popula o select de pais de origem
     const [countryOptions, setCountryOptions] = useState([]);
+    //popula o select do ID DOC
     const [docTypeOptions , setDocTypeOptions] = useState([]);
+
     const [formData, setFormData] = useState(() => ({
         DateOfBirth: personalID?.DateOfBirth || "",
         CountryOfBirth: personalID?.CountryOfBirth || "",
@@ -47,10 +50,10 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
         if (inputRef.current) inputRef.current.focus();
     }, []);
 
+    //useEffect para popular countryOptions
     useEffect(() => {
         const fetchCountries = async () => {
             try {
-
                 if(!propertyID) {
                     console.log("Não há propertyID associado"  , propertyID);
                 }
@@ -69,6 +72,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
         fetchCountries();
     }, [propertyID]);
 
+    //useEffect para popular docTypeOptions
     useEffect(() => {
         const fetchDocTypes = async () => {
             try {
@@ -98,16 +102,13 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
         fetchDocTypes();
     }, [propertyID]);
 
-
-
-
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
             <ModalContent>
                 {() => (
                     <>
                         <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white">
-                            {t.modals.personalInfo?.title || "Personal Information"}
+                            {t.modals.PersonalID.title }
                             <Button
                                 color="transparent"
                                 variant="light"
@@ -123,6 +124,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                 <div className="flex gap-4">
                                     <div className="w-1/3">
                                         <label className="block text-sm font-medium">
+                                            {/*Vai buscar as diferentes traduções aos ficheiros no public ->locales */}
                                             {t.modals.PersonalID.dateofBirth || "Date of Birth"}
                                         </label>
                                         <input
@@ -157,12 +159,17 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                         <label className="block text-sm font-medium">
                                             {t.modals.PersonalID.nationality || "Nationality"}
                                         </label>
-                                        <input
-                                            type="text"
-                                            name="Nationality"
-                                            value={formData.Nationality}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-[0.375rem] focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                        <Select
+                                            options={countryOptions}
+                                            value={countryOptions.find(option => option.value === formData.Nationality)}
+                                            onChange={(selectedOption) => {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    Nationality: selectedOption.value,
+                                                }));
+                                                setIsDataModified(true);
+                                            }}
+                                            isSearchable
                                         />
                                     </div>
                                 </div>
