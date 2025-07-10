@@ -422,6 +422,7 @@
             "email": "Correo electrónico:",
             "cancel": "Cancelar",
             "save": "Guardar",
+            "edit": "Editar",
             "countryError": "Error al cargar los países."
         },
         "userLogout": {

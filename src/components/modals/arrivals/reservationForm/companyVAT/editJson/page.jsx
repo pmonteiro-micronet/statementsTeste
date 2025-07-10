@@ -48,6 +48,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const [isDataModified, setIsDataModified] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     const [locale, setLocale] = useState("pt");
 
@@ -183,6 +184,10 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
 
     if (loading) return <LoadingBackdrop open={true} />;
 
+        const handleEdit = () => {
+        setIsEditing(true);
+    };
+
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
             <ModalContent>
@@ -205,6 +210,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                             name="companyName"
                                             value={formData.companyName}
                                             onChange={handleChange}
+                                            disabled={!isEditing}
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
@@ -216,6 +222,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                             value={formData.vatNo}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
+                                            disabled={!isEditing}
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                         {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
@@ -230,6 +237,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                             name="streetAddress"
                                             value={formData.streetAddress}
                                             onChange={handleChange}
+                                            disabled={!isEditing}
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
@@ -241,6 +249,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                             name="zipCode"
                                             value={formData.zipCode}
                                             onChange={handleChange}
+                                            disabled={!isEditing}
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
@@ -251,6 +260,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                             name="city"
                                             value={formData.city}
                                             onChange={handleChange}
+                                            disabled={!isEditing}
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
@@ -265,6 +275,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                             name="state"
                                             value={formData.state}
                                             onChange={handleChange}
+                                            disabled={!isEditing}
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
@@ -276,6 +287,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                             onChange={handleCountryChange}
                                             isSearchable
                                             styles={customStyles}
+                                            disabled={!isEditing}
                                         />
                                     </div>
                                 </div>
@@ -288,6 +300,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                             name="emailAddress"
                                             value={formData.emailAddress}
                                             onChange={handleChange}
+                                            disabled={!isEditing}
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
@@ -297,7 +310,15 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                             {errorMessage && <p className="text-red-500 text-xs -mt-4">{errorMessage}</p>}
                             <div className="flex justify-end space-x-2 -mt-4">
                                 <Button color="error" onClick={handleCloseModal}>{t.modals.companyInfo.cancel}</Button>
-                                <Button color="primary" onClick={handleSave}>{t.modals.companyInfo.save}</Button>
+                                {isEditing ? (
+                                    <Button color="primary" onClick={handleSave}>
+                                        {t.modals.companyInfo.save}
+                                    </Button>
+                                ) : (
+                                    <Button color="primary" onClick={handleEdit}>
+                                        {t.modals.companyInfo.edit}
+                                    </Button>
+                                )}
                             </div>
                         </ModalBody>
                     </>
