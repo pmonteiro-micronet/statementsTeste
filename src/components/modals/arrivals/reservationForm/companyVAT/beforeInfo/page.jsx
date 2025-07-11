@@ -16,11 +16,12 @@ const BeforeCompanyVat = ({ onClose, propertyID }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [vatError, setVatError] = useState("");
   const [isDataModified, setIsDataModified] = useState(false);
-  const inputRef = useRef(null);
-    console.log(errorMessage, isDataModified);
   const [searchResults, setSearchResults] = useState([]);
   const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
+  const [pageNumber, setPageNumber] = useState(1);
+  const inputRef = useRef(null);
 
+  console.log(errorMessage, isDataModified);
   useEffect(() => {
     const storedLanguage = localStorage.getItem("language");
     if (storedLanguage) setLocale(storedLanguage);
@@ -54,8 +55,10 @@ const BeforeCompanyVat = ({ onClose, propertyID }) => {
     if (onClose) onClose();
   };
 
-  const handleSearchClick = async () => {
+  const handleSearchClick = async (resetPage = true) => {
     try {
+      const currentPage = resetPage ? 1 : pageNumber + 1;
+
       const response = await fetch("/api/reservations/checkins/registrationForm/searchcompany", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -63,7 +66,7 @@ const BeforeCompanyVat = ({ onClose, propertyID }) => {
           propertyID,
           companyName: formData.companyName,
           vatNo: formData.vatNo,
-          pageNumber: 1
+          pageNumber: currentPage
         })
       });
 
@@ -71,7 +74,11 @@ const BeforeCompanyVat = ({ onClose, propertyID }) => {
 
       const data = await response.json();
       console.log("Resultado da empresa:", data);
-      setSearchResults(data);
+
+      setPageNumber(currentPage);
+      setSearchResults(prev =>
+        resetPage ? data : [...prev, ...data]
+      );
       setIsResultsModalOpen(true);
     } catch (error) {
       console.error("Erro ao buscar empresa:", error);
@@ -87,7 +94,7 @@ const BeforeCompanyVat = ({ onClose, propertyID }) => {
           onOpenChange={() => setIsResultsModalOpen(false)}
           className="z-60"
           size="3xl"
-          hideCloseButton={false}
+          hideCloseButton={true}
         >
           <ModalContent>
             {() => (
@@ -107,14 +114,24 @@ const BeforeCompanyVat = ({ onClose, propertyID }) => {
                   {searchResults.length === 0 ? (
                     <p>Nenhuma empresa encontrada.</p>
                   ) : (
-                    <ul>
-                      {searchResults.map((company, index) => (
-                        <li key={company.kdnr || index} className="border-b border-gray-300 py-2">
-                          <p><strong>Empresa:</strong> {company.shortname || "—"}</p>
-                          <p><strong>NIF:</strong> {company.vatno || "—"}</p>
-                        </li>
-                      ))}
-                    </ul>
+                    <>
+                      <ul>
+                        {searchResults.map((company, index) => (
+                          <li key={company.kdnr || index} className="border-b border-gray-300 py-2">
+                            <p><strong>Empresa:</strong> {company.name1 || "—"}</p>
+                            <p><strong>NIF:</strong> {company.vatno || "—"}</p>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="flex justify-center mt-4">
+                        <Button
+                          onClick={() => handleSearchClick(false)}
+                          className="bg-primary text-white"
+                        >
+                          Pesquisar mais
+                        </Button>
+                      </div>
+                    </>
                   )}
                 </ModalBody>
               </>
@@ -130,7 +147,12 @@ const BeforeCompanyVat = ({ onClose, propertyID }) => {
             <>
               <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white h-12">
                 {t.modals?.companyInfo?.insert || "Insert Company Info"}
-                <Button color="transparent" variant="light" onClick={handleCloseModal} className="w-auto min-w-0 p-0 m-0">
+                <Button
+                  color="transparent"
+                  variant="light"
+                  onClick={handleCloseModal}
+                  className="w-auto min-w-0 p-0 m-0"
+                >
                   <MdClose size={30} />
                 </Button>
               </ModalHeader>
@@ -168,7 +190,10 @@ const BeforeCompanyVat = ({ onClose, propertyID }) => {
 
                     <div className="self-end">
                       <button
-                        onClick={handleSearchClick}
+                        onClick={() => {
+                          setPageNumber(1);
+                          handleSearchClick(true);
+                        }}
                         className="px-3 py-2 bg-primary text-white rounded-md flex items-center justify-center"
                       >
                         <CiSearch color="white" size={20} />
