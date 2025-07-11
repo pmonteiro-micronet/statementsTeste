@@ -9,10 +9,11 @@ import pt from "../../../../../../../public/locales/portuguesPortugal/common.jso
 import es from "../../../../../../../public/locales/espanol/common.json";
 
 import CompanyVATFormEdit from "@/components/modals/arrivals/reservationForm/companyVAT/edit/page";
+import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insert/page";
 
 const translations = { en, pt, es };
 
-const BeforeCompanyVat = ({ onClose, propertyID, profileID }) => {
+const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
     const [locale, setLocale] = useState("pt");
     const [formData, setFormData] = useState({ companyName: "", vatNo: "" });
     const [errorMessage, setErrorMessage] = useState("");
@@ -24,7 +25,11 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID }) => {
     const inputRef = useRef(null);
     const [selectedCompany, setSelectedCompany] = useState(false);
 
-    console.log(errorMessage, isDataModified);
+    // Estado para controlar o modal principal
+    const [isMainModalOpen, setIsMainModalOpen] = useState(true);
+
+    const [isInsertModalOpen, setIsInsertModalOpen] = useState(false);
+
     useEffect(() => {
         const storedLanguage = localStorage.getItem("language");
         if (storedLanguage) setLocale(storedLanguage);
@@ -56,6 +61,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID }) => {
 
     const handleCloseModal = () => {
         if (onClose) onClose();
+        setIsMainModalOpen(false);
     };
 
     const handleSearchClick = async (resetPage = true) => {
@@ -78,12 +84,25 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID }) => {
             const data = await response.json();
             console.log("Resultado da empresa:", data);
 
-            setSearchResults(data); // Sempre substitui os resultados
-            setPageNumber(nextPage); // Avança para a próxima página
+            setSearchResults(data);
+            setPageNumber(nextPage);
             setIsResultsModalOpen(true);
         } catch (error) {
             console.error("Erro ao buscar empresa:", error);
         }
+    };
+
+    // Quando o usuário seleciona uma empresa na lista, abrir o modal de edição e fechar o principal
+    const handleSelectCompany = (company) => {
+        setSelectedCompany(company);
+        setIsMainModalOpen(false);
+        setIsResultsModalOpen(false);
+    };
+
+    // Fechar o modal de edição da empresa e manter o modal principal fechado
+    const handleCloseCompanyEdit = () => {
+        setSelectedCompany(false);
+        setIsMainModalOpen(false);
     };
 
     return (
@@ -121,23 +140,26 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID }) => {
                                                     <li
                                                         key={company.kdnr || index}
                                                         className="border-b border-gray-300 py-2 cursor-pointer hover:bg-gray-100"
-                                                        onClick={() => {
-                                                            setSelectedCompany(company);
-                                                            setIsResultsModalOpen(false);
-                                                        }}
+                                                        onClick={() => handleSelectCompany(company)}
                                                     >
                                                         <p><strong>Empresa:</strong> {company.name1 || "—"}</p>
                                                         <p><strong>NIF:</strong> {company.vatno || "—"}</p>
                                                     </li>
                                                 ))}
                                             </ul>
-                                            <div className="flex justify-center mt-4">
+                                            <div className="flex justify-center mt-4 space-x-2">
                                                 <Button
                                                     onClick={() => handleSearchClick(false)}
                                                     className="bg-primary text-white"
                                                 >
                                                     Pesquisar mais
                                                 </Button>
+                                                <FaPlusCircle
+                                                    size={20}
+                                                    color="#FC9D25"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => setIsInsertModalOpen(true)}
+                                                />
                                             </div>
                                         </>
                                     )}
@@ -148,16 +170,31 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID }) => {
                 </Modal>
             )}
 
-            {/* Modal principal */}
+            {isInsertModalOpen && (
+                <CompanyVATFormInsert
+                    onClose={() => setIsInsertModalOpen(false)}
+                    profileID={profileID}
+                    propertyID={propertyID}
+                    resNo={resNo}
+                />
+            )}
+
+            {/* Modal principal ou modal de edição */}
             {selectedCompany ? (
                 <CompanyVATFormEdit
-                    onClose={() => setSelectedCompany(false)}
+                    onClose={handleCloseCompanyEdit}
                     profileID={profileID}
                     propertyID={propertyID}
                     company={selectedCompany}
                 />
             ) : (
-                <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
+                <Modal
+                    isOpen={isMainModalOpen}
+                    onOpenChange={handleCloseModal}
+                    className="z-50"
+                    size="5xl"
+                    hideCloseButton={true}
+                >
                     <ModalContent>
                         {() => (
                             <>
