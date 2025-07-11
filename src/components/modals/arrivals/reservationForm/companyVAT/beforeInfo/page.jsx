@@ -21,6 +21,7 @@ const BeforeCompanyVat = ({ onClose, propertyID }) => {
   const [pageNumber, setPageNumber] = useState(1);
   const inputRef = useRef(null);
 
+  console.log(errorMessage, isDataModified);
   useEffect(() => {
     const storedLanguage = localStorage.getItem("language");
     if (storedLanguage) setLocale(storedLanguage);
