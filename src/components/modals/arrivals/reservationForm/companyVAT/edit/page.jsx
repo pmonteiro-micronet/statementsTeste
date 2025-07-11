@@ -77,8 +77,6 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
     const [isDataModified, setIsDataModified] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
-    const isCompanyEdit = company !== undefined && company !== null;
-
     const handleCloseModal = () => {
         if (isDataModified) {
             // Pergunta ao usuário se ele deseja perder os dados
