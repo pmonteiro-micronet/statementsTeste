@@ -17,7 +17,7 @@ const BeforeCompanyVat = ({ onClose, propertyID }) => {
   const [vatError, setVatError] = useState("");
   const [isDataModified, setIsDataModified] = useState(false);
   const inputRef = useRef(null);
-
+    console.log(errorMessage, isDataModified);
   const [searchResults, setSearchResults] = useState([]);
   const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
 
