@@ -22,7 +22,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID }) => {
     const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
     const [pageNumber, setPageNumber] = useState(1);
     const inputRef = useRef(null);
-    const [selectedCompany, setSelectedCompany] = useState(null);
+    const [selectedCompany, setSelectedCompany] = useState(false);
 
     console.log(errorMessage, isDataModified);
     useEffect(() => {
@@ -151,9 +151,10 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID }) => {
             {/* Modal principal */}
             {selectedCompany ? (
                 <CompanyVATFormEdit
-                    onClose={() => setIsCVATModalOpen(false)}
+                    onClose={() => setSelectedCompany(false)}
                     profileID={profileID}
                     propertyID={propertyID}
+                    company={selectedCompany}
                 />
             ) : (
                 <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>

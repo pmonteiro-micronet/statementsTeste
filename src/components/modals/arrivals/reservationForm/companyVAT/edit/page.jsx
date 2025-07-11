@@ -27,17 +27,44 @@ const customStyles = {
 
 const validatePortugueseVAT = (vat) => /^PT\d{9}$/.test(vat);
 
-const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData }) => {
-    const [formData, setFormData] = useState(() => ({
-        companyName: companyVATData?.companyName || "",
-        vatNo: companyVATData?.vatNo || "",
-        emailAddress: companyVATData?.emailAddress || "",
-        country: companyVATData?.country || "",
-        streetAddress: companyVATData?.streetAddress || "",
-        zipCode: companyVATData?.zipCode || "",
-        city: companyVATData?.city || "",
-        state: companyVATData?.state || "",
-    }));
+const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData, company }) => {
+    const [formData, setFormData] = useState(() => {
+        if (company) {
+            return {
+                companyName: company.name1 || "",
+                vatNo: company.vatno || "",
+                emailAddress: company.email || "",
+                country: company.land || "",
+                streetAddress: company.strasse || "",
+                zipCode: company.zipCode || "",
+                city: company.city || "",
+                state: company.state || "",
+            };
+        } else if (companyVATData) {
+            return {
+                companyName: companyVATData.companyName || "",
+                vatNo: companyVATData.vatNo || "",
+                emailAddress: companyVATData.emailAddress || "",
+                country: companyVATData.country || "",
+                streetAddress: companyVATData.streetAddress || "",
+                zipCode: companyVATData.zipCode || "",
+                city: companyVATData.city || "",
+                state: companyVATData.state || "",
+            };
+        } else {
+            // Caso nenhum dos dois exista, inicializa vazio
+            return {
+                companyName: "",
+                vatNo: "",
+                emailAddress: "",
+                country: "",
+                streetAddress: "",
+                zipCode: "",
+                city: "",
+                state: "",
+            };
+        }
+    });
 
     const [errorMessage, setErrorMessage] = useState("");
     const [vatError, setVatError] = useState("");
