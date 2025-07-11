@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
+import { FaPlusCircle } from "react-icons/fa";
 
 import en from "../../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../../public/locales/portuguesPortugal/common.json";
@@ -25,6 +26,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
     const inputRef = useRef(null);
     const [selectedCompany, setSelectedCompany] = useState(false);
 
+    console.log(errorMessage, isDataModified);
     // Estado para controlar o modal principal
     const [isMainModalOpen, setIsMainModalOpen] = useState(true);
 
