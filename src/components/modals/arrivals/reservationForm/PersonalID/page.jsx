@@ -4,7 +4,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/rea
 import { MdClose } from "react-icons/md";
 import Select from "react-select";
 import axios from "axios";
-
+import {savePersonalID} from "../../../../../services/api";
 
 const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
     //popula o select de pais de origem
@@ -101,6 +101,16 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
 
         fetchDocTypes();
     }, [propertyID]);
+
+    const handleSave = async() => {
+        const result = await savePersonalID(formData, personalID, propertyID);
+        if(result.sucess) {
+            setIsDataModified(false);
+            onClose(formData);
+        }else{
+            console.error("erro ao alterar dados:" , result.error);
+        }
+    }
 
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
@@ -233,9 +243,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                     </Button>
                                     <Button
                                         color="primary"
-                                        onClick={() => {
-                                            onClose(formData);
-                                        }}
+                                        onClick={handleSave}
                                     >
                                         {t.modals.companyInfo.save}
                                     </Button>
