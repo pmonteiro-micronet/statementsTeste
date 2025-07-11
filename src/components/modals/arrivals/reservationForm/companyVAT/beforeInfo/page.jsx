@@ -12,17 +12,11 @@ import es from "../../../../../../../public/locales/espanol/common.json";
 
 const translations = { en, pt, es };
 
-const BeforeCompanyVat = ({ onClose}) => {
+const BeforeCompanyVat = ({ onClose, propertyID}) => {
     const [locale, setLocale] = useState("pt");
     const [formData, setFormData] = useState({
         companyName: "",
-        vatNo: "",
-        emailAddress: "",
-        country: "",
-        streetAddress: "",
-        zipCode: "",
-        city: "",
-        state: ""
+        vatNo: ""
     });
     const [errorMessage, setErrorMessage] = useState("");
     console.log(errorMessage);
@@ -79,6 +73,35 @@ const BeforeCompanyVat = ({ onClose}) => {
         if (onClose) onClose();
     };
 
+    const handleSearchClick = async () => {
+        try {
+            const response = await fetch("/api/reservations/checkins/registrationForm/searchcompany", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    propertyID: propertyID,
+                    companyName: formData.companyName,
+                    vatNo: formData.vatNo,
+                    pageNumber: 1
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Erro ao buscar empresa");
+            }
+
+            const data = await response.json();
+            console.log("Resultado da empresa:", data);
+
+            // aqui você pode lidar com os dados recebidos
+        } catch (error) {
+            console.error("Erro ao buscar empresa:", error);
+            // Exibir feedback ao usuário se quiser
+        }
+    };
+
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
             <ModalContent>
@@ -124,9 +147,13 @@ const BeforeCompanyVat = ({ onClose}) => {
 
                                     {/* Botão Search alinhado com os inputs */}
                                     <div className="self-end"> {/* Alinha o botão com a base dos inputs */}
-                                        <button className="px-3 py-2 bg-primary text-white rounded-md flex items-center justify-center">
+                                        <button
+                                            onClick={handleSearchClick}
+                                            className="px-3 py-2 bg-primary text-white rounded-md flex items-center justify-center"
+                                        >
                                             <CiSearch color="white" size={20} />
                                         </button>
+
                                     </div>
                                 </div>
                             </div>
