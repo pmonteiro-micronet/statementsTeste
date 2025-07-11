@@ -76,7 +76,7 @@ const BeforeCompanyVat = ({ onClose, propertyID}) => {
     const handleSearchClick = async () => {
         try {
             const response = await fetch("/api/reservations/checkins/registrationForm/searchcompany", {
-                method: "POST",
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json"
                 },
