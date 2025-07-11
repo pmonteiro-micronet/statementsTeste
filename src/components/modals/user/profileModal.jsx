@@ -418,7 +418,7 @@ const ProfileModalForm = ({
                                                                     <div className="text-gray-400">Loading...</div>
                                                                 ) : (
                                                                     <div className="flex flex-col items-center">
-                                                                        <span className="text-xs text-gray-500">PMS Service</span>
+                                                                        <span className="text-xs text-gray-500">PMS</span>
                                                                         <Switch
                                                                             size="sm"
                                                                             isSelected={statusMap[hotel.propertyID]}

@@ -79,6 +79,14 @@
             "cardInHouses": "InHouses",
             "cardDepartures": "Partidas"
         },
+        "registrationRequests": {
+            "title": "Formulário de Registo",
+            "reservation": "Reserva",
+            "checkin": "Check-in",
+            "checkout": "Check-out",
+            "guestEmail": "Email do Hóspede",
+            "ViewDetails": "Ver Detalhes"
+        },
         "departures": {
             "today": "Hoje",
             "tomorrow": "Amanhã",
@@ -236,7 +244,7 @@
         "noItems": "Nenhum item encontrado.",
         "totalBalance": "SALDO TOTAL",
         "noTotalBalance": "Sem saldo total disponível.",
-        "vat": "IVA",
+        "vat": "Contribuinte",
         "gross": "Bruto",
         "net": "Líquido",
         "tax": "Imposto",
@@ -402,10 +410,10 @@
             }
         },
         "companyInfo": {
-            "insert": "Criar novo número de IVA da empresa",
+            "insert": "Criar nova ficha de empresa",
             "update": "Atualizar empresa",
             "companyName": "Nome da empresa:",
-            "vatNO": "N.º de IVA:",
+            "vatNO": "N.º de contribuinte:",
             "streetAddress": "Morada:",
             "zipCode": "Código postal:",
             "city": "Cidade:",
@@ -414,6 +422,7 @@
             "email": "E-mail:",
             "cancel": "Cancelar",
             "save": "Guardar",
+            "edit": "Editar",
             "countryError": "Erro ao carregar os países."
         },
         "userLogout": {
@@ -465,7 +474,7 @@
         "birthDate": "Data de nascimento:",
         "countryIssue": "País de emissão:",
         "birthPlace": "Local de nascimento:",
-        "vatNo": "Nº de IVA:",
+        "vatNo": "Nº de contribuinte:",
         "reservationNo": "Nº da reserva:",
         "room": "Quarto:",
         "arrivalDate": "Data de chegada:",

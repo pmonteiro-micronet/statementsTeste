@@ -79,6 +79,14 @@
             "cardInHouses": "InHouses",
             "cardDepartures": "Salidas"
         },
+        "registrationRequests": {
+            "title": "Formulario de Registro",
+            "reservation": "Reserva",
+            "checkin": "Entrada",
+            "checkout": "Salida",
+            "guestEmail": "Correo del Huésped",
+            "ViewDetails": "Ver Detalles"
+        },
         "departures": {
             "today": "Hoy",
             "tomorrow": "Mañana",
@@ -414,6 +422,7 @@
             "email": "Correo electrónico:",
             "cancel": "Cancelar",
             "save": "Guardar",
+            "edit": "Editar",
             "countryError": "Error al cargar los países."
         },
         "userLogout": {
