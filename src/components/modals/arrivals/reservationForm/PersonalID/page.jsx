@@ -4,7 +4,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/rea
 import { MdClose } from "react-icons/md";
 import Select from "react-select";
 import axios from "axios";
-import {savePersonalID} from "../../../../../services/api";
+
 
 const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
     //popula o select de pais de origem
@@ -102,15 +102,40 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
         fetchDocTypes();
     }, [propertyID]);
 
-    const handleSave = async() => {
-        const result = await savePersonalID(formData, personalID, propertyID);
-        if(result.sucess) {
+    const savePersonalID = async (formData , profileID) => {
+        try {
+            const response = await axios.post('/api/reservations/checkins/registrationForm/editpersonalID', null, {
+                headers: {
+                    authorization: 'API_AUTH_TOKEN',
+                    Dateofbirth: formData.DateOfBirth,
+                    IDCountryofBirth: formData.CountryOfBirth,
+                    Nationality: formData.Nationality,
+                    IDDoc: formData.IDDoc,
+                    DocNr: formData.NrDoc,
+                    Expdate: formData.ExpDate,
+                    Issue: formData.Issue,
+                    profileID: profileID,
+                }
+            });
+
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error("savePersonalID error:", error?.response?.data || error.message);
+            return { success: false, error: error?.response?.data || error.message };
+        }
+    };
+
+    const handleSave = async () => {
+        const result = await savePersonalID(formData, personalID);
+
+        if (result.success) {
             setIsDataModified(false);
             onClose(formData);
-        }else{
-            console.error("erro ao alterar dados:" , result.error);
+        } else {
+            console.log("Erro ao alterar dados:", result.error);
         }
-    }
+    };
+
 
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>

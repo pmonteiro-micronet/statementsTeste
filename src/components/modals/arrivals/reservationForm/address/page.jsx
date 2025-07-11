@@ -64,6 +64,41 @@ const AddressForm = ({ onClose, personalID, propertyID, t }) => {
         fetchCountries();
     }, [propertyID]);
 
+    const saveAddress = async () => {
+        try {
+            const payload = {
+                authorization: 'API_AUTH_TOKEN',
+                countryid: formData.Country,
+                streetaddress: formData.Street,
+                postalcode: formData.PostalCode,
+                city: formData.City,
+                stateprovinceregion: formData.Region,
+                profileid: profileID,
+            };
+
+            const response = await axios.post('/api/reservations/checkins/registrationForm/editaddress', payload);
+
+            if (response.status === 200) {
+                setIsDataModified(false);
+                onClose(formData); // pass updated data if needed
+            } else {
+                console.error("Failed to save address:", response.data);
+            }
+        } catch (error) {
+            console.error("Error saving address:", error?.response?.data || error.message);
+        }
+    };
+
+    const handleSave = async () => {
+        const result = await saveAddress(formData, personalID);
+
+        if (result.success) {
+            setIsDataModified(false);
+            onClose(formData);
+        } else {
+            console.error("Erro ao alterar endereço:", result.error);
+        }
+    };
 
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
@@ -161,9 +196,7 @@ const AddressForm = ({ onClose, personalID, propertyID, t }) => {
                                     </Button>
                                     <Button
                                         color="primary"
-                                        onClick={() => {
-                                            onClose(formData);
-                                        }}
+                                        onClick={handleSave}
                                     >
                                         {t.modals.companyInfo.save}
                                     </Button>
