@@ -20,7 +20,9 @@ import BeforeCompanyVat from "@/components/modals/arrivals/reservationForm/compa
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
 import SuccessRegistrationForm from "@/components/modals/arrivals/reservationForm/success/page";
 import LoadingBackdrop from "@/components/Loader/page";
+import PersonalIDForm  from "@/components/modals/arrivals/reservationForm/PersonalID/page";
 import { FaPlusCircle } from "react-icons/fa";
+import AddressForm from "@/components/modals/arrivals/reservationForm/address/page"
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -563,6 +565,8 @@ export default function Page() {
     const [isCVATModalOpen, setIsCVATModalOpen] = useState(false);
     const [isCVATModalOpenInsert, setIsCVATModalOpenInsert] = useState(false);
     const [companyVATData, setCompanyVATData] = useState(null);
+    const [isPersonalIDModalOpen, setisPersonalIDModalOpen] = useState(false);
+    const [isAddressModalOpen, setisAddressModalOpen] = useState(false);
     const [modalField, setModalField] = useState(null); // Para identificar o campo em edição
 
     const [initialEmail, setInitialEmail] = useState("");
@@ -1006,9 +1010,28 @@ export default function Page() {
 
                                 <div className='flex flex-row details-on-screen'>
                                     {/** Dados de Morada */}
-                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 details-on-screen-card'>
+                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 mr-1 relative details-on-screen-card'>
                                         <p className='text-[#f7ba83] mb-1'>{t.frontOffice.registrationForm.address}</p>
                                         <div className='flex flex-col w-full mt-2'>
+                                            <div className="absolute top-2 right-2 cursor-pointer z-10">
+                                                <FaPencilAlt
+                                                    size={15}
+                                                    color="orange"
+                                                    onClick={() => {
+                                                        setisAddressModalOpen(true);
+                                                    }}
+                                                />
+                                            </div>
+
+                                            {isAddressModalOpen && (
+                                                <AddressForm
+                                                    onClose={() => setisAddressModalOpen(false)}
+                                                    personalID={personalID}
+                                                    propertyID={propertyID}
+                                                    t={t}
+                                                />
+                                            )}
+
                                             <InputFieldControlled
                                                 type={"text"}
                                                 id={"Country"}
@@ -1058,9 +1081,28 @@ export default function Page() {
                                     </div>
 
                                     {/** Dados de Info pessoal */}
-                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 px-4 details-on-screen-card'>
+                                    <div className='w-1/2 bg-cardColor py-2 px-2 rounded-lg mt-1 px-4 relative details-on-screen-card'>
                                         <p className='text-[#f7ba83] mb-1'>{t.frontOffice.registrationForm.personalId}</p>
                                         <div className='flex flex-row justify-between gap-4 mt-4'>
+                                            <div className="absolute top-2 right-2 cursor-pointer z-10">
+                                                <FaPencilAlt
+                                                    size={15}
+                                                    color="orange"
+                                                    onClick={() => {
+                                                        setisPersonalIDModalOpen(true);
+                                                    }}
+                                                />
+                                            </div>
+
+                                            {isPersonalIDModalOpen && (
+                                                <PersonalIDForm
+                                                    onClose={() => setisPersonalIDModalOpen(false)}
+                                                    personalID={personalID}
+                                                    propertyID={propertyID}
+                                                    t={t}
+                                                />
+                                            )}
+
                                             <InputFieldControlled
                                                 type={
                                                     personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
