@@ -5,8 +5,6 @@ import Select from "react-select";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 
-import { CiSearch } from "react-icons/ci";
-
 import en from "../../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../../../public/locales/espanol/common.json";
@@ -216,11 +214,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                                                 onBlur={handleBlur}
                                                 className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                             />
-                                            <button className="px-3 py-1 bg-primary text-white rounded-md">
-                                                <CiSearch color="white" size={30}/>
-                                            </button>
                                         </div>
-
                                         {vatError && <p className="text-red-500 text-xs mt-1">{vatError}</p>}
                                     </div>
                                     <div className="w-2/3">

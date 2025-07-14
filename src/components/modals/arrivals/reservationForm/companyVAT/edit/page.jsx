@@ -10,6 +10,10 @@ import en from "../../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../../../public/locales/espanol/common.json";
 
+import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insert/page";
+
+import { HiSwitchHorizontal } from "react-icons/hi";
+
 const translations = { en, pt, es };
 
 const customStyles = {
@@ -76,6 +80,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
 
     const [isDataModified, setIsDataModified] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+
+    const [isInsertModalOpen, setIsInsertModalOpen] = useState(false);
 
     const handleCloseModal = () => {
         if (isDataModified) {
@@ -217,142 +223,164 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
     };
 
     return (
-        <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
-            <ModalContent>
-                {() => (
-                    <>
-                        <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white">
-                            {t.modals.companyInfo.update}
-                            <Button color="transparent" variant="light" onClick={handleCloseModal} className="w-auto min-w-0 p-0 m-0">
-                                <MdClose size={30} />
-                            </Button>
-                        </ModalHeader>
-                        <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
-                            <div className="flex flex-col">
-                                <div className="flex flex-row gap-2 mb-0.5 items-center">
-                                    <div className="w-2/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.companyName}</label>
-                                        <input
-                                            ref={inputRef}
-                                            type="text"
-                                            name="companyName"
-                                            value={formData.companyName}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+        <>
+            {isInsertModalOpen && (
+                <CompanyVATFormInsert
+                    onClose={() => setIsInsertModalOpen(false)}
+                    profileID={profileID}
+                    propertyID={propertyID}
+                    resNo={resNo}
+                />
+            )}
+
+            <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
+                <ModalContent>
+                    {() => (
+                        <>
+                            <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white">
+                                {t.modals.companyInfo.update}
+                                <Button color="transparent" variant="light" onClick={handleCloseModal} className="w-auto min-w-0 p-0 m-0">
+                                    <MdClose size={30} />
+                                </Button>
+                            </ModalHeader>
+                            <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
+                                <div className="flex flex-col">
+                                    <div className="flex gap-2 items-center mb-2 text-xs cursor-pointer"
+                                        onClick={() => {
+                                            setIsInsertModalOpen(true);
+                                        }}>
+                                        <HiSwitchHorizontal
+                                            size={18}
+                                            color="#FC9D25"
+                                            style={{ cursor: "pointer" }}
                                         />
+                                        <p>Switch companys</p>
                                     </div>
-                                    <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.vatNO}</label>
-                                        <input
-                                            type="text"
-                                            name="vatNo"
-                                            value={formData.vatNo}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            disabled={!isEditing}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
-                                        {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
+                                    <div className="flex flex-row gap-2 mb-0.5 items-center">
+                                        <div className="w-2/3">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.companyName}</label>
+                                            <input
+                                                ref={inputRef}
+                                                type="text"
+                                                name="companyName"
+                                                value={formData.companyName}
+                                                onChange={handleChange}
+                                                disabled={!isEditing}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            />
+                                        </div>
+                                        <div className="w-1/3">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.vatNO}</label>
+                                            <input
+                                                type="text"
+                                                name="vatNo"
+                                                value={formData.vatNo}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                disabled={!isEditing}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            />
+                                            {vatError && <p className="text-red-500 text-xs">{vatError}</p>}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-row gap-2 mb-0.5 items-center">
+                                        <div className="w-1/3">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.streetAddress}</label>
+                                            <input
+                                                type="text"
+                                                name="streetAddress"
+                                                value={formData.streetAddress}
+                                                onChange={handleChange}
+                                                disabled={!isEditing}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            />
+                                        </div>
+
+                                        <div className="w-1/3">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.zipCode}</label>
+                                            <input
+                                                type="text"
+                                                name="zipCode"
+                                                value={formData.zipCode}
+                                                onChange={handleChange}
+                                                disabled={!isEditing}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            />
+                                        </div>
+                                        <div className="w-1/3">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.city}</label>
+                                            <input
+                                                type="text"
+                                                name="city"
+                                                value={formData.city}
+                                                onChange={handleChange}
+                                                disabled={!isEditing}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-row gap-2 mb-0.5 items-center">
+
+                                        <div className="w-1/3">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.state}</label>
+                                            <input
+                                                type="text"
+                                                name="state"
+                                                value={formData.state}
+                                                onChange={handleChange}
+                                                disabled={!isEditing}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            />
+                                        </div>
+                                        <div className="w-1/3">
+                                            <label className="block text-sm font-medium">{t.modals.companyInfo.country}</label>
+                                            <Select
+                                                options={countryOptions}
+                                                value={countryOptions.find(option => option.value === formData.country)}
+                                                onChange={handleCountryChange}
+                                                isSearchable
+                                                styles={customStyles}
+                                                disabled={!isEditing}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-row">
+                                        <div className="w-full">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.email}</label>
+                                            <input
+                                                type="text"
+                                                name="emailAddress"
+                                                value={formData.emailAddress}
+                                                onChange={handleChange}
+                                                disabled={!isEditing}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="flex flex-row gap-2 mb-0.5 items-center">
-                                    <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.streetAddress}</label>
-                                        <input
-                                            type="text"
-                                            name="streetAddress"
-                                            value={formData.streetAddress}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
-                                    </div>
-
-                                    <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.zipCode}</label>
-                                        <input
-                                            type="text"
-                                            name="zipCode"
-                                            value={formData.zipCode}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
-                                    </div>
-                                    <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.city}</label>
-                                        <input
-                                            type="text"
-                                            name="city"
-                                            value={formData.city}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
-                                    </div>
+                                {errorMessage && <p className="text-red-500 text-xs -mt-4">{errorMessage}</p>}
+                                <div className="flex justify-end space-x-2 -mt-4">
+                                    <Button color="error" onClick={handleCloseModal}>{t.modals.companyInfo.cancel}</Button>
+                                    {isEditing ? (
+                                        <Button color="primary" onClick={handleSave}>
+                                            {t.modals.companyInfo.save}
+                                        </Button>
+                                    ) : (
+                                        <Button color="primary" onClick={handleEdit}>
+                                            {t.modals.companyInfo.edit}
+                                        </Button>
+                                    )}
                                 </div>
-
-                                <div className="flex flex-row gap-2 mb-0.5 items-center">
-
-                                    <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.state}</label>
-                                        <input
-                                            type="text"
-                                            name="state"
-                                            value={formData.state}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
-                                    </div>
-                                    <div className="w-1/3">
-                                        <label className="block text-sm font-medium">{t.modals.companyInfo.country}</label>
-                                        <Select
-                                            options={countryOptions}
-                                            value={countryOptions.find(option => option.value === formData.country)}
-                                            onChange={handleCountryChange}
-                                            isSearchable
-                                            styles={customStyles}
-                                            disabled={!isEditing}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-row">
-                                    <div className="w-full">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.email}</label>
-                                        <input
-                                            type="text"
-                                            name="emailAddress"
-                                            value={formData.emailAddress}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {errorMessage && <p className="text-red-500 text-xs -mt-4">{errorMessage}</p>}
-                            <div className="flex justify-end space-x-2 -mt-4">
-                                <Button color="error" onClick={handleCloseModal}>{t.modals.companyInfo.cancel}</Button>
-                                {isEditing ? (
-                                    <Button color="primary" onClick={handleSave}>
-                                        {t.modals.companyInfo.save}
-                                    </Button>
-                                ) : (
-                                    <Button color="primary" onClick={handleEdit}>
-                                        {t.modals.companyInfo.edit}
-                                    </Button>
-                                )}
-                            </div>
-                        </ModalBody>
-                    </>
-                )}
-            </ModalContent>
-        </Modal>
+                            </ModalBody>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+        </>
     );
 };
 
