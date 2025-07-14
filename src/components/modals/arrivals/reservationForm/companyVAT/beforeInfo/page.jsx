@@ -26,6 +26,8 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
     const inputRef = useRef(null);
     const [selectedCompany, setSelectedCompany] = useState(false);
 
+    const vatRef = useRef(null);
+
     console.log(errorMessage, isDataModified);
     // Estado para controlar o modal principal
     const [isMainModalOpen, setIsMainModalOpen] = useState(true);
@@ -35,7 +37,13 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
     useEffect(() => {
         const storedLanguage = localStorage.getItem("language");
         if (storedLanguage) setLocale(storedLanguage);
-    }, []);
+
+        // Dar foco ao campo vatNo ao abrir o modal
+        if (isMainModalOpen && vatRef.current) {
+            vatRef.current.focus();
+        }
+    }, [isMainModalOpen]);
+
 
     const t = translations[locale] || translations["pt"];
 
@@ -219,6 +227,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                                                     {t.modals.companyInfo.vatNO}
                                                 </label>
                                                 <input
+                                                    ref={vatRef}
                                                     type="text"
                                                     name="vatNo"
                                                     value={formData.vatNo}

@@ -1,7 +1,7 @@
 "use client"; // Importante para usar hooks no Next.js
 
 import { signIn } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Html5QrcodeScanner } from "html5-qrcode"; // Biblioteca de leitura de QR Code
@@ -55,6 +55,7 @@ const SignIn = () => {
   const t = translations[locale];
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordText, setShowPasswordText] = useState(false);
+  const passwordInputRef = useRef(null);
 
   useEffect(() => {
     const savedHotelID = localStorage.getItem("selectedHotelID");
@@ -150,6 +151,12 @@ const SignIn = () => {
     }
   }, [scanning]);  // Dependência do estado `scanning`  
 
+  useEffect(() => {
+    if (showPassword && passwordInputRef.current) {
+      passwordInputRef.current.focus();
+    }
+  }, [showPassword]);
+
   return (
     <div className="min-h-screen bg-gradient-to-tr from-orange-500 via-black to-black flex justify-center items-center">
       <div className="w-[23rem] bg-white rounded-3xl p-4">
@@ -158,7 +165,7 @@ const SignIn = () => {
             extensions
           </div>
           <div className="flex justify-center">
-            <img src="/icon/extensions_logo.png" alt="logo" width={40}/>
+            <img src="/icon/extensions_logo.png" alt="logo" width={40} />
           </div>
         </div>
 
@@ -194,6 +201,7 @@ const SignIn = () => {
             <>
               <div className="mt-4 relative">
                 <input
+                  ref={passwordInputRef}
                   type={showPasswordText ? "text" : "password"}
                   placeholder={t.auth.password}
                   value={password}
