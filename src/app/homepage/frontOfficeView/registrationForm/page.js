@@ -1026,7 +1026,7 @@ export default function Page() {
                                             {isAddressModalOpen && (
                                                 <AddressForm
                                                     onClose={() => setisAddressModalOpen(false)}
-                                                    personalID={personalID}
+                                                    personalID={address}
                                                     propertyID={propertyID}
                                                     t={t}
                                                 />

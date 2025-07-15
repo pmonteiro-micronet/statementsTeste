@@ -102,17 +102,17 @@ const AddressForm = ({ onClose, personalID, propertyID, t }) => {
     };
 
     useEffect(() => {
-        if (personalID) {
+        if (address) {
             setFormData({
-                Country: personalID.Country || "",
-                Street: personalID.Street || "",
-                PostalCode: personalID.PostalCode || "",
-                City: personalID.City || "",
-                Region: personalID.Region || "",
+                Country: address.Country || "",
+                Street: address.Street || "",
+                PostalCode: address.PostalCode || "",
+                City: address.City || "",
+                Region: address.Region || "",
             });
             setIsDataModified(false); // reset à flag de modificação por serem dados novos
         }
-    }, [personalID]);
+    }, [address]);
 
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>

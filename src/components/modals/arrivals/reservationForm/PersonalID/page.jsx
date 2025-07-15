@@ -41,10 +41,11 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
         setIsDataModified(true);
     };
 
-    const getDateValue = (dateStr, defaultStr) => {
-        if (!dateStr || dateStr === defaultStr) return "";
+    const getDateValue = (dateStr) => {
+        if (!dateStr || dateStr === "1900-01-01" || dateStr === "2050-12-31") return "";
         return dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
     };
+
 
     useEffect(() => {
         if (inputRef.current) inputRef.current.focus();
@@ -165,6 +166,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                         <input
                                             type="date"
                                             name="DateOfBirth"
+                                            value={getDateValue(formData.DateOfBirth)}
                                             onChange={handleChange}
                                             className="w-full min-w-[180px] border border-gray-300 rounded-md px-2 py-[0.375rem] focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
@@ -242,6 +244,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                         <input
                                             type="date"
                                             name="ExpDate"
+                                            value={getDateValue(formData.ExpDate)}
                                             onChange={handleChange}
                                             required
                                             className="w-full min-w-[180px] border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
