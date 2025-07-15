@@ -197,11 +197,11 @@ const AddressForm = ({ onClose, address, propertyID, t }) => {
                                         </label>
                                         <Select
                                             options={countryOptions}
-                                            value={countryOptions.find(option => option.value === formData.Country)}
+                                            value={countryOptions.find(option => option.label === formData.Country)}
                                             onChange={(selectedOption) => {
                                                 setFormData(prev => ({
                                                     ...prev,
-                                                    Country: selectedOption.value,
+                                                    Country: selectedOption.label,
                                                 }));
                                                 setIsDataModified(true);
                                             }}
