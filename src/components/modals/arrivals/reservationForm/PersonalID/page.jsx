@@ -13,12 +13,12 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
     const [docTypeOptions , setDocTypeOptions] = useState([]);
 
     const [formData, setFormData] = useState(() => ({
-        DateOfBirth: personalID?.DateOfBirth || "",
+        DateOfBirth: personalID?.DateOfBirth ? personalID.DateOfBirth.split('T')[0] : "",
         CountryOfBirth: personalID?.CountryOfBirth || "",
         Nationality: personalID?.Nationality || "",
         IDDoc: personalID?.IDDoc || "",
         NrDoc: personalID?.NrDoc || "",
-        ExpDate: personalID?.ExpDate || "",
+        ExpDate: personalID?.ExpDate ? personalID.ExpDate.split('T')[0] : "",
         Issue: personalID?.Issue || "",
     }));
 
@@ -39,11 +39,6 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
         setIsDataModified(true);
-    };
-
-    const getDateValue = (dateStr, defaultStr) => {
-        if (!dateStr || dateStr === defaultStr) return "";
-        return dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
     };
 
     useEffect(() => {
@@ -160,21 +155,20 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                     <div className="w-1/3">
                                         <label className="block text-sm font-medium">
                                             {/*Vai buscar as diferentes traduções aos ficheiros no public ->locales */}
-                                            {t.modals.PersonalID.dateofBirth || "Date of Birth"}
+                                            {t.modals.PersonalID.dateofBirth}
                                         </label>
                                         <input
-                                            ref={inputRef}
                                             type="date"
                                             name="DateOfBirth"
-                                            value={getDateValue(formData.DateOfBirth, "1900-01-01")}
+                                            value={formData.DateOfBirth ?? ""}
                                             onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-[0.375rem] focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            className="w-full min-w-[180px] border border-gray-300 rounded-md px-2 py-[0.375rem] focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
 
                                     <div className="w-1/3">
                                         <label className="block text-sm font-medium">
-                                            {t.modals.PersonalID.countryofBirth || "Country of Birth"} *
+                                            {t.modals.PersonalID.countryofBirth} *
                                         </label>
                                         <Select
                                             options={countryOptions}
@@ -240,14 +234,14 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
 
                                 <div className="flex gap-4">
                                     <div className="w-1/2">
-                                        <label className="block text-sm font-medium">{t.modals.PersonalID.expDate} *</label>
+                                        <label className="block text-sm font-medium">{t.modals.PersonalID.expDate} </label>
                                         <input
                                             type="date"
                                             name="ExpDate"
-                                            value={getDateValue(formData.ExpDate, "2050-12-31")}
+                                            value={formData.ExpDate ?? ""}
                                             onChange={handleChange}
                                             required
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            className="w-full min-w-[180px] border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
                                     <div className="w-1/2">
@@ -262,7 +256,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                     </div>
                                 </div>
 
-                                <div className="flex justify-end space-x-2 -mt-4">
+                                <div className="flex justify-end space-x-2 ">
                                     <Button color="error" onClick={handleCloseModal}>
                                         {t.modals.companyInfo.cancel}
                                     </Button>

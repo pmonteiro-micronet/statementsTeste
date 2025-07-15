@@ -439,7 +439,7 @@
             "idDoc": "Documento de identificacíon",
             "idDocNumber": "Nr.",
             "expDate": "Fecha de Caducidad",
-            "issue": "Error"
+            "issue": "emisión"
         },
         "Address": {
             "title":"Informacíon de direccíon" ,

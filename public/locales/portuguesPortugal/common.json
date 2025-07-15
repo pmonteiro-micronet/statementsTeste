@@ -439,7 +439,7 @@
             "idDoc": "Documento de identificação",
             "idDocNumber": "Nº",
             "expDate": "Data de exp.",
-            "issue": "Erro"
+            "issue": "Emissão"
         },
         "Address": {
             "title": "Informação da Morada",
