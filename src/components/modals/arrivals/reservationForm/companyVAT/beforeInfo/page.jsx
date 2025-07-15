@@ -146,8 +146,8 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                                     ) : (
                                         <>
                                             <table className="w-full text-left min-w-max border-collapse">
-                                                <thead className="sticky top-0 z-30">
-                                                    <tr className="bg-primary text-white h-12">
+                                                <thead className="sticky top-0 z-30 bg-primary shadow-md">
+                                                    <tr className="text-white h-12">
                                                         <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
                                                             <div className="flex items-center gap-2">
                                                                 Empresa
