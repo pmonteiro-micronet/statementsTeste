@@ -119,7 +119,7 @@ const AddressForm = ({ onClose, address, propertyID, t }) => {
             <ModalContent>
                 {() => (
                     <>
-                        <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white">
+                        <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white h-10">
                             {t.modals.Address.title }
                             <Button
                                 color="transparent"
@@ -197,11 +197,11 @@ const AddressForm = ({ onClose, address, propertyID, t }) => {
                                         </label>
                                         <Select
                                             options={countryOptions}
-                                            value={countryOptions.find(option => option.value === formData.Country)}
+                                            value={countryOptions.find(option => option.label === formData.Country)}
                                             onChange={(selectedOption) => {
                                                 setFormData(prev => ({
                                                     ...prev,
-                                                    Country: selectedOption.value,
+                                                    Country: selectedOption.label,
                                                 }));
                                                 setIsDataModified(true);
                                             }}

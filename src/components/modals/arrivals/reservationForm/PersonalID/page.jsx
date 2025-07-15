@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import Select from "react-select";
@@ -10,7 +10,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
     //popula o select de pais de origem
     const [countryOptions, setCountryOptions] = useState([]);
     //popula o select do ID DOC
-    const [docTypeOptions , setDocTypeOptions] = useState([]);
+    const [docTypeOptions, setDocTypeOptions] = useState([]);
 
     const [formData, setFormData] = useState(() => ({
         DateOfBirth: personalID?.DateOfBirth ? personalID.DateOfBirth.split('T')[0] : "",
@@ -22,7 +22,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
         Issue: personalID?.Issue || "",
     }));
 
-    console.log("ID" , propertyID);
+    console.log("ID", propertyID);
     const [isDataModified, setIsDataModified] = useState(false);
     const inputRef = useRef(null);
 
@@ -49,8 +49,8 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
     useEffect(() => {
         const fetchCountries = async () => {
             try {
-                if(!propertyID) {
-                    console.log("Não há propertyID associado"  , propertyID);
+                if (!propertyID) {
+                    console.log("Não há propertyID associado", propertyID);
                 }
                 const response = await axios.get(`/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`);
                 const formattedOptions = response.data
@@ -97,7 +97,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
         fetchDocTypes();
     }, [propertyID]);
 
-    const savePersonalID = async (formData , profileID) => {
+    const savePersonalID = async (formData, profileID) => {
         try {
             const response = await axios.post('/api/reservations/checkins/registrationForm/editpersonalID', null, {
                 headers: {
@@ -131,6 +131,16 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
         }
     };
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (inputRef.current) {
+                inputRef.current.focus();
+            }
+        }, 300); // atraso leve ajuda a garantir foco após animação/modal aberto
+
+        return () => clearTimeout(timer);
+    }, []);
+
 
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
@@ -138,7 +148,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                 {() => (
                     <>
                         <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white h-10">
-                            {t.modals.PersonalID.title }
+                            {t.modals.PersonalID.title}
                             <Button
                                 color="transparent"
                                 variant="light"
@@ -149,20 +159,35 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                             </Button>
                         </ModalHeader>
 
-                        <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
-                            <div className="flex flex-col gap-3">
-                                <div className="flex gap-4">
+                        <ModalBody className="flex flex-col mx-5 my-5 space-y-6 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
+                            <div className="flex flex-col gap-6">
+
+                                {/* Linha 1: Data de nascimento, País de nascimento, Nacionalidade */}
+                                <div className="flex flex-row justify-between w-full gap-4">
                                     <div className="w-1/3">
                                         <label className="block text-sm font-medium">
-                                            {/*Vai buscar as diferentes traduções aos ficheiros no public ->locales */}
                                             {t.modals.PersonalID.dateofBirth}
                                         </label>
                                         <input
-                                            type="date"
+                                            type="text"
                                             name="DateOfBirth"
-                                            value={formData.DateOfBirth ?? ""}
-                                            onChange={handleChange}
-                                            className="w-full min-w-[180px] border border-gray-300 rounded-md px-2 py-[0.375rem] focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            value={formData.DateOfBirth}
+                                            onChange={(e) => {
+                                                let value = e.target.value.replace(/\D/g, ""); // remove tudo que não for número
+
+                                                // Aplica a máscara: dd/mm/yyyy
+                                                if (value.length > 2 && value.length <= 4) {
+                                                    value = value.slice(0, 2) + "/" + value.slice(2);
+                                                } else if (value.length > 4) {
+                                                    value = value.slice(0, 2) + "/" + value.slice(2, 4) + "/" + value.slice(4, 8);
+                                                }
+
+                                                setFormData((prev) => ({ ...prev, DateOfBirth: value }));
+                                                setIsDataModified(true);
+                                            }}
+                                            placeholder="dd/mm/aaaa"
+                                            maxLength={10}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-2 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
 
@@ -174,10 +199,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                             options={countryOptions}
                                             value={countryOptions.find(option => option.label === formData.CountryOfBirth)}
                                             onChange={(selectedOption) => {
-                                                setFormData(prev => ({
-                                                    ...prev,
-                                                    CountryOfBirth: selectedOption.label,
-                                                }));
+                                                setFormData(prev => ({ ...prev, CountryOfBirth: selectedOption.label }));
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
@@ -192,10 +214,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                             options={countryOptions}
                                             value={countryOptions.find(option => option.label === formData.Nationality)}
                                             onChange={(selectedOption) => {
-                                                setFormData(prev => ({
-                                                    ...prev,
-                                                    Nationality: selectedOption.label,
-                                                }));
+                                                setFormData(prev => ({ ...prev, Nationality: selectedOption.label }));
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
@@ -203,72 +222,94 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                     </div>
                                 </div>
 
-                                <div className="flex gap-4">
+                                {/* Linha 2: Tipo de documento e número */}
+                                <div className="flex flex-row justify-between gap-4">
                                     <div className="w-1/2">
-                                        <label className="block text-sm font-medium">{t.modals.PersonalID.idDoc} *</label>
+                                        <label className="block text-sm font-medium">
+                                            {t.modals.PersonalID.idDoc} *
+                                        </label>
                                         <Select
                                             options={docTypeOptions}
                                             value={docTypeOptions.find(option => option.label === String(formData.IDDoc)) || null}
                                             onChange={(selectedOption) => {
-                                                setFormData(prev => ({
-                                                    ...prev,
-                                                    IDDoc: selectedOption.label,
-                                                }));
+                                                setFormData(prev => ({ ...prev, IDDoc: selectedOption.label }));
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
                                         />
                                     </div>
+
                                     <div className="w-1/2">
-                                        <label className="block text-sm font-medium">{t.modals.PersonalID.idDocNumber} *</label>
+                                        <label className="block text-sm font-medium">
+                                            {t.modals.PersonalID.idDocNumber} *
+                                        </label>
                                         <input
                                             type="text"
                                             name="NrDoc"
                                             value={formData.NrDoc}
                                             onChange={handleChange}
                                             required
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            ref={inputRef}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-2 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
                                 </div>
 
-                                <div className="flex gap-4">
+                                {/* Linha 3: Data de expiração e entidade emissora */}
+                                <div className="flex flex-row justify-between gap-4">
                                     <div className="w-1/2">
-                                        <label className="block text-sm font-medium">{t.modals.PersonalID.expDate} </label>
+                                        <label className="block text-sm font-medium">
+                                            {t.modals.PersonalID.expDate}
+                                        </label>
                                         <input
-                                            type="date"
+                                            type="text"
                                             name="ExpDate"
-                                            value={formData.ExpDate ?? ""}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full min-w-[180px] border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            value={formData.ExpDate}
+                                            onChange={(e) => {
+                                                let value = e.target.value.replace(/\D/g, ""); // remove tudo que não for número
+
+                                                if (value.length > 2 && value.length <= 4) {
+                                                    value = value.slice(0, 2) + "/" + value.slice(2);
+                                                } else if (value.length > 4) {
+                                                    value = value.slice(0, 2) + "/" + value.slice(2, 4) + "/" + value.slice(4, 8);
+                                                }
+
+                                                setFormData((prev) => ({ ...prev, ExpDate: value }));
+                                                setIsDataModified(true);
+                                            }}
+                                            placeholder="dd/mm/aaaa"
+                                            maxLength={10}
+                                            className="w-full border border-gray-300 rounded-md px-2 py-2 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
+
                                     <div className="w-1/2">
-                                        <label className="block text-sm font-medium">{t.modals.PersonalID.issue}</label>
+                                        <label className="block text-sm font-medium">
+                                            {t.modals.PersonalID.issue}
+                                        </label>
                                         <input
                                             type="text"
                                             name="Issue"
                                             value={formData.Issue}
                                             onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            className="w-full border border-gray-300 rounded-md px-2 py-2 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
                                     </div>
                                 </div>
 
-                                <div className="flex justify-end space-x-2 ">
+                                {/* Botões */}
+                                <div className="flex justify-end space-x-2">
                                     <Button color="error" onClick={handleCloseModal}>
                                         {t.modals.companyInfo.cancel}
                                     </Button>
-                                    <Button
-                                        color="primary"
-                                        onClick={handleSave}
-                                    >
+                                    <Button color="primary" onClick={handleSave}>
                                         {t.modals.companyInfo.save}
                                     </Button>
                                 </div>
                             </div>
                         </ModalBody>
+
+
                     </>
                 )}
             </ModalContent>
