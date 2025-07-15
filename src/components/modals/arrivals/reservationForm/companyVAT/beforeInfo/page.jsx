@@ -145,18 +145,47 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                                         <p>Nenhuma empresa encontrada.</p>
                                     ) : (
                                         <>
-                                            <ul>
-                                                {searchResults.map((company, index) => (
-                                                    <li
-                                                        key={company.kdnr || index}
-                                                        className="border-b border-gray-300 py-2 cursor-pointer hover:bg-gray-100"
-                                                        onClick={() => handleSelectCompany(company)}
-                                                    >
-                                                        <p><strong>Empresa:</strong> {company.name1 || "—"}</p>
-                                                        <p><strong>NIF:</strong> {company.vatno || "—"}</p>
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                            <table className="w-full text-left min-w-max border-collapse">
+                                                <thead className="sticky top-0 z-30">
+                                                    <tr className="bg-primary text-white h-12">
+                                                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
+                                                            <div className="flex items-center gap-2">
+                                                                Empresa
+                                                            </div>
+                                                        </td>
+                                                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
+                                                            <div className="flex items-center gap-2">
+                                                                NIF
+                                                            </div>
+                                                        </td>
+                                                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
+                                                            <div className="flex items-center gap-2">
+                                                                País
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {searchResults.map((company, index) => (
+                                                        <tr
+                                                            key={company.kdnr || index}
+                                                            className="hover:bg-gray-100 cursor-pointer"
+                                                            onClick={() => handleSelectCompany(company)}
+                                                        >
+                                                            <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
+                                                                {company.name1 || "—"}
+                                                            </td>
+                                                            <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
+                                                                {company.vatno || "—"}
+                                                            </td>
+                                                            <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
+                                                                {company.land || "—"}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+
                                             <div className="flex justify-center mt-4 space-x-2">
                                                 <Button
                                                     onClick={() => handleSearchClick(false)}
