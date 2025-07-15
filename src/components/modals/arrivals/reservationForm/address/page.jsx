@@ -119,7 +119,7 @@ const AddressForm = ({ onClose, address, propertyID, t }) => {
             <ModalContent>
                 {() => (
                     <>
-                        <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white">
+                        <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white h-10">
                             {t.modals.Address.title }
                             <Button
                                 color="transparent"
