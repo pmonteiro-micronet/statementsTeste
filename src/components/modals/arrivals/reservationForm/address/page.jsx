@@ -6,7 +6,7 @@ import Select from "react-select";
 import axios from "axios";
 
 
-const AddressForm = ({ onClose, personalID, propertyID, t }) => {
+const AddressForm = ({ onClose, address, propertyID, t }) => {
     //popula o select de pais
     const [countryOptions, setCountryOptions] = useState([]);
 
