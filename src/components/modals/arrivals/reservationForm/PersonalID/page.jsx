@@ -137,7 +137,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
             <ModalContent>
                 {() => (
                     <>
-                        <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white">
+                        <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white h-10">
                             {t.modals.PersonalID.title }
                             <Button
                                 color="transparent"
@@ -172,11 +172,11 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                         </label>
                                         <Select
                                             options={countryOptions}
-                                            value={countryOptions.find(option => option.value === formData.CountryOfBirth)}
+                                            value={countryOptions.find(option => option.label === formData.CountryOfBirth)}
                                             onChange={(selectedOption) => {
                                                 setFormData(prev => ({
                                                     ...prev,
-                                                    CountryOfBirth: selectedOption.value,
+                                                    CountryOfBirth: selectedOption.label,
                                                 }));
                                                 setIsDataModified(true);
                                             }}
@@ -186,15 +186,15 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
 
                                     <div className="w-1/3">
                                         <label className="block text-sm font-medium">
-                                            {t.modals.PersonalID.nationality || "Nationality"}
+                                            {t.modals.PersonalID.nationality}
                                         </label>
                                         <Select
                                             options={countryOptions}
-                                            value={countryOptions.find(option => option.value === formData.Nationality)}
+                                            value={countryOptions.find(option => option.label === formData.Nationality)}
                                             onChange={(selectedOption) => {
                                                 setFormData(prev => ({
                                                     ...prev,
-                                                    Nationality: selectedOption.value,
+                                                    Nationality: selectedOption.label,
                                                 }));
                                                 setIsDataModified(true);
                                             }}
@@ -208,11 +208,11 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                         <label className="block text-sm font-medium">{t.modals.PersonalID.idDoc} *</label>
                                         <Select
                                             options={docTypeOptions}
-                                            value={docTypeOptions.find(option => option.value === String(formData.IDDoc)) || null}
+                                            value={docTypeOptions.find(option => option.label === String(formData.IDDoc)) || null}
                                             onChange={(selectedOption) => {
                                                 setFormData(prev => ({
                                                     ...prev,
-                                                    IDDoc: selectedOption.value,
+                                                    IDDoc: selectedOption.label,
                                                 }));
                                                 setIsDataModified(true);
                                             }}
