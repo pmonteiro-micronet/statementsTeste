@@ -28,6 +28,7 @@ export async function POST(request) {
             ProfileID: parseInt(profileid),
         };
 
+        //mudar o property stay para property port
         const url = `http://${propertyServer}:${propertyPortStay}/editaddress`;
         const response = await axios.post(url, null, { headers });
 
