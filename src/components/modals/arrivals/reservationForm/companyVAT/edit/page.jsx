@@ -83,6 +83,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
 
     const [isInsertModalOpen, setIsInsertModalOpen] = useState(false);
 
+    const [showConfirmNewCompanyModal, setShowConfirmNewCompanyModal] = useState(false);
+
     const handleCloseModal = () => {
         if (isDataModified) {
             // Pergunta ao usuário se ele deseja perder os dados
@@ -233,6 +235,40 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 />
             )}
 
+<Modal isOpen={showConfirmNewCompanyModal} onOpenChange={setShowConfirmNewCompanyModal}>
+    <ModalContent>
+        {() => (
+            <>
+                <ModalHeader className="text-lg font-medium">
+                    {t.modals.companyInfo.attention || "Atenção"}
+                </ModalHeader>
+                <ModalBody>
+                    <p className="text-sm text-gray-700">
+                        A ficha atual será substituída pela nova ficha. Deseja continuar?
+                    </p>
+                </ModalBody>
+                <div className="flex justify-end gap-2 px-6 pb-4">
+                    <Button
+                        color="error"
+                        onClick={() => setShowConfirmNewCompanyModal(false)}
+                    >
+                        {t.modals.companyInfo.cancel || "Cancelar"}
+                    </Button>
+                    <Button
+                        color="primary"
+                        onClick={() => {
+                            setShowConfirmNewCompanyModal(false);
+                            setIsInsertModalOpen(true);
+                        }}
+                    >
+                        {t.modals.companyInfo.continue || "Continuar"}
+                    </Button>
+                </div>
+            </>
+        )}
+    </ModalContent>
+</Modal>
+
             <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
                 <ModalContent>
                     {() => (
@@ -245,17 +281,6 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                             </ModalHeader>
                             <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
                                 <div className="flex flex-col">
-                                    <div className="flex gap-2 items-center mb-2 text-xs cursor-pointer"
-                                        onClick={() => {
-                                            setIsInsertModalOpen(true);
-                                        }}>
-                                        <HiSwitchHorizontal
-                                            size={18}
-                                            color="#FC9D25"
-                                            style={{ cursor: "pointer" }}
-                                        />
-                                        <p>Switch companys</p>
-                                    </div>
                                     <div className="flex flex-row gap-2 mb-0.5 items-center">
                                         <div className="w-2/3">
                                             <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.companyName}</label>
@@ -365,6 +390,13 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                 {errorMessage && <p className="text-red-500 text-xs -mt-4">{errorMessage}</p>}
                                 <div className="flex justify-end space-x-2 -mt-4">
                                     <Button color="error" onClick={handleCloseModal}>{t.modals.companyInfo.cancel}</Button>
+                                    <div
+                                        className="flex gap-2 items-center mb-2 text-xs cursor-pointer"
+                                        onClick={() => setShowConfirmNewCompanyModal(true)}
+                                    >
+                                        <HiSwitchHorizontal size={18} color="#FC9D25" style={{ cursor: "pointer" }} />
+                                        <p>New company</p>
+                                    </div>
                                     {isEditing ? (
                                         <Button color="primary" onClick={handleSave}>
                                             {t.modals.companyInfo.save}
