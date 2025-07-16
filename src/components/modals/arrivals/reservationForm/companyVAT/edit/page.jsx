@@ -12,8 +12,6 @@ import es from "../../../../../../../public/locales/espanol/common.json";
 
 import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insert/page";
 
-import { HiSwitchHorizontal } from "react-icons/hi";
-
 const translations = { en, pt, es };
 
 const customStyles = {
