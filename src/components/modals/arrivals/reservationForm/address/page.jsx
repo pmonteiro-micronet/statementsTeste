@@ -10,13 +10,13 @@ const AddressForm = ({ onClose, address, propertyID, t }) => {
     //popula o select de pais
     const [countryOptions, setCountryOptions] = useState([]);
 
-    const [formData, setFormData] = useState({
-        Country: "",
-        Street: "",
-        PostalCode: "",
-        City: "",
-        Region: "",
-    });
+    const [formData, setFormData] = useState(() => ({
+        Country: address?.Country || "",
+        Street: address?.Street || "",
+        PostalCode: address?.PostalCode || "",
+        City: address?.City || "",
+        Region: address?.Region || "",
+    }));
 
 
     console.log("ID" , propertyID);
@@ -100,19 +100,6 @@ const AddressForm = ({ onClose, address, propertyID, t }) => {
             console.error("Erro ao alterar endereço:", result.error);
         }
     };
-
-    useEffect(() => {
-        if (address) {
-            setFormData({
-                Country: address.Country || "",
-                Street: address.Street || "",
-                PostalCode: address.PostalCode || "",
-                City: address.City || "",
-                Region: address.Region || "",
-            });
-            setIsDataModified(false); // reset à flag de modificação por serem dados novos
-        }
-    }, [address]);
 
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
