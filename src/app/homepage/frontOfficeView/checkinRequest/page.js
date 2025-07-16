@@ -128,8 +128,13 @@ export default function CheckinRequester() {
 
     const getGuestName = (firstName = "", lastName = "") => {
         const fullName = `${firstName} ${lastName}`.trim();
-        return fullName.length > 20 ? `${fullName.slice(0, 20)}...` : fullName;
+        return fullName.length > 15 ? `${fullName.slice(0, 13)}...` : fullName;
     };
+
+    function truncateText(text, maxLength) {
+        if (!text) return '';
+        return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+    }
 
     return (
         <main className="min-h-screen flex flex-col p-8 bg-background">
@@ -143,8 +148,8 @@ export default function CheckinRequester() {
                     if (!reservation || !guest || !propertyID || !requestID) return null;
 
                     return (
-                        <div key={index} className="relative flex flex-col bg-white rounded-lg shadow-md border border-gray-200 p-4 h-full">
-                            <div className="flex flex-col justify-between h-full">
+                        <div key={index} className="card">
+                            <div className="flex flex-col ">
                                 <div>
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
@@ -177,7 +182,9 @@ export default function CheckinRequester() {
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="font-semibold">{t.frontOffice.registrationRequests.guestEmail}</p>
-                                            <span className="truncate">{guest.Contacts?.[0]?.Email}</span>
+                                            <span className="truncate">
+                                                {truncateText(guest.Contacts?.[0]?.Email, 15)}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>

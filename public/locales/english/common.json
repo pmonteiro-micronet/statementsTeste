@@ -84,7 +84,7 @@
             "reservation": "Reservation",
             "checkin": "Check-in",
             "checkout": "Check-out",
-            "guestEmail": "Guest Email",
+            "guestEmail": "Email",
             "ViewDetails": "View Details"
         },
         "departures": {
