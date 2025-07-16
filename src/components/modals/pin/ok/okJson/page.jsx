@@ -21,7 +21,7 @@ const OkPIN = ({ isModalOpen, setIsModalOpen }) => {
     const { data: session, status } = useSession();
     const [propertyID, setPropertyID] = useState("");
     // const [autoFocusEnabled, setAutoFocusEnabled] = useState(false);
-    const { onOpenChange } = useDisclosure();
+    const { isOpen, onOpenChange } = useDisclosure();
     console.log(propertyID, onOpenChange);
     const inputRef = useRef(null);
 
