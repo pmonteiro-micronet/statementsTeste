@@ -14,7 +14,7 @@
   /* 2 cards per row on medium screens (641px to 1024px) */
   @media (min-width: 641px) and (max-width: 1024px) {
     .grid-container {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
     }
     /* .roomFont {
       font-size: 30px;
@@ -33,7 +33,7 @@
   
     @media (min-width: 900px) {
     .grid-container {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
     }
   }
   /* Card styling */
@@ -46,7 +46,6 @@
     flex-direction: column;
     position: relative;
     justify-content: center;
-    align-items: center;
     min-height: 18rem;
     min-width: 16rem;
   }

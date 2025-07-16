@@ -84,7 +84,7 @@
             "reservation": "Reserva",
             "checkin": "Entrada",
             "checkout": "Salida",
-            "guestEmail": "Correo del Huésped",
+            "guestEmail": "Correo",
             "ViewDetails": "Ver Detalles"
         },
         "departures": {
