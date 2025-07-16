@@ -128,79 +128,76 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                     <ModalContent>
                         {() => (
                             <>
-                                <ModalBody className="p-0 flex flex-col max-h-[70vh]">
-                                    {searchResults.length === 0 ? (
-                                        <div className="p-4 flex-grow overflow-auto">
-                                            <p>Nenhuma empresa encontrada.</p>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            {/* Cabeçalho fixo da tabela */}
-                                            <div className="bg-primary text-white shadow-md px-4">
-                                                <table className="w-full text-left min-w-max border-collapse">
-                                                    <thead className="sticky top-0 z-50">
-                                                        <tr className="h-12">
-                                                            <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
-                                                                <div className="flex items-center gap-2">Empresa</div>
-                                                            </td>
-                                                            <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
-                                                                <div className="flex items-center gap-2">NIF</div>
-                                                            </td>
-                                                            <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
-                                                                <div className="flex items-center gap-2">País</div>
-                                                            </td>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
+                               <ModalBody className="p-0 flex flex-col max-h-[70vh]">
+  {searchResults.length === 0 ? (
+    <div className="p-4 flex-grow overflow-auto">
+      <p>Nenhuma empresa encontrada.</p>
+    </div>
+  ) : (
+    <>
+      {/* Tabela com cabeçalho fixo e corpo rolável */}
+      <div className="flex-grow overflow-y-auto px-4">
+        <table className="w-full text-left min-w-max border-collapse">
+          <thead className="sticky top-0 z-50 bg-primary text-white shadow-md">
+            <tr className="h-12">
+              <th className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase font-medium">
+                <div className="flex items-center gap-2">Empresa</div>
+              </th>
+              <th className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase font-medium">
+                <div className="flex items-center gap-2">NIF</div>
+              </th>
+              <th className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase font-medium">
+                <div className="flex items-center gap-2">País</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {searchResults.map((company, index) => (
+              <tr
+                key={company.kdnr || index}
+                className="hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleSelectCompany(company)}
+              >
+                <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
+                  {company.name1 || "—"}
+                </td>
+                <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
+                  {company.vatno || "—"}
+                </td>
+                <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
+                  {company.land || "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-                                            {/* Conteúdo rolável: só tbody */}
-                                            <div className="flex-grow overflow-y-auto px-4">
-                                                <table className="w-full text-left min-w-max border-collapse">
-                                                    <tbody>
-                                                        {searchResults.map((company, index) => (
-                                                            <tr
-                                                                key={company.kdnr || index}
-                                                                className="hover:bg-gray-100 cursor-pointer"
-                                                                onClick={() => handleSelectCompany(company)}
-                                                            >
-                                                                <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
-                                                                    {company.name1 || "—"}
-                                                                </td>
-                                                                <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
-                                                                    {company.vatno || "—"}
-                                                                </td>
-                                                                <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
-                                                                    {company.land || "—"}
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
+      {/* Botões fixos no fundo */}
+      <div className="sticky bottom-0 bg-gray-100 px-4 py-2 flex justify-end gap-4 z-40 border-t border-gray-200">
+        <Button
+          onClick={() => setIsResultsModalOpen(false)}
+          className="bg-gray-200 text-black"
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={() => handleSearchClick(false)}
+          className="bg-primary text-white"
+        >
+          Search more
+        </Button>
+        <Button
+          onClick={() => setIsInsertModalOpen(true)}
+          className="bg-primary text-white"
+        >
+          New company
+        </Button>
+      </div>
+    </>
+  )}
+</ModalBody>
 
-                                            {/* Botões fixos no fundo */}
-                                            <div className="sticky bottom-0 bg-gray-100 px-4 py-2 flex justify-end gap-4 z-40 border-t border-gray-200">
-                                                <Button 
-                                                onClick={() => setIsResultsModalOpen(false)}
-                                                    className="bg-gray-200 text-black">
-                                                    Cancel
-                                                </Button>
-                                                <Button
-                                                    onClick={() => handleSearchClick(false)}
-                                                    className="bg-primary text-white"
-                                                >
-                                                    Search more
-                                                </Button>
-                                                <Button
-                                                    onClick={() => setIsInsertModalOpen(true)}
-                                                    className="bg-primary text-white">
-                                                    New company
-                                                </Button>
-                                            </div>
-                                        </>
-                                    )}
-                                </ModalBody>
                             </>
                         )}
                     </ModalContent>
