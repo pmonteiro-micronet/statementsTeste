@@ -9,12 +9,12 @@ export async function POST(request) {
         console.log("[INFO] Dados recebidos no body:", body);
 
         const {
-            Dateofbirth,
-            IDCountryofBirth,
+            DateOfBirth,
+            CountryOfBirth,
             Nationality,
             IDDoc,
             DocNr,
-            Expdate,
+            ExpDate,
             Issue,
             profileID,
             propertyID
@@ -55,12 +55,12 @@ export async function POST(request) {
 
         const headers = {
             Authorization: process.env.API_AUTH_TOKEN,
-            DateOfbirth: Dateofbirth,
-            IDCountryOfBirth: parseInt(IDCountryofBirth),
+            DateOfBirth: DateOfBirth,
+            CountryOfBirth: parseInt(CountryOfBirth),
             Nationality: parseInt(Nationality),
             IDDoc: parseInt(IDDoc),
             DocNr: parseInt(DocNr),
-            Expdate: Expdate,
+            ExpDate: ExpDate,
             Issue: Issue,
             ProfileID: parseInt(profileID),
         };

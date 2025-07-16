@@ -100,12 +100,12 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
     const savePersonalID = async (formData, profileID) => {
         try {
             const response = await axios.post('/api/reservations/checkins/registrationForm/editpersonalID', {
-                Dateofbirth: formData.DateOfBirth,
-                IDCountryofBirth: formData.CountryOfBirth,
+                DateOfBirth: formData.DateOfBirth,
+                CountryOfBirth: formData.CountryOfBirth,
                 Nationality: formData.Nationality,
                 IDDoc: formData.IDDoc,
                 DocNr: formData.NrDoc,
-                Expdate: formData.ExpDate,
+                ExpDate: formData.ExpDate,
                 Issue: formData.Issue,
                 profileID: profileID,
                 propertyID: propertyID
