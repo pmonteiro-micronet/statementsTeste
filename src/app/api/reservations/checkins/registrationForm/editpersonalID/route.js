@@ -39,7 +39,7 @@ export async function POST(request) {
 
         const property = await prisma.properties.findUnique({
             where: { propertyID: propertyIDInt },
-            select: { propertyServer: true, propertyPortStay: true }
+            select: { propertyServer: true, propertyPort: true }
         });
 
         if (!property) {
@@ -50,8 +50,8 @@ export async function POST(request) {
             );
         }
 
-        const { propertyServer, propertyPortStay } = property;
-        console.log("[INFO] Dados da propriedade:", { propertyServer, propertyPortStay });
+        const { propertyServer, propertyPort } = property;
+        console.log("[INFO] Dados da propriedade:", { propertyServer, propertyPort });
 
         const headers = {
             Authorization: process.env.API_AUTH_TOKEN,
@@ -67,7 +67,7 @@ export async function POST(request) {
 
         console.log("[INFO] Headers preparados para envio:", headers);
 
-        const url = `http://${propertyServer}:${propertyPortStay}/editpersonal`;
+        const url = `http://${propertyServer}:${propertyPort}/editpersonal`;
         console.log("[INFO] Enviando requisição para:", url);
 
         const response = await axios.post(url, null, { headers });
