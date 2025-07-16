@@ -137,7 +137,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
     <>
       {/* Tabela com cabeçalho fixo e corpo rolável */}
       <div className="flex-grow overflow-y-auto px-4">
-        <table className="w-full text-left min-w-max border-collapse">
+        <table className="w-full text-left min-w-max border-collapse mt-2">
           <thead className="sticky top-0 z-50 bg-primary text-white shadow-md">
             <tr className="h-12">
               <th className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase font-medium">
