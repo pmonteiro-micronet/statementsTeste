@@ -1,12 +1,14 @@
 // src/api/reservations/checkins/registrationForm/editpersonalID.js
+import { NextResponse } from 'next/server';
+import prisma from "@/lib/db";
 import axios from "axios";
 
 export async function POST(request) {
     try {
         const body = await request.json();
+        console.log("[INFO] Dados recebidos no body:", body);
 
         const {
-            authorization,
             Dateofbirth,
             IDCountryofBirth,
             Nationality,
@@ -15,12 +17,44 @@ export async function POST(request) {
             Expdate,
             Issue,
             profileID,
+            propertyID
         } = body;
 
+        if (!propertyID) {
+            console.error("[ERRO] PropertyID está ausente");
+            return new NextResponse(
+                JSON.stringify({ error: "Faltam parâmetros: PropertyID" }),
+                { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
+            );
+        }
+
+        const propertyIDInt = parseInt(propertyID, 10);
+        if (isNaN(propertyIDInt)) {
+            console.error("[ERRO] PropertyID não é um número válido:", propertyID);
+            return new NextResponse(
+                JSON.stringify({ error: "PropertyID inválido, deve ser um número" }),
+                { status: 400, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
+            );
+        }
+
+        const property = await prisma.properties.findUnique({
+            where: { propertyID: propertyIDInt },
+            select: { propertyServer: true, propertyPortStay: true }
+        });
+
+        if (!property) {
+            console.error("[ERRO] PropertyID não encontrado no banco de dados:", propertyIDInt);
+            return new NextResponse(
+                JSON.stringify({ error: "PropertyID não encontrado no banco de dados" }),
+                { status: 404, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
+            );
+        }
+
+        const { propertyServer, propertyPortStay } = property;
+        console.log("[INFO] Dados da propriedade:", { propertyServer, propertyPortStay });
+
         const headers = {
-            Authorization:
-                authorization ||
-                "q4vf9p8n4907895f7m8d24m75c2q947m2398c574q9586c490q756c98q4m705imtugcfecvrhym04capwz3e2ewqaefwegfiuoamv4ros2nuyp0sjc3iutow924bn5ry943utrjmi",
+            Authorization: process.env.API_AUTH_TOKEN,
             DateOfbirth: Dateofbirth,
             IDCountryOfBirth: parseInt(IDCountryofBirth),
             Nationality: parseInt(Nationality),
@@ -31,19 +65,30 @@ export async function POST(request) {
             ProfileID: parseInt(profileID),
         };
 
+        console.log("[INFO] Headers preparados para envio:", headers);
+
         const url = `http://${propertyServer}:${propertyPortStay}/editpersonal`;
+        console.log("[INFO] Enviando requisição para:", url);
+
         const response = await axios.post(url, null, { headers });
+
+        console.log("[SUCESSO] Resposta do servidor remoto:", response.data);
 
         return new Response(JSON.stringify(response.data), {
             status: response.status,
             headers: { "Content-Type": "application/json" },
         });
+
     } catch (error) {
-        console.error("Proxy error:", error?.response?.data || error.message);
+        console.error("[ERRO] Falha ao processar requisição:");
+        console.error("Mensagem:", error.message);
+        console.error("Stack:", error.stack);
+        if (error.response) {
+            console.error("Resposta do servidor remoto:", error.response.data);
+        }
 
         const status = error.response?.status || 500;
-        const message =
-            error.response?.data || { message: "Internal Server Error" };
+        const message = error.response?.data || { message: "Internal Server Error" };
 
         return new Response(JSON.stringify(message), {
             status,

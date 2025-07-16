@@ -12,8 +12,6 @@ import es from "../../../../../../../public/locales/espanol/common.json";
 
 import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insert/page";
 
-import { HiSwitchHorizontal } from "react-icons/hi";
-
 const translations = { en, pt, es };
 
 const customStyles = {
@@ -235,39 +233,39 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 />
             )}
 
-<Modal isOpen={showConfirmNewCompanyModal} onOpenChange={setShowConfirmNewCompanyModal}>
-    <ModalContent>
-        {() => (
-            <>
-                <ModalHeader className="text-lg font-medium">
-                    {t.modals.companyInfo.attention || "Atenção"}
-                </ModalHeader>
-                <ModalBody>
-                    <p className="text-sm text-gray-700">
-                        A ficha atual será substituída pela nova ficha. Deseja continuar?
-                    </p>
-                </ModalBody>
-                <div className="flex justify-end gap-2 px-6 pb-4">
-                    <Button
-                        color="error"
-                        onClick={() => setShowConfirmNewCompanyModal(false)}
-                    >
-                        {t.modals.companyInfo.cancel || "Cancelar"}
-                    </Button>
-                    <Button
-                        color="primary"
-                        onClick={() => {
-                            setShowConfirmNewCompanyModal(false);
-                            setIsInsertModalOpen(true);
-                        }}
-                    >
-                        {t.modals.companyInfo.continue || "Continuar"}
-                    </Button>
-                </div>
-            </>
-        )}
-    </ModalContent>
-</Modal>
+            <Modal isOpen={showConfirmNewCompanyModal} onOpenChange={setShowConfirmNewCompanyModal}>
+                <ModalContent>
+                    {() => (
+                        <>
+                            <ModalHeader className="text-lg font-medium">
+                                {t.modals.companyInfo.attention || "Atenção"}
+                            </ModalHeader>
+                            <ModalBody>
+                                <p className="text-sm text-gray-700">
+                                    A ficha atual será substituída pela nova ficha. Deseja continuar?
+                                </p>
+                            </ModalBody>
+                            <div className="flex justify-end gap-2 px-6 pb-4">
+                                <Button
+                                    color="error"
+                                    onClick={() => setShowConfirmNewCompanyModal(false)}
+                                >
+                                    {t.modals.companyInfo.cancel || "Cancelar"}
+                                </Button>
+                                <Button
+                                    color="primary"
+                                    onClick={() => {
+                                        setShowConfirmNewCompanyModal(false);
+                                        setIsInsertModalOpen(true);
+                                    }}
+                                >
+                                    {t.modals.companyInfo.continue || "Continuar"}
+                                </Button>
+                            </div>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
 
             <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
                 <ModalContent>
@@ -390,13 +388,9 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                 {errorMessage && <p className="text-red-500 text-xs -mt-4">{errorMessage}</p>}
                                 <div className="flex justify-end space-x-2 -mt-4">
                                     <Button color="error" onClick={handleCloseModal}>{t.modals.companyInfo.cancel}</Button>
-                                    <div
-                                        className="flex gap-2 items-center mb-2 text-xs cursor-pointer"
-                                        onClick={() => setShowConfirmNewCompanyModal(true)}
-                                    >
-                                        <HiSwitchHorizontal size={18} color="#FC9D25" style={{ cursor: "pointer" }} />
-                                        <p>New company</p>
-                                    </div>
+                                    <Button color="primary" onClick={() => setShowConfirmNewCompanyModal(true)}>
+                                        New company
+                                    </Button>
                                     {isEditing ? (
                                         <Button color="primary" onClick={handleSave}>
                                             {t.modals.companyInfo.save}
