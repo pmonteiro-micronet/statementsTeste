@@ -140,69 +140,70 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                                         <MdClose size={24} />
                                     </Button>
                                 </ModalHeader>
-                                <ModalBody className="p-4 max-h-[60vh] overflow-y-auto">
-                                    {searchResults.length === 0 ? (
-                                        <p>Nenhuma empresa encontrada.</p>
-                                    ) : (
-                                        <>
-                                            <table className="w-full text-left min-w-max border-collapse">
-                                                <thead className="sticky top-0 z-30 bg-primary shadow-md">
-                                                    <tr className="text-white h-12">
-                                                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
-                                                            <div className="flex items-center gap-2">
-                                                                Empresa
-                                                            </div>
-                                                        </td>
-                                                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
-                                                            <div className="flex items-center gap-2">
-                                                                NIF
-                                                            </div>
-                                                        </td>
-                                                        <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
-                                                            <div className="flex items-center gap-2">
-                                                                País
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {searchResults.map((company, index) => (
-                                                        <tr
-                                                            key={company.kdnr || index}
-                                                            className="hover:bg-gray-100 cursor-pointer"
-                                                            onClick={() => handleSelectCompany(company)}
-                                                        >
-                                                            <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
-                                                                {company.name1 || "—"}
-                                                            </td>
-                                                            <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
-                                                                {company.vatno || "—"}
-                                                            </td>
-                                                            <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
-                                                                {company.land || "—"}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                  <ModalBody className="p-0 flex flex-col max-h-[70vh]">
+  {searchResults.length === 0 ? (
+    <div className="p-4 flex-grow overflow-auto">
+      <p>Nenhuma empresa encontrada.</p>
+    </div>
+  ) : (
+    <>
+      {/* Conteúdo rolável */}
+      <div className="flex-grow overflow-y-auto">
+        <table className="w-full text-left min-w-max border-collapse">
+          <thead className="sticky top-0 z-50 bg-primary shadow-md text-white">
+            <tr className="h-12">
+              <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
+                <div className="flex items-center gap-2">Empresa</div>
+              </td>
+              <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
+                <div className="flex items-center gap-2">NIF</div>
+              </td>
+              <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">
+                <div className="flex items-center gap-2">País</div>
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            {searchResults.map((company, index) => (
+              <tr
+                key={company.kdnr || index}
+                className="hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleSelectCompany(company)}
+              >
+                <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
+                  {company.name1 || "—"}
+                </td>
+                <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
+                  {company.vatno || "—"}
+                </td>
+                <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
+                  {company.land || "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-                                            <div className="flex justify-center mt-4 space-x-2">
-                                                <Button
-                                                    onClick={() => handleSearchClick(false)}
-                                                    className="bg-primary text-white"
-                                                >
-                                                    Pesquisar mais
-                                                </Button>
-                                                <FaPlusCircle
-                                                    size={20}
-                                                    color="#FC9D25"
-                                                    style={{ cursor: "pointer" }}
-                                                    onClick={() => setIsInsertModalOpen(true)}
-                                                />
-                                            </div>
-                                        </>
-                                    )}
-                                </ModalBody>
+      {/* Botões fixos no fundo */}
+      <div className="sticky bottom-0 bg-gray-300 px-4 py-2 flex justify-center gap-4 z-40 border-t border-gray-400">
+        <Button
+          onClick={() => handleSearchClick(false)}
+          className="bg-primary text-white"
+        >
+          Pesquisar mais
+        </Button>
+        <FaPlusCircle
+          size={20}
+          color="#FC9D25"
+          style={{ cursor: "pointer" }}
+          onClick={() => setIsInsertModalOpen(true)}
+        />
+      </div>
+    </>
+  )}
+</ModalBody>
+
                             </>
                         )}
                     </ModalContent>
