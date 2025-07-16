@@ -199,11 +199,14 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
           style={{ cursor: "pointer" }}
           onClick={() => setIsInsertModalOpen(true)}
         />
+        <Button
+        onClick={() => setIsResultsModalOpen(false)}>
+Cancel
+        </Button>
       </div>
     </>
   )}
 </ModalBody>
-
                             </>
                         )}
                     </ModalContent>
