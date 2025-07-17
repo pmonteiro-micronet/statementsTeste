@@ -43,14 +43,13 @@ export async function POST(request) {
     }
 
     const { propertyServer, propertyPort } = property;
-    const externalPageNumber = pageNumber + 1;
 
     // Monta query string dinamicamente
     const params = new URLSearchParams();
     if (companyName) params.append("companyname", companyName);
     if (vatNo) params.append("companyvat", vatNo);
     params.append("itemsperpage", "10");
-    params.append("pagenumber", externalPageNumber.toString());
+    params.append("pagenumber", pageNumber.toString());
 
     // Log dos dados recebidos
     console.log("📦 Dados recebidos no body:", {
