@@ -393,9 +393,6 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                     <Button color="primary" onClick={() => setShowConfirmNewCompanyModal(true)}>
                                         New company
                                     </Button>
-                                    <Button color="primary" className="w-14" onClick={handleSave}>
-                                        Select company
-                                    </Button>
                                     {isEditing ? (
                                         <Button color="primary" onClick={handleSave}>
                                             {t.modals.companyInfo.save}
