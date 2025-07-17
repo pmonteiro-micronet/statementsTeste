@@ -219,6 +219,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                     onClose={handleCloseCompanyEdit}
                     profileID={profileID}
                     propertyID={propertyID}
+                    resNo={resNo}
                     company={selectedCompany}
                 />
             ) : (
