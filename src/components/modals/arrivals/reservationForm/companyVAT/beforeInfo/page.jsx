@@ -114,6 +114,14 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
         setIsMainModalOpen(true);
     };
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            setPageNumber(1);
+            handleSearchClick(true);
+        }
+    };
+
     return (
         <>
             {/* Modal de resultados */}
@@ -258,6 +266,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                                                     value={formData.vatNo}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
+                                                    onKeyDown={handleKeyDown}
                                                     className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                                 />
                                                 {vatError && <p className="text-red-500 text-xs mt-1">{vatError}</p>}
@@ -273,6 +282,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                                                     name="companyName"
                                                     value={formData.companyName}
                                                     onChange={handleChange}
+                                                    onKeyDown={handleKeyDown}
                                                     className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                                 />
                                             </div>
