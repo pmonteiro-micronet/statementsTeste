@@ -6,7 +6,7 @@ import Select from "react-select";
 import axios from "axios";
 
 
-const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
+const PersonalIDForm = ({ onClose, personalID, propertyID, profileID, t }) => {
     //popula o select de pais de origem
     const [countryOptions, setCountryOptions] = useState([]);
     //popula o select do ID DOC
@@ -25,6 +25,12 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
     console.log("ID", propertyID);
     const [isDataModified, setIsDataModified] = useState(false);
     const inputRef = useRef(null);
+
+    const [selectIDForm, setSelectIDFrom] = useState(() => ({
+        IDCountryOfBirth: "",
+        IDDocSelect: "",
+        IDNationality: ""
+    }));
 
     const handleCloseModal = () => {
         if (isDataModified) {
@@ -97,13 +103,13 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
         fetchDocTypes();
     }, [propertyID]);
 
-    const savePersonalID = async (formData, profileID) => {
+    const savePersonalID = async (formData, selectIDForm) => {
         try {
             const response = await axios.post('/api/reservations/checkins/registrationForm/editpersonalID', {
                 DateOfBirth: formData.DateOfBirth,
-                CountryOfBirth: formData.CountryOfBirth,
-                Nationality: formData.Nationality,
-                IDDoc: formData.IDDoc,
+                CountryOfBirth: selectIDForm.IDCountryOfBirth,
+                Nationality: selectIDForm.IDNationality,
+                IDDoc: selectIDForm.IDDocSelect,
                 DocNr: formData.NrDoc,
                 ExpDate: formData.ExpDate,
                 Issue: formData.Issue,
@@ -119,7 +125,7 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
     };
 
     const handleSave = async () => {
-        const result = await savePersonalID(formData, personalID);
+        const result = await savePersonalID(formData, selectIDForm);
 
         if (result.success) {
             setIsDataModified(false);
@@ -197,11 +203,21 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                             options={countryOptions}
                                             value={countryOptions.find(option => option.label === formData.CountryOfBirth)}
                                             onChange={(selectedOption) => {
-                                                setFormData(prev => ({ ...prev, CountryOfBirth: selectedOption.label }));
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    CountryOfBirth: selectedOption.label  // ex: "Portugal"
+                                                }));
+
+                                                setSelectIDFrom(prev => ({
+                                                    ...prev,
+                                                    IDCountryOfBirth: selectedOption.value  // ex: "PT"
+                                                }));
+
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
                                         />
+
                                     </div>
 
                                     <div className="w-1/3">
@@ -212,7 +228,16 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                             options={countryOptions}
                                             value={countryOptions.find(option => option.label === formData.Nationality)}
                                             onChange={(selectedOption) => {
-                                                setFormData(prev => ({ ...prev, Nationality: selectedOption.label }));
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    Nationality: selectedOption.label  // ex: "Portugal"
+                                                }));
+
+                                                setSelectIDFrom(prev => ({
+                                                    ...prev,
+                                                    IDNationality: selectedOption.value  // ex: "PT"
+                                                }));
+
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
@@ -230,7 +255,16 @@ const PersonalIDForm = ({ onClose, personalID, propertyID, t }) => {
                                             options={docTypeOptions}
                                             value={docTypeOptions.find(option => option.label === String(formData.IDDoc)) || null}
                                             onChange={(selectedOption) => {
-                                                setFormData(prev => ({ ...prev, IDDoc: selectedOption.label }));
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    IDDoc: selectedOption.label  // ex: "Bilhete Identidade"
+                                                }));
+
+                                                setSelectIDFrom(prev => ({
+                                                    ...prev,
+                                                    IDDocSelect: selectedOption.value  // ex: "BI"
+                                                }));
+
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
