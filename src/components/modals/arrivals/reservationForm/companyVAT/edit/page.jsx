@@ -27,7 +27,7 @@ const customStyles = {
     })
 };
 
-const validatePortugueseVAT = (vat) => /^PT\d{9}$/.test(vat);
+const validatePortugueseVAT = (vat) => /^5\d{8}$/.test(vat);
 
 const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData, company }) => {
     const [formData, setFormData] = useState(() => {
@@ -161,7 +161,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
     const handleBlur = () => {
         if (formData.country === "Portugal" && formData.vatNo) {
             if (!validatePortugueseVAT(formData.vatNo)) {
-                setVatError("O NIF português deve ter exatamente 9 dígitos e começar com 'PT'.");
+                setVatError("O NIF português deve ter exatamente 9 dígitos e começar com 5.");
             } else {
                 setVatError("");
             }
