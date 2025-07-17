@@ -411,7 +411,7 @@
         },
         "companyInfo": {
             "insert": "Crear nuevo número de IVA de la empresa",
-            "update": "Actualizar empresa",
+            "update": "Empresa",
             "companyName": "Nombre de la empresa:",
             "vatNO": "N.º de IVA:",
             "streetAddress": "Dirección:",

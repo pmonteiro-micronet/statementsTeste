@@ -411,7 +411,7 @@
         },
         "companyInfo": {
             "insert": "Criar nova ficha de empresa",
-            "update": "Atualizar empresa",
+            "update": "Empresa",
             "companyName": "Nome da empresa:",
             "vatNO": "N.º de contribuinte:",
             "streetAddress": "Morada:",

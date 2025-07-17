@@ -410,7 +410,7 @@
         },
         "companyInfo": {
             "insert": "Create New Company VAT Number",
-            "update": "Update Company",
+            "update": "Company",
             "companyName": "Company Name:",
             "vatNO": "VAT No.:",
             "streetAddress": "Street Address:",
