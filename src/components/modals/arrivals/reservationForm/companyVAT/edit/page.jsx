@@ -83,6 +83,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
 
     const [showConfirmNewCompanyModal, setShowConfirmNewCompanyModal] = useState(false);
 
+    const extractedCompanyID = company?.companyID;
+
     const handleCloseModal = () => {
         if (isDataModified) {
             // Pergunta ao usuário se ele deseja perder os dados
@@ -194,7 +196,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 profileID,
                 propertyID,
                 resNo,
-                companyID,
+                companyID: companyID || extractedCompanyID,
                 countryID: formData.country,
                 countryName: formData.countryName,
                 companyName: formData.companyName,
