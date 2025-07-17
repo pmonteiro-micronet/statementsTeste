@@ -129,11 +129,15 @@ export default function Arrivals({ params }) {
     sendDataToAPI();
   }, [propertyID]);
 
-  const handleOpenModal = () => {
+  const [selectedReserva, setSelectedReserva] = useState(null);
+
+  const handleOpenModal = (reserva) => {
+    setSelectedReserva(reserva); 
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
+    setSelectedReserva(null); 
     setIsModalOpen(false);
   };
 
@@ -455,7 +459,7 @@ export default function Arrivals({ params }) {
                               closeOnSelect={true}
                               className="relative z-10 text-textPrimaryColor"
                             >
-                              <DropdownItem key="edit" onClick={() => handleOpenModal()}>
+                              <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
                                 <div className="flex flex-row gap-2">
                                   <IoMdInformationCircle size={15} /> {t.frontOffice.arrivals.info}
                                 </div>
@@ -506,17 +510,17 @@ export default function Arrivals({ params }) {
                             buttonColor={"transparent"}
                             modalHeader={t.frontOffice.infoModal.arrival.reservation.title}
                             formTypeModal={11}
-                            roomNumber={reserva.Room}  // Passando o roomNumber
-                            dateCI={reserva.DateCI}
-                            booker={reserva.Booker}
-                            salutation={reserva.Salutation}
-                            lastName={reserva.LastName}
-                            firstName={reserva.FirstName}
-                            roomType={reserva.RoomType}
-                            resStatus={reserva.RoomStatus}
-                            totalPax={reserva.TotalPax}
-                            balance={reserva.Total}
-                            country={reserva.Country}
+                            roomNumber={selectedReserva?.Room}  // Passando o roomNumber
+                            dateCI={selectedReserva?.DateCI}
+                            booker={selectedReserva?.Booker}
+                            salutation={selectedReserva?.Salutation}
+                            lastName={selectedReserva?.LastName}
+                            firstName={selectedReserva?.FirstName}
+                            roomType={selectedReserva?.RoomType}
+                            resStatus={selectedReserva?.RoomStatus}
+                            totalPax={selectedReserva?.TotalPax}
+                            balance={selectedReserva?.Total}
+                            country={selectedReserva?.Country}
                             isBackdropVisible={true}
                             isOpen={isModalOpen}
                             onClose={handleCloseModal}
