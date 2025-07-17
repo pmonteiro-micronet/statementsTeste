@@ -181,6 +181,15 @@ const SignIn = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="border border-black w-full rounded-lg p-2 outline-none"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  if (!showPassword && email.trim()) {
+                    e.preventDefault();
+                    setShowPassword(true);
+                  }
+                  // If showPassword is true, let the form handle submit as usual
+                }
+              }}
             />
           </div>
 

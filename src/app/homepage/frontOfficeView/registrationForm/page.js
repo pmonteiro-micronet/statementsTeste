@@ -616,6 +616,14 @@ export default function Page() {
     const [activeKey, setActiveKey] = useState("individual");
 
     useEffect(() => {
+        if (reserva && reserva.hasCompanyVAT === 1) {
+            setActiveKey("company");
+        } else {
+            setActiveKey("individual");
+        }
+    }, [reserva]);
+
+    useEffect(() => {
         if (companyVATData && Object.keys(companyVATData).length > 0) {
             console.log("companyVATData atualizado, abrindo modal...", companyVATData);
             setIsCVATModalOpen(true);
