@@ -1099,6 +1099,7 @@ export default function Page() {
                                                     onClose={() => setisPersonalIDModalOpen(false)}
                                                     personalID={personalID}
                                                     propertyID={propertyID}
+                                                    profileID={profileID}
                                                     t={t}
                                                 />
                                             )}
