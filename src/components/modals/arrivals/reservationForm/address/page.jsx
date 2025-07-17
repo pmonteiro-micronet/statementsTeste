@@ -6,7 +6,7 @@ import Select from "react-select";
 import axios from "axios";
 
 
-const AddressForm = ({ onClose, address, propertyID, t }) => {
+const AddressForm = ({ onClose, address, propertyID, profileID, t }) => {
     //popula o select de pais
     const [countryOptions, setCountryOptions] = useState([]);
 
@@ -18,8 +18,11 @@ const AddressForm = ({ onClose, address, propertyID, t }) => {
         Region: address?.Region || "",
     }));
 
+    const [countryIDSelected, setCountryIDSelected] = useState(() => ({
+        CountryID: ""
+    }));
 
-    console.log("ID" , propertyID);
+    console.log("ID", propertyID);
     const [isDataModified, setIsDataModified] = useState(false);
     const inputRef = useRef(null);
 
@@ -47,8 +50,8 @@ const AddressForm = ({ onClose, address, propertyID, t }) => {
     useEffect(() => {
         const fetchCountries = async () => {
             try {
-                if(!propertyID) {
-                    console.log("Não há propertyID associado"  , propertyID);
+                if (!propertyID) {
+                    console.log("Não há propertyID associado", propertyID);
                 }
                 const response = await axios.get(`/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`);
                 const formattedOptions = response.data
@@ -65,41 +68,44 @@ const AddressForm = ({ onClose, address, propertyID, t }) => {
         fetchCountries();
     }, [propertyID]);
 
-    const saveAddress = async () => {
-        try {
-            const payload = {
-                authorization: 'API_AUTH_TOKEN',
-                countryid: formData.Country,
-                streetaddress: formData.Street,
-                postalcode: formData.PostalCode,
-                city: formData.City,
-                stateprovinceregion: formData.Region,
-                profileid: profileID,
-            };
+  const saveAddress = async () => {
+    try {
+        const payload = {
+            countryID: countryIDSelected.CountryID,
+            address: formData.Street,
+            postalcode: formData.PostalCode,
+            city: formData.City,
+            region: formData.Region,
+            profileID: profileID,
+            propertyID: propertyID
+        };
 
-            const response = await axios.post('/api/reservations/checkins/registrationForm/editaddress', payload);
+        const response = await axios.post('/api/reservations/checkins/registrationForm/editaddress', payload);
 
-            if (response.status === 200) {
-                setIsDataModified(false);
-                onClose(formData); // pass updated data if needed
-            } else {
-                console.error("Failed to save address:", response.data);
-            }
-        } catch (error) {
-            console.error("Error saving address:", error?.response?.data || error.message);
-        }
-    };
-
-    const handleSave = async () => {
-        const result = await saveAddress(formData, personalID);
-
-        if (result.success) {
+        if (response.status === 200) {
             setIsDataModified(false);
-            onClose(formData);
+            return { success: true };
         } else {
-            console.error("Erro ao alterar endereço:", result.error);
+            console.error("Failed to save address:", response.data);
+            return { success: false, error: response.data };
         }
-    };
+    } catch (error) {
+        console.error("Error saving address:", error?.response?.data || error.message);
+        return { success: false, error: error?.response?.data || error.message };
+    }
+};
+
+
+const handleSave = async () => {
+    const result = await saveAddress();
+    if (result?.success) {
+        setIsDataModified(false);
+        onClose(formData);
+    } else {
+        console.error("Erro ao alterar endereço:", result?.error);
+    }
+};
+
 
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
@@ -107,7 +113,7 @@ const AddressForm = ({ onClose, address, propertyID, t }) => {
                 {() => (
                     <>
                         <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white h-10">
-                            {t.modals.Address.title }
+                            {t.modals.Address.title}
                             <Button
                                 color="transparent"
                                 variant="light"
@@ -190,6 +196,11 @@ const AddressForm = ({ onClose, address, propertyID, t }) => {
                                                     ...prev,
                                                     Country: selectedOption.label,
                                                 }));
+
+                                                setCountryIDSelected({
+                                                    CountryID: selectedOption.value,
+                                                });
+
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
