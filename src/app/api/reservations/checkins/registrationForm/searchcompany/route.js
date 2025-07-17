@@ -52,6 +52,14 @@ export async function POST(request) {
     params.append("itemsperpage", "10");
     params.append("pagenumber", externalPageNumber.toString());
 
+    // Log dos dados recebidos
+    console.log("📦 Dados recebidos no body:", {
+      propertyID,
+      companyName,
+      vatNo,
+      pageNumber,
+    });
+
     const url = `http://${propertyServer}:${propertyPort}/searchforcompany?${params.toString()}`;
 
     const externalResponse = await axios.get(url, {
@@ -60,6 +68,8 @@ export async function POST(request) {
         "Content-Type": "application/json"
       }
     });
+
+    console.log("🌍 URL da requisição externa:", url);
 
     return new NextResponse(JSON.stringify(externalResponse.data), {
       status: 200,

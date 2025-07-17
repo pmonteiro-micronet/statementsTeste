@@ -20,6 +20,18 @@ export async function POST(request) {
             propertyID
         } = body;
 
+        console.log("[INFO] Campos recebidos do body:", {
+            DateOfBirth,
+            CountryOfBirth,
+            Nationality,
+            IDDoc,
+            DocNr,
+            ExpDate,
+            Issue,
+            profileID,
+            propertyID
+        });
+
         if (!propertyID) {
             console.error("[ERRO] PropertyID está ausente");
             return new NextResponse(
