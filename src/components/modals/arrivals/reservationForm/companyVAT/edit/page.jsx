@@ -390,6 +390,9 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                 {errorMessage && <p className="text-red-500 text-xs -mt-4">{errorMessage}</p>}
                                 <div className="flex justify-end space-x-2 -mt-4">
                                     <Button color="error" onClick={handleCloseModal}>{t.modals.companyInfo.cancel}</Button>
+                                    <Button color="primary" onClick={handleSave}>
+                                        Select company
+                                    </Button>
                                     <Button color="primary" onClick={() => setShowConfirmNewCompanyModal(true)}>
                                         New company
                                     </Button>
