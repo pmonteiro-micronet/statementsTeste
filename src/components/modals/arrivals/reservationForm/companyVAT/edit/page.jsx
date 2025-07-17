@@ -36,11 +36,11 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 companyName: company.name1 || "",
                 vatNo: company.vatno || "",
                 emailAddress: company.email || "",
-                country: company.land || "",
+                country: company.landkz || "",
                 streetAddress: company.strasse || "",
-                zipCode: company.zipCode || "",
+                zipCode: company.plz || "",
                 city: company.city || "",
-                state: company.state || "",
+                state: company.region || "",
             };
         } else if (companyVATData) {
             return {
