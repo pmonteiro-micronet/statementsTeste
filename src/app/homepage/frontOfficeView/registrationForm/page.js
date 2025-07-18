@@ -1395,9 +1395,9 @@ export default function Page() {
                                             onClose={() => setIsCVATModalOpen(false)}
                                             profileID={guestInfo.ProfileID}
                                             propertyID={propertyID}
-                                            initialData={companyVATData} // Aqui usamos o nome correto da variável
+                                            initialData={companyVATData} 
                                             resNo={reserva.ResNo}
-                                            companyID={reserva.CompanyID}
+                                            companyID={reserva.CompanyID || localCompanyData?.companyID}
                                             companyVATData={companyVATData}
                                         />
                                     )}
