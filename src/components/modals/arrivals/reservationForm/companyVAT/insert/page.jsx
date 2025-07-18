@@ -145,7 +145,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
             return;
         }
 
-        // Substituir valores vazios por um espaço em branco
+        // Substituir valores vazios por espaço em branco
         const formattedData = Object.fromEntries(
             Object.entries(formData).map(([key, value]) => [key, String(value).trim() === "" ? " " : String(value).trim()])
         );
@@ -157,13 +157,33 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                 resNo,
                 countryID: formData.country,
                 countryName: formData.countryName,
-                ...formattedData // Enviar os dados formatados
+                ...formattedData // dados formatados
             });
+
+            // Atualizar localStorage
+            const existingCompanies = JSON.parse(localStorage.getItem("company") || "{}");
+
+            // Monta o objeto para salvar no localStorage, incluindo os campos extras
+            const localStorageData = {
+                profileID,
+                propertyID,
+                resNo,
+                countryID: formData.country,
+                countryName: formData.countryName,
+                ...formattedData,
+                hasCompanyVAT: 1,
+                BlockedCVatNO: 0,
+            };
+
+            existingCompanies[profileID] = localStorageData;
+
+            localStorage.setItem("company", JSON.stringify(existingCompanies));
 
             console.log("Success:", response.data);
             setErrorMessage("");
             setIsDataModified(false);
             onClose();
+
         } catch (error) {
             console.error("Erro ao salvar informações de VAT:", error);
             setErrorMessage("Falha ao salvar. Por favor, tente novamente.");

@@ -1303,30 +1303,29 @@ export default function Page() {
                                                 )}
 
                                                 {activeKey === "company" && (
-                                                    reserva.hasCompanyVAT === 1 ? (
+                                                    reserva.hasCompanyVAT === 1 || localCompanyData?.hasCompanyVAT === 1 ? (
                                                         <FaPencilAlt
                                                             size={15}
-                                                            color={reserva.BlockedCVatNO === 1 ? "gray" : "#FC9D25"}
-                                                            style={{ cursor: reserva.BlockedCVatNO === 1 ? "not-allowed" : "pointer" }}
-                                                            title={reserva.BlockedCVatNO === 1 ? "Fiscalizado" : ""}
+                                                            color={(localCompanyData?.BlockedCVatNO ?? reserva.BlockedCVatNO) === 1 ? "gray" : "#FC9D25"}
+                                                            style={{ cursor: (localCompanyData?.BlockedCVatNO ?? reserva.BlockedCVatNO) === 1 ? "not-allowed" : "pointer" }}
+                                                            title={(localCompanyData?.BlockedCVatNO ?? reserva.BlockedCVatNO) === 1 ? "Fiscalizado" : ""}
                                                             onClick={() => {
                                                                 console.log("BlockedCVatNO:", reserva.BlockedCVatNO);
                                                                 console.log("hasCompanyVAT:", reserva.hasCompanyVAT);
-                                                                if (reserva.BlockedCVatNO === 0) {
+                                                                if (blocked === 0) {
                                                                     const companyData = {
-                                                                        companyName: reserva.Company || "",
-                                                                        vatNo: reserva.CompanyVatNo || "",
-                                                                        emailAddress: reserva.CompanyEmail || "",
-                                                                        country: reserva.CompanyCountryName || "",
-                                                                        streetAddress: reserva.CompanyStreetAddress || "",
-                                                                        zipCode: reserva.CompanyZipCode || "",
-                                                                        city: reserva.CompanyCity || "",
-                                                                        state: reserva.CompanyState || "",
+                                                                        companyName: localCompanyData?.companyName || reserva.Company || "",
+                                                                        vatNo: localCompanyData?.vatNo || reserva.CompanyVatNo || "",
+                                                                        emailAddress: localCompanyData?.emailAddress || reserva.CompanyEmail || "",
+                                                                        country: localCompanyData?.country || reserva.CompanyCountryName || "",
+                                                                        streetAddress: localCompanyData?.streetAddress || reserva.CompanyStreetAddress || "",
+                                                                        zipCode: localCompanyData?.zipCode || reserva.CompanyZipCode || "",
+                                                                        city: localCompanyData?.city || reserva.CompanyCity || "",
+                                                                        state: localCompanyData?.state || reserva.CompanyState || "",
                                                                     };
 
                                                                     console.log("Definindo companyVATData:", companyData);
-
-                                                                    setCompanyVATData(companyData); // Atualiza os dados
+                                                                    setCompanyVATData(companyData);
                                                                 }
                                                             }}
                                                         />

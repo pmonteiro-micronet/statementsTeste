@@ -211,19 +211,23 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
         try {
             await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", payload);
 
-            // Atualiza ou cria no localStorage
             const existingCompanies = JSON.parse(localStorage.getItem("company") || "{}");
 
-            // Atualiza ou insere a nova empresa para o profileID
-            existingCompanies[profileID] = payload;
+            // Clona o payload e adiciona o campo extra apenas para o localStorage
+            const localStorageData = {
+                ...payload,
+                hasCompanyVAT: 1,
+                BlockedCVatNO: 0,
+            };
 
-            // Salva de volta no localStorage
+
+            existingCompanies[profileID] = localStorageData;
+
             localStorage.setItem("company", JSON.stringify(existingCompanies));
 
             onClose();
-            // Recarrega a página
             window.location.reload();
-            
+
         } catch (error) {
             console.error("Erro ao salvar empresa:", error);
             setErrorMessage("Erro ao salvar. Por favor, tente novamente.");
