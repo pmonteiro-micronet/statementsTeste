@@ -36,7 +36,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 companyName: company.name1 || "",
                 vatNo: company.vatno || "",
                 emailAddress: company.email || "",
-                country: company.landkz || "",
+                country: "",
+                countryName: company.landkz || "",
                 streetAddress: company.strasse || "",
                 zipCode: company.plz || "",
                 city: company.city || "",
@@ -47,7 +48,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 companyName: companyVATData.companyName || "",
                 vatNo: companyVATData.vatNo || "",
                 emailAddress: companyVATData.emailAddress || "",
-                country: companyVATData.country || "",
+                country: "",
+                countryName: companyVATData.country || "",
                 streetAddress: companyVATData.streetAddress || "",
                 zipCode: companyVATData.zipCode || "",
                 city: companyVATData.city || "",
@@ -60,6 +62,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 vatNo: "",
                 emailAddress: "",
                 country: "",
+                countryName: "",
                 streetAddress: "",
                 zipCode: "",
                 city: "",
@@ -379,7 +382,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                             <label className="block text-sm font-medium">{t.modals.companyInfo.country}</label>
                                             <Select
                                                 options={countryOptions}
-                                                value={countryOptions.find(option => option.value === formData.country)}
+                                                value={countryOptions.find(option => option.value === formData.countryName)}
                                                 onChange={handleCountryChange}
                                                 isSearchable
                                                 styles={customStyles}
