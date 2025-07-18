@@ -20,7 +20,7 @@ import BeforeCompanyVat from "@/components/modals/arrivals/reservationForm/compa
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
 import SuccessRegistrationForm from "@/components/modals/arrivals/reservationForm/success/page";
 import LoadingBackdrop from "@/components/Loader/page";
-import PersonalIDForm  from "@/components/modals/arrivals/reservationForm/PersonalID/page";
+import PersonalIDForm from "@/components/modals/arrivals/reservationForm/PersonalID/page";
 import { FaPlusCircle } from "react-icons/fa";
 import AddressForm from "@/components/modals/arrivals/reservationForm/address/page"
 
@@ -72,6 +72,15 @@ export default function Page() {
 
     const [locale, setLocale] = useState("pt");
     const router = useRouter();
+
+    const [localCompanyData, setLocalCompanyData] = useState(null);
+
+    useEffect(() => {
+        const companies = JSON.parse(localStorage.getItem("company") || "{}");
+        if (companies[profileID]) {
+            setLocalCompanyData(companies[profileID]);
+        }
+    }, [profileID]);
 
     const { data: session, status } = useSession();
 
@@ -1329,8 +1338,8 @@ export default function Page() {
                                         <div className="mt-2">
                                             <p className="!text-textLabelColor text-lg">
                                                 {activeKey === "company"
-                                                    ? reserva.hasCompanyVAT === 1
-                                                        ? reserva.Company || "" // Exibe o nome da empresa se disponível
+                                                    ? reserva.hasCompanyVAT === 1 || localCompanyData
+                                                        ? localCompanyData?.companyName || reserva.Company || ""
                                                         : ""
                                                     : `${guestInfo.LastName}, ${guestInfo.FirstName}`}
                                             </p>
@@ -1343,8 +1352,8 @@ export default function Page() {
                                                     ariaLabel="VAT Nr.:"
                                                     value={
                                                         activeKey === "company"
-                                                            ? reserva.hasCompanyVAT === 1
-                                                                ? reserva.CompanyVatNo || "" // Exibe o VAT da empresa se disponível
+                                                            ? reserva.hasCompanyVAT === 1 || localCompanyData
+                                                                ? localCompanyData?.vatNo || reserva.CompanyVatNo || ""
                                                                 : ""
                                                             : reserva.BlockedVatNO === 1 && !vatNo
                                                                 ? "999999990"

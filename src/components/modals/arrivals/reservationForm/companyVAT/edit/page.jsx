@@ -190,7 +190,6 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
             return;
         }
 
-        // Substituir campos vazios por um espaço " "
         const payload = Object.fromEntries(
             Object.entries({
                 profileID,
@@ -211,7 +210,20 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
 
         try {
             await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", payload);
+
+            // Atualiza ou cria no localStorage
+            const existingCompanies = JSON.parse(localStorage.getItem("company") || "{}");
+
+            // Atualiza ou insere a nova empresa para o profileID
+            existingCompanies[profileID] = payload;
+
+            // Salva de volta no localStorage
+            localStorage.setItem("company", JSON.stringify(existingCompanies));
+
             onClose();
+            // Recarrega a página
+            window.location.reload();
+            
         } catch (error) {
             console.error("Erro ao salvar empresa:", error);
             setErrorMessage("Erro ao salvar. Por favor, tente novamente.");
