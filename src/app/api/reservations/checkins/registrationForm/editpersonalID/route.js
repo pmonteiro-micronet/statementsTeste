@@ -68,14 +68,15 @@ export async function POST(request) {
         const headers = {
             Authorization: process.env.API_AUTH_TOKEN,
             DateOfBirth: DateOfBirth,
-            CountryOfBirth: parseInt(CountryOfBirth),
-            Nationality: parseInt(Nationality),
-            IDDoc: parseInt(IDDoc),
-            DocNr: parseInt(DocNr),
+            CountryOfBirth: isNaN(parseInt(CountryOfBirth)) ? null : parseInt(CountryOfBirth),
+            Nationality: isNaN(parseInt(Nationality)) ? null : parseInt(Nationality),
+            IDDoc: isNaN(parseInt(IDDoc)) ? null : parseInt(IDDoc),
+            DocNr: isNaN(parseInt(DocNr)) ? null : parseInt(DocNr),
             ExpDate: ExpDate,
             Issue: Issue,
             ProfileID: parseInt(profileID),
         };
+
 
         console.log("[INFO] Headers preparados para envio:", headers);
 
