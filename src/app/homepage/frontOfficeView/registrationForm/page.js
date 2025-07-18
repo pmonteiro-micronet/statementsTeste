@@ -1304,7 +1304,7 @@ export default function Page() {
                                                             onClick={() => {
                                                                 console.log("BlockedCVatNO:", reserva.BlockedCVatNO);
                                                                 console.log("hasCompanyVAT:", reserva.hasCompanyVAT);
-                                                                if (blocked === 0) {
+                                                                if ((localCompanyData?.BlockedCVatNO ?? reserva.BlockedCVatNO) === 0) {
                                                                     const companyData = {
                                                                         companyName: localCompanyData?.companyName || reserva.Company || "",
                                                                         vatNo: localCompanyData?.vatNo || reserva.CompanyVatNo || "",
