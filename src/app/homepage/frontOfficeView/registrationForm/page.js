@@ -1042,7 +1042,10 @@ export default function Page() {
 
                                             {isAddressModalOpen && (
                                                 <AddressForm
-                                                    onClose={() => setisAddressModalOpen(false)}
+                                                    onClose={(updatedAddress) => {
+                                                        setisAddressModalOpen(false);
+                                                        if (updatedAddress) setAddress(updatedAddress); // Update state if new data
+                                                    }}
                                                     address={address}
                                                     profileID={profileID}
                                                     propertyID={propertyID}
@@ -1114,7 +1117,10 @@ export default function Page() {
 
                                             {isPersonalIDModalOpen && (
                                                 <PersonalIDForm
-                                                    onClose={() => setisPersonalIDModalOpen(false)}
+                                                    onClose={(updatedPersonalID) => {
+                                                        setisPersonalIDModalOpen(false);
+                                                        if (updatedPersonalID) setPersonalID(updatedPersonalID); // Update state if new data
+                                                    }}
                                                     personalID={personalID}
                                                     propertyID={propertyID}
                                                     profileID={profileID}
