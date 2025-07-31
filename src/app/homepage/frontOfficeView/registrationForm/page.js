@@ -20,7 +20,7 @@ import BeforeCompanyVat from "@/components/modals/arrivals/reservationForm/compa
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
 import SuccessRegistrationForm from "@/components/modals/arrivals/reservationForm/success/page";
 import LoadingBackdrop from "@/components/Loader/page";
-import PersonalIDForm  from "@/components/modals/arrivals/reservationForm/PersonalID/page";
+import PersonalIDForm from "@/components/modals/arrivals/reservationForm/PersonalID/page";
 import { FaPlusCircle } from "react-icons/fa";
 import AddressForm from "@/components/modals/arrivals/reservationForm/address/page"
 
@@ -72,6 +72,15 @@ export default function Page() {
 
     const [locale, setLocale] = useState("pt");
     const router = useRouter();
+
+    const [localCompanyData, setLocalCompanyData] = useState(null);
+
+    useEffect(() => {
+        const companies = JSON.parse(localStorage.getItem("company") || "{}");
+        if (companies[profileID]) {
+            setLocalCompanyData(companies[profileID]);
+        }
+    }, [profileID]);
 
     const { data: session, status } = useSession();
 
@@ -1294,30 +1303,29 @@ export default function Page() {
                                                 )}
 
                                                 {activeKey === "company" && (
-                                                    reserva.hasCompanyVAT === 1 ? (
+                                                    reserva.hasCompanyVAT === 1 || localCompanyData?.hasCompanyVAT === 1 ? (
                                                         <FaPencilAlt
                                                             size={15}
-                                                            color={reserva.BlockedCVatNO === 1 ? "gray" : "#FC9D25"}
-                                                            style={{ cursor: reserva.BlockedCVatNO === 1 ? "not-allowed" : "pointer" }}
-                                                            title={reserva.BlockedCVatNO === 1 ? "Fiscalizado" : ""}
+                                                            color={(localCompanyData?.BlockedCVatNO ?? reserva.BlockedCVatNO) === 1 ? "gray" : "#FC9D25"}
+                                                            style={{ cursor: (localCompanyData?.BlockedCVatNO ?? reserva.BlockedCVatNO) === 1 ? "not-allowed" : "pointer" }}
+                                                            title={(localCompanyData?.BlockedCVatNO ?? reserva.BlockedCVatNO) === 1 ? "Fiscalizado" : ""}
                                                             onClick={() => {
                                                                 console.log("BlockedCVatNO:", reserva.BlockedCVatNO);
                                                                 console.log("hasCompanyVAT:", reserva.hasCompanyVAT);
-                                                                if (reserva.BlockedCVatNO === 0) {
+                                                                if ((localCompanyData?.BlockedCVatNO ?? reserva.BlockedCVatNO) === 0) {
                                                                     const companyData = {
-                                                                        companyName: reserva.Company || "",
-                                                                        vatNo: reserva.CompanyVatNo || "",
-                                                                        emailAddress: reserva.CompanyEmail || "",
-                                                                        country: reserva.CompanyCountryName || "",
-                                                                        streetAddress: reserva.CompanyStreetAddress || "",
-                                                                        zipCode: reserva.CompanyZipCode || "",
-                                                                        city: reserva.CompanyCity || "",
-                                                                        state: reserva.CompanyState || "",
+                                                                        companyName: localCompanyData?.companyName || reserva.Company || "",
+                                                                        vatNo: localCompanyData?.vatNo || reserva.CompanyVatNo || "",
+                                                                        emailAddress: localCompanyData?.emailAddress || reserva.CompanyEmail || "",
+                                                                        country: localCompanyData?.country || reserva.CompanyCountryName || "",
+                                                                        streetAddress: localCompanyData?.streetAddress || reserva.CompanyStreetAddress || "",
+                                                                        zipCode: localCompanyData?.zipCode || reserva.CompanyZipCode || "",
+                                                                        city: localCompanyData?.city || reserva.CompanyCity || "",
+                                                                        state: localCompanyData?.state || reserva.CompanyState || "",
                                                                     };
 
                                                                     console.log("Definindo companyVATData:", companyData);
-
-                                                                    setCompanyVATData(companyData); // Atualiza os dados
+                                                                    setCompanyVATData(companyData);
                                                                 }
                                                             }}
                                                         />
@@ -1337,8 +1345,8 @@ export default function Page() {
                                         <div className="mt-2">
                                             <p className="!text-textLabelColor text-lg">
                                                 {activeKey === "company"
-                                                    ? reserva.hasCompanyVAT === 1
-                                                        ? reserva.Company || "" // Exibe o nome da empresa se disponível
+                                                    ? reserva.hasCompanyVAT === 1 || localCompanyData
+                                                        ? localCompanyData?.companyName || reserva.Company || ""
                                                         : ""
                                                     : `${guestInfo.LastName}, ${guestInfo.FirstName}`}
                                             </p>
@@ -1351,8 +1359,8 @@ export default function Page() {
                                                     ariaLabel="VAT Nr.:"
                                                     value={
                                                         activeKey === "company"
-                                                            ? reserva.hasCompanyVAT === 1
-                                                                ? reserva.CompanyVatNo || "" // Exibe o VAT da empresa se disponível
+                                                            ? reserva.hasCompanyVAT === 1 || localCompanyData
+                                                                ? localCompanyData?.vatNo || reserva.CompanyVatNo || ""
                                                                 : ""
                                                             : reserva.BlockedVatNO === 1 && !vatNo
                                                                 ? "999999990"
@@ -1387,9 +1395,9 @@ export default function Page() {
                                             onClose={() => setIsCVATModalOpen(false)}
                                             profileID={guestInfo.ProfileID}
                                             propertyID={propertyID}
-                                            initialData={companyVATData} // Aqui usamos o nome correto da variável
+                                            initialData={companyVATData} 
                                             resNo={reserva.ResNo}
-                                            companyID={reserva.CompanyID}
+                                            companyID={reserva.CompanyID || localCompanyData?.companyID}
                                             companyVATData={companyVATData}
                                         />
                                     )}

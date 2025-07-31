@@ -36,7 +36,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 companyName: company.name1 || "",
                 vatNo: company.vatno || "",
                 emailAddress: company.email || "",
-                country: company.landkz || "",
+                country: "",
+                countryName: company.landkz || "",
                 streetAddress: company.strasse || "",
                 zipCode: company.plz || "",
                 city: company.city || "",
@@ -47,7 +48,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 companyName: companyVATData.companyName || "",
                 vatNo: companyVATData.vatNo || "",
                 emailAddress: companyVATData.emailAddress || "",
-                country: companyVATData.country || "",
+                country: "",
+                countryName: companyVATData.country || "",
                 streetAddress: companyVATData.streetAddress || "",
                 zipCode: companyVATData.zipCode || "",
                 city: companyVATData.city || "",
@@ -60,6 +62,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 vatNo: "",
                 emailAddress: "",
                 country: "",
+                countryName: "",
                 streetAddress: "",
                 zipCode: "",
                 city: "",
@@ -190,7 +193,6 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
             return;
         }
 
-        // Substituir campos vazios por um espaço " "
         const payload = Object.fromEntries(
             Object.entries({
                 profileID,
@@ -211,7 +213,24 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
 
         try {
             await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", payload);
+
+            const existingCompanies = JSON.parse(localStorage.getItem("company") || "{}");
+
+            // Clona o payload e adiciona o campo extra apenas para o localStorage
+            const localStorageData = {
+                ...payload,
+                hasCompanyVAT: 1,
+                BlockedCVatNO: 0,
+            };
+
+
+            existingCompanies[profileID] = localStorageData;
+
+            localStorage.setItem("company", JSON.stringify(existingCompanies));
+
             onClose();
+            window.location.reload();
+
         } catch (error) {
             console.error("Erro ao salvar empresa:", error);
             setErrorMessage("Erro ao salvar. Por favor, tente novamente.");
@@ -363,7 +382,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                             <label className="block text-sm font-medium">{t.modals.companyInfo.country}</label>
                                             <Select
                                                 options={countryOptions}
-                                                value={countryOptions.find(option => option.value === formData.country)}
+                                                value={countryOptions.find(option => option.value === formData.countryName)}
                                                 onChange={handleCountryChange}
                                                 isSearchable
                                                 styles={customStyles}

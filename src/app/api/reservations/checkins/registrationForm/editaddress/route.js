@@ -21,7 +21,7 @@ export async function POST(request) {
 
         const headers = {
             Authorization: process.env.API_AUTH_TOKEN,
-            CountryID: parseInt(countryID),
+            CountryID: isNaN(parseInt(countryID)) ? null : parseInt(countryID),
             StreetAddress: address,
             PostalCode: postalcode,
             City: city,
