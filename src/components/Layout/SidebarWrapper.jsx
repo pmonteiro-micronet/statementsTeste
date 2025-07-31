@@ -20,6 +20,7 @@ import { AiOutlineFileDone } from "react-icons/ai";
 import { LuMapPinHouse } from "react-icons/lu";
 import { RxEnter, RxExit } from "react-icons/rx";
 import { FaRegAddressCard } from "react-icons/fa";
+import { GiArchiveRegister } from "react-icons/gi";
 
 export default function SidebarWrapper({ children }) {
   const { data: session } = useSession();
@@ -157,6 +158,12 @@ export default function SidebarWrapper({ children }) {
               label: `${t.navbar.text.dashboard}`,
               onClick: () => router.push(`/homepage/frontOfficeView/${selectedHotelID}`),
               icon: <TbLayoutDashboardFilled />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/reservations/${selectedHotelID}`,
+              label: `Reservations`,
+              onClick: () => handleRedirect("reservations"),
+              icon: <GiArchiveRegister />,
             },
             {
               ref: `/homepage/frontOfficeView/checkinRequest`,

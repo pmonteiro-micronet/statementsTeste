@@ -121,6 +121,11 @@ const PropertiesEditForm = ({
     //     }
     // }, [propertyID]);
 
+    const [hasRoomCloud, setHasRoomCloud] = useState(hotel.hasRoomCloud || false);
+    const [roomCloudUsername, setRoomCloudUsername] = useState(hotel.roomCloudUsername || "");
+    const [roomCloudPassword, setRoomCloudPassword] = useState(hotel.roomCloudPassword || "");
+    const [roomCloudHotelID, setRoomCloudHotelID] = useState(hotel.roomCloudHotelID || "");
+
     const [locale, setLocale] = useState("pt");
 
     useEffect(() => {
@@ -1129,6 +1134,54 @@ const PropertiesEditForm = ({
 
                                         </Tab>
                                     )}
+                                    <Tab key="ota" title="OTA">
+                                        <div>
+                                            <div className="flex items-center gap-2 -mt-6 mb-2">
+                                                <input
+                                                    type="checkbox"
+                                                    id="hasRoomCloud"
+                                                    checked={hasRoomCloud}
+                                                    onChange={(e) => setHasRoomCloud(e.target.checked)}
+                                                    className="w-4 h-4"
+                                                    disabled={!isEditing}
+                                                />
+                                                <label htmlFor="hasRoomCloud" className="text-sm">Has Room Cloud?</label>
+                                            </div>
+                                            <p className="bg-gray-200 p-1 mb-2">Setup Room Cloud account</p>
+                                            <div className="flex flex-row gap-2 w-full">
+                                                <div className="w-1/3 flex flex-col text-xs">
+                                                    <p>Username</p>
+                                                    <input
+                                                        type="text"
+                                                        value={roomCloudUsername}
+                                                        onChange={(e) => setRoomCloudUsername(e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        disabled={!isEditing}
+                                                    />
+                                                </div>
+                                                <div className="w-1/3 flex flex-col text-xs">
+                                                    <p>Password</p>
+                                                    <input
+                                                        type="password"
+                                                        value={roomCloudPassword}
+                                                        onChange={(e) => setRoomCloudPassword(e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        disabled={!isEditing}
+                                                    />
+                                                </div>
+                                                <div className="w-1/3 flex flex-col text-xs">
+                                                    <p>Hotel ID</p>
+                                                    <input
+                                                        type="text"
+                                                        value={roomCloudHotelID}
+                                                        onChange={(e) => setRoomCloudHotelID(e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        disabled={!isEditing}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Tab>
                                 </Tabs>
 
                                 {/* Exibição de erro */}
