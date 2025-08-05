@@ -27,6 +27,8 @@ export default function AllProfiles({ }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProperty, setSelectedProperty] = useState(null);
 const [selectedHotelTerms, setSelectedHotelTerms] = useState(null);
+const [selectedRoomCloud, setSelectedRoomCloud] = useState(null);
+
 
     const [locale, setLocale] = useState("pt");
 
@@ -82,27 +84,48 @@ const [selectedHotelTerms, setSelectedHotelTerms] = useState(null);
         setPage(1);
     };
 
-    const handleOpenModal = async (property) => {
-    setSelectedProperty(property);
+const handleOpenModal = async (property) => {
+  setSelectedProperty(property);
 
-    try {
-      // Buscar termos específicos da propriedade pela propertyID
-     const response = await axios.get(`/api/properties/hotelTerms/${property.propertyID}`);
+  try {
+    const propertyID = property.propertyID;
 
-      // Supondo que a API retorna algo tipo { response: { hotelTermsEN: "...", hotelTermsPT: "...", ... } }
-      if (response.data && response.data.response) {
-        setSelectedHotelTerms(response.data.response);
-      } else {
-        setSelectedHotelTerms(null);
-        console.error("Resposta inesperada para hotelTerms:", response.data);
+    const [hotelTermsRes, roomCloudRes] = await Promise.allSettled([
+      axios.get(`/api/properties/hotelTerms/${propertyID}`),
+      axios.get(`/api/properties/roomCloud/${propertyID}`)
+    ]);
+
+    // --- Hotel Terms ---
+    if (hotelTermsRes.status === "fulfilled" && hotelTermsRes.value.data?.response) {
+      setSelectedHotelTerms(hotelTermsRes.value.data.response);
+    } else {
+      setSelectedHotelTerms({}); // valor vazio
+      if (hotelTermsRes.status === "rejected") {
+        console.warn(`HotelTerms não encontrado para propertyID ${propertyID}`);
       }
-    } catch (error) {
-      setSelectedHotelTerms(null);
-      console.error("Erro ao buscar termos do hotel:", error);
     }
 
-    setIsModalOpen(true);
-  };
+    // --- Room Cloud ---
+    if (roomCloudRes.status === "fulfilled" && roomCloudRes.value.data?.response) {
+      setSelectedRoomCloud(roomCloudRes.value.data.response);
+    } else {
+      setSelectedRoomCloud({}); // valor vazio
+      if (roomCloudRes.status === "rejected") {
+        console.warn(`RoomCloud não encontrado para propertyID ${propertyID}`);
+      }
+    }
+
+  } catch (error) {
+    // Este catch só será acionado em erros fora do Promise.allSettled (ex: bug no código)
+    console.error("Erro inesperado ao buscar dados:", error);
+    setSelectedHotelTerms({});
+    setSelectedRoomCloud({});
+  }
+
+  setIsModalOpen(true);
+};
+
+
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -212,6 +235,7 @@ const [selectedHotelTerms, setSelectedHotelTerms] = useState(null);
                         propertyID={selectedProperty.propertyID}
                         hotel={selectedProperty}
                         hotelTerms={selectedHotelTerms}
+                        roomCloud={selectedRoomCloud}
                     />
                 </>
             )}

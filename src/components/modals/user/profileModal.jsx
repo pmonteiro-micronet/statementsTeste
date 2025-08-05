@@ -55,6 +55,8 @@ const ProfileModalForm = ({
     const [locale, setLocale] = useState("pt");
 
     const [selectedHotelTerms, setSelectedHotelTerms] = useState(null);
+    const [selectedRoomCloud, setSelectedRoomCloud] = useState({});
+
     useEffect(() => {
         // Carregar o idioma do localStorage
         const storedLanguage = localStorage.getItem("language");
@@ -88,25 +90,47 @@ const ProfileModalForm = ({
     }, [user]);
 
     const handleEditClick = async (hotel) => {
-            setSelectedHotel(hotel); // Armazena a propriedade clicada
+        setSelectedHotel(hotel); // Armazena a propriedade clicada
 
-            try {
-                // Buscar termos específicos da propriedade pela propertyID
-                const response = await axios.get(`/api/properties/hotelTerms/${hotel.propertyID}`);
+        try {
+            const propertyID = hotel.propertyID;
 
-                if (response.data && response.data.response) {
-                    setSelectedHotelTerms(response.data.response);
-                } else {
-                    setSelectedHotelTerms(null);
-                    console.error("Resposta inesperada para hotelTerms:", response.data);
+            // Fazer as duas chamadas em paralelo
+            const [hotelTermsRes, roomCloudRes] = await Promise.allSettled([
+                axios.get(`/api/properties/hotelTerms/${propertyID}`),
+                axios.get(`/api/properties/roomCloud/${propertyID}`)
+            ]);
+
+            // --- Hotel Terms ---
+            if (hotelTermsRes.status === "fulfilled" && hotelTermsRes.value.data?.response) {
+                setSelectedHotelTerms(hotelTermsRes.value.data.response);
+            } else {
+                setSelectedHotelTerms({});
+                if (hotelTermsRes.status === "rejected") {
+                    console.warn(`HotelTerms não encontrado para propertyID ${propertyID}`);
                 }
-            } catch (error) {
-                setSelectedHotelTerms(null);
-                console.error("Erro ao buscar termos do hotel:", error);
             }
 
-            setIsModalOpen(true); // Abre o modal de edição de propriedade
+            // --- Room Cloud ---
+            if (roomCloudRes.status === "fulfilled" && roomCloudRes.value.data?.response) {
+                setSelectedRoomCloud(roomCloudRes.value.data.response);
+            } else {
+                setSelectedRoomCloud({});
+                if (roomCloudRes.status === "rejected") {
+                    console.warn(`RoomCloud não encontrado para propertyID ${propertyID}`);
+                }
+            }
+
+        } catch (error) {
+            // Só entra aqui se der algum erro inesperado fora das requests
+            setSelectedHotelTerms({});
+            setSelectedRoomCloud({});
+            console.error("Erro inesperado ao buscar dados:", error);
+        }
+
+        setIsModalOpen(true); // Abre o modal de edição de propriedade
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault(); // Impede o comportamento padrão do formulário
@@ -429,7 +453,7 @@ const ProfileModalForm = ({
                                                                 <FaPencilAlt
                                                                     className={`cursor-pointer text-primary`}
                                                                     onClick={() => handleEditClick(hotel)}
-                                                                    style={{ pointerEvents: "auto"}}
+                                                                    style={{ pointerEvents: "auto" }}
                                                                 />
                                                             </div>
                                                         </div>
@@ -451,6 +475,7 @@ const ProfileModalForm = ({
                 <PropertiesEditForm
                     hotel={selectedHotel}
                     hotelTerms={selectedHotelTerms}
+                    roomCloud={selectedRoomCloud}
                     onClose={() => setIsModalOpen(false)}
                 />
             )}

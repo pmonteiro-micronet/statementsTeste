@@ -48,6 +48,7 @@ export async function PATCH(request, context) {
       hotelNIF,
       passeIni,
       pdfFilePath,
+      hasStay,
       replyEmail,
       replyPassword,
       sendingServer,
@@ -55,6 +56,7 @@ export async function PATCH(request, context) {
       emailSubject,
       emailBody,
       infoEmail,
+      hasRoomCloud
   } = await request.json();
 
   try {
@@ -76,6 +78,10 @@ export async function PATCH(request, context) {
               { status: 400 }
           );
       }
+
+      const roomCloudValue = Boolean(hasRoomCloud);
+      const hasStayValue = Boolean(hasStay);
+
 
       // Atualize a propriedade no banco de dados
       const updatedProperty = await prisma.properties.update({
@@ -100,6 +106,7 @@ export async function PATCH(request, context) {
               hotelNIF,
               passeIni,
               pdfFilePath,
+              hasStay: hasStayValue,
               replyEmail,
               replyPassword,
               sendingServer,
@@ -107,6 +114,7 @@ export async function PATCH(request, context) {
               emailSubject,
               emailBody,
               infoEmail,
+              hasRoomCloud: roomCloudValue
           },
       });
 

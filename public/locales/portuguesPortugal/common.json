@@ -407,6 +407,19 @@
                     "Phone": "Telefone",
                     "Email": "Email"
                 }
+            },
+            "roomCloud": {
+                "hasRoomCloud": "Possui RoomCloud?",
+                "title1": "Configurar conta RoomCloud",
+                "username": "Nome de usuário",
+                "password": "Senha",
+                "hotelID": "ID do hotel"
+            },
+            "searchUsers": {
+                "search": "Buscar...",
+                "noResults": "Nenhum usuário encontrado.",
+                "userList": "Lista de usuários",
+                "close": "Fechar"
             }
         },
         "companyInfo": {
@@ -445,7 +458,7 @@
             "title": "Informação da Morada",
             "country": "País",
             "streetAdress": "Morada",
-            "zipCode":"Código Postal",
+            "zipCode": "Código Postal",
             "city": "Cidade",
             "SPR": "Estado/Provincia/Região"
         }

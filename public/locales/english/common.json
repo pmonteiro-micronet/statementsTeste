@@ -406,6 +406,19 @@
                     "Phone": "Phone",
                     "Email": "Email"
                 }
+            },
+            "roomCloud": {
+                "hasRoomCloud": "Has RoomCloud?",
+                "title1": "Setup Room Cloud Account",
+                "username": "Username",
+                "password": "Password",
+                "hotelID": "Hotel ID"
+            },
+            "searchUsers": {
+                "search": "Search...",
+                "noResults": "No users found.",
+                "userList": "User List",
+                "close": "Close"
             }
         },
         "companyInfo": {
