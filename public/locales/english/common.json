@@ -422,7 +422,7 @@
             }
         },
         "companyInfo": {
-            "insert": "Create New Company VAT Number",
+            "insert": "Company",
             "update": "Company",
             "companyName": "Company Name:",
             "vatNO": "VAT No.:",
@@ -435,7 +435,16 @@
             "cancel": "Cancel",
             "save": "Save",
             "edit": "Edit",
-            "countryError": "Error loading countries."
+            "countryError": "Error loading countries.",
+            "noResults": "No results found.",
+            "newCompany": "New Company",
+            "showCompany": {
+                "companyName": "Company Name",
+                "vatNo": "VATNO",
+                "country": "Country",
+                "cancel": "Cancel",
+                "searchMore": "Search more"
+            }
         },
         "userLogout": {
             "title": "Confirm Logout",
