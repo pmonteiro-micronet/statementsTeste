@@ -42,7 +42,6 @@ export async function PUT(req) {
       hotelPostalCode,
       hotelRNET,
       hotelNIF,
-
       hasStay,
       replyEmail,
       replyPassword,
@@ -50,32 +49,32 @@ export async function PUT(req) {
       sendingPort,
       emailSubject,
       emailBody,
-      infoEmail
+      infoEmail,
+      hasRoomCloud,
     } = body;
 
-    // Verificar campos obrigatórios
     if (!propertyName || !propertyTag || !hotelName) {
-      console.error("Campos obrigatórios ausentes");
       return new NextResponse(
         JSON.stringify({ error: "Some required fields are missing." }),
         { status: 400 }
       );
     }
 
-    console.log("Validando tipos de dados");
     if (typeof mpehotel !== "number") {
-      console.error("mpehotel devem ser números");
       return new NextResponse(
         JSON.stringify({
-          error: "propertyPort and mpehotel must be numbers.",
+          error: "propertyPortStay and mpehotel must be numbers.",
         }),
         { status: 400 }
       );
     }
 
-    console.log("Atualizando as propriedades no banco de dados");
+    // ✅ Converter valores para boolean de forma segura
+    const stayValue = Boolean(hasStay);
+    const roomCloudValue = Boolean(hasRoomCloud);
 
-    // Atualizar ou criar propriedades no banco
+    console.log("Atualizando propriedades com hasStay:", stayValue, "hasRoomCloud:", roomCloudValue);
+
     let updatedProperties;
     const existingProperty = await prisma.properties.findUnique({
       where: { propertyTag },
@@ -102,15 +101,15 @@ export async function PUT(req) {
           hotelPostalCode,
           hotelRNET,
           hotelNIF,
-
-          hasStay,
+          hasStay: stayValue,          // ✅ Boolean direto
           replyEmail,
           replyPassword,
           sendingServer,
           sendingPort,
           emailSubject,
           emailBody,
-          infoEmail
+          infoEmail,
+          hasRoomCloud: roomCloudValue // ✅ Boolean direto
         },
       });
     } else {
@@ -134,34 +133,27 @@ export async function PUT(req) {
           hotelPostalCode,
           hotelRNET,
           hotelNIF,
-
+          hasStay: stayValue,
           replyEmail,
           replyPassword,
           sendingServer,
           sendingPort,
           emailSubject,
           emailBody,
-          infoEmail
+          infoEmail,
+          hasRoomCloud: roomCloudValue
         },
       });
     }
 
-    console.log("Propriedades processadas com sucesso:", updatedProperties);
-
-    // Retorna o ID da propriedade
     return new NextResponse(
-      JSON.stringify({ propertyId: updatedProperties.id, updatedProperties }),
+      JSON.stringify({ propertyId: updatedProperties.propertyID, updatedProperties }),
       { status: 201 }
     );
   } catch (error) {
     console.error("Erro no processo:", error);
-    if (error instanceof Error) {
-      return new NextResponse(JSON.stringify({ error: error.message }), {
-        status: 500,
-      });
-    }
     return new NextResponse(
-      JSON.stringify({ error: "Failed to update properties." }),
+      JSON.stringify({ error: error.message || "Failed to update properties." }),
       { status: 500 }
     );
   }

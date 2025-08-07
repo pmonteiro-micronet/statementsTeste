@@ -38,6 +38,7 @@ model properties {
   emailSubject     String?           @default("") @db.VarChar(255)
   privacyPolicyEN  String?           @default("") @db.VarChar(1000)
   privacyPolicyPT  String?           @default("") @db.VarChar(1000)
+  hasRoomCloud     Boolean           @default(false)
   usersProperties  usersProperties[]
 }
 
@@ -160,4 +161,24 @@ model registrationRecords {
   seen            Boolean?
   uniqueKey       String?   @db.VarChar(255)
   seenAt          DateTime? @db.DateTime(0)
+}
+
+model roomCloud {
+  id         Int     @id @default(autoincrement())
+  username   String? @default("") @db.VarChar(200)
+  password   String? @default("") @db.VarChar(255)
+  hotelID    String? @default("") @db.VarChar(50)
+  propertyID Int?    @unique(map: "propertyID") @default(-1)
+}
+
+model roomCloudPropUsers {
+  id         Int @id @default(autoincrement())
+  userID     Int @default(-1)
+  propertyID Int @default(-1)
+}
+
+model stayPropUsers {
+  id         Int @id @default(autoincrement())
+  userID     Int @default(-1)
+  propertyID Int @default(-1)
 }

@@ -407,6 +407,19 @@
                     "Phone": "Teléfono",
                     "Email": "Correo electrónico"
                 }
+            },
+            "roomCloud": {
+                "hasRoomCloud": "¿Tiene RoomCloud?",
+                "title1": "Configurar cuenta de RoomCloud",
+                "username": "Nombre de usuario",
+                "password": "Contraseña",
+                "hotelID": "ID del hotel"
+            },
+            "searchUsers": {
+                "search": "Buscar...",
+                "noResults": "No se encontraron usuarios.",
+                "userList": "Lista de usuarios",
+                "close": "Cerrar"
             }
         },
         "companyInfo": {
@@ -442,10 +455,10 @@
             "issue": "emisión"
         },
         "Address": {
-            "title":"Informacíon de direccíon" ,
+            "title": "Informacíon de direccíon",
             "country": "País",
             "streetAdress": "Direccíon",
-            "zipCode":"Código Postal",
+            "zipCode": "Código Postal",
             "city": "Ciudad",
             "SPR": "Estado/Provincia/Regíon"
         }

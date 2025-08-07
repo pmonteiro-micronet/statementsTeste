@@ -4,21 +4,24 @@ import { useRef } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import axios from "axios";
-import { Tabs, Tab } from "@heroui/react";
 // import { useRouter } from 'next/navigation';
 
 import { FaGripLines } from "react-icons/fa";
 import { IoCopy } from "react-icons/io5";
+import { FaUsers } from "react-icons/fa";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../public/locales/espanol/common.json";
+
+import { MdKeyboardArrowLeft } from "react-icons/md";
 
 const translations = { en, pt, es };
 
 const PropertiesEditForm = ({
     hotel,
     hotelTerms,
+    roomCloud,
     onClose,
     formTypeModal
 }) => {
@@ -72,7 +75,7 @@ const PropertiesEditForm = ({
     const [showVariablesbar, setShowVariablesbar] = useState(false);
     const [hoveredVar, setHoveredVar] = useState(null);
 
-    const [activeTab, setActiveTab] = useState("propertyDetails");
+    // const [activeTab, setActiveTab] = useState("propertyDetails");
     const [showTemplatesModal, setShowTemplatesModal] = useState(false);
 
     const [smallTab, setSmallTab] = useState("details"); // ou "reviews" como valor inicial
@@ -122,9 +125,9 @@ const PropertiesEditForm = ({
     // }, [propertyID]);
 
     const [hasRoomCloud, setHasRoomCloud] = useState(hotel.hasRoomCloud || false);
-    const [roomCloudUsername, setRoomCloudUsername] = useState(hotel.roomCloudUsername || "");
-    const [roomCloudPassword, setRoomCloudPassword] = useState(hotel.roomCloudPassword || "");
-    const [roomCloudHotelID, setRoomCloudHotelID] = useState(hotel.roomCloudHotelID || "");
+    const [roomCloudUsername, setRoomCloudUsername] = useState(roomCloud[0]?.username || "");
+    const [roomCloudPassword, setRoomCloudPassword] = useState(roomCloud[0]?.password || "");
+    const [roomCloudHotelID, setRoomCloudHotelID] = useState(roomCloud[0]?.hotelID || "");
 
     const [locale, setLocale] = useState("pt");
 
@@ -144,6 +147,10 @@ const PropertiesEditForm = ({
             setError("Please fill in all fields.");
             return;
         }
+
+        const roomCloudValue = !!hasRoomCloud;
+        const hasStayValue = !!hasStay;
+
 
         try {
             setLoading(true);
@@ -168,6 +175,7 @@ const PropertiesEditForm = ({
                 hotelNIF,
                 passeIni,
                 pdfFilePath,
+                hasStay: hasStayValue,
                 replyEmail,
                 replyPassword,
                 sendingServer,
@@ -175,10 +183,22 @@ const PropertiesEditForm = ({
                 emailSubject,
                 emailBody,
                 infoEmail,
+                hasRoomCloud: roomCloudValue
             });
 
             // Se a propriedade foi atualizada com sucesso, salva os termos
             if (response.status === 200) {
+                const roomCloudResponse = await axios.post(`/api/properties/roomCloud`, {
+                    propertyID: hotel.propertyID,
+                    roomCloudUsername,
+                    roomCloudPassword,
+                    roomCloudHotelID
+                });
+
+                if (![200, 201].includes(roomCloudResponse.status)) {
+                    throw new Error(`Failed to save RoomCloud data. Status: ${roomCloudResponse.status}`);
+                }
+
                 const hotelTermsResponse = await axios.post(`/api/properties/hotelTerms`, {
                     propertyID: hotel.propertyID,
                     termsAndCondEN: hotelTermsEN,
@@ -450,6 +470,192 @@ const PropertiesEditForm = ({
         setShowTemplatesModal(false); // fecha modal após seleção
     };
 
+    const [activeSection, setActiveSection] = useState(null); // null = menu principal
+    const [activeStayTab, setActiveStayTab] = useState("settings");
+    const [isRoomCloudUserModalOpen, setIsRoomCloudUserModalOpen] = useState(false);
+    const [isStayUserModalOpen, setIsStayUserModalOpen] = useState(false);
+    const [associatedRoomCloudUserIDs, setAssociatedRoomCloudUserIDs] = useState(false);
+    const [associatedStayUserIDs, setAssociatedStayUserIDs] = useState(false);
+
+
+
+    const [roomCloudUserData, setRoomCloudUserData] = useState([]);
+    const [stayUserData, setStayUserData] = useState([]);
+
+
+    const goBack = () => setActiveSection(null);
+
+
+    const handleOpenRoomCloudUserModal = async () => {
+        try {
+            // Busca lista de usuários
+            const responseUsers = await axios.get("/api/user");
+            const users = Array.isArray(responseUsers.data.response) ? responseUsers.data.response : [];
+
+            // Busca associações user-property
+            const responseAssociations = await axios.get("/api/properties/roomCloudPropUsers");
+
+            // ⬅️ Aqui está a correção:
+            const associations = Array.isArray(responseAssociations.data.response)
+                ? responseAssociations.data.response
+                : [];
+
+            setRoomCloudUserData(users);
+
+            // Filtra as associações do hotel atual
+            const filteredAssociations = associations.filter(
+                (assoc) => assoc.propertyID === hotel.propertyID
+            );
+
+            // Salva os userIDs associados (para marcar checkbox depois)
+            const associatedIdsSet = new Set(filteredAssociations.map((a) => a.userID));
+            setAssociatedRoomCloudUserIDs(associatedIdsSet);
+
+            setIsRoomCloudUserModalOpen(true);
+        } catch (error) {
+            console.error("Erro ao buscar usuários e associações:", error);
+            setRoomCloudUserData([]);
+            setAssociatedRoomCloudUserIDs(new Set());
+            setIsRoomCloudUserModalOpen(true);
+        }
+    };
+
+    const [searchRoomCloudTerm, setSearchRoomCloudTerm] = useState("");
+
+    const filteredRoomCloudUsers = roomCloudUserData.filter((user) =>
+        `${user.firstName} ${user.secondName}`
+            .toLowerCase()
+            .includes(searchRoomCloudTerm.toLowerCase())
+    );
+
+    const handleOpenStayUserModal = async () => {
+        try {
+            // Busca lista de usuários
+            const responseUsers = await axios.get("/api/user");
+            const users = Array.isArray(responseUsers.data.response) ? responseUsers.data.response : [];
+
+            // Busca associações user-property
+            const responseAssociations = await axios.get("/api/properties/stayPropUsers");
+
+            // ⬅️ Aqui está a correção:
+            const associations = Array.isArray(responseAssociations.data.response)
+                ? responseAssociations.data.response
+                : [];
+
+            setStayUserData(users);
+
+            // Filtra as associações do hotel atual
+            const filteredAssociations = associations.filter(
+                (assoc) => assoc.propertyID === hotel.propertyID
+            );
+
+            // Salva os userIDs associados (para marcar checkbox depois)
+            const associatedIdsSet = new Set(filteredAssociations.map((a) => a.userID));
+            setAssociatedStayUserIDs(associatedIdsSet);
+
+            setIsStayUserModalOpen(true);
+        } catch (error) {
+            console.error("Erro ao buscar usuários e associações:", error);
+            setStayUserData([]);
+            setAssociatedStayUserIDs(new Set());
+            setIsStayUserModalOpen(true);
+        }
+    };
+
+    const [searchStayTerm, setSearchStayTerm] = useState("");
+
+    const filteredStayUsers = stayUserData.filter((user) =>
+        `${user.firstName} ${user.secondName}`
+            .toLowerCase()
+            .includes(searchStayTerm.toLowerCase())
+    );
+
+    const handleRoomCloudUserCheckboxClick = async (userID, checked) => {
+        const payload = {
+            userID,
+            propertyID: hotel.propertyID,
+        };
+
+        // Atualiza UI de forma otimista
+        setAssociatedRoomCloudUserIDs(prev => {
+            const updated = new Set(prev);
+            if (checked) {
+                updated.add(userID);
+            } else {
+                updated.delete(userID);
+            }
+            return updated;
+        });
+
+        try {
+            if (checked) {
+                const response = await axios.put("/api/properties/roomCloudPropUsers", payload);
+                console.log("Usuário adicionado:", response.data);
+            } else {
+                const response = await axios.delete("/api/properties/roomCloudPropUsers", {
+                    data: payload, // necessário com DELETE + body
+                });
+                console.log("Usuário removido:", response.data);
+            }
+        } catch (error) {
+            console.error("Erro ao atualizar usuário:", error);
+
+            // Desfaz otimisticamente se deu erro
+            setAssociatedRoomCloudUserIDs(prev => {
+                const updated = new Set(prev);
+                if (checked) {
+                    updated.delete(userID);
+                } else {
+                    updated.add(userID);
+                }
+                return updated;
+            });
+        }
+    };
+
+    const handleStayUserCheckboxClick = async (userID, checked) => {
+        const payload = {
+            userID,
+            propertyID: hotel.propertyID,
+        };
+
+        // Atualiza UI de forma otimista
+        setAssociatedStayUserIDs(prev => {
+            const updated = new Set(prev);
+            if (checked) {
+                updated.add(userID);
+            } else {
+                updated.delete(userID);
+            }
+            return updated;
+        });
+
+        try {
+            if (checked) {
+                const response = await axios.put("/api/properties/stayPropUsers", payload);
+                console.log("Usuário adicionado:", response.data);
+            } else {
+                const response = await axios.delete("/api/properties/stayPropUsers", {
+                    data: payload, // necessário com DELETE + body
+                });
+                console.log("Usuário removido:", response.data);
+            }
+        } catch (error) {
+            console.error("Erro ao atualizar usuário:", error);
+
+            // Desfaz otimisticamente se deu erro
+            setAssociatedStayUserIDs(prev => {
+                const updated = new Set(prev);
+                if (checked) {
+                    updated.delete(userID);
+                } else {
+                    updated.add(userID);
+                }
+                return updated;
+            });
+        }
+    };
+
     return (
         <>
             {formTypeModal === 11 && (
@@ -475,149 +681,214 @@ const PropertiesEditForm = ({
                                 </Button>
                             </ModalHeader>
                             <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor">
-                                <Tabs aria-label="Options" className="flex justify-center" selectedKey={activeTab} onSelectionChange={setActiveTab}>
-                                    <Tab key="propertyDetails" title={t.modals.propertiesEdit.propertyDetails}>
-                                        <div className="-mt-4 flex flex-col gap-2">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.propertyName}</label>
+                                {/* ✅ Se não tem seção ativa, mostra as opções */}
+                                {activeSection === null && (
+                                    <div className="flex flex-row gap-4 justify-center mt-4">
+                                        <div
+                                            className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 flex justify-center hover:bg-primary hover:text-white"
+                                            onClick={() => setActiveSection("propertyDetails")}
+                                        >
+                                            {t.modals.propertiesEdit.propertyDetails}
+                                        </div>
+
+                                        <div
+                                            className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 flex justify-center hover:bg-primary hover:text-white"
+                                            onClick={() => setActiveSection("hotelDetails")}
+                                        >
+                                            {t.modals.createProperty.hotelDetails}
+                                        </div>
+
+                                        {hasStay && (
+                                            <div
+                                                className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 flex justify-center hover:bg-primary hover:text-white"
+                                                onClick={() => setActiveSection("stay")}
+                                            >
+                                                Stay
+                                            </div>
+                                        )}
+
+                                        {hasRoomCloud && (
+                                            <div
+                                                className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 flex justify-center hover:bg-primary hover:text-white"
+                                                onClick={() => setActiveSection("ota")}
+                                            >
+                                                OTA
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {activeSection === "propertyDetails" && (
+                                    <div className="flex flex-col gap-2 p-4">
+                                        {/* Botão voltar */}
+                                        <button onClick={goBack} className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+                                            <MdKeyboardArrowLeft size={18} />
+                                        </button>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.propertyName}</label>
+                                            <input
+                                                type="text"
+                                                value={propertyName}
+                                                onChange={(e) => setPropertyName(e.target.value)}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                            />
+                                        </div>
+                                        <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                            <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.propertyTag}</label>
                                                 <input
                                                     type="text"
-                                                    value={propertyName}
-                                                    onChange={(e) => setPropertyName(e.target.value)}
+                                                    value={propertyTag}
+                                                    onChange={(e) => setPropertyTag(e.target.value)}
                                                     className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                     disabled={!isEditing} // Desabilita o campo quando não está em edição
                                                 />
                                             </div>
-                                            {/* <div>
-                                    <label className="block text-sm font-medium text-gray-400">{"Connection String:"}</label>
-                                    <input
-                                        type="text"
-                                        value={propertyConnectionString}
-                                        onChange={(e) => setPropertyConnectionString(e.target.value)}
-                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                    />
-                                </div> */}
-                                            <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
-                                                <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.propertyTag}</label>
+                                            <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.mpeHotel}</label>
+                                                <input
+                                                    type="text"
+                                                    value={mpehotel}
+                                                    onChange={(e) => setmpehotel(e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                    disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                            <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.propertyServer}</label>
+                                                <input
+                                                    type="text"
+                                                    value={propertyServer}
+                                                    onChange={(e) => setPropertyServer(e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                    disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                />
+                                            </div>
+                                            <div className="flex flex-row w-1/2 gap-4"> {/* Cada campo ocupa metade do espaço */}
+                                                <div className="flex flex-col w-1/2">
+                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.extensionsPort}</label>
                                                     <input
                                                         type="text"
-                                                        value={propertyTag}
-                                                        onChange={(e) => setPropertyTag(e.target.value)}
+                                                        value={propertyPort}
+                                                        onChange={(e) => setPropertyPort(e.target.value)}
                                                         className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                         disabled={!isEditing} // Desabilita o campo quando não está em edição
                                                     />
                                                 </div>
-                                                <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.mpeHotel}</label>
+                                                <div className="flex flex-col w-1/2">
+                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stayPort}</label>
                                                     <input
                                                         type="text"
-                                                        value={mpehotel}
-                                                        onChange={(e) => setmpehotel(e.target.value)}
+                                                        value={propertyPortStay}
+                                                        onChange={(e) => setPropertyPortStay(e.target.value)}
                                                         className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                         disabled={!isEditing} // Desabilita o campo quando não está em edição
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
-                                                <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.propertyServer}</label>
-                                                    <input
-                                                        type="text"
-                                                        value={propertyServer}
-                                                        onChange={(e) => setPropertyServer(e.target.value)}
-                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                    />
-                                                </div>
-                                                <div className="flex flex-row w-1/2 gap-4"> {/* Cada campo ocupa metade do espaço */}
-                                                    <div className="flex flex-col w-1/2">
-                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.extensionsPort}</label>
-                                                        <input
-                                                            type="text"
-                                                            value={propertyPort}
-                                                            onChange={(e) => setPropertyPort(e.target.value)}
-                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                        />
-                                                    </div>
-                                                    <div className="flex flex-col w-1/2">
-                                                        <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stayPort}</label>
-                                                        <input
-                                                            type="text"
-                                                            value={propertyPortStay}
-                                                            onChange={(e) => setPropertyPortStay(e.target.value)}
-                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                        />
-                                                    </div>
-                                                </div>
 
+                                        </div>
+                                        <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
+                                            <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.iniPath}</label>
+                                                <input
+                                                    type="text"
+                                                    value={passeIni}
+                                                    onChange={(e) => setPasseIni(e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                    disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                />
                                             </div>
-                                            <div className="flex flex-row w-full gap-4"> {/* Usa flex-row para exibir os itens lado a lado */}
-                                                <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.iniPath}</label>
-                                                    <input
-                                                        type="text"
-                                                        value={passeIni}
-                                                        onChange={(e) => setPasseIni(e.target.value)}
-                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                    />
-                                                </div>
-                                                <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
-                                                    <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.pdfFile}</label>
-                                                    <input
-                                                        type="text"
-                                                        value={pdfFilePath}
-                                                        onChange={(e) => setPdfFilePath(e.target.value)}
-                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                    />
-                                                </div>
+                                            <div className="flex flex-col w-1/2"> {/* Cada campo ocupa metade do espaço */}
+                                                <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.pdfFile}</label>
+                                                <input
+                                                    type="text"
+                                                    value={pdfFilePath}
+                                                    onChange={(e) => setPdfFilePath(e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                    disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                />
                                             </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelImage}</label>
-                                                <div className="flex flex-col gap-2">
-                                                    <input
-                                                        type="file"
-                                                        accept="image/png" // Aceita apenas arquivos PNG
-                                                        onChange={handleImageChange}
-                                                        className="block w-full text-sm text-gray-500
+                                        </div>
+                                        <div className="flex flex-row gap-4 mb-4">
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    id="hasStay"
+                                                    checked={hasStay}
+                                                    onChange={(e) => setHasStay(e.target.checked)}
+                                                    disabled={!isEditing}
+                                                    className="accent-primary"
+                                                />
+                                                <label htmlFor="hasStay" className="text-sm text-gray-600">
+                                                    Tem stay?
+                                                </label>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    id="hasRoomCloud"
+                                                    checked={hasRoomCloud}
+                                                    onChange={(e) => setHasRoomCloud(e.target.checked)}
+                                                    disabled={!isEditing}
+                                                    className="accent-primary"
+                                                />
+                                                <label htmlFor="hasRoomCloud" className="text-sm text-gray-600">
+                                                    Tem RoomCloud?
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelImage}</label>
+                                            <div className="flex flex-col gap-2">
+                                                <input
+                                                    type="file"
+                                                    accept="image/png" // Aceita apenas arquivos PNG
+                                                    onChange={handleImageChange}
+                                                    className="block w-full text-sm text-gray-500
                                             file:mr-4 file:py-2 file:px-4
                                             file:rounded file:border-0
                                             file:text-sm file:font-semibold
                                             file:bg-primary file:text-white
                                             hover:file:bg-primary-dark"
+                                                />
+                                                {selectedImage && (
+                                                    <div className="flex items-center gap-2">
+                                                        <p className="text-sm text-gray-700">{t.modals.propertiesEdit.selected} {selectedImage.name}</p>
+                                                        <Button
+                                                            color="primary"
+                                                            onClick={handleImageUpload}
+                                                            disabled={loading}
+                                                        >
+                                                            {loading ? "Uploading..." : "Upload"}
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                                {imageUrl && (
+                                                    <img
+                                                        src={imageUrl}
+                                                        alt="Current Hotel"
+                                                        className="mt-4 w-20 h-20 rounded shadow -mb-8"
                                                     />
-                                                    {selectedImage && (
-                                                        <div className="flex items-center gap-2">
-                                                            <p className="text-sm text-gray-700">{t.modals.propertiesEdit.selected} {selectedImage.name}</p>
-                                                            <Button
-                                                                color="primary"
-                                                                onClick={handleImageUpload}
-                                                                disabled={loading}
-                                                            >
-                                                                {loading ? "Uploading..." : "Upload"}
-                                                            </Button>
-                                                        </div>
-                                                    )}
-                                                    {imageUrl && (
-                                                        <img
-                                                            src={imageUrl}
-                                                            alt="Current Hotel"
-                                                            className="mt-4 w-20 h-20 rounded shadow -mb-8"
-                                                        />
-                                                    )}
-                                                </div>
+                                                )}
                                             </div>
                                         </div>
-                                    </Tab>
-                                    <Tab key="hotelDetails" title="Hotel Details">
-                                        {/* Abas de raiz menores após a principal */}
+                                    </div>
+                                )}
+
+                                {activeSection === "hotelDetails" && (
+                                    <div className="flex flex-col gap-2 p-4">
+                                        {/* Botão voltar */}
+                                        <button onClick={goBack} className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+                                            <MdKeyboardArrowLeft size={18} />
+                                        </button>
+
                                         <div className="-mt-4">
-                                            <div className="flex space-x-2 text-sm">
+                                            <div className="flex space-x-2 text-sm justify-center">
                                                 <button
                                                     onClick={() => setSmallTab("details")}
                                                     className={`px-3 py-1 rounded-md border ${smallTab === "details" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"
@@ -906,9 +1177,33 @@ const PropertiesEditForm = ({
                                                 }
                                             </div>
                                         </div>
-                                    </Tab>
-                                    {hasStay && (
-                                        <Tab key="stay" title="Stay">
+                                    </div>
+                                )}
+
+                                {activeSection === "stay" && (
+                                    <div className="flex flex-col gap-2 p-4">
+                                        {/* Botão voltar */}
+                                        <button onClick={goBack} className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+                                            <MdKeyboardArrowLeft size={18} />
+                                        </button>
+                                        <div className="flex justify-between items-center mb-4 text-sm gap-2 -mt-4">
+                                            <div className="flex flex-row gap-2">
+                                            <button
+                                                className={`px-3 py-1 rounded-md border ${activeStayTab === "settings" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
+                                                onClick={() => setActiveStayTab("settings")}
+                                            >
+                                                Settings
+                                            </button>
+                                            <button
+                                                className={`px-3 py-1 rounded-md border  ${activeStayTab === "email" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
+                                                onClick={() => setActiveStayTab("email")}
+                                            >
+                                                Email Settings
+                                            </button>
+                                            </div>
+                                            <FaUsers size={15} className="cursor-pointer" onClick={handleOpenStayUserModal} />
+                                        </div>
+                                        {activeStayTab === "settings" && (
                                             <div>
                                                 <p className="bg-gray-200 p-1 mb-2">{t.modals.propertiesEdit.stay.sendSMTP}</p>
                                                 <div className="flex flex-row gap-2 w-full">
@@ -968,189 +1263,296 @@ const PropertiesEditForm = ({
 
                                                 </div>
                                             </div>
-                                        </Tab>
-                                    )}
-                                    {hasStay && (
-                                        <Tab key="stayEmail" title="Stay Email">
-                                            <p className="bg-gray-200 p-1 -mt-4 mb-2">{t.modals.propertiesEdit.stay.email}</p>
-                                            <div className="w-1/2 flex flex-col text-xs">
-                                                <p>{t.modals.propertiesEdit.stay.emailSubject}</p>
-                                                <input
-                                                    ref={subjectInputRef}
-                                                    type="text"
-                                                    value={emailSubject}
-                                                    onChange={(e) => setEmailSubject(e.target.value)}
-                                                    onDoubleClick={handleDoubleClickSubject}
-                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                    disabled={!isEditing}
-                                                />
-                                            </div>
-                                            {/* Botão de Negrito */}
-                                            <div className="mt-2">
-                                                <button
-                                                    type="button"
-                                                    className={`px-2 py-1 rounded-md text-xs font-bold border ${selectedBold ? 'bg-[#FC9D25] text-white border-[#FC9D25]' : 'bg-transparent text-[#FC9D25] border-[#FC9D25]'
-                                                        }`}
-                                                    onClick={handleBoldClick}
-                                                >
-                                                    B
-                                                </button>
-                                            </div>
-                                            <div className="w-full flex flex-col text-xs mt-2 -mb-8">
-                                                <div className="flex flex-row justify-between items-center mb-1 cursor-pointer">
-                                                    <div>
-                                                        <p>{t.modals.propertiesEdit.stay.emailBody}</p>
-                                                    </div>
-                                                    <div className="flex flex-row gap-2 items-center hover:text-blue-600">
-                                                        <p onClick={() => setShowTemplatesModal(true)} className="cursor-pointer">Templates</p>
-                                                        <div
-                                                            className="bg-[#FC9D25] p-1 rounded-lg"
-                                                            onClick={() => setShowVariablesbar(!showVariablesbar)}
-                                                        >
-                                                            <FaGripLines color="white" size={15} />
-                                                        </div>
-                                                    </div>
+                                        )}
+
+                                        {activeStayTab === "email" && (
+                                            <div>
+                                                <p className="bg-gray-200 p-1 -mt-4 mb-2">{t.modals.propertiesEdit.stay.email}</p>
+                                                <div className="w-1/2 flex flex-col text-xs">
+                                                    <p>{t.modals.propertiesEdit.stay.emailSubject}</p>
+                                                    <input
+                                                        ref={subjectInputRef}
+                                                        type="text"
+                                                        value={emailSubject}
+                                                        onChange={(e) => setEmailSubject(e.target.value)}
+                                                        onDoubleClick={handleDoubleClickSubject}
+                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                        disabled={!isEditing}
+                                                    />
                                                 </div>
-                                                <textarea
-                                                    ref={textareaRef}
-                                                    onDoubleClick={handleDoubleClick}
-                                                    value={emailBody}
-                                                    onChange={(e) => setEmailBody(e.target.value)}
-                                                    onSelect={handleSelectionChange}
-                                                    className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none resize-none"
-                                                    disabled={!isEditing}
-                                                />
-                                            </div>
-                                            {showVariablesbar && (
-                                                <div className="fixed top-0 right-0 h-full w-72 bg-white shadow-lg p-4 z-50 flex flex-col">
-                                                    <div className="flex justify-between items-center mb-4 flex-shrink-0">
-                                                        <h2 className="text-sm font-bold">{t.modals.propertiesEdit.stay.displayedElements}</h2>
-                                                        <button onClick={() => setShowVariablesbar(false)} className="text-gray-500 text-lg">&times;</button>
-                                                    </div>
-
-                                                    <div className="flex-shrink-0 font-bold flex justify-between border-b pb-1 mb-2 text-xs">
-                                                        <span>{t.modals.propertiesEdit.stay.variable}</span>
-                                                        <span>{t.modals.propertiesEdit.stay.description}</span>
-                                                    </div>
-
-                                                    <div className="flex-grow overflow-y-auto text-xs space-y-6">
-                                                        {/* Detalhes do hóspede */}
-                                                        <div>
-                                                            <h3 className="font-semibold mb-2">{t.modals.propertiesEdit.stay.guestDetails.title}</h3>
-                                                            <ul className="space-y-2">
-                                                                {guestDetails.map(({ key, desc }) => (
-                                                                    <li key={key} className="flex justify-between">
-                                                                        <span
-                                                                            className="flex items-center cursor-pointer hover:text-[#FC9D25] space-x-1"
-                                                                            onClick={() => copyToClipboard(key)}
-                                                                            onMouseEnter={() => setHoveredVar(key)}
-                                                                            onMouseLeave={() => setHoveredVar(null)}
-                                                                            title="Clique para copiar"
-                                                                        >
-                                                                            <span>{key}</span>
-                                                                            {hoveredVar === key && <IoCopy size={16} />}
-                                                                        </span>
-                                                                        <span>{desc}</span>
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        </div>
-
-                                                        {/* Detalhes da reserva */}
-                                                        <div>
-                                                            <h3 className="font-semibold mb-2">{t.modals.propertiesEdit.stay.reservationDetails.title}</h3>
-                                                            <ul className="space-y-2">
-                                                                {reservationDetails.map(({ key, desc }) => (
-                                                                    <li key={key} className="flex justify-between">
-                                                                        <span
-                                                                            className="flex items-center cursor-pointer hover:text-[#FC9D25] space-x-1"
-                                                                            onClick={() => copyToClipboard(key)}
-                                                                            onMouseEnter={() => setHoveredVar(key)}
-                                                                            onMouseLeave={() => setHoveredVar(null)}
-                                                                            title="Clique para copiar"
-                                                                        >
-                                                                            <span>{key}</span>
-                                                                            {hoveredVar === key && <IoCopy size={16} />}
-                                                                        </span>
-                                                                        <span>{desc}</span>
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        </div>
-
-                                                        {/* Detalhes do hotel */}
-                                                        <div>
-                                                            <h3 className="font-semibold mb-2">{t.modals.propertiesEdit.stay.hotelDetails.title}</h3>
-                                                            <ul className="space-y-2">
-                                                                {hotelDetails.map(({ key, desc }) => (
-                                                                    <li key={key} className="flex justify-between">
-                                                                        <span
-                                                                            className="flex items-center cursor-pointer hover:text-[#FC9D25] space-x-1"
-                                                                            onClick={() => copyToClipboard(key)}
-                                                                            onMouseEnter={() => setHoveredVar(key)}
-                                                                            onMouseLeave={() => setHoveredVar(null)}
-                                                                            title="Clique para copiar"
-                                                                        >
-                                                                            <span>{key}</span>
-                                                                            {hoveredVar === key && <IoCopy size={16} />}
-                                                                        </span>
-                                                                        <span>{desc}</span>
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        </div>
-                                                    </div>
+                                                {/* Botão de Negrito */}
+                                                <div className="mt-2">
+                                                    <button
+                                                        type="button"
+                                                        className={`px-2 py-1 rounded-md text-xs font-bold border ${selectedBold ? 'bg-[#FC9D25] text-white border-[#FC9D25]' : 'bg-transparent text-[#FC9D25] border-[#FC9D25]'
+                                                            }`}
+                                                        onClick={handleBoldClick}
+                                                    >
+                                                        B
+                                                    </button>
                                                 </div>
-                                            )}
-                                            {showTemplatesModal && (
-                                                <div className="fixed top-0 right-0 h-full w-72 bg-white shadow-lg p-4 z-50 flex flex-col overflow-auto">
-                                                    <div className="flex justify-between items-center mb-4">
-                                                        <h2 className="text-sm font-bold">Templates</h2>
-                                                        <button
-                                                            onClick={() => setShowTemplatesModal(false)}
-                                                            className="text-gray-500 text-lg"
-                                                        >
-                                                            &times;
-                                                        </button>
+                                                <div className="w-full flex flex-col text-xs mt-2 -mb-8">
+                                                    <div className="flex flex-row justify-between items-center mb-1 cursor-pointer">
+                                                        <div>
+                                                            <p>{t.modals.propertiesEdit.stay.emailBody}</p>
+                                                        </div>
+                                                        <div className="flex flex-row gap-2 items-center hover:text-blue-600">
+                                                            <p onClick={() => setShowTemplatesModal(true)} className="cursor-pointer">Templates</p>
+                                                            <div
+                                                                className="bg-[#FC9D25] p-1 rounded-lg"
+                                                                onClick={() => setShowVariablesbar(!showVariablesbar)}
+                                                            >
+                                                                <FaGripLines color="white" size={15} />
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div className="text-xs flex flex-col gap-2">
-                                                        {templates.length > 0 ? (
-                                                            templates.map((template) => (
-                                                                <div
-                                                                    key={template.templateID}
-                                                                    onClick={() => handleSelectTemplate(template)}
-                                                                    className="cursor-pointer p-2 border rounded hover:bg-gray-100"
-                                                                >
-                                                                    <strong>Template #{template.templateID}</strong>
-                                                                    <p className="text-gray-600 text-xs truncate">{template.emailSubject}</p>
-                                                                </div>
-                                                            ))
+                                                    <textarea
+                                                        ref={textareaRef}
+                                                        onDoubleClick={handleDoubleClick}
+                                                        value={emailBody}
+                                                        onChange={(e) => setEmailBody(e.target.value)}
+                                                        onSelect={handleSelectionChange}
+                                                        className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none resize-none"
+                                                        disabled={!isEditing}
+                                                    />
+                                                </div>
+                                                {showVariablesbar && (
+                                                    <div className="fixed top-0 right-0 h-full w-72 bg-white shadow-lg p-4 z-50 flex flex-col">
+                                                        <div className="flex justify-between items-center mb-4 flex-shrink-0">
+                                                            <h2 className="text-sm font-bold">{t.modals.propertiesEdit.stay.displayedElements}</h2>
+                                                            <button onClick={() => setShowVariablesbar(false)} className="text-gray-500 text-lg">&times;</button>
+                                                        </div>
+
+                                                        <div className="flex-shrink-0 font-bold flex justify-between border-b pb-1 mb-2 text-xs">
+                                                            <span>{t.modals.propertiesEdit.stay.variable}</span>
+                                                            <span>{t.modals.propertiesEdit.stay.description}</span>
+                                                        </div>
+
+                                                        <div className="flex-grow overflow-y-auto text-xs space-y-6">
+                                                            {/* Detalhes do hóspede */}
+                                                            <div>
+                                                                <h3 className="font-semibold mb-2">{t.modals.propertiesEdit.stay.guestDetails.title}</h3>
+                                                                <ul className="space-y-2">
+                                                                    {guestDetails.map(({ key, desc }) => (
+                                                                        <li key={key} className="flex justify-between">
+                                                                            <span
+                                                                                className="flex items-center cursor-pointer hover:text-[#FC9D25] space-x-1"
+                                                                                onClick={() => copyToClipboard(key)}
+                                                                                onMouseEnter={() => setHoveredVar(key)}
+                                                                                onMouseLeave={() => setHoveredVar(null)}
+                                                                                title="Clique para copiar"
+                                                                            >
+                                                                                <span>{key}</span>
+                                                                                {hoveredVar === key && <IoCopy size={16} />}
+                                                                            </span>
+                                                                            <span>{desc}</span>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+
+                                                            {/* Detalhes da reserva */}
+                                                            <div>
+                                                                <h3 className="font-semibold mb-2">{t.modals.propertiesEdit.stay.reservationDetails.title}</h3>
+                                                                <ul className="space-y-2">
+                                                                    {reservationDetails.map(({ key, desc }) => (
+                                                                        <li key={key} className="flex justify-between">
+                                                                            <span
+                                                                                className="flex items-center cursor-pointer hover:text-[#FC9D25] space-x-1"
+                                                                                onClick={() => copyToClipboard(key)}
+                                                                                onMouseEnter={() => setHoveredVar(key)}
+                                                                                onMouseLeave={() => setHoveredVar(null)}
+                                                                                title="Clique para copiar"
+                                                                            >
+                                                                                <span>{key}</span>
+                                                                                {hoveredVar === key && <IoCopy size={16} />}
+                                                                            </span>
+                                                                            <span>{desc}</span>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+
+                                                            {/* Detalhes do hotel */}
+                                                            <div>
+                                                                <h3 className="font-semibold mb-2">{t.modals.propertiesEdit.stay.hotelDetails.title}</h3>
+                                                                <ul className="space-y-2">
+                                                                    {hotelDetails.map(({ key, desc }) => (
+                                                                        <li key={key} className="flex justify-between">
+                                                                            <span
+                                                                                className="flex items-center cursor-pointer hover:text-[#FC9D25] space-x-1"
+                                                                                onClick={() => copyToClipboard(key)}
+                                                                                onMouseEnter={() => setHoveredVar(key)}
+                                                                                onMouseLeave={() => setHoveredVar(null)}
+                                                                                title="Clique para copiar"
+                                                                            >
+                                                                                <span>{key}</span>
+                                                                                {hoveredVar === key && <IoCopy size={16} />}
+                                                                            </span>
+                                                                            <span>{desc}</span>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {showTemplatesModal && (
+                                                    <div className="fixed top-0 right-0 h-full w-72 bg-white shadow-lg p-4 z-50 flex flex-col overflow-auto">
+                                                        <div className="flex justify-between items-center mb-4">
+                                                            <h2 className="text-sm font-bold">Templates</h2>
+                                                            <button
+                                                                onClick={() => setShowTemplatesModal(false)}
+                                                                className="text-gray-500 text-lg"
+                                                            >
+                                                                &times;
+                                                            </button>
+                                                        </div>
+                                                        <div className="text-xs flex flex-col gap-2">
+                                                            {templates.length > 0 ? (
+                                                                templates.map((template) => (
+                                                                    <div
+                                                                        key={template.templateID}
+                                                                        onClick={() => handleSelectTemplate(template)}
+                                                                        className="cursor-pointer p-2 border rounded hover:bg-gray-100"
+                                                                    >
+                                                                        <strong>Template #{template.templateID}</strong>
+                                                                        <p className="text-gray-600 text-xs truncate">{template.emailSubject}</p>
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <p>Nenhum template encontrado.</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}{/* Modal simples */}
+                                        {isStayUserModalOpen && (
+                                            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                                                <div className="bg-white p-4 rounded w-96 h-96 flex flex-col">
+                                                    <h2 className="text-lg font-bold mb-2">{t.modals.propertiesEdit.searchUsers.userList}</h2>
+
+                                                    {/* Campo de busca */}
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Pesquisar usuário..."
+                                                        className="border border-gray-300 rounded px-2 py-1 mb-2 text-sm"
+                                                        value={searchStayTerm}
+                                                        onChange={(e) => setSearchStayTerm(e.target.value)}
+                                                    />
+
+                                                    {/* Lista com scroll se for maior que o tamanho do modal */}
+                                                    <div className="flex-1 overflow-y-auto">
+                                                        {filteredStayUsers.length > 0 ? (
+                                                            <div className="flex flex-col gap-2">
+                                                                {filteredStayUsers.map((user, index) => (
+                                                                    <div key={index} className="flex justify-between items-center">
+                                                                        <p>
+                                                                            {user.firstName} {user.secondName}
+                                                                        </p>
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            className="w-5 h-5"
+                                                                            checked={!!associatedStayUserIDs && associatedStayUserIDs.has(user.userID)}
+                                                                            onChange={(e) => handleStayUserCheckboxClick(user.userID, e.target.checked)}
+                                                                        />
+                                                                    </div>
+                                                                ))}
+                                                            </div>
                                                         ) : (
-                                                            <p>Nenhum template encontrado.</p>
+                                                            <p className="text-gray-500 text-sm">{t.modals.propertiesEdit.searchUsers.noResults}</p>
                                                         )}
                                                     </div>
+
+                                                    <button
+                                                        className="mt-4 bg-gray-200 px-4 py-2 rounded"
+                                                        onClick={() => setIsStayUserModalOpen(false)}
+                                                    >
+                                                        {t.modals.propertiesEdit.searchUsers.close}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                )}
+
+                                {activeSection === "ota" && (
+                                    <div className="flex flex-col gap-2 p-4">
+                                        {/* Botão voltar */}
+                                        <button onClick={goBack} className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+                                            <MdKeyboardArrowLeft size={18} />
+                                        </button>
+                                        <div>
+                                            <div className="flex flex-row justify-between items-center mb-4">
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="hasRoomCloud"
+                                                        checked={hasRoomCloud}
+                                                        onChange={(e) => setHasRoomCloud(e.target.checked)}
+                                                        className="w-4 h-4"
+                                                        disabled={!isEditing}
+                                                    />
+                                                    <label htmlFor="hasRoomCloud" className="text-sm">{t.modals.propertiesEdit.roomCloud.hasRoomCloud}</label>
+                                                </div>
+
+                                                <FaUsers size={15} className="cursor-pointer" onClick={handleOpenRoomCloudUserModal} />
+
+                                            </div>
+                                            {/* Modal simples */}
+                                            {isRoomCloudUserModalOpen && (
+                                                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                                                    <div className="bg-white p-4 rounded w-96 h-96 flex flex-col">
+                                                        <h2 className="text-lg font-bold mb-2">{t.modals.propertiesEdit.searchUsers.userList}</h2>
+
+                                                        {/* Campo de busca */}
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Pesquisar usuário..."
+                                                            className="border border-gray-300 rounded px-2 py-1 mb-2 text-sm"
+                                                            value={searchRoomCloudTerm}
+                                                            onChange={(e) => setSearchRoomCloudTerm(e.target.value)}
+                                                        />
+
+                                                        {/* Lista com scroll se for maior que o tamanho do modal */}
+                                                        <div className="flex-1 overflow-y-auto">
+                                                            {filteredRoomCloudUsers.length > 0 ? (
+                                                                <div className="flex flex-col gap-2">
+                                                                    {filteredRoomCloudUsers.map((user, index) => (
+                                                                        <div key={index} className="flex justify-between items-center">
+                                                                            <p>
+                                                                                {user.firstName} {user.secondName}
+                                                                            </p>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                className="w-5 h-5"
+                                                                                checked={!!associatedRoomCloudUserIDs && associatedRoomCloudUserIDs.has(user.userID)}
+                                                                                onChange={(e) => handleRoomCloudUserCheckboxClick(user.userID, e.target.checked)}
+                                                                            />
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            ) : (
+                                                                <p className="text-gray-500 text-sm">{t.modals.propertiesEdit.searchUsers.noResults}</p>
+                                                            )}
+                                                        </div>
+
+                                                        <button
+                                                            className="mt-4 bg-gray-200 px-4 py-2 rounded"
+                                                            onClick={() => setIsRoomCloudUserModalOpen(false)}
+                                                        >
+                                                            {t.modals.propertiesEdit.searchUsers.close}
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             )}
 
-                                        </Tab>
-                                    )}
-                                    <Tab key="ota" title="OTA">
-                                        <div>
-                                            <div className="flex items-center gap-2 -mt-6 mb-2">
-                                                <input
-                                                    type="checkbox"
-                                                    id="hasRoomCloud"
-                                                    checked={hasRoomCloud}
-                                                    onChange={(e) => setHasRoomCloud(e.target.checked)}
-                                                    className="w-4 h-4"
-                                                    disabled={!isEditing}
-                                                />
-                                                <label htmlFor="hasRoomCloud" className="text-sm">Has Room Cloud?</label>
-                                            </div>
-                                            <p className="bg-gray-200 p-1 mb-2">Setup Room Cloud account</p>
+                                            <p className="bg-gray-200 p-1 mb-2">{t.modals.propertiesEdit.roomCloud.title1}</p>
                                             <div className="flex flex-row gap-2 w-full">
                                                 <div className="w-1/3 flex flex-col text-xs">
-                                                    <p>Username</p>
+                                                    <p>{t.modals.propertiesEdit.roomCloud.username}</p>
                                                     <input
                                                         type="text"
                                                         value={roomCloudUsername}
@@ -1160,7 +1562,7 @@ const PropertiesEditForm = ({
                                                     />
                                                 </div>
                                                 <div className="w-1/3 flex flex-col text-xs">
-                                                    <p>Password</p>
+                                                    <p>{t.modals.propertiesEdit.roomCloud.password}</p>
                                                     <input
                                                         type="password"
                                                         value={roomCloudPassword}
@@ -1170,7 +1572,7 @@ const PropertiesEditForm = ({
                                                     />
                                                 </div>
                                                 <div className="w-1/3 flex flex-col text-xs">
-                                                    <p>Hotel ID</p>
+                                                    <p>{t.modals.propertiesEdit.roomCloud.hotelID}</p>
                                                     <input
                                                         type="text"
                                                         value={roomCloudHotelID}
@@ -1181,9 +1583,8 @@ const PropertiesEditForm = ({
                                                 </div>
                                             </div>
                                         </div>
-                                    </Tab>
-                                </Tabs>
-
+                                    </div>
+                                )}
                                 {/* Exibição de erro */}
                                 {error && <p className="text-red-500 text-sm">{error}</p>}
 
