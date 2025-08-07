@@ -423,7 +423,7 @@
             }
         },
         "companyInfo": {
-            "insert": "Criar nova ficha de empresa",
+            "insert": "Empresa",
             "update": "Empresa",
             "companyName": "Nome da empresa:",
             "vatNO": "N.º de contribuinte:",
@@ -436,7 +436,16 @@
             "cancel": "Cancelar",
             "save": "Guardar",
             "edit": "Editar",
-            "countryError": "Erro ao carregar os países."
+            "countryError": "Erro ao carregar os países.",
+            "noResults": "Não foram encontrados resultados.",
+            "newCompany": "Nova empresa",
+            "showCompany": {
+                "companyName": "Nome da Empresa",
+                "vatNo": "NIF",
+                "country": "País",
+                "cancel": "Cancelar",
+                "searchMore": "Pesquisar mais"
+            }
         },
         "userLogout": {
             "title": "Confirmar Terminar Sessão",

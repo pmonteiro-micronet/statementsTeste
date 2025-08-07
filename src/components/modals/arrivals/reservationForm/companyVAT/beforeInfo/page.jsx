@@ -139,13 +139,13 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                                 <ModalBody className="p-0 flex flex-col max-h-[70vh]">
                                     {searchResults.length === 0 ? (
                                         <div className="p-4 flex-grow overflow-auto">
-                                            <div className="">
-                                                <p>No company found.</p>
+                                            <div className="flex flex-col gap-4">
+                                                <p>{t.modals.companyInfo.noResults}</p>
                                                 <Button
                                                     onClick={() => setIsInsertModalOpen(true)}
-                                                    className="bg-primary text-white"
+                                                    className="bg-primary text-white flex justify-end"
                                                 >
-                                                    New company
+                                                    {t.modals.companyInfo.newCompany}
                                                 </Button>
                                             </div>
                                         </div>
@@ -157,13 +157,13 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                                                     <thead className="sticky top-0 z-50 bg-primary text-white shadow-md">
                                                         <tr className="h-12">
                                                             <th className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase font-medium">
-                                                                <div className="flex items-center gap-2">Empresa</div>
+                                                                <div className="flex items-center gap-2">{t.modals.companyInfo.showCompany.companyName}</div>
                                                             </th>
                                                             <th className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase font-medium">
-                                                                <div className="flex items-center gap-2">NIF</div>
+                                                                <div className="flex items-center gap-2">{t.modals.companyInfo.showCompany.vatNo}</div>
                                                             </th>
                                                             <th className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase font-medium">
-                                                                <div className="flex items-center gap-2">País</div>
+                                                                <div className="flex items-center gap-2">{t.modals.companyInfo.showCompany.country}</div>
                                                             </th>
                                                         </tr>
                                                     </thead>
@@ -195,19 +195,19 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                                                     onClick={() => setIsResultsModalOpen(false)}
                                                     className="bg-gray-200 text-black"
                                                 >
-                                                    Cancel
+                                                    {t.modals.companyInfo.showCompany.cancel}
                                                 </Button>
                                                 <Button
                                                     onClick={() => handleSearchClick(false)}
                                                     className="bg-primary text-white"
                                                 >
-                                                    Search more
+                                                    {t.modals.companyInfo.showCompany.searchMore}
                                                 </Button>
                                                 <Button
                                                     onClick={() => setIsInsertModalOpen(true)}
                                                     className="bg-primary text-white"
                                                 >
-                                                    New company
+                                                    {t.modals.companyInfo.newCompany}
                                                 </Button>
                                             </div>
                                         </>

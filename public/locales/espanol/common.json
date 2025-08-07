@@ -423,7 +423,7 @@
             }
         },
         "companyInfo": {
-            "insert": "Crear nuevo número de IVA de la empresa",
+            "insert": "Empresa",
             "update": "Empresa",
             "companyName": "Nombre de la empresa:",
             "vatNO": "N.º de IVA:",
@@ -436,7 +436,16 @@
             "cancel": "Cancelar",
             "save": "Guardar",
             "edit": "Editar",
-            "countryError": "Error al cargar los países."
+            "countryError": "Error al cargar los países.",
+            "noResults": "No se encontraron resultados.",
+            "newCompany": "Nueva empresa",
+            "showCompany": {
+                "companyName": "Nombre de la empresa",
+                "vatNo": "NIF",
+                "country": "País",
+                "cancel": "Cancelar",
+                "searchMore": "Buscar más"
+            }
         },
         "userLogout": {
             "title": "Confirmar cierre de sesión",
