@@ -139,7 +139,15 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                                 <ModalBody className="p-0 flex flex-col max-h-[70vh]">
                                     {searchResults.length === 0 ? (
                                         <div className="p-4 flex-grow overflow-auto">
-                                            <p>Nenhuma empresa encontrada.</p>
+                                            <div className="">
+                                                <p>No company found.</p>
+                                                <Button
+                                                    onClick={() => setIsInsertModalOpen(true)}
+                                                    className="bg-primary text-white"
+                                                >
+                                                    New company
+                                                </Button>
+                                            </div>
                                         </div>
                                     ) : (
                                         <>
