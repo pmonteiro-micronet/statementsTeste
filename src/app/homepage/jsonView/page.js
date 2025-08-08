@@ -13,7 +13,8 @@ import InputFieldControlled from "@/components/input/page";
 import { FaPencilAlt } from "react-icons/fa";
 import { FaPlusCircle } from "react-icons/fa";
 import CompanyVATFormEdit from "@/components/modals/arrivals/reservationForm/companyVAT/editJson/page";
-import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insertJson/page";
+// import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insertJson/page";
+import BeforeCompanyVatJson from "@/components/modals/arrivals/reservationForm/companyVAT/beforeInfoJson/page";
 import EditVatNoModal from "@/components/modals/arrivals/reservationForm/vatEdit/page";
 
 const translations = { en, pt, es };
@@ -518,7 +519,7 @@ const JsonViewPage = () => {
               )}
 
               {isCVATModalOpenInsert && (
-                <CompanyVATFormInsert
+                <BeforeCompanyVatJson
                   onClose={() => setIsCVATModalOpenInsert(false)}
                   profileID={profileID}
                   propertyID={propertyID}

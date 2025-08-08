@@ -8,12 +8,12 @@ import en from "../../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../../../public/locales/espanol/common.json";
 
-import CompanyVATFormEdit from "@/components/modals/arrivals/reservationForm/companyVAT/edit/page";
-import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insert/page";
+import CompanyVATFormEditJson from "@/components/modals/arrivals/reservationForm/companyVAT/editJson/page";
+import CompanyVATFormInsertJson from "@/components/modals/arrivals/reservationForm/companyVAT/insertJson/page";
 
 const translations = { en, pt, es };
 
-const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
+const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo }) => {
     const [locale, setLocale] = useState("pt");
     const [formData, setFormData] = useState({ companyName: "", vatNo: "" });
     const [errorMessage, setErrorMessage] = useState("");
@@ -223,7 +223,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
             )}
 
             {isInsertModalOpen && (
-                <CompanyVATFormInsert
+                <CompanyVATFormInsertJson
                     onClose={() => setIsInsertModalOpen(false)}
                     profileID={profileID}
                     propertyID={propertyID}
@@ -233,7 +233,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
 
             {/* Modal principal ou modal de edição */}
             {selectedCompany ? (
-                <CompanyVATFormEdit
+                <CompanyVATFormEditJson
                     onClose={handleCloseCompanyEdit}
                     profileID={profileID}
                     propertyID={propertyID}
@@ -320,4 +320,4 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
     );
 };
 
-export default BeforeCompanyVat;
+export default BeforeCompanyVatJson;
