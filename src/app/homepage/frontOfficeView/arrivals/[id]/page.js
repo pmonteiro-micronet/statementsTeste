@@ -132,12 +132,12 @@ export default function Arrivals({ params }) {
   const [selectedReserva, setSelectedReserva] = useState(null);
 
   const handleOpenModal = (reserva) => {
-    setSelectedReserva(reserva); 
+    setSelectedReserva(reserva);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
-    setSelectedReserva(null); 
+    setSelectedReserva(null);
     setIsModalOpen(false);
   };
 
@@ -488,6 +488,9 @@ export default function Arrivals({ params }) {
 
                                   if (isVerified) {
                                     // Redireciona caso seja verificado com sucesso
+                                    const url = `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}`;
+
+                                    console.log("👉 URL de redirecionamento:", url);
                                     router.push(
                                       `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}`
                                     );
