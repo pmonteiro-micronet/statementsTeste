@@ -11,6 +11,7 @@ import pt from "../../../../../../../public/locales/portuguesPortugal/common.jso
 import es from "../../../../../../../public/locales/espanol/common.json";
 
 import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insert/page";
+import BeforeCompanyVat from "@/components/modals/arrivals/reservationForm/companyVAT/beforeInfo/page";
 
 const translations = { en, pt, es };
 
@@ -85,6 +86,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
     const [isInsertModalOpen, setIsInsertModalOpen] = useState(false);
 
     const [showConfirmNewCompanyModal, setShowConfirmNewCompanyModal] = useState(false);
+    const [showSearchCompanyModal, setShowSearchCompanyModal] = useState(false);
 
     const extractedCompanyID = company?.CompanyID;
 
@@ -254,6 +256,15 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 />
             )}
 
+            {showSearchCompanyModal && (
+                <BeforeCompanyVat
+                    onClose={() => setShowSearchCompanyModal(false)}
+                    profileID={profileID}
+                    propertyID={propertyID}
+                    resNo={resNo}
+                />
+            )}
+
             <Modal isOpen={showConfirmNewCompanyModal} onOpenChange={setShowConfirmNewCompanyModal}>
                 <ModalContent>
                     {() => (
@@ -414,6 +425,9 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                     </Button>
                                     <Button color="primary" onClick={() => setShowConfirmNewCompanyModal(true)}>
                                         New company
+                                    </Button>
+                                    <Button color="primary" onClick={() => setShowSearchCompanyModal(true)}>
+                                        Search
                                     </Button>
                                     {isEditing ? (
                                         <Button color="primary" onClick={handleSave}>
