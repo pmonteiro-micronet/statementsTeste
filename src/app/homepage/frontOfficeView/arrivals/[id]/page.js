@@ -477,6 +477,7 @@ export default function Arrivals({ params }) {
                                 onClick={async () => {
                                   // Busca os detalhes da propriedade
                                   const propertyDetails = await fetchPropertyDetails(reserva.propertyID);
+                                  console.log("Detalhes da propriedade:", propertyDetails);
 
                                   if (!propertyDetails) {
                                     console.error("Não foi possível encontrar os detalhes da propriedade.");
