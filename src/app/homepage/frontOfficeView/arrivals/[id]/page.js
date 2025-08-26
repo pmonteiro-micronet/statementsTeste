@@ -287,6 +287,7 @@ export default function Arrivals({ params }) {
     try {
       const response = await axios.get(`/api/properties?propertyID=${propertyID}`);
       if (response.data && response.data.response) {
+        console.log("RESPOSTA DE PROPERTY DETAILS:", response);
         return response.data.response[0]; // Supondo que o resultado é uma lista e pegamos o primeiro item
       }
       throw new Error("Nenhuma propriedade encontrada.");
