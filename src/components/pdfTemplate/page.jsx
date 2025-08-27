@@ -47,23 +47,48 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     const logoBase64 = await loadImageAsBase64(logoPath);
 
     // Tamanho da página (A4 padrão)
+    // Tamanho da página (A4 padrão)
     const pageWidth = doc.internal.pageSize.width;
 
-    // Novo tamanho da imagem
-    const logoWidth = 208; 
-    const logoHeight = 104; 
+    // Definir limites máximos do logo
+    const maxLogoWidth = 279;
+    const maxLogoHeight = 157;
 
-    // Calcular a posição X para centralizar a imagem
-    const logoX = (pageWidth - logoWidth) / 2;
+    let logoWidth = maxLogoWidth;
+    let logoHeight = maxLogoHeight;
 
-    // Adiciona o logo ao PDF (caso carregado com sucesso)
     if (logoBase64) {
-        doc.addImage(logoBase64, 'PNG', logoX, 10, logoWidth, logoHeight);
+        // Criar objeto Image para descobrir dimensões reais
+        const img = new Image();
+        img.src = logoBase64;
+
+        await new Promise((resolve) => {
+            img.onload = () => {
+                // Pega dimensões reais
+                logoWidth = img.width;
+                logoHeight = img.height;
+
+                // Se passar do limite, escala proporcionalmente
+                if (logoWidth > maxLogoWidth || logoHeight > maxLogoHeight) {
+                    const widthRatio = maxLogoWidth / logoWidth;
+                    const heightRatio = maxLogoHeight / logoHeight;
+                    const scale = Math.min(widthRatio, heightRatio);
+
+                    logoWidth *= scale;
+                    logoHeight *= scale;
+                }
+                resolve();
+            };
+        });
+
+        // Centraliza na horizontal
+        const logoX = (pageWidth - logoWidth) / 2;
+
+        doc.addImage(logoBase64, "PNG", logoX, 10, logoWidth, logoHeight);
     }
 
     // Ajuste o conteúdo para não sobrepor a imagem
-    const contentStartY = logoBase64 ? 120 : 10; // Ajuste para não sobrepor o logo
-
+    const contentStartY = logoBase64 ? logoHeight + 20 : 10;
 
     // Adiciona "Registration Form", local e data na mesma linha
     const location = reserva.HotelName || ''; // Local da propriedade
@@ -113,7 +138,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     const titleValueSpacing = 27; // Espaçamento entre título e valor
 
     // Ajuste o texto das descrições (títulos) para a cor cinza
-    doc.setTextColor(...grayColor); // Define a cor do texto para cinza
+    doc.setTextColor(...grayColor);
     doc.text(t.registrationForm.name, guestColumn1X, guestTextY);
     doc.text(t.registrationForm.address, guestColumn1X, guestTextY + lineHeight);
     doc.text(t.registrationForm.country, guestColumn1X, guestTextY + 2 * lineHeight);
