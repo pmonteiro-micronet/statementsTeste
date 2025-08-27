@@ -283,13 +283,38 @@ export default function Arrivals({ params }) {
   };
 
 
+  // const fetchPropertyDetails = async (propertyID) => {
+  //   try {
+  //     const response = await axios.get(`/api/properties?propertyID=${propertyID}`);
+  //     if (response.data && response.data.response) {
+  //       console.log("RESPOSTA DE PROPERTY DETAILS:", response);
+  //       return response.data.response[0]; // Supondo que o resultado é uma lista e pegamos o primeiro item
+  //     }
+  //     throw new Error("Nenhuma propriedade encontrada.");
+  //   } catch (error) {
+  //     console.error("Erro ao buscar detalhes da propriedade:", error);
+  //     return null;
+  //   }
+  // };
   const fetchPropertyDetails = async (propertyID) => {
     try {
       const response = await axios.get(`/api/properties?propertyID=${propertyID}`);
+
       if (response.data && response.data.response) {
         console.log("RESPOSTA DE PROPERTY DETAILS:", response);
-        return response.data.response[0]; // Supondo que o resultado é uma lista e pegamos o primeiro item
+
+        // Busca o objeto no array cujo propertyID seja igual ao que você passou
+        const property = response.data.response.find(
+          (prop) => prop.propertyID === propertyID
+        );
+
+        if (property) {
+          return property;
+        }
+
+        throw new Error("Nenhuma propriedade encontrada com esse ID.");
       }
+
       throw new Error("Nenhuma propriedade encontrada.");
     } catch (error) {
       console.error("Erro ao buscar detalhes da propriedade:", error);
