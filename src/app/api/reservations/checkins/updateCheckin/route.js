@@ -8,30 +8,14 @@ export async function POST(request) {
     const body = await request.json();
     console.log("Dados recebidos no backend:", body);
 
-    const { resNo } = body;
+    const { resNo, propertyID } = body;
 
-    if (!resNo) {
+    if (!resNo || !propertyID) {
       return new NextResponse(
-        JSON.stringify({ error: "O número da reserva (resNo) é obrigatório." }),
+        JSON.stringify({ error: "O número da reserva (resNo) e o propertyID são obrigatório." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
-
-    // Consulta ao banco de dados para obter informações da reserva
-    const reservation = await prisma.reservations.findUnique({
-      where: { resNo: resNo },
-      select: { propertyID: true },
-    });
-
-    if (!reservation) {
-      return new NextResponse(
-        JSON.stringify({ error: "Reserva não encontrada no banco de dados." }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Obtém o propertyID da reserva
-    const { propertyID } = reservation;
 
     // Busca informações do servidor da propriedade
     const property = await prisma.properties.findUnique({
