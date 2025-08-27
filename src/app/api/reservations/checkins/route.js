@@ -44,7 +44,7 @@ export async function POST(request) {
          where: { propertyID: Number(propertyID) },
          select: { propertyServer: true, propertyPort: true },
        });
-
+       console.log("Dados da propriedade encontrados:", property);
     if (!property) {
       return NextResponse.json(
         { message: "PropertyID não encontrado no banco de dados" },
