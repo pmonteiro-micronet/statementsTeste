@@ -62,7 +62,7 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     }
 
     // Ajuste o conteúdo para não sobrepor a imagem
-    const marginAfterLogo = 20; // define um espaçamento bonito
+    const marginAfterLogo = 10; // define um espaçamento bonito
     const contentStartY = logoBase64 ? (10 + logoHeight + marginAfterLogo) : 10;
 
     // Adiciona "Registration Form", local e data na mesma linha

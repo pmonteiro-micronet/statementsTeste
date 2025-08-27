@@ -33,9 +33,16 @@ export async function POST(request) {
       );
     }
 
-    // Converte para int
-    const propertyID = parseInt(body.propertyID, 10);
+    // Valida se o resNo foi recebido
+    if (!body.resNo) {
+      return NextResponse.json(
+        { message: "resNo é obrigatório." },
+        { status: 400 }
+      );
+    }
 
+    // Converte propertyID para int
+    const propertyID = parseInt(body.propertyID, 10);
     if (isNaN(propertyID)) {
       return NextResponse.json(
         { message: "propertyID deve ser um número válido." },
@@ -43,31 +50,45 @@ export async function POST(request) {
       );
     }
 
-    // Cria um registro no banco de dados
-    const newRequest = await prisma.requestRecordsArrivals.create({
-      data: {
-        requestBody: JSON.stringify(body),
-        requestType: "POST",
-        requestDateTime: new Date(),
-        responseStatus: "201",
-        responseBody: "",
-        propertyID: propertyID, // Agora como Int
+    // Consulta o propertyServer e propertyPort
+    const property = await prisma.properties.findUnique({
+      where: { propertyID },
+      select: { propertyServer: true, propertyPort: true },
+    });
+
+    if (!property) {
+      return NextResponse.json(
+        { message: "PropertyID não encontrado no banco de dados" },
+        { status: 404 }
+      );
+    }
+
+    const { propertyServer, propertyPort } = property;
+
+    // URL dinâmica
+    const url = `http://${propertyServer}:${propertyPort}/updatecheckin`;
+    console.log("URL para requisição:", url);
+
+    // Chamada externa via axios
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: 'q4vf9p8n4907895f7m8d24m75c2q947m2398c574q9586c490q756c98q4m705imtugcfecvrhym04capwz3e2ewqaefwegfiuoamv4ros2nuyp0sjc3iutow924bn5ry943utrjmi',
+        resNo: String(body.resNo),
       },
     });
 
-    console.log("Data saved to DB:", newRequest);
+    console.log("Resposta externa:", response.data);
 
-    const responseBody = {
-      message: "Dados armazenados com sucesso",
-      data: newRequest,
-    };
+    return NextResponse.json({
+      message: "Dados processados e enviados com sucesso",
+      externalResponse: response.data,
+    }, { status: 201 });
 
-    return NextResponse.json(responseBody, { status: 201 });
   } catch (error) {
-    console.error("Erro ao gravar os dados:", error.message);
+    console.error("Erro ao processar os dados:", error.message);
 
     return NextResponse.json(
-      { message: "Erro ao gravar os dados", error: error.message },
+      { message: "Erro ao processar os dados", error: error.message },
       { status: 500 }
     );
   }
