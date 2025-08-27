@@ -22,7 +22,7 @@ export async function GET() {
 // Exporta a função que lida com as requisições POST
 export async function POST(request) {
   try {
-    const body = await request.json(); // Lê o corpo da requisição
+    const body = await request.json();
     console.log("POST Request received:", body);
 
     // Valida se o propertyID foi recebido
@@ -33,35 +33,43 @@ export async function POST(request) {
       );
     }
 
+    // Converte para int
+    const propertyID = parseInt(body.propertyID, 10);
+
+    if (isNaN(propertyID)) {
+      return NextResponse.json(
+        { message: "propertyID deve ser um número válido." },
+        { status: 400 }
+      );
+    }
+
     // Cria um registro no banco de dados
     const newRequest = await prisma.requestRecordsArrivals.create({
       data: {
-        requestBody: JSON.stringify(body), // Armazena o corpo completo como JSON
-        requestType: "POST", // Definido como POST
-        requestDateTime: new Date(), // Data e hora atual
-        responseStatus: "201", // Supondo sucesso inicialmente
-        responseBody: "", // Inicialmente vazio, será atualizado depois
-        propertyID: body.propertyID, // Armazena o propertyID
+        requestBody: JSON.stringify(body),
+        requestType: "POST",
+        requestDateTime: new Date(),
+        responseStatus: "201",
+        responseBody: "",
+        propertyID: propertyID, // Agora como Int
       },
     });
 
     console.log("Data saved to DB:", newRequest);
 
-    // Resposta de sucesso
     const responseBody = {
       message: "Dados armazenados com sucesso",
       data: newRequest,
     };
 
-    // Envie a resposta ao cliente
     return NextResponse.json(responseBody, { status: 201 });
   } catch (error) {
     console.error("Erro ao gravar os dados:", error.message);
-    
-    // Retorne o erro ao cliente
+
     return NextResponse.json(
       { message: "Erro ao gravar os dados", error: error.message },
       { status: 500 }
     );
   }
 }
+
