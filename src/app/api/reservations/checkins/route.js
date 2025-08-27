@@ -1,22 +1,22 @@
 //app/api/reservations/checkouts
 import { NextResponse } from 'next/server'; // Importa NextResponse
 import axios from "axios";
-import prisma from "@/lib/db"; // Importa a instância do Prisma Client que você configurou
+import prisma from "@/lib/db";
 
-// Para o método GET (busca por registros da data atual)
-export async function GET() {
-  try {
-    const response = await prisma.requestRecordsArrivals.findMany();
+// // Para o método GET (busca por registros da data atual)
+// export async function GET() {
+//   try {
+//     const response = await prisma.requestRecordsArrivals.findMany();
 
-    return new NextResponse(JSON.stringify({ response }), { status: 200 });
-  } catch (error) {
-    console.error("Erro ao buscar registros:", error);
-    return new NextResponse(
-      JSON.stringify({ error: "Failed to fetch records" }),
-      { status: 500 }
-    );
-  }
-}
+//     return new NextResponse(JSON.stringify({ response }), { status: 200 });
+//   } catch (error) {
+//     console.error("Erro ao buscar registros:", error);
+//     return new NextResponse(
+//       JSON.stringify({ error: "Failed to fetch records" }),
+//       { status: 500 }
+//     );
+//   }
+// }
 
 // Exporta a função que lida com as requisições POST
 export async function POST(request) {
@@ -36,7 +36,7 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-
+    console.log("propertyID e resNo recebidos:", propertyID, resNo);
     // Consulta o propertyServer e propertyPort
     const property = await prisma.properties.findUnique({
       where: { propertyID: propertyID },
