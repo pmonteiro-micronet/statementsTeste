@@ -39,7 +39,7 @@ export async function POST(request) {
 
     // Consulta o propertyServer e propertyPort
     const property = await prisma.properties.findUnique({
-      where: { propertyID: Number(propertyID) },
+      where: { propertyID: propertyID },
       select: { propertyServer: true, propertyPort: true },
     });
 
