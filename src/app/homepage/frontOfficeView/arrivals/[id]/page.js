@@ -341,7 +341,7 @@ export default function Arrivals({ params }) {
     try {
       const response = await axios.post(
         '/api/reservations/checkins/updateCheckin',
-        { resNo }, // Enviando resNo no body
+        { resNo, propertyID }, // Enviando resNo no body
         {
           headers: {
             'Content-Type': 'application/json',
