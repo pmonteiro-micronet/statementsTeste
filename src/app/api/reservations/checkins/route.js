@@ -1,5 +1,6 @@
 //app/api/reservations/checkouts
 import { NextResponse } from 'next/server'; // Importa NextResponse
+import axios from "axios";
 import prisma from "@/lib/db"; // Importa a instância do Prisma Client que você configurou
 
 // Para o método GET (busca por registros da data atual)

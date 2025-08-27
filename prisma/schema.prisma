@@ -182,3 +182,13 @@ model stayPropUsers {
   userID     Int @default(-1)
   propertyID Int @default(-1)
 }
+
+model requestRecordsReservationsOta {
+  requestID       Int      @id @default(autoincrement())
+  requestBody     Json
+  requestType     String   @db.VarChar(8192)
+  requestDateTime DateTime @db.DateTime(0)
+  responseStatus  String?  @db.VarChar(20)
+  responseBody    String?  @db.Text
+  propertyID      Int
+}
