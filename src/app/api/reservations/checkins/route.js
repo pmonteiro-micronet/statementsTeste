@@ -5,20 +5,18 @@ import prisma from "@/lib/db"; // Importa a instância do Prisma Client que voc�
 
 // Para o método GET (busca por registros da data atual)
 export async function GET() {
-    try {
-      const response = await prisma.requestRecordsArrivals.findMany();
-  
-      return new NextResponse(JSON.stringify({ response }), { status: 200 });
-    } catch (error) {
-      console.error("Erro ao buscar registros:", error);
-      return new NextResponse(
-        JSON.stringify({ error: "Failed to fetch records" }),
-        { status: 500 }
-      );
-    } finally {
-      await prisma.$disconnect(); // Desconexão do Prisma
-    }
+  try {
+    const response = await prisma.requestRecordsArrivals.findMany();
+
+    return new NextResponse(JSON.stringify({ response }), { status: 200 });
+  } catch (error) {
+    console.error("Erro ao buscar registros:", error);
+    return new NextResponse(
+      JSON.stringify({ error: "Failed to fetch records" }),
+      { status: 500 }
+    );
   }
+}
 
 // Exporta a função que lida com as requisições POST
 export async function POST(request) {
@@ -44,7 +42,7 @@ export async function POST(request) {
          where: { propertyID: Number(propertyID) },
          select: { propertyServer: true, propertyPort: true },
        });
-       console.log("Dados da propriedade encontrados:", property);
+
     if (!property) {
       return NextResponse.json(
         { message: "PropertyID não encontrado no banco de dados" },
