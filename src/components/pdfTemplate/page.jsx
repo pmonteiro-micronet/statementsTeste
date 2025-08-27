@@ -50,8 +50,8 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     const pageWidth = doc.internal.pageSize.width;
 
     // Novo tamanho da imagem
-    const logoWidth = 100; 
-    const logoHeight = 54; 
+    const logoWidth = 80;
+    const logoHeight = 43;
 
     // Calcular a posição X para centralizar a imagem
     const logoX = (pageWidth - logoWidth) / 2;
@@ -62,8 +62,8 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     }
 
     // Ajuste o conteúdo para não sobrepor a imagem
-    const contentStartY = logoBase64 ? 120 : 10; // Ajuste para não sobrepor o logo
-
+    const marginAfterLogo = 20; // define um espaçamento bonito
+    const contentStartY = logoBase64 ? (10 + logoHeight + marginAfterLogo) : 10;
 
     // Adiciona "Registration Form", local e data na mesma linha
     const location = reserva.HotelName || ''; // Local da propriedade
