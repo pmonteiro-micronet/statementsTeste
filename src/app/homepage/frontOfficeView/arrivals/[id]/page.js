@@ -305,7 +305,7 @@ export default function Arrivals({ params }) {
 
         // Busca o objeto no array cujo propertyID seja igual ao que você passou
         const property = response.data.response.find(
-          (prop) => prop.propertyID === propertyID
+          (prop) => prop.propertyID === Number(propertyID)
         );
 
         if (property) {
