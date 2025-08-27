@@ -26,7 +26,7 @@ export async function POST(request) {
 
     const {
       propertyID,
-      resNo,  
+      resNo,
     } = body;
 
     // Valida se o propertyID foi recebido
@@ -39,9 +39,9 @@ export async function POST(request) {
 
     // Consulta o propertyServer e propertyPort
     const property = await prisma.properties.findUnique({
-         where: { propertyID: Number(propertyID) },
-         select: { propertyServer: true, propertyPort: true },
-       });
+      where: { propertyID: Number(propertyID) },
+      select: { propertyServer: true, propertyPort: true },
+    });
 
     if (!property) {
       return NextResponse.json(
@@ -72,10 +72,15 @@ export async function POST(request) {
     }, { status: 201 });
 
   } catch (error) {
-    console.error("Erro ao processar os dados:", error.message);
+    // Log completo no servidor (útil para debug)
+    console.error("Erro ao processar os dados:", error);
 
+    // Mensagem controlada para o cliente
     return NextResponse.json(
-      { message: "Erro ao processar os dados", error: error.message },
+      {
+        message: "Erro ao processar os dados",
+        error: error instanceof Error ? error.message : "Erro desconhecido",
+      },
       { status: 500 }
     );
   }
