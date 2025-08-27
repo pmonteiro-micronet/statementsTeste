@@ -339,9 +339,14 @@ export default function Arrivals({ params }) {
 
   const handleCheckIn = async (resNo) => {
     try {
+      const payload = {
+        resNo,
+        propertyID: parseInt(propertyID, 10), // já em int
+      };
+
       const response = await axios.post(
         '/api/reservations/checkins/updateCheckin',
-        { resNo, propertyID }, // Enviando resNo no body
+        payload,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -361,6 +366,7 @@ export default function Arrivals({ params }) {
       setIsErrorModalOpen(true);
     }
   };
+
 
   const [sortOrder, setSortOrder] = useState('asc');
   const [sortField, setSortField] = useState('');
