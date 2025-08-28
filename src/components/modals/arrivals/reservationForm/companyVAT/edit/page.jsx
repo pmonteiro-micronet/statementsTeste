@@ -134,8 +134,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 setCountryOptions(formattedOptions);
                 setLoading(false);
             } catch (error) {
-                console.error("Erro ao buscar países:", error);
-                setErrorMessage("Erro ao carregar os países.");
+                console.log("Erro ao buscar países:", error);
+                setErrorMessage(t.modals.companyInfo.errors.errorCountries);
                 setLoading(false);
             }
         };
@@ -156,7 +156,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
 
         if (name === "emailAddress") {
             if (!emailRegex.test(value)) {
-                setErrorMessage("E-mail inválido.");
+                setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
             } else {
                 setErrorMessage("");
             }
@@ -166,7 +166,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
     const handleBlur = () => {
         if (formData.country === "Portugal" && formData.vatNo) {
             if (!validatePortugueseVAT(formData.vatNo)) {
-                setVatError("O NIF português deve ter exatamente 9 dígitos e começar com 5.");
+                setVatError(t.modals.companyInfo.errors.invalidVAT);
             } else {
                 setVatError("");
             }
@@ -186,12 +186,12 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
 
     const handleSave = async () => {
         if (!formData.companyName) {
-            setErrorMessage("O nome da empresa é obrigatório.");
+            setErrorMessage(t.modals.companyInfo.errors.companyNameRequired);
             return;
         }
 
         if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
-            setErrorMessage("Por favor, insira um e-mail válido.");
+            setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
             return;
         }
 
@@ -234,8 +234,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
             window.location.reload();
 
         } catch (error) {
-            console.error("Erro ao salvar empresa:", error);
-            setErrorMessage("Erro ao salvar. Por favor, tente novamente.");
+            console.log("Erro ao salvar empresa:", error);
+            setErrorMessage(t.modals.companyInfo.errors.errorSaving);
         }
     };
 
@@ -270,11 +270,11 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                     {() => (
                         <>
                             <ModalHeader className="text-lg font-medium">
-                                {t.modals.companyInfo.attention || "Atenção"}
+                                {t.modals.companyInfo.attention}
                             </ModalHeader>
                             <ModalBody>
                                 <p className="text-sm text-gray-700">
-                                    A ficha atual será substituída pela nova ficha. Deseja continuar?
+                                    {t.modals.companyInfo.switchCompany}
                                 </p>
                             </ModalBody>
                             <div className="flex justify-end gap-2 px-6 pb-4">
@@ -282,7 +282,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                     color="error"
                                     onClick={() => setShowConfirmNewCompanyModal(false)}
                                 >
-                                    {t.modals.companyInfo.cancel || "Cancelar"}
+                                    {t.modals.companyInfo.cancel}
                                 </Button>
                                 <Button
                                     color="primary"
@@ -291,7 +291,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                         setIsInsertModalOpen(true);
                                     }}
                                 >
-                                    {t.modals.companyInfo.continue || "Continuar"}
+                                    {t.modals.companyInfo.continue}
                                 </Button>
                             </div>
                         </>
@@ -421,13 +421,13 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                                 <div className="flex justify-end space-x-2 -mt-4">
                                     <Button color="error" onClick={handleCloseModal}>{t.modals.companyInfo.cancel}</Button>
                                     <Button color="primary" onClick={handleSave}>
-                                        Select company
+                                        {t.modals.companyInfo.selectCompany}
                                     </Button>
                                     <Button color="primary" onClick={() => setShowConfirmNewCompanyModal(true)}>
-                                        New company
+                                        {t.modals.companyInfo.newCompany}
                                     </Button>
                                     <Button color="primary" onClick={() => setShowSearchCompanyModal(true)}>
-                                        Search
+                                        {t.modals.companyInfo.searchCompany}
                                     </Button>
                                     {isEditing ? (
                                         <Button color="primary" onClick={handleSave}>

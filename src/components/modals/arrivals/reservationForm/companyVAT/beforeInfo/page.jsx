@@ -56,13 +56,13 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
 
         if (name === "emailAddress") {
             const emailRegex = /\S+@\S+\.\S+/;
-            setErrorMessage(emailRegex.test(value) ? "" : "E-mail inválido.");
+            setErrorMessage(emailRegex.test(value) ? "" : t.modals.companyInfo.errors.invalidEmail);
         }
     };
 
     const handleBlur = () => {
         if (formData.country === "Portugal" && formData.vatNo && !/^\d{9}$/.test(formData.vatNo)) {
-            setVatError("O NIF português deve ter exatamente 9 dígitos.");
+            setVatError(t.modals.companyInfo.errors.invalidVAT);
         } else {
             setVatError("");
         }

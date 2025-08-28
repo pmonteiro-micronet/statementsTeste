@@ -3,6 +3,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 
+import en from "../../../../../../public/locales/english/common.json";
+import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../../public/locales/espanol/common.json";
+
+const translations = { en, pt, es };
+
 const EditRegistrationForm = ({
     currentLabel,
     currentValue,
@@ -18,6 +24,19 @@ const EditRegistrationForm = ({
     const [errorMessage, setErrorMessage] = useState("");
 
     const inputRef = useRef(null);
+
+    const [locale, setLocale] = useState("pt");
+
+    useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+        }
+    }, []);
+
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"];
 
     useEffect(() => {
         setNewEmail("");
@@ -37,17 +56,17 @@ const EditRegistrationForm = ({
         const invalidDomain = /@guest\.booking\.com$/i;
 
         if (!trimmedEmail && !trimmedPhone) {
-            setErrorMessage("Please provide at least a new email or phone number.");
+            setErrorMessage(t.modals.companyInfo.errors.phoneOrEmail);
             return;
         }
 
         if (trimmedEmail) {
             if (!emailRegex.test(trimmedEmail)) {
-                setErrorMessage("Please enter a valid email address.");
+                setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
                 return;
             }
             if (invalidDomain.test(trimmedEmail)) {
-                setErrorMessage("Invalid email. It cannot end with @guest.booking.com");
+                setErrorMessage(t.modals.companyInfo.errors.invalidEmailBooking);
                 return;
             }
         }
@@ -61,12 +80,12 @@ const EditRegistrationForm = ({
         const trimmed = newValue.trim();
 
         if (!trimmed) {
-            setErrorMessage(`${currentLabel} cannot be empty.`);
+            setErrorMessage(`${currentLabel} {t.modals.companyInfo.emptyFields}`);
             return;
         }
 
         if (validation && !validation(trimmed)) {
-            setErrorMessage(`${currentLabel} is invalid. Please check the value.`);
+            setErrorMessage(`${currentLabel} {t.modals.companyInfo.invalidFields}`);
             return;
         }
 
@@ -107,7 +126,7 @@ const EditRegistrationForm = ({
                                         <div className="flex flex-row justify-between gap-4">
                                         <div className="flex flex-col gap-2 w-2/3">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-400">Current Email:</label>
+                                                <label className="block text-sm font-medium text-gray-400">{t.modals.Contacts.currentEmail}</label>
                                                 <input
                                                     type="text"
                                                     value={currentValue}
@@ -116,7 +135,7 @@ const EditRegistrationForm = ({
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-textPrimaryColor">New Email:</label>
+                                                <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.Contacts.newEmail}</label>
                                                 <input
                                                     ref={inputRef}
                                                     type="text"
@@ -128,7 +147,7 @@ const EditRegistrationForm = ({
                                </div>
                                <div className="flex flex-col gap-2 w-1/3">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-400">Current Phone Number:</label>
+                                                <label className="block text-sm font-medium text-gray-400">{t.modals.Contacts.currentPhone}</label>
                                                 <input
                                                     type="text"
                                                     value={additionalValue}
@@ -137,7 +156,7 @@ const EditRegistrationForm = ({
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-textPrimaryColor">New Phone Number:</label>
+                                                <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.Contacts.newPhone}</label>
                                                 <input
                                                     type="text"
                                                     value={newPhone}
@@ -153,7 +172,7 @@ const EditRegistrationForm = ({
                             ) : (
                                 <>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-400">{`Current ${currentLabel}:`}</label>
+                                        <label className="block text-sm font-medium text-gray-400">{`{t.modals.Contacts.current} ${currentLabel}:`}</label>
                                         <input
                                             type="text"
                                             value={currentValue}
@@ -162,7 +181,7 @@ const EditRegistrationForm = ({
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{`New ${currentLabel}:`}</label>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">{`{t.modals.Contacts.new} ${currentLabel}:`}</label>
                                         <input
                                             ref={inputRef}
                                             type={currentLabel.toLowerCase() === "vat no." ? "number" : "text"}
@@ -180,10 +199,10 @@ const EditRegistrationForm = ({
                             {/* Botões */}
                             <div className="flex justify-end space-x-2 pt-2">
                                 <Button color="error" onClick={onCloseModal}>
-                                    Cancel
+                                    {t.modals.companyInfo.cancel}
                                 </Button>
                                 <Button color="primary" onClick={handleSave}>
-                                    Save
+                                    {t.modals.companyInfo.save}
                                 </Button>
                             </div>
                         </ModalBody>

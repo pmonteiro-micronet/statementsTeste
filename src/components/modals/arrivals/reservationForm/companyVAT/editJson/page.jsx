@@ -11,6 +11,7 @@ import pt from "../../../../../../../public/locales/portuguesPortugal/common.jso
 import es from "../../../../../../../public/locales/espanol/common.json";
 
 import CompanyVATFormInsertJson from "@/components/modals/arrivals/reservationForm/companyVAT/insertJson/page";
+import BeforeCompanyVat from "@/components/modals/arrivals/reservationForm/companyVAT/beforeInfo/page";
 
 const translations = { en, pt, es };
 
@@ -85,6 +86,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
     const [isInsertModalOpen, setIsInsertModalOpen] = useState(false);
 
     const [showConfirmNewCompanyModal, setShowConfirmNewCompanyModal] = useState(false);
+    const [showSearchCompanyModal, setShowSearchCompanyModal] = useState(false);
 
     const extractedCompanyID = company?.CompanyID;
 
@@ -132,8 +134,8 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                 setCountryOptions(formattedOptions);
                 setLoading(false);
             } catch (error) {
-                console.error("Erro ao buscar países:", error);
-                setErrorMessage("Erro ao carregar os países.");
+                console.log("Erro ao buscar países:", error);
+                setErrorMessage(t.modals.companyInfo.errors.errorCountries);
                 setLoading(false);
             }
         };
@@ -154,7 +156,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
 
         if (name === "emailAddress") {
             if (!emailRegex.test(value)) {
-                setErrorMessage("E-mail inválido.");
+                setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
             } else {
                 setErrorMessage("");
             }
@@ -164,7 +166,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
     const handleBlur = () => {
         if (formData.country === "Portugal" && formData.vatNo) {
             if (!validatePortugueseVAT(formData.vatNo)) {
-                setVatError("O NIF português deve ter exatamente 9 dígitos e começar com 5.");
+                setVatError(t.modals.companyInfo.errors.invalidVAT);
             } else {
                 setVatError("");
             }
@@ -184,12 +186,12 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
 
     const handleSave = async () => {
         if (!formData.companyName) {
-            setErrorMessage("O nome da empresa é obrigatório.");
+            setErrorMessage(t.modals.companyInfo.errors.companyNameRequired);
             return;
         }
 
         if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
-            setErrorMessage("Por favor, insira um e-mail válido.");
+            setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
             return;
         }
 
@@ -232,8 +234,8 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
             window.location.reload();
 
         } catch (error) {
-            console.error("Erro ao salvar empresa:", error);
-            setErrorMessage("Erro ao salvar. Por favor, tente novamente.");
+            console.log("Erro ao salvar empresa:", error);
+            setErrorMessage(t.modals.companyInfo.errors.errorSaving);
         }
     };
 
@@ -254,16 +256,24 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                 />
             )}
 
+            {showSearchCompanyModal && (
+                <BeforeCompanyVat
+                    onClose={() => setShowSearchCompanyModal(false)}
+                    profileID={profileID}
+                    propertyID={propertyID}
+                    resNo={resNo}
+                />
+            )}
             <Modal isOpen={showConfirmNewCompanyModal} onOpenChange={setShowConfirmNewCompanyModal}>
                 <ModalContent>
                     {() => (
                         <>
                             <ModalHeader className="text-lg font-medium">
-                                {t.modals.companyInfo.attention || "Atenção"}
+                                {t.modals.companyInfo.attention}
                             </ModalHeader>
                             <ModalBody>
                                 <p className="text-sm text-gray-700">
-                                    A ficha atual será substituída pela nova ficha. Deseja continuar?
+                                    {t.modals.companyInfo.switchCompany}
                                 </p>
                             </ModalBody>
                             <div className="flex justify-end gap-2 px-6 pb-4">
@@ -271,7 +281,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                                     color="error"
                                     onClick={() => setShowConfirmNewCompanyModal(false)}
                                 >
-                                    {t.modals.companyInfo.cancel || "Cancelar"}
+                                    {t.modals.companyInfo.cancel}
                                 </Button>
                                 <Button
                                     color="primary"
@@ -280,7 +290,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                                         setIsInsertModalOpen(true);
                                     }}
                                 >
-                                    {t.modals.companyInfo.continue || "Continuar"}
+                                    {t.modals.companyInfo.continue}
                                 </Button>
                             </div>
                         </>
@@ -410,10 +420,13 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                                 <div className="flex justify-end space-x-2 -mt-4">
                                     <Button color="error" onClick={handleCloseModal}>{t.modals.companyInfo.cancel}</Button>
                                     <Button color="primary" onClick={handleSave}>
-                                        Select company
+                                        {t.modals.companyInfo.selectCompany}
                                     </Button>
                                     <Button color="primary" onClick={() => setShowConfirmNewCompanyModal(true)}>
-                                        New company
+                                        {t.modals.companyInfo.newCompany}
+                                    </Button>
+                                    <Button color="primary" onClick={() => setShowSearchCompanyModal(true)}>
+                                        {t.modals.companyInfo.searchCompany}
                                     </Button>
                                     {isEditing ? (
                                         <Button color="primary" onClick={handleSave}>

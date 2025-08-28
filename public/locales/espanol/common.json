@@ -434,11 +434,16 @@
             "country": "País:",
             "email": "Correo electrónico:",
             "cancel": "Cancelar",
+            "continue": "Continuar",
             "save": "Guardar",
             "edit": "Editar",
             "countryError": "Error al cargar los países.",
             "noResults": "No se encontraron resultados.",
-            "newCompany": "Nueva empresa",
+            "newCompany": "Crear empresa",
+            "selectCompany": "Seleccionar empresa",
+            "searchCompany": "Buscar empresa",
+            "switchCompany": "La empresa actual será reemplazada por la nueva. ¿Desea continuar?",
+            "attention": "Atención",
             "showCompany": {
                 "companyName": "Nombre de la empresa",
                 "vatNo": "NIF",
@@ -461,7 +466,7 @@
             "idDoc": "Documento de identificacíon",
             "idDocNumber": "Nr.",
             "expDate": "Fecha de Caducidad",
-            "issue": "emisión"
+            "issue": "Emisión"
         },
         "Address": {
             "title": "Informacíon de direccíon",
@@ -470,6 +475,26 @@
             "zipCode": "Código Postal",
             "city": "Ciudad",
             "SPR": "Estado/Provincia/Regíon"
+        },
+        "Contacts": {
+            "currentEmail": "Correo electrónico actual:",
+            "newEmail": "Nuevo correo electrónico:",
+            "currentPhone": "Número de teléfono actual:",
+            "newPhone": "Nuevo número de teléfono:",
+            "current": "Actual",
+            "new": "Nuevo"
+        },
+        "errors": {
+            "invalidEmail": "Correo electrónico no válido.",
+            "invalidEmailBooking": "El correo electrónico proporcionado está asociado con un perfil de Booking.com. Por favor, use una dirección de correo electrónico diferente.",
+            "phoneOrEmail": "Por favor, proporcione al menos un nuevo correo electrónico o número de teléfono.",
+            "invalidVAT": "El CPF portugués debe tener exactamente 9 dígitos y comenzar con 5.",
+            "companyNameRequired": "El nombre de la empresa es obligatorio.",
+            "errorSaving": "Error al guardar los datos de la empresa. Por favor, inténtelo de nuevo.",
+            "errorCountries": "Error al cargar los países. Por favor, inténtelo de nuevo.",
+            "loseData": "Si continúa, se perderán todos los datos no guardados. ¿Desea continuar?",
+            "emptyFields": "no puede estar vacío.",
+            "invalidFields": "es inválido. Por favor, verifique el valor."
         }
     },
     "pagination": {

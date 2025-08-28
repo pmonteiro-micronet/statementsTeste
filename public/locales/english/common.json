@@ -433,11 +433,16 @@
             "country": "Country:",
             "email": "E-mail:",
             "cancel": "Cancel",
+            "continue": "Continue",
             "save": "Save",
             "edit": "Edit",
             "countryError": "Error loading countries.",
             "noResults": "No results found.",
-            "newCompany": "New Company",
+            "newCompany": "Insert Company",
+            "selectCompany": "Select Company",
+            "searchCompany": "Search Company",
+            "switchCompany": "The current company will be replaced by the new company. Do you want to continue?",
+            "attention": "Attention",
             "showCompany": {
                 "companyName": "Company Name",
                 "vatNo": "VATNO",
@@ -469,6 +474,26 @@
             "zipCode":"Zip code",
             "city": "City",
             "SPR": "State/Province/Region"
+        },
+        "Contacts": {
+            "currentEmail": "Current email:",
+            "newEmail": "New email:",
+            "currentPhone": "Current phone number:",
+            "newPhone": "New phone number:",
+            "current": "Current",
+            "new": "New"
+        },
+        "errors": {
+            "invalidEmail": "Invalid email.",
+            "invalidEmailBooking": "The email provided is associated with a Booking.com profile. Please use a different email address.",
+            "phoneOrEmail": "Please provide at least a new email or phone number.",
+            "invalidVAT": "The Portuguese VAT must have exactly 9 digits and start with 5.",
+            "companyNameRequired": "Company name is required.",
+            "errorSaving": "Error saving company data. Please try again.",
+            "errorCountries": "Error loading countries. Please try again.",
+            "loseData": "If you continue, all unsaved data will be lost. Do you want to continue?",
+            "emptyFields": "cannot be empty.",
+            "invalidFields": "is invalid. Please check the value."
         }
     },
     "pagination": {
