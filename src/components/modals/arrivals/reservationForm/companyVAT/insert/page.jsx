@@ -77,7 +77,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
 
         if (name === "emailAddress") {
             if (!emailRegex.test(value)) {
-                setErrorMessage("E-mail inválido.");
+                setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
             } else {
                 setErrorMessage("");
             }
@@ -87,7 +87,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
     const handleBlur = () => {
         if (formData.country === "Portugal" && formData.vatNo) {
             if (!/^\d{9}$/.test(formData.vatNo)) {
-                setVatError("O NIF português deve ter exatamente 9 dígitos.");
+                setVatError(t.modals.companyInfo.errors.invalidVAT);
             } else {
                 setVatError("");
             }
@@ -136,12 +136,12 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
 
     const handleSave = async () => {
         if (!formData.companyName.trim()) {
-            setErrorMessage("O nome da empresa é obrigatório.");
+            setErrorMessage(t.modals.companyInfo.errors.companyNameRequired);
             return;
         }
 
         if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
-            setErrorMessage("Por favor, insira um e-mail válido.");
+            setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
             return;
         }
 
@@ -185,15 +185,15 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
             onClose();
 
         } catch (error) {
-            console.error("Erro ao salvar informações de VAT:", error);
-            setErrorMessage("Falha ao salvar. Por favor, tente novamente.");
+            console.log("Erro ao salvar informações de VAT:", error);
+            setErrorMessage(t.modals.companyInfo.errorSaving);
         }
     };
 
     const handleCloseModal = () => {
         if (isDataModified) {
             // Pergunta ao usuário se ele deseja perder os dados
-            const confirmLeave = window.confirm("Você vai perder os dados, continuar?");
+            const confirmLeave = window.confirm(t.modals.companyInfo.loseData);
             if (confirmLeave) {
                 onClose();
             }

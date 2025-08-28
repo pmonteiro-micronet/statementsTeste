@@ -434,11 +434,16 @@
             "country": "País:",
             "email": "E-mail:",
             "cancel": "Cancelar",
+            "continue": "Continuar",
             "save": "Guardar",
             "edit": "Editar",
             "countryError": "Erro ao carregar os países.",
             "noResults": "Não foram encontrados resultados.",
-            "newCompany": "Nova empresa",
+            "newCompany": "Criar empresa",
+            "selectCompany": "Selecionar empresa",
+            "searchCompany": "Pesquisar empresa",
+            "switchCompany": "A ficha atual será substituída pela nova ficha. Deseja continuar?",
+            "attention": "Atenção",
             "showCompany": {
                 "companyName": "Nome da Empresa",
                 "vatNo": "NIF",
@@ -470,6 +475,26 @@
             "zipCode": "Código Postal",
             "city": "Cidade",
             "SPR": "Estado/Provincia/Região"
+        },
+        "Contacts": {
+            "currentEmail": "Email atual:",
+            "newEmail": "Novo email:",
+            "currentPhone": "Número de telefone atual:",
+            "newPhone": "Novo número de telefone:",
+            "current": "Atual",
+            "new": "Novo"
+        },
+        "errors": {
+            "invalidEmail": "Email inválido.",
+            "invalidEmailBooking": "O email fornecido está associado a um perfil do Booking.com. Por favor, utilize um endereço de email diferente.",
+            "phoneOrEmail": "Por favor, forneça pelo menos um novo email ou número de telefone.",
+            "invalidVAT": "O NIF português deve ter exatamente 9 dígitos e começar com 5.",
+            "companyNameRequired": "O nome da empresa é obrigatório.",
+            "errorSaving": "Erro ao guardar os dados da empresa. Por favor, tente novamente.",
+            "errorCountries": "Erro ao carregar os países. Por favor, tente novamente.",
+            "loseData": "Se continuar, todos os dados não guardados serão perdidos. Deseja continuar?",
+            "emptyFields": "não pode estar vazio.",
+            "invalidFields": "é inválido. Por favor, verifique o valor."
         }
     },
     "pagination": {
