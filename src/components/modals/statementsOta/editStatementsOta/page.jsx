@@ -20,7 +20,7 @@ const EditReservationModal = ({
   initialDayPrices = []
 }) => {
   const [locale, setLocale] = useState("pt");
-  console.log(locale);
+  console.log(setLocale);
   const t = translations[locale] || translations["pt"];
 
   const [activeTab, setActiveTab] = useState("reservation");

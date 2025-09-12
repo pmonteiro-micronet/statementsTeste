@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
-import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, select, } from "@heroui/react";
+import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem } from "@heroui/react";
 
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoMdAdd } from "react-icons/io";
