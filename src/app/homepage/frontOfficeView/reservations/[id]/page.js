@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
-import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "@heroui/react";
+import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, select, } from "@heroui/react";
 
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoMdAdd } from "react-icons/io";
@@ -45,6 +45,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  console.log(isModalOpen);
   const [isNewReservationModalOpen, setIsNewReservationModalOpen] = useState(false); // Add state for modal
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // <-- Add this state
 
@@ -70,8 +71,6 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   console.log(router);
 
   const [propertyName, setPropertyName] = useState([]);
-
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
@@ -191,14 +190,9 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [selectedReserva, setSelectedReserva] = useState(null);
 
   const handleOpenModal = (reserva) => {
+    console.log(selectedReserva);
     setSelectedReserva(reserva); // Armazena os dados da reserva clicada
     setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedReserva(null); // Limpa os dados ao fechar a modal
-    window.location.reload(); // Recarrega a página
   };
 
   // Handler for opening the edit modal
