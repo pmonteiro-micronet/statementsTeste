@@ -20,6 +20,7 @@ const EditReservationModal = ({
   initialDayPrices = []
 }) => {
   const [locale, setLocale] = useState("pt");
+  console.log(locale);
   const t = translations[locale] || translations["pt"];
 
   const [activeTab, setActiveTab] = useState("reservation");
@@ -163,6 +164,7 @@ const EditReservationModal = ({
     } catch (err) {
       setError("Failed to save reservation.");
       setLoading(false);
+      console.log(err)
     }
   };
 
