@@ -629,7 +629,7 @@ const CreatePropertyModal = ({
                                                 </div>
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelImage}</label>
+                                                <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelImage} <p><b>(.PNG 280x160)</b></p></label>
                                                 <div className="flex flex-col gap-2">
                                                     <input
                                                         type="file"

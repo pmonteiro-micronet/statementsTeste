@@ -843,7 +843,7 @@ const PropertiesEditForm = ({
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelImage}</label>
+                                            <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelImage} <p><b>(.PNG 280x160)</b></p></label>
                                             <div className="flex flex-col gap-2">
                                                 <input
                                                     type="file"
@@ -1048,6 +1048,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setHotelTermsEN(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={2000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {hotelTermsEN.length} / 2000
@@ -1062,6 +1063,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setHotelTermsPT(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={2000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {hotelTermsPT.length} / 2000
@@ -1075,6 +1077,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setHotelTermsES(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={2000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {hotelTermsES.length} / 2000
@@ -1093,6 +1096,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setPrivacyPolicyEN(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={2000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {privacyPolicyEN.length} / 2000
@@ -1106,6 +1110,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setPrivacyPolicyPT(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={2000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {privacyPolicyPT.length} / 2000
@@ -1119,6 +1124,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setPrivacyPolicyES(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={2000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {privacyPolicyES.length} / 2000
@@ -1137,6 +1143,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setMiniTermsEN(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={1000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {miniTermsEN.length} / 1000
@@ -1150,6 +1157,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setMiniTermsPT(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={1000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {miniTermsPT.length} / 1000
@@ -1163,6 +1171,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setMiniTermsES(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={1000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {miniTermsES.length} / 1000
