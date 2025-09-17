@@ -230,8 +230,8 @@ const PropertiesEditForm = ({ hotel, hotelTerms, roomCloud, onClose }) => {
                 });
 
                 if (hotelTermsResponse.status === 200 || hotelTermsResponse.status === 201) {
-                    setIsEditing(false);
-                    onClose(); // Fecha o modal
+                    //setIsEditing(false);
+                    //onClose(); // Fecha o modal
                 } else {
                     setError("Failed to save hotel terms.");
                 }
@@ -376,7 +376,7 @@ const PropertiesEditForm = ({ hotel, hotelTerms, roomCloud, onClose }) => {
     ];
 
     const hotelDetails = [
-        { key: '{{hotel_name}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelName },
+        //{ key: '{{hotel_name}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelName },
         { key: '{{hotel_email}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelEmail },
         { key: '{{hotel_phone}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelPhone },
     ];

@@ -184,9 +184,9 @@ const CreatePropertyModal = ({
                     resetForm();
 
                     // ✅ Atualiza a página depois de salvar tudo com sucesso
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 800); // pequeno delay para mostrar a mensagem de sucesso
+                    // setTimeout(() => {
+                    //     window.location.reload();
+                    // }, 800); // pequeno delay para mostrar a mensagem de sucesso
                 } else {
                     setErrorMessage(`Failed to save hotel terms. Status: ${hotelTermsResponse.status}`);
                 }
@@ -361,7 +361,7 @@ const CreatePropertyModal = ({
     ];
 
     const hotelDetails = [
-        { key: '{{hotel_name}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelName },
+        //{ key: '{{hotel_name}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelName },
         { key: '{{hotel_email}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelEmail },
         { key: '{{hotel_phone}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelPhone },
     ];

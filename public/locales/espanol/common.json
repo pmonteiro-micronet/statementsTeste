@@ -273,7 +273,8 @@
             "name": "Nombre",
             "lastName": "Apellido",
             "email": "Correo electrónico",
-            "info": "Info"
+            "info": "Info",
+            "expirationDate": "Fecha de Expiración"
         }
     },
     "modals": {

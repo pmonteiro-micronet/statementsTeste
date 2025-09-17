@@ -273,7 +273,8 @@
             "name": "Nome",
             "lastName": "Sobrenome",
             "email": "Email",
-            "info": "Info"
+            "info": "Info",
+            "expirationDate": "Data de Expiração"
         }
     },
     "modals": {
@@ -313,7 +314,7 @@
             "email": "Email:",
             "password": "Password:",
             "pin": "PIN::",
-            "expirationDate": "Date de Expiração:",
+            "expirationDate": "Data de Expiração:",
             "submit": "Gravar"
         },
         "createProperty": {
