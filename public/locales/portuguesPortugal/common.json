@@ -460,7 +460,7 @@
             "yes": "Sim"
         },
         "PersonalID": {
-            "title": "Infromações pessoais",
+            "title": "Informações pessoais",
             "dateofBirth": "Data de nascimento",
             "countryofBirth": "País de nascimento",
             "nationality": "Nacionalidade",
