@@ -1096,6 +1096,7 @@ export default function Page() {
 
                                             {isAddressModalOpen && (
                                                 <AddressForm
+
                                                     onClose={() => setisAddressModalOpen(false)}
                                                     onSave={(newAddressData) => {
                                                         console.log("Dados recebidos do AddressForm:", newAddressData);
