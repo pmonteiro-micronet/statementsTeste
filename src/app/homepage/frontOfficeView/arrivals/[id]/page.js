@@ -522,11 +522,11 @@ export default function Arrivals({ params }) {
 
                                   if (isVerified) {
                                     // Redireciona caso seja verificado com sucesso
-                                    const url = `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}&mpehotel=${mpehotel}`;
+                                    const url = `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}`;
 
                                     console.log("👉 URL de redirecionamento:", url);
                                     router.push(
-                                      `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}%mpehotel=${mpehotel}`
+                                      `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.profileID}`
                                     );
                                   } else {
                                     // Exibe mensagem de erro no modal
