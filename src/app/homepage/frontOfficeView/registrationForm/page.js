@@ -256,50 +256,38 @@ export default function Page() {
 
             setIsLoading(true);
             try {
-                const response = await axios.get(`/api/reservations/checkins/registrationForm/${requestID}`);
-                console.log("Resposta da API para o requestID:", response);
+                const response = await axios.get(`/api/reservations/checkins/registrationForm/updateRealTime`, {
+                    params: { resNo, propertyID }
+                });
 
-                if (response.data?.response?.length > 0) {
-                    const requestBody = response.data.response[0].responseBody;
-                    const reservas = JSON.parse(requestBody);
-                    console.log("Reservas encontradas no responseBody:", reservas);
+                console.log("Resposta da API (real-time):", response);
 
+                const reservas = response.data; // Já é JSON válido
+
+                if (Array.isArray(reservas) && reservas.length > 0) {
                     let reservaSelecionada = null;
                     let guestInfo = null;
                     let address = null;
                     let personalID = null;
                     let contacts = null;
 
-                    if (Array.isArray(reservas)) {
-                        // Caso seja array: percorre o array procurando a reserva pelo resNo dentro de ReservationInfo
-                        for (const reservaObj of reservas) {
-                            if (reservaObj.ReservationInfo?.some(info => `${info.ResNo}` === `${resNo}`)) {
-                                reservaSelecionada = reservaObj.ReservationInfo.find(info => `${info.ResNo}` === `${resNo}`);
-
-                                guestInfo = reservaObj.GuestInfo?.[0]?.GuestDetails?.[0] || null;
-                                address = reservaObj.GuestInfo?.[0]?.Address?.[0] || null;
-                                personalID = reservaObj.GuestInfo?.[0]?.PersonalID?.[0] || null;
-                                contacts = reservaObj.GuestInfo?.[0]?.Contacts?.[0] || null;
-
-                                break;
-                            }
+                    for (const reservaObj of reservas) {
+                        if (reservaObj.ReservationInfo?.some(info => `${info.ResNo}` === `${resNo}`)) {
+                            reservaSelecionada = reservaObj.ReservationInfo.find(info => `${info.ResNo}` === `${resNo}`);
+                            guestInfo = reservaObj.GuestInfo?.[0]?.GuestDetails?.[0] || null;
+                            address = reservaObj.GuestInfo?.[0]?.Address?.[0] || null;
+                            personalID = reservaObj.GuestInfo?.[0]?.PersonalID?.[0] || null;
+                            contacts = reservaObj.GuestInfo?.[0]?.Contacts?.[0] || null;
+                            break;
                         }
-                    } else if (typeof reservas === 'object' && reservas !== null) {
-                        // Caso seja objeto: busca diretamente em ReservationInfo
-                        reservaSelecionada = reservas.ReservationInfo?.find(info => `${info.ResNo}` === `${resNo}`);
-
-                        guestInfo = reservas.GuestInfo?.[0]?.GuestDetails?.[0] || null;
-                        address = reservas.GuestInfo?.[0]?.Address?.[0] || null;
-                        personalID = reservas.GuestInfo?.[0]?.PersonalID?.[0] || null;
-                        contacts = reservas.GuestInfo?.[0]?.Contacts?.[0] || null;
                     }
 
                     if (reservaSelecionada) {
                         console.log("Reserva encontrada:", reservaSelecionada);
-                        console.log("Informações do hóspede:", guestInfo);
-                        console.log("Informações do endereço:", address);
-                        console.log("Informações do PersonalID:", personalID);
-                        console.log("Informações de contato:", contacts);
+                        console.log("Hóspede:", guestInfo);
+                        console.log("Endereço:", address);
+                        console.log("Documento:", personalID);
+                        console.log("Contatos:", contacts);
 
                         setReserva(reservaSelecionada);
                         setGuestInfo(guestInfo);
@@ -319,7 +307,7 @@ export default function Page() {
                     console.warn(`Nenhuma reserva encontrada para o requestID: ${requestID}`);
                 }
             } catch (error) {
-                console.error("Erro ao buscar reserva específica:", error.message);
+                console.error("Erro ao buscar reserva em tempo real:", error.message);
             } finally {
                 setIsLoading(false);
             }
