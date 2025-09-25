@@ -24,7 +24,7 @@ const customStyles = {
     })
 };
 
-const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
+const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultData }) => {
     console.log("ResNo", resNo, "ProfileID", profileID, "PropertyID", propertyID);
     const [formData, setFormData] = useState({
         companyName: "",
@@ -44,7 +44,23 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        const [locale, setLocale] = useState("pt");
+    useEffect(() => {
+        if (defaultData) {
+            setFormData((prev) => ({
+                ...prev,
+                companyName: defaultData.companyName || "",
+                vatNo: defaultData.vatNo || "",
+            }));
+        }
+    }, [defaultData]);
+
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, []);
+
+    const [locale, setLocale] = useState("pt");
 
     useEffect(() => {
         // Carregar o idioma do localStorage
@@ -56,12 +72,6 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
 
     // Carregar as traduções com base no idioma atual
     const t = translations[locale] || translations["pt"];
-
-    useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.focus();
-        }
-    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -139,17 +149,17 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
             setErrorMessage(t.modals.companyInfo.errors.companyNameRequired);
             return;
         }
-    
+
         if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
             setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
             return;
         }
-    
+
         // Substituir valores vazios por um espaço em branco
         const formattedData = Object.fromEntries(
             Object.entries(formData).map(([key, value]) => [key, String(value).trim() === "" ? " " : String(value).trim()])
-        );        
-    
+        );
+
         try {
             const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVATJson", {
                 profileID,
@@ -159,7 +169,26 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                 countryName: formData.countryName,
                 ...formattedData // Enviar os dados formatados
             });
-    
+
+                        // Atualizar localStorage
+            const existingCompanies = JSON.parse(localStorage.getItem("JSONcompany") || "{}");
+
+            // Monta o objeto para salvar no localStorage, incluindo os campos extras
+            const localStorageData = {
+                profileID,
+                propertyID,
+                resNo,
+                countryID: formData.country,
+                countryName: formData.countryName,
+                ...formattedData,
+                hasCompanyVAT: 1,
+                BlockedCVatNO: 0,
+            };
+
+            existingCompanies[profileID] = localStorageData;
+
+            localStorage.setItem("JSONcompany", JSON.stringify(existingCompanies));
+
             console.log("Success:", response.data);
             setErrorMessage("");
             setIsDataModified(false);
@@ -168,7 +197,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
             console.log("Erro ao salvar informações de VAT:", error);
             setErrorMessage(t.modals.companyInfo.errorSaving);
         }
-    };    
+    };
 
     const handleCloseModal = () => {
         if (isDataModified) {
@@ -296,7 +325,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
                             <div className="flex justify-end space-x-2">
                                 <Button color="error" onClick={handleCloseModal}>{t.modals.companyInfo.cancel}</Button>

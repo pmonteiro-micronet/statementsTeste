@@ -74,6 +74,9 @@ export default function Page() {
     const router = useRouter();
 
     const [localCompanyData, setLocalCompanyData] = useState(null);
+    const [addressData, setAddressData] = useState({});
+    const [personalIDData, setPersonalIDData] = useState({});
+
 
     useEffect(() => {
         const companies = JSON.parse(localStorage.getItem("company") || "{}");
@@ -411,7 +414,6 @@ export default function Page() {
         }
         let missingFields = [];
 
-        if (!guestInfo.FirstName) missingFields.push("First Name");
         if (!guestInfo.LastName) missingFields.push("Last Name");
         if (!address.Country) missingFields.push("Country");
         if (!personalID.IDDoc) missingFields.push("Document Type");
@@ -439,6 +441,50 @@ export default function Page() {
 
         setErrorMessage('');
         setIsErrorModalOpen(false);
+
+        try {
+            // atualiza o address
+            const payloadAddress = {
+                countryID: addressData.CountryID,
+                address: addressData.Street,
+                postalcode: addressData.PostalCode,
+                city: addressData.City,
+                profileID: profileID,
+                propertyID: propertyID
+            };
+
+            const responseAddress = await axios.post(
+                '/api/reservations/checkins/registrationForm/editaddress',
+                payloadAddress
+            );
+            console.log("Endereço salvo com sucesso:", responseAddress.data);
+
+            // atualiza o personalID
+            const payloadPersonalID = {
+                DateOfBirth: personalIDData.DateOfBirth,
+                CountryOfBirth: personalIDData.CountryOfBirthID, // assumindo que você guardou o ID aqui
+                Nationality: personalIDData.NationalityID,       // idem
+                IDDoc: personalIDData.IDDocID,                   // idem
+                DocNr: personalIDData.NrDoc,
+                ExpDate: personalIDData.ExpDate,
+                Issue: personalIDData.Issue,
+                profileID: profileID,
+                propertyID: propertyID
+            };
+
+            const responsePersonalID = await axios.post(
+                '/api/reservations/checkins/registrationForm/editpersonalID',
+                payloadPersonalID
+            );
+            console.log("Personal ID salvo com sucesso:", responsePersonalID.data);
+
+        } catch (error) {
+            console.error("Erro ao salvar endereço ou Personal ID:", error);
+            errors.push("Erro ao salvar endereço ou dados do documento. Tente novamente.");
+            setErrorMessage(errors.join("\n"));
+            setIsErrorModalOpen(true);
+            return;
+        }
 
         let emailToSend = email !== initialEmail ? email : initialEmail; // Envia undefined se não houver alteração
         let vatNoToSend = vatNo !== initialVatNo ? vatNo : initialVatNo; // Envia undefined se não houver alteração
@@ -482,15 +528,23 @@ export default function Page() {
                 Childs: reserva.Childs,
                 LastName: guestInfo.LastName,
                 FirstName: guestInfo.FirstName,
-                Street: address.Street,
-                Country: address.Country,
-                IdDoc: personalID.IDDoc,
-                NrDoc: personalID.NrDoc,
+
+                // Usa addressData se existir, senão fallback para address
+                Street: addressData?.Street ?? address.Street,
+                Country: addressData?.Country ?? address.Country,
+
+                // Usa personalIDData se existir, senão fallback para personalID
+                IdDoc: personalIDData?.IDDoc ?? personalID.IDDoc,
+                NrDoc: personalIDData?.NrDoc ?? personalID.NrDoc,
+                ExpDate: personalIDData?.ExpDate ?? personalID.ExpDate,
+                DateOfBirth: personalIDData?.DateOfBirth ?? personalID.DateOfBirth,
+                Issue: personalIDData?.Issue ?? personalID.Issue,
+                CountryOfBirth: personalIDData?.CountryOfBirth ?? personalID.CountryOfBirth,
+                IDCountryOfBirth: personalIDData?.IDCountryOfBirth ?? personalID.IDCountryOfBirth,
+                IDDocSelect: personalIDData?.IDDocSelect ?? personalID.IDDocSelect,
+                IDNationality: personalIDData?.IDNationality ?? personalID.IDNationality,
+
                 Phone: contacts.PhoneNumber,
-                ExpDate: personalID.ExpDate,
-                DateOfBirth: personalID.DateOfBirth,
-                Issue: personalID.Issue,
-                CountryOfBirth: personalID.CountryOfBirth,
                 VatNo: contacts.VatNo,
                 PersonalEmail: contacts.Email,
                 ProtectionPolicy: policyAccepted,
@@ -1015,7 +1069,7 @@ export default function Page() {
                                                     type={"text"}
                                                     id={"First Name"}
                                                     name={"First Name"}
-                                                    label={`${t.frontOffice.registrationForm.firstName} *`}
+                                                    label={`${t.frontOffice.registrationForm.firstName}`}
                                                     ariaLabel={"First Name:"}
                                                     value={guestInfo.FirstName}
                                                     style={"w-full h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
@@ -1043,7 +1097,11 @@ export default function Page() {
                                             {isAddressModalOpen && (
                                                 <AddressForm
                                                     onClose={() => setisAddressModalOpen(false)}
-                                                    address={address}
+                                                    onSave={(newAddressData) => {
+                                                        console.log("Dados recebidos do AddressForm:", newAddressData);
+                                                        setAddressData(newAddressData); // guarda no state addressData
+                                                    }}
+                                                    address={addressData}
                                                     profileID={profileID}
                                                     propertyID={propertyID}
                                                     t={t}
@@ -1086,7 +1144,7 @@ export default function Page() {
                                                 value={address.City}
                                                 style={inputStyleFull}
                                             />
-                                            <InputFieldControlled
+                                            {/* <InputFieldControlled
                                                 type={"text"}
                                                 id={"State / Province / Region"}
                                                 name={"State / Province / Region"}
@@ -1094,7 +1152,7 @@ export default function Page() {
                                                 ariaLabel={"State / Province / Region:"}
                                                 value={address.Region}
                                                 style={inputStyleFull}
-                                            />
+                                            /> */}
                                         </div>
                                     </div>
 
@@ -1115,9 +1173,13 @@ export default function Page() {
                                             {isPersonalIDModalOpen && (
                                                 <PersonalIDForm
                                                     onClose={() => setisPersonalIDModalOpen(false)}
-                                                    personalID={personalID}
-                                                    propertyID={propertyID}
+                                                    onSave={(newPersonalIDData) => {
+                                                        console.log("Dados recebidos do modal PersonalID:", newPersonalIDData);
+                                                        setPersonalIDData(newPersonalIDData); // armazena no state local
+                                                    }}
+                                                    personalID={personalIDData} // passa o state atual
                                                     profileID={profileID}
+                                                    propertyID={propertyID}
                                                     t={t}
                                                 />
                                             )}
@@ -1395,7 +1457,7 @@ export default function Page() {
                                             onClose={() => setIsCVATModalOpen(false)}
                                             profileID={guestInfo.ProfileID}
                                             propertyID={propertyID}
-                                            initialData={companyVATData} 
+                                            initialData={companyVATData}
                                             resNo={reserva.ResNo}
                                             companyID={reserva.CompanyID || localCompanyData?.companyID}
                                             companyVATData={companyVATData}

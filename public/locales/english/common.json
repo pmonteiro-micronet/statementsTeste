@@ -36,6 +36,7 @@
             "departures": "Departures",
             "arrivals": "Arrivals",
             "inHouses": "InHouses",
+            "housekeeping": "Housekeeping",
             "viewMode": "View Mode",
             "language": "Language",
             "logout": "Logout",
@@ -134,6 +135,23 @@
             "statement": "Statement",
             "room": "Room",
             "noReservations": "No reservations found."
+        },
+        "housekeeping": {
+            "title": "Housekeeping",
+            "tomorrow": "Tomorrow",
+            "room": "Room",
+            "roomStatus": "ST",
+            "guestName": "Guest Name",
+            "travelAgency": "Travel Agency",
+            "company": "Company",
+            "group": "Group",
+            "notes": "Notes",
+            "resNo": "Res. No.",
+            "arrival": "Arrival",
+            "info": "Info",
+            "registrationForm": "Registration Form",
+            "noReservations": "No reservations found.",
+            "attention": "Attention"
         },
         "registrationForm": {
             "title": "Registration Form",
@@ -471,7 +489,7 @@
             "title": "Address Information",
             "country": "Country",
             "streetAdress": "Address",
-            "zipCode":"Zip code",
+            "zipCode": "Zip code",
             "city": "City",
             "SPR": "State/Province/Region"
         },

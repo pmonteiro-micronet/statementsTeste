@@ -14,7 +14,7 @@ export async function POST(request) {
             address,
             postalcode,
             city,
-            region,
+            // region,
             profileID,
             propertyID
         } = body;
@@ -25,7 +25,7 @@ export async function POST(request) {
             StreetAddress: address,
             PostalCode: postalcode,
             City: city,
-            StateProvinceRegion: region,
+            // StateProvinceRegion: region,
             ProfileID: parseInt(profileID),
         };
 
