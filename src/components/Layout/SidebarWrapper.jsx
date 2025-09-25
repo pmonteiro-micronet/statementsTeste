@@ -21,6 +21,7 @@ import { LuMapPinHouse } from "react-icons/lu";
 import { RxEnter, RxExit } from "react-icons/rx";
 import { FaRegAddressCard } from "react-icons/fa";
 import { GiArchiveRegister } from "react-icons/gi";
+import { MdOutlineDryCleaning } from "react-icons/md";
 
 export default function SidebarWrapper({ children }) {
   const { data: session } = useSession();
@@ -36,7 +37,8 @@ export default function SidebarWrapper({ children }) {
   const [isHotelConfirmed, setIsHotelConfirmed] = useState(false);
 
     const [locale, setLocale] = useState("pt");
-    
+  const isAdmin = session?.user?.permission === 1;
+
       useEffect(() => {
         // Carregar o idioma do localStorage
         const storedLanguage = localStorage.getItem("language");
@@ -188,6 +190,15 @@ export default function SidebarWrapper({ children }) {
               onClick: () => handleRedirect("departures"),
               icon: <RxExit />,
             },
+            // Só adiciona housekeeping se for admin
+          ...(isAdmin
+            ? [{
+                ref: `/homepage/frontOfficeView/housekeeping/${selectedHotelID}`,
+                label: `${t.navbar.text.housekeeping}`,
+                onClick: () => handleRedirect("housekeeping"),
+                icon: <MdOutlineDryCleaning />,
+              }]
+            : []),
           ],
         },        
       });

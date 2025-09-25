@@ -6,7 +6,7 @@ import Select from "react-select";
 import axios from "axios";
 
 
-const AddressForm = ({ onClose, address, propertyID, profileID, t }) => {
+const AddressForm = ({ onClose, onSave, address, propertyID, t }) => {
     //popula o select de pais
     const [countryOptions, setCountryOptions] = useState([]);
 
@@ -15,7 +15,7 @@ const AddressForm = ({ onClose, address, propertyID, profileID, t }) => {
         Street: address?.Street || "",
         PostalCode: address?.PostalCode || "",
         City: address?.City || "",
-        Region: address?.Region || "",
+        // Region: address?.Region || "",
     }));
 
     const [countryIDSelected, setCountryIDSelected] = useState(() => ({
@@ -68,44 +68,54 @@ const AddressForm = ({ onClose, address, propertyID, profileID, t }) => {
         fetchCountries();
     }, [propertyID]);
 
-  const saveAddress = async () => {
-    try {
-        const payload = {
-            countryID: countryIDSelected.CountryID,
-            address: formData.Street,
-            postalcode: formData.PostalCode,
-            city: formData.City,
-            region: formData.Region,
-            profileID: profileID,
-            propertyID: propertyID
-        };
+//   const saveAddress = async () => {
+//     try {
+//         const payload = {
+//             countryID: countryIDSelected.CountryID,
+//             address: formData.Street,
+//             postalcode: formData.PostalCode,
+//             city: formData.City,
+//             // region: formData.Region,
+//             profileID: profileID,
+//             propertyID: propertyID
+//         };
 
-        const response = await axios.post('/api/reservations/checkins/registrationForm/editaddress', payload);
+//         const response = await axios.post('/api/reservations/checkins/registrationForm/editaddress', payload);
 
-        if (response.status === 200) {
-            setIsDataModified(false);
-            return { success: true };
-        } else {
-            console.error("Failed to save address:", response.data);
-            return { success: false, error: response.data };
-        }
-    } catch (error) {
-        console.error("Error saving address:", error?.response?.data || error.message);
-        return { success: false, error: error?.response?.data || error.message };
-    }
-};
+//         if (response.status === 200) {
+//             setIsDataModified(false);
+//             return { success: true };
+//         } else {
+//             console.error("Failed to save address:", response.data);
+//             return { success: false, error: response.data };
+//         }
+//     } catch (error) {
+//         console.error("Error saving address:", error?.response?.data || error.message);
+//         return { success: false, error: error?.response?.data || error.message };
+//     }
+// };
 
 
-const handleSave = async () => {
-    const result = await saveAddress();
-    if (result?.success) {
+
+
+// const handleSave = async () => {
+//     const result = await saveAddress();
+//     if (result?.success) {
+//         setIsDataModified(false);
+//         onClose(formData);
+//     } else {
+//         console.error("Erro ao alterar endereço:", result?.error);
+//     }
+// };
+
+ const handleSave = () => {
+        onSave({
+            ...formData,
+            CountryID: countryIDSelected.CountryID
+        });
         setIsDataModified(false);
-        onClose(formData);
-    } else {
-        console.error("Erro ao alterar endereço:", result?.error);
-    }
-};
-
+        onClose();
+    };
 
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
@@ -170,7 +180,7 @@ const handleSave = async () => {
                                         />
                                     </div>
 
-                                    <div className="flex-1 min-w-[150px]">
+                                    {/* <div className="flex-1 min-w-[150px]">
                                         <label className="block text-sm font-medium">
                                             {t.modals.Address.SPR}
                                         </label>
@@ -182,7 +192,7 @@ const handleSave = async () => {
                                             required
                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                         />
-                                    </div>
+                                    </div> */}
 
                                     <div className="flex-1 min-w-[150px]">
                                         <label className="block text-sm font-medium">

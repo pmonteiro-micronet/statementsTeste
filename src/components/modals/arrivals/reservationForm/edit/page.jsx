@@ -181,7 +181,7 @@ const EditRegistrationForm = ({
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{`{t.modals.Contacts.new} ${currentLabel}:`}</label>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">{`t.modals.Contacts.new ${currentLabel}:`}</label>
                                         <input
                                             ref={inputRef}
                                             type={currentLabel.toLowerCase() === "vat no." ? "number" : "text"}

@@ -24,7 +24,7 @@ const customStyles = {
     })
 };
 
-const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
+const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultData }) => {
     console.log("ResNo", resNo, "ProfileID", profileID, "PropertyID", propertyID);
     const [formData, setFormData] = useState({
         companyName: "",
@@ -43,6 +43,16 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo }) => {
     const [isDataModified, setIsDataModified] = useState(false);  // Estado para monitorar mudanças nos dados
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    useEffect(() => {
+        if (defaultData) {
+            setFormData((prev) => ({
+                ...prev,
+                companyName: defaultData.companyName || "",
+                vatNo: defaultData.vatNo || "",
+            }));
+        }
+    }, [defaultData]);
 
     useEffect(() => {
         if (inputRef.current) {
