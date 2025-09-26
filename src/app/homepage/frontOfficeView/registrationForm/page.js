@@ -1090,7 +1090,7 @@ export default function Page() {
                                                         console.log("Dados recebidos do AddressForm:", newAddressData);
                                                         setAddressData(newAddressData); // guarda no state addressData
                                                     }}
-                                                    address={addressData}
+                                                    address={address}
                                                     profileID={profileID}
                                                     propertyID={propertyID}
                                                     t={t}
@@ -1166,7 +1166,7 @@ export default function Page() {
                                                         console.log("Dados recebidos do modal PersonalID:", newPersonalIDData);
                                                         setPersonalIDData(newPersonalIDData); // armazena no state local
                                                     }}
-                                                    personalID={personalIDData} // passa o state atual
+                                                    personalID={personalID} // passa o state atual
                                                     profileID={profileID}
                                                     propertyID={propertyID}
                                                     t={t}

@@ -140,9 +140,9 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
     const handleSave = () => {
         onSave({
             ...formData,
-            IDCountryOfBirth: selectIDForm.IDCountryOfBirth,
-            IDDocSelect: selectIDForm.IDDocSelect,
-            IDNationality: selectIDForm.IDNationality
+            CountryOfBirth: selectIDForm.IDCountryOfBirth,
+            DocSelect: selectIDForm.IDDocSelect,
+            Nationality: selectIDForm.IDNationality
         });
         setIsDataModified(false);
         onClose();
