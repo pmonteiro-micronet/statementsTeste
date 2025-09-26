@@ -9,35 +9,30 @@ import { AiOutlineCalendar } from "react-icons/ai";
 import "react-datepicker/dist/react-datepicker.css";
 
 const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
-    //popula o select de pais de origem
     const [countryOptions, setCountryOptions] = useState([]);
-    //popula o select do ID DOC
     const [docTypeOptions, setDocTypeOptions] = useState([]);
 
     const [formData, setFormData] = useState(() => ({
         DateOfBirth: personalID?.DateOfBirth ? personalID.DateOfBirth.split('T')[0] : "",
-        CountryOfBirth: personalID?.CountryOfBirth || "",
-        Nationality: personalID?.Nationality || "",
-        IDDoc: personalID?.IDDoc || "",
-        NrDoc: personalID?.NrDoc || "",
         ExpDate: personalID?.ExpDate ? personalID.ExpDate.split('T')[0] : "",
+        NrDoc: personalID?.NrDoc || "",
         Issue: personalID?.Issue || "",
+        CountryOfBirthID: personalID?.CountryOfBirthID || "",
+        CountryOfBirthLabel: personalID?.CountryOfBirth || "",
+        NationalityID: personalID?.NationalityID || "",
+        NationalityLabel: personalID?.Nationality || "",
+        IDDocID: personalID?.IDDocID || "",
+        IDDocLabel: personalID?.IDDoc || "",
     }));
 
-    console.log("ID", propertyID);
     const [isDataModified, setIsDataModified] = useState(false);
     const inputRef = useRef(null);
-
-    const [selectIDForm, setSelectIDFrom] = useState(() => ({
-        IDCountryOfBirth: "",
-        IDDocSelect: "",
-        IDNationality: ""
-    }));
+    const dobRef = useRef(null);
+    const expDateRef = useRef(null);
 
     const handleCloseModal = () => {
         if (isDataModified) {
-            const confirmLeave = window.confirm("Você vai perder os dados, continuar?");
-            if (confirmLeave) onClose();
+            if (window.confirm("Você vai perder os dados, continuar?")) onClose();
         } else {
             onClose();
         }
@@ -45,7 +40,7 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormData(prev => ({ ...prev, [name]: value }));
         setIsDataModified(true);
     };
 
@@ -53,57 +48,56 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
         if (inputRef.current) inputRef.current.focus();
     }, []);
 
-    //useEffect para popular countryOptions
-    useEffect(() => {
-        const fetchCountries = async () => {
-            try {
-                if (!propertyID) {
-                    console.log("Não há propertyID associado", propertyID);
-                }
-                const response = await axios.get(`/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`);
-                const formattedOptions = response.data
-                    .map((country) => ({
-                        value: country.codenr,
-                        label: country.land,
-                    }))
-                    .sort((a, b) => a.label.localeCompare(b.label));
-                setCountryOptions(formattedOptions);
-            } catch (error) {
-                console.error("Erro ao buscar países:", error);
-            }
-        };
-        fetchCountries();
-    }, [propertyID]);
+   // Buscar países
+useEffect(() => {
+    const fetchCountries = async () => {
+        if (!propertyID) return;
+        try {
+            const response = await axios.get(
+                `/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`
+            );
 
-    //useEffect para popular docTypeOptions
-    useEffect(() => {
-        const fetchDocTypes = async () => {
-            try {
-                if (!propertyID) {
-                    console.log("Não há propertyID associado", propertyID);
-                    return;
-                }
+            // Garante que value = ID e label = nome do país
+            const options = response.data
+                .map(c => ({ value: c.codenr, label: c.land }))
+                .sort((a, b) => a.label.localeCompare(b.label));
 
-                const response = await axios.get(
-                    `/api/reservations/checkins/registrationForm/doctypes?propertyID=${propertyID}`
-                );
+            setCountryOptions(options);
+        } catch (error) {
+            console.error("Erro ao buscar países:", error);
+        }
+    };
+    fetchCountries();
+}, [propertyID]);
 
-                const formattedOptions = response.data
-                    .map((doc) => ({
-                        value: doc.value,
-                        label: doc.label,
-                    }))
-                    .sort((a, b) => a.label.localeCompare(b.label));
+// Buscar tipos de documento
+useEffect(() => {
+    const fetchDocTypes = async () => {
+        if (!propertyID) return;
+        try {
+            const response = await axios.get(
+                `/api/reservations/checkins/registrationForm/doctypes?propertyID=${propertyID}`
+            );
 
-                setDocTypeOptions(formattedOptions);
+            // Garante que value = ID/tipo e label = nome do documento
+            const options = response.data
+                .map(d => ({ value: d.value, label: d.label }))
+                .sort((a, b) => a.label.localeCompare(b.label));
 
-            } catch (error) {
-                console.error("Erro ao buscar tipos de documentos:", error);
-            }
-        };
+            setDocTypeOptions(options);
+        } catch (error) {
+            console.error("Erro ao buscar tipos de documentos:", error);
+        }
+    };
+    fetchDocTypes();
+}, [propertyID]);
 
-        fetchDocTypes();
-    }, [propertyID]);
+
+    const handleSave = () => {
+        onSave(formData); // IDs já estão em formData
+        setIsDataModified(false);
+        onClose();
+    };
 
     // const savePersonalID = async (formData, selectIDForm) => {
     //     try {
@@ -137,16 +131,16 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
     //     }
     // };
 
-    const handleSave = () => {
-        onSave({
-            ...formData,
-            CountryOfBirth: selectIDForm.IDCountryOfBirth,
-            DocSelect: selectIDForm.IDDocSelect,
-            Nationality: selectIDForm.IDNationality
-        });
-        setIsDataModified(false);
-        onClose();
-    };
+    // const handleSave = () => {
+    //     onSave({
+    //         ...formData,
+    //         CountryOfBirth: selectIDForm.IDCountryOfBirth,
+    //         DocSelect: selectIDForm.IDDocSelect,
+    //         Nationality: selectIDForm.IDNationality
+    //     });
+    //     setIsDataModified(false);
+    //     onClose();
+    // };
 
 
     useEffect(() => {
@@ -158,9 +152,6 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
 
         return () => clearTimeout(timer);
     }, []);
-
-    const expDateRef = useRef(null);
-    const dobRef = useRef(null);
 
     // Converte string "aaaa/mm/dd" para Date
     const parseDate = (value) => {

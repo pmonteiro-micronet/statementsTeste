@@ -67,8 +67,7 @@ export async function POST(request) {
 
     console.log("Resposta da API externa:", response.data);
 
-    // Capturar corretamente o CompanyID da resposta da API externa
-    const companyID = response.data?.CompanyID; // Com "C" maiúsculo
+    const companyID = response.data?.CompanyID;
 
     if (!companyID) {
       return new NextResponse(
@@ -77,80 +76,19 @@ export async function POST(request) {
       );
     }
 
-    // Buscar o registro no banco para atualização
-    const record = await prisma.requestRecordsArrivals.findFirst({
-      where: { propertyID: Number(propertyID) },
-      select: { requestID: true, responseBody: true },
-    });
-
-    if (!record) {
-      return new NextResponse(
-        JSON.stringify({ error: "Registro não encontrado." }), 
-        { status: 404 }
-      );
-    }
-
-    const { requestID } = record;
-
-    // Converter JSONs do banco de forma segura
-    let responseBody = record.responseBody
-      ? (typeof record.responseBody === "string" ? JSON.parse(record.responseBody) : record.responseBody)
-      : [];
-
-    // Função para atualizar os dados da empresa dentro do JSON (somente no responseBody)
-    const atualizarCamposEmpresaNoResponseBody = (json, profileID, companyID) => {
-      json.forEach((reserva) => {
-        // Verifica se há algum hóspede com o profileID correto nesta reserva
-        const hospedeEncontrado = reserva.GuestInfo.some((guest) =>
-          guest.GuestDetails.some((detail) => detail.ProfileID === profileID)
-        );
-    
-        if (hospedeEncontrado) {
-          reserva.ReservationInfo.forEach((reservation) => {
-            reservation.Company = companyName;
-            reservation.CompanyEmail = emailAddress;
-            reservation.CompanyVatNo = vatNo;
-            reservation.CompanyState = state;
-            reservation.CompanyCity = city;
-            reservation.CompanyZipCode = zipCode;
-            reservation.CompanyStreetAddress = streetAddress;
-            reservation.CompanyCountryName = countryName;
-            reservation.CompanyCountryID = countryID;
-            reservation.hasCompanyVAT = 1;
-            reservation.CompanyID = companyID; 
-          });
-        }
-      });
-    };    
-
-    console.log("VAT antes da atualização do responseBody:", vatNo);
-
-    atualizarCamposEmpresaNoResponseBody(responseBody, profileID, companyID);
-    
-    console.log("responseBody FINAL antes de salvar:", JSON.stringify(responseBody, null, 2));
-    
-    await prisma.requestRecordsArrivals.update({
-      where: { requestID: requestID },  
-      data: {
-        responseBody: JSON.stringify(responseBody),
-      },
-    });
-    
-
     return new NextResponse(
       JSON.stringify({
-        message: "Dados enviados e armazenados com sucesso",
-        updatedResponseBody: responseBody,
+        message: "Dados enviados com sucesso (sem atualização de BD)",
         externalAPIResponse: response.data,
       }),
       { status: 200 }
     );
   } catch (error) {
-    console.error("Erro ao enviar ou atualizar os dados:", error);
+    console.error("Erro ao enviar os dados:", error);
 
     return new NextResponse(
       JSON.stringify({
-        error: error.response?.data || "Erro ao enviar ou atualizar os dados",
+        error: error.response?.data || "Erro ao enviar os dados",
       }),
       { status: 500 }
     );
