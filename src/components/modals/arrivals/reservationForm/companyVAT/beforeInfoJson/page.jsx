@@ -26,6 +26,7 @@ const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo }) => {
     const [selectedCompany, setSelectedCompany] = useState(false);
 
     const vatRef = useRef(null);
+    const [insertFormData, setInsertFormData] = useState(null);
 
     console.log(errorMessage, isDataModified);
     // Estado para controlar o modal principal
@@ -143,7 +144,10 @@ const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo }) => {
                                                 <p>{t.modals.companyInfo.noResults}</p>
                                                 <div className="flex justify-end space-x-2 mt-2">
                                                     <Button
-                                                        onClick={() => setIsInsertModalOpen(true)}
+                                                        onClick={() => {
+                                                            setInsertFormData(formData);
+                                                            setIsInsertModalOpen(true);
+                                                        }}
                                                         className="bg-primary text-white"
                                                     >
                                                         {t.modals.companyInfo.newCompany}
@@ -228,6 +232,7 @@ const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo }) => {
                     profileID={profileID}
                     propertyID={propertyID}
                     resNo={resNo}
+                    defaultData={insertFormData}
                 />
             )}
 

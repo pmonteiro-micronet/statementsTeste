@@ -36,6 +36,7 @@
             "departures": "Partidas",
             "arrivals": "Chegadas",
             "inHouses": "InHouses",
+            "housekeeping": "Housekeeping",
             "viewMode": "Modo de Visualização",
             "language": "Idioma",
             "logout": "Sair",
@@ -136,6 +137,23 @@
             "info": "Informações",
             "statement": "Statement",
             "noReservations": "Nenhuma reserva encontrada."
+        },
+        "housekeeping": {
+            "title": "Housekeeping",
+            "tomorrow": "Tomorrow",
+            "room": "Room",
+            "roomStatus": "ST",
+            "guestName": "Guest Name",
+            "travelAgency": "Travel Agency",
+            "company": "Company",
+            "group": "Group",
+            "notes": "Notes",
+            "resNo": "Res. No.",
+            "arrival": "Arrival",
+            "info": "Info",
+            "registrationForm": "Registration Form",
+            "noReservations": "No reservations found.",
+            "attention": "Attention"
         },
         "registrationForm": {
             "title": "Formulário de Registo",
