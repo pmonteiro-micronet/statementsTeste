@@ -29,7 +29,7 @@ export async function GET(request) {
         // Buscar propertyServer e propertyPortStay no banco
         const property = await prisma.properties.findUnique({
             where: { propertyID: propertyIDInt },
-            select: { propertyServer: true, propertyPortStay: true, mpehotel: true }
+            select: { propertyServer: true, propertyPort: true, mpehotel: true }
         });
 
         if (!property) {
