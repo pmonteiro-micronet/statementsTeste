@@ -3,16 +3,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
-import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "@heroui/react";
+import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem } from "@heroui/react";
 
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { IoMdAdd } from "react-icons/io";
 import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
 import { IoMdInformationCircle } from "react-icons/io";
 import { CgFormatIndentIncrease } from "react-icons/cg";
 
-import InHousesInfoForm from "@/components/modals/inhouses/info/page";
+import NewReservationModal from "@/components/modals/statementsOta/newStatementsOta/page.jsx";
+import EditReservationModal from "@/components/modals/statementsOta/editStatementsOta/page.jsx"; // <-- Add this import
 import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 
@@ -43,6 +45,11 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  console.log(isModalOpen);
+  const [isNewReservationModalOpen, setIsNewReservationModalOpen] = useState(false); // Add state for modal
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // <-- Add this state
+
+  const [editReservationData, setEditReservationData] = useState(null); // <-- Add this state
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
@@ -65,8 +72,6 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
   const [propertyName, setPropertyName] = useState([]);
 
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
   // Função para enviar os dados para a API
   const sendDataToAPI = async () => {
     try {
@@ -78,24 +83,11 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
         const mpehotel = propertyResponse.data.response[0].mpehotel;
         console.log('Mpehotel encontrado:', mpehotel);
 
-        // Faz as requisições com delay
-        await axios.get("/api/reservations/checkins/reservations_4_tat", {
+        await axios.get("/api/reservations/reservationsOta/reservations_4_ota", {
           params: { mpehotel, propertyID },
         });
 
-        // Aguarda 1 segundo antes de fazer a próxima requisição
-        await sleep(1000);
-
-        await axios.get("/api/reservations/inHouses/reservations_4_tat", {
-          params: { mpehotel, propertyID },
-        });
-
-        // Aguarda mais 1 segundo antes de fazer a última requisição
-        await sleep(1000);
-
-        await axios.get("/api/reservations/info", {
-          params: { mpehotel, propertyID },
-        });
+        
 
         setPostSuccessful(true);
 
@@ -198,21 +190,29 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [selectedReserva, setSelectedReserva] = useState(null);
 
   const handleOpenModal = (reserva) => {
+    console.log(selectedReserva);
     setSelectedReserva(reserva); // Armazena os dados da reserva clicada
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedReserva(null); // Limpa os dados ao fechar a modal
-    window.location.reload(); // Recarrega a página
+  // Handler for opening the edit modal
+  const handleOpenEditModal = (reserva) => {
+    setEditReservationData(reserva);
+    setIsEditModalOpen(true);
+  };
+
+  // Handler for closing the edit modal
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditReservationData(null);
+    fetchReservas(); // Refresh reservations after edit
   };
 
   // Função para pegar as reservas
   const fetchReservas = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`/api/reservations/inHouses/${propertyID}`);
+      const response = await axios.get(`/api/reservations/reservationsOta/${propertyID}`);
       console.log("Response completo:", response);
 
       // Parse das reservas
@@ -400,8 +400,15 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
           </div>
         </div>
 
-        <div className="mt-4">
-          <h2 className="text-lg text-textPrimaryColor">{propertyName} : {t.frontOffice.inHouses.title}</h2>
+        <div className="mt-4 flex justify-between items-center">
+          <h2 className="text-lg text-textPrimaryColor">{propertyName} : Reservations</h2>
+          <button
+            className="flex items-center justify-center text-white bg-primary rounded-lg cursor-pointer p-2 w-9 h-9"
+            title="Add Reservation"
+            onClick={() => setIsNewReservationModalOpen(true)} // Open modal on click
+          >
+            <IoMdAdd />
+          </button>
         </div>
 
         <div className="mt-5 flex flex-col h-[calc(100vh-210px)]">
@@ -433,15 +440,18 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                         )}
                       </div>
                     </td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.company}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">Room Type</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">Rate Code</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">Currency</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">Price</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.notes}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">Status</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.resNo}</td>
                   </tr>
                 </thead>
                 <tbody>
                   {sortedItems.map((reserva, index) => {
                     const isOpen = openDropdownIndex === index;
-                    // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                     return (
                       <tr key={index} onClick={() => setOpenDropdownIndex(index)} className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">
                         <td className="pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center">
@@ -465,7 +475,12 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                                 isOpen={true}
                                 className="relative z-10 text-textPrimaryColor"
                               >
-                                <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
+                                <DropdownItem key="edit" onClick={() => handleOpenEditModal(reserva)}>
+                                  <div className="flex flex-row gap-2">
+                                    <FaGear size={15}/> Edit
+                                  </div>
+                                </DropdownItem>
+                                <DropdownItem key="info" onClick={() => handleOpenModal(reserva)}>
                                   <div className="flex flex-row gap-2">
                                     <IoMdInformationCircle size={15}/> {t.frontOffice.inHouses.info}
                                   </div>
@@ -481,44 +496,27 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                                   }}
                                 >
                                   <div className="flex flex-row gap-2">
-                                  <CgFormatIndentIncrease size={15}/> {t.frontOffice.inHouses.statement}
+                                    <CgFormatIndentIncrease size={15}/> {t.frontOffice.inHouses.statement}
                                   </div>
                                 </DropdownItem>
                               </DropdownMenu>
                             </Dropdown>
                           </div>
 
-                          <InHousesInfoForm
-                            buttonName={t.frontOffice.inHouses.info}
-                            buttonColor={"transparent"}
-                            modalHeader={"Res. No.: " + selectedReserva?.ResNo}
-                            formTypeModal={11}
-                            roomNumber={selectedReserva?.Room}
-                            dateCI={selectedReserva?.DateCI}
-                            booker={selectedReserva?.Booker}
-                            salutation={selectedReserva?.Salutation}
-                            lastName={selectedReserva?.LastName}
-                            firstName={selectedReserva?.FirstName}
-                            roomType={selectedReserva?.RoomType}
-                            resStatus={selectedReserva?.resStatus}
-                            childs={selectedReserva?.Childs}
-                            adults={selectedReserva?.Adults}
-                            balance={selectedReserva?.balance}
-                            country={selectedReserva?.Country}
-                            isBackdropVisible={true}
-                            isOpen={isModalOpen}
-                            onClose={handleCloseModal}
-                          />
 
                         </td>
-                        <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.DateCI}</td>
-                        <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.DateCO}</td>
+                        <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.Arrival?.split("T")[0]}</td>
+                        <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.Departure?.split("T")[0]}</td>
                         <td className="text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.Room}</td>
                         <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">
-                          {`${reserva.LastName}, ${reserva.FirstName}`}
+                          {`${reserva.Lastname}, ${reserva.FirstName}`}
                         </td>
-                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-32 truncate whitespace-nowrap overflow-hidden">{reserva.Company}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva["Room Type"]}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva["Rate Code"]}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva.Currency}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva.Price}</td>
                         <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate whitespace-nowrap overflow-hidden">{reserva.Notes}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">{reserva.Status}</td>
                         <td className="h-14 pr-2 pr-2 border-r border-[#e6e6e6] text-right w-20 truncate whitespace-nowrap overflow-hidden">{reserva.ResNo}</td>
                       </tr>
                     );
@@ -560,6 +558,29 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
           onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
         />
       )}
+      {/* New Reservation Modal */}
+      <NewReservationModal
+        isOpen={isNewReservationModalOpen}
+        onClose={() => setIsNewReservationModalOpen(false)}
+
+        propertyID={propertyID} // <-- pass the propertyID from your page state
+      />
+      {/* Edit Reservation Modal */}
+      <EditReservationModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onSaved={fetchReservas}
+        propertyID={propertyID}
+        initialReservation={editReservationData}
+        initialRoom={editReservationData ? {
+          id: editReservationData.Room,
+          rateId: editReservationData["Rate Code"],
+          quantity: editReservationData.Quantity,
+          price: editReservationData.Price,
+          adults: editReservationData.Adults,
+        } : {}}
+        initialDayPrices={[]} // Fill with day price data if available
+      />
     </main>)
   );
 }

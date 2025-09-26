@@ -127,6 +127,7 @@ export default function AllProfiles({ }) {
                                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.allProfiles.table.name}</td>
                                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.allProfiles.table.lastName}</td>
                                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.allProfiles.table.email}</td>
+                                    <td className="pl-2 border-r border-[#e6e6e6] uppercase">{t.allProfiles.table.expirationDate}</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -160,6 +161,7 @@ export default function AllProfiles({ }) {
                                         <td className="pl-2 border-r border-[#e6e6e6]">{user.firstName}</td>
                                         <td className="pl-2 border-r border-[#e6e6e6]">{user.secondName}</td>
                                         <td className="pl-2 pr-2 border-r border-[#e6e6e6]">{user.email}</td>
+                                        <td className="pl-2 pr-2">{user.expirationDate ? new Date(user.expirationDate).toLocaleDateString() : "-"}</td>
                                     </tr>
                                 ))}
                             </tbody>

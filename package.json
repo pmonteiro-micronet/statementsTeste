@@ -37,7 +37,8 @@
       "react-responsive": "^10.0.0",
       "react-select": "^5.10.0",
       "signature_pad": "^5.0.4",
-      "tailwind-merge": "^2.6.0"
+      "tailwind-merge": "^2.6.0",
+      "xml2js": "^0.6.2"
    },
    "devDependencies": {
       "@types/node": "^20",
