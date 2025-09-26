@@ -40,10 +40,11 @@ export async function GET(request) {
         }
 
         const { propertyServer, propertyPort, mpehotel } = property;
-
+        console.log("🔍 Propriedade encontrada:", property);
         // Construir a URL da API externa
-        const url = `http://${propertyServer}:${propertyPort}/registrationForm/updateRealTime`;
+        const url = `http://${propertyServer}:${propertyPort}/realtimeupdaterf`;
 
+        console.log("➡️ Chamando API externa:", url);
         // Chamada ao servidor externo, passando mpeHotel e resNo nos headers
         const response = await axios.get(url, {
             headers: {
