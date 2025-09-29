@@ -153,6 +153,9 @@ const JsonViewPage = () => {
       try {
         const parsedData = JSON.parse(reservationData.requestBody);
 
+        // Log para ver o que foi recebido
+      console.log("DADOS RECEBIDOS (parsedData):", parsedData);
+
         let vatNumber = "";
         let reservationNumber = "";
         let profileID = null;
