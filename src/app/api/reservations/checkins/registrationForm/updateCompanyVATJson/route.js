@@ -97,8 +97,15 @@ export async function POST(request) {
 
     // Função para atualizar os dados da empresa dentro do JSON
     const atualizarCamposEmpresa = (json, resNo) => {
+      if (!json) return json;
+
+      // Garante que é sempre array
+      if (!Array.isArray(json)) {
+        json = [json];
+      }
+
       json.forEach((reserva) => {
-        if (reserva.Reservation && reserva.Reservation.length > 0) {
+        if (reserva.Reservation && Array.isArray(reserva.Reservation)) {
           reserva.Reservation.forEach((reservation) => {
             if (reservation.ReservationNumber === resNo) {
               reservation.Company = companyName;
@@ -115,12 +122,14 @@ export async function POST(request) {
           });
         }
       });
+
+      return json;
     };
 
     console.log("Atualizando responseBody e requestBody com CompanyID:", companyID);
 
-    atualizarCamposEmpresa(responseBody, resNo);
-    atualizarCamposEmpresa(requestBody, resNo);
+    responseBody = atualizarCamposEmpresa(responseBody, resNo);
+    requestBody = atualizarCamposEmpresa(requestBody, resNo);
 
     console.log("responseBody FINAL antes de salvar:", JSON.stringify(responseBody, null, 2));
     console.log("requestBody FINAL antes de salvar:", JSON.stringify(requestBody, null, 2));
