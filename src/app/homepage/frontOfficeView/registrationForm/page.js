@@ -1098,39 +1098,42 @@ export default function Page() {
                                             )}
 
                                             <InputFieldControlled
-                                                type={"text"}
-                                                id={"Country"}
-                                                name={"Country"}
+                                                type="text"
+                                                id="Country"
+                                                name="Country"
                                                 label={`${t.frontOffice.registrationForm.country} *`}
-                                                ariaLabel={"Country:"}
-                                                value={address.Country}
+                                                ariaLabel="Country:"
+                                                value={addressData?.Country ?? address.Country ?? ""}
                                                 style={inputStyleFull}
                                             />
+
                                             <InputFieldControlled
-                                                type={"text"}
-                                                id={"Street Address"}
-                                                name={"Street Address"}
+                                                type="text"
+                                                id="Street Address"
+                                                name="Street Address"
                                                 label={t.frontOffice.registrationForm.streetAddress}
-                                                ariaLabel={"Street Address:"}
-                                                value={address.Street}
+                                                ariaLabel="Street Address:"
+                                                value={addressData?.Street ?? address.Street ?? ""}
                                                 style={inputStyleFull}
                                             />
+
                                             <InputFieldControlled
-                                                type={"text"}
-                                                id={"ZIP / Postal Code"}
-                                                name={"ZIP / Postal Code"}
+                                                type="text"
+                                                id="ZIP / Postal Code"
+                                                name="ZIP / Postal Code"
                                                 label={t.frontOffice.registrationForm.zipPostalCode}
-                                                ariaLabel={"ZIP / Postal Code:"}
-                                                value={address.PostalCode}
+                                                ariaLabel="ZIP / Postal Code:"
+                                                value={addressData?.PostalCode ?? address.PostalCode ?? ""}
                                                 style={inputStyleFull}
                                             />
+
                                             <InputFieldControlled
-                                                type={"text"}
-                                                id={"City"}
-                                                name={"City"}
+                                                type="text"
+                                                id="City"
+                                                name="City"
                                                 label={t.frontOffice.registrationForm.city}
-                                                ariaLabel={"City:"}
-                                                value={address.City}
+                                                ariaLabel="City:"
+                                                value={addressData?.City ?? address.City ?? ""}
                                                 style={inputStyleFull}
                                             />
                                             {/* <InputFieldControlled
@@ -1197,7 +1200,7 @@ export default function Page() {
                                                 name={"Country of Birth"}
                                                 label={`${t.frontOffice.registrationForm.countryOfBirth} *`}
                                                 ariaLabel={"Country of Birth:"}
-                                                value={personalID.CountryOfBirth}
+                                                value={personalIDData?.CountryOfBirthLabel ?? personalID.CountryOfBirth}
                                                 style={`${inputStyleFullWithLine}`}
                                             />
                                         </div>
@@ -1212,7 +1215,7 @@ export default function Page() {
                                             name={"Nationality"}
                                             label={t.frontOffice.registrationForm.nationality}
                                             ariaLabel={"Nationality:"}
-                                            value={personalID.Nationality}
+                                            value={personalIDData?.NationalityLabel ?? personalID.Nationality}
                                             style={`${inputStyleFullWithLine}`}
                                         />
                                         <div className='flex flex-row justify-between items-center gap-4 mt-4'>
@@ -1227,7 +1230,7 @@ export default function Page() {
                                                 name={"ID Doc"}
                                                 label={`${t.frontOffice.registrationForm.idDoc} *`}
                                                 ariaLabel={"ID Doc:"}
-                                                value={personalID.IDDoc}
+                                                value={personalIDData?.IDDocLabel ?? personalID.IDDoc}
                                                 style={`${inputStyleFullWithLine}`}
                                             />
                                             <InputFieldControlled
@@ -1236,7 +1239,7 @@ export default function Page() {
                                                 name={"ID Doc Nr."}
                                                 label={`${t.frontOffice.registrationForm.idDocNumber} *`}
                                                 ariaLabel={"ID Doc Nr.:"}
-                                                value={personalID.NrDoc}
+                                                value={personalIDData?.NrDoc ?? personalID.NrDoc}
                                                 style={`${inputStyleFullWithLine}`}
                                             />
                                         </div>
@@ -1264,7 +1267,7 @@ export default function Page() {
                                                 name={"Country issue"}
                                                 label={t.frontOffice.registrationForm.issue}
                                                 ariaLabel={"Country issue:"}
-                                                value={personalID.Issue}
+                                                value={personalIDData?.Issue ?? personalID.Issue}
                                                 style={inputStyleFullWithLine}
                                             />
                                         </div>
