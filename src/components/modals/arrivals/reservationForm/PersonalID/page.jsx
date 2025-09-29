@@ -48,49 +48,49 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
         if (inputRef.current) inputRef.current.focus();
     }, []);
 
-   // Buscar países
-useEffect(() => {
-    const fetchCountries = async () => {
-        if (!propertyID) return;
-        try {
-            const response = await axios.get(
-                `/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`
-            );
+    // Buscar países
+    useEffect(() => {
+        const fetchCountries = async () => {
+            if (!propertyID) return;
+            try {
+                const response = await axios.get(
+                    `/api/reservations/checkins/registrationForm/countries?propertyID=${propertyID}`
+                );
 
-            // Garante que value = ID e label = nome do país
-            const options = response.data
-                .map(c => ({ value: c.codenr, label: c.land }))
-                .sort((a, b) => a.label.localeCompare(b.label));
+                // Garante que value = ID e label = nome do país
+                const options = response.data
+                    .map(c => ({ value: c.codenr, label: c.land }))
+                    .sort((a, b) => a.label.localeCompare(b.label));
 
-            setCountryOptions(options);
-        } catch (error) {
-            console.error("Erro ao buscar países:", error);
-        }
-    };
-    fetchCountries();
-}, [propertyID]);
+                setCountryOptions(options);
+            } catch (error) {
+                console.error("Erro ao buscar países:", error);
+            }
+        };
+        fetchCountries();
+    }, [propertyID]);
 
-// Buscar tipos de documento
-useEffect(() => {
-    const fetchDocTypes = async () => {
-        if (!propertyID) return;
-        try {
-            const response = await axios.get(
-                `/api/reservations/checkins/registrationForm/doctypes?propertyID=${propertyID}`
-            );
+    // Buscar tipos de documento
+    useEffect(() => {
+        const fetchDocTypes = async () => {
+            if (!propertyID) return;
+            try {
+                const response = await axios.get(
+                    `/api/reservations/checkins/registrationForm/doctypes?propertyID=${propertyID}`
+                );
 
-            // Garante que value = ID/tipo e label = nome do documento
-            const options = response.data
-                .map(d => ({ value: d.value, label: d.label }))
-                .sort((a, b) => a.label.localeCompare(b.label));
+                // Garante que value = ID/tipo e label = nome do documento
+                const options = response.data
+                    .map(d => ({ value: d.value, label: d.label }))
+                    .sort((a, b) => a.label.localeCompare(b.label));
 
-            setDocTypeOptions(options);
-        } catch (error) {
-            console.error("Erro ao buscar tipos de documentos:", error);
-        }
-    };
-    fetchDocTypes();
-}, [propertyID]);
+                setDocTypeOptions(options);
+            } catch (error) {
+                console.error("Erro ao buscar tipos de documentos:", error);
+            }
+        };
+        fetchDocTypes();
+    }, [propertyID]);
 
 
     const handleSave = () => {
@@ -274,23 +274,21 @@ useEffect(() => {
                                         </label>
                                         <Select
                                             options={countryOptions}
-                                            value={countryOptions.find(option => option.label === formData.CountryOfBirth)}
+                                            value={
+                                                countryOptions.find(
+                                                    option => option.value === formData.CountryOfBirthID
+                                                ) || null
+                                            }
                                             onChange={(selectedOption) => {
                                                 setFormData(prev => ({
                                                     ...prev,
-                                                    CountryOfBirth: selectedOption.label  // ex: "Portugal"
+                                                    CountryOfBirthID: selectedOption.value,   // <-- ID
+                                                    CountryOfBirthLabel: selectedOption.label // <-- Label
                                                 }));
-
-                                                setSelectIDFrom(prev => ({
-                                                    ...prev,
-                                                    IDCountryOfBirth: selectedOption.value  // ex: "PT"
-                                                }));
-
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
                                         />
-
                                     </div>
 
                                     <div className="w-1/3">
@@ -299,18 +297,17 @@ useEffect(() => {
                                         </label>
                                         <Select
                                             options={countryOptions}
-                                            value={countryOptions.find(option => option.label === formData.Nationality)}
+                                            value={
+                                                countryOptions.find(
+                                                    option => option.value === formData.NationalityID
+                                                ) || null
+                                            }
                                             onChange={(selectedOption) => {
                                                 setFormData(prev => ({
                                                     ...prev,
-                                                    Nationality: selectedOption.label  // ex: "Portugal"
+                                                    NationalityID: selectedOption.value,   // <-- ID
+                                                    NationalityLabel: selectedOption.label // <-- Label
                                                 }));
-
-                                                setSelectIDFrom(prev => ({
-                                                    ...prev,
-                                                    IDNationality: selectedOption.value  // ex: "PT"
-                                                }));
-
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
@@ -326,18 +323,17 @@ useEffect(() => {
                                         </label>
                                         <Select
                                             options={docTypeOptions}
-                                            value={docTypeOptions.find(option => option.label === String(formData.IDDoc)) || null}
+                                            value={
+                                                docTypeOptions.find(
+                                                    option => option.value === formData.IDDocID
+                                                ) || null
+                                            }
                                             onChange={(selectedOption) => {
                                                 setFormData(prev => ({
                                                     ...prev,
-                                                    IDDoc: selectedOption.label  // ex: "Bilhete Identidade"
+                                                    IDDocID: selectedOption.value,   // <-- ID
+                                                    IDDocLabel: selectedOption.label // <-- Label
                                                 }));
-
-                                                setSelectIDFrom(prev => ({
-                                                    ...prev,
-                                                    IDDocSelect: selectedOption.value  // ex: "BI"
-                                                }));
-
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
