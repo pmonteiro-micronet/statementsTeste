@@ -154,7 +154,7 @@ const JsonViewPage = () => {
         const parsedData = JSON.parse(reservationData.requestBody);
 
         // Log para ver o que foi recebido
-      console.log("DADOS RECEBIDOS (parsedData):", parsedData);
+        console.log("DADOS RECEBIDOS (parsedData):", parsedData);
 
         let vatNumber = "";
         let reservationNumber = "";
@@ -171,7 +171,7 @@ const JsonViewPage = () => {
           // Acessa Reservation e pega o ReservationNumber e CompanyID
           if (data.Reservation && data.Reservation.length > 0) {
             reservationNumber = data.Reservation[0].ReservationNumber || "";
-            companyID = data.Reservation[0].companyVatNO || ""; // Acessa CompanyID (companyVatNO)
+            companyID = data.Reservation[0].CompanyID || ""; // Acessa CompanyID (companyVatNO)
           }
         });
 
@@ -458,7 +458,7 @@ const JsonViewPage = () => {
                           <p className="!text-textLabelColor text-lg">
                             {activeKey === "company"
                               ? reservation.hasCompanyVAT === 1
-                                ? reservation.Company || ""
+                                ? reservation.Reservation?.[0]?.Company || ""
                                 : ""
                               : `${guest.LastName || ""}, ${guest.FirstName || ""}`}
                           </p>
@@ -474,7 +474,7 @@ const JsonViewPage = () => {
                               value={
                                 activeKey === "company"
                                   ? reservation.hasCompanyVAT === 1
-                                    ? reservation.CompanyVatNo || ""
+                                    ? reservation.Reservation?.[0]?.CompanyVatNo || ""
                                     : ""
                                   : reservation.BlockedVatNO === 1 && !vatNo
                                     ? "999999990"
