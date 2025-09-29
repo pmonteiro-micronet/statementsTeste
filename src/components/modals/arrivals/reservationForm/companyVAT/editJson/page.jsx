@@ -235,7 +235,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
 
         } catch (error) {
             console.log("Erro ao salvar empresa:", error);
-            setErrorMessage(t.modals.companyInfo.errors.errorSaving);
+            setErrorMessage(t.modals.errors.errorSaving);
         }
     };
 
