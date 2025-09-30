@@ -457,7 +457,7 @@ const JsonViewPage = () => {
                           {/* Nome da empresa ou hóspede */}
                           <p className="!text-textLabelColor text-lg">
                             {activeKey === "company"
-                              ? reservation.hasCompanyVAT === 1
+                              ? reservation.Reservation?.[0]?.hasCompanyVAT === 1
                                 ? reservation.Reservation?.[0]?.Company || ""
                                 : ""
                               : `${guest.LastName || ""}, ${guest.FirstName || ""}`}
@@ -473,7 +473,7 @@ const JsonViewPage = () => {
                               ariaLabel="VAT Nr.:"
                               value={
                                 activeKey === "company"
-                                  ? reservation.hasCompanyVAT === 1
+                                  ? reservation.Reservation?.[0]?.hasCompanyVAT === 1
                                     ? reservation.Reservation?.[0]?.CompanyVatNo || ""
                                     : ""
                                   : reservation.BlockedVatNO === 1 && !vatNo
