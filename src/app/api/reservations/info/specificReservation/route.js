@@ -130,12 +130,16 @@ export async function GET(request) {
 
     return new NextResponse(
       JSON.stringify({
-        data: {
-          requestID: newRequest.requestID,
-          message: "Dados salvos ou atualizados com sucesso.",
-        },
+        message: "Dados salvos ou atualizados com sucesso.",
+         data: {
+      requestID: newRequest.requestID,
+      ...JSON.parse(newRequest.responseBody), // espalha o JSON armazenado
+    },
       }),
-      { status: 200 }
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
     );
   } catch (error) {
     console.error("Erro ao enviar dados para o servidor:", error.response ? error.response.data : error.message);

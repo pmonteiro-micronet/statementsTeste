@@ -133,38 +133,50 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
   try {
     const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
-      params: {
-        ResNo,
-        window: windowValue,
-        propertyID,
-      },
+      params: { ResNo, window: windowValue, propertyID },
     });
 
     console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
     console.log("Resposta da API ao salvar statement:", saveResponse.data);
 
-    if (saveResponse.data && saveResponse.data.data) {
-      const updatedRecord = saveResponse.data.data;
+    // 🔹 Pegando o body corretamente, que pode ser objeto ou string
+    let updatedRecord = saveResponse.data?.data?.responseBody || saveResponse.data?.data;
 
-      // 🔎 Verifica se GuestInfo está vazio
-      const guestInfo = Array.isArray(updatedRecord[0]?.GuestInfo) ? updatedRecord[0].GuestInfo : [];
-
-      if (guestInfo.length === 0) {
-        console.warn("GuestInfo vazio → não há movimentos para mostrar.");
-        setErrorMessage(t.frontOffice.inHouses.errors.windowA); // tua modal de erro
+    // 🔹 Se for string, parseia para objeto
+    if (typeof updatedRecord === "string") {
+      try {
+        updatedRecord = JSON.parse(updatedRecord);
+      } catch (err) {
+        console.error("Erro ao fazer parse do JSON da API:", err);
+        setErrorMessage("Erro ao processar os dados da reserva.");
         setIsErrorModalOpen(true);
-        return; // 🚫 não faz o router.push
+        return;
       }
+    }
 
-      // Continua fluxo normal se GuestInfo não estiver vazio
-      if (updatedRecord.requestID) {
-        console.log("Statement atualizado com requestID:", updatedRecord.requestID);
-        router.push(`/homepage/jsonView?recordID=${updatedRecord.requestID}&propertyID=${propertyID}`);
-      } else {
-        console.warn("Resposta da API não contém requestID.");
-      }
+    console.log("UPDATEDRECORD:", updatedRecord);
+
+    // 🔎 Agora guestInfo deve existir dentro da chave "0"
+    const guestInfo = Array.isArray(updatedRecord["0"]?.GuestInfo)
+      ? updatedRecord["0"].GuestInfo
+      : [];
+
+    console.log("GUESTINFO:", guestInfo);
+
+    if (guestInfo.length === 0) {
+      console.warn("GuestInfo vazio → não há movimentos para mostrar.");
+      setErrorMessage(t.frontOffice.inHouses.errors.windowA);
+      setIsErrorModalOpen(true);
+      return;
+    }
+
+    // Continua fluxo normal: pega requestID fora do array
+    const requestID = updatedRecord?.requestID;
+    if (requestID) {
+      console.log("Statement atualizado com requestID:", requestID);
+      router.push(`/homepage/jsonView?recordID=${requestID}&propertyID=${propertyID}`);
     } else {
-      console.warn("Resposta da API inválida.");
+      console.warn("Resposta da API não contém requestID.");
     }
 
   } catch (error) {
@@ -196,6 +208,9 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     }
   }
 };
+
+
+
 
 
   const [selectedReserva, setSelectedReserva] = useState(null);
