@@ -136,7 +136,12 @@
             "departure": "Salida",
             "info": "Información",
             "statement": "Statement",
-            "noReservations": "No se encontraron reservas."
+            "noReservations": "No se encontraron reservas.",
+            "errors": {
+                "windowA": "La ventana A no tiene movimientos para mostrar",
+                "noCommunication": "No hemos podido comunicarnos con el servicio PMS. Por favor, contacte con soporte.",
+                "support": "No hemos podido completar su solicitud. Por favor, contacte con soporte."
+            }
         },
         "housekeeping": {
             "title": "Housekeeping",

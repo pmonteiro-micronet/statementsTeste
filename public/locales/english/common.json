@@ -134,7 +134,12 @@
             "info": "Info",
             "statement": "Statement",
             "room": "Room",
-            "noReservations": "No reservations found."
+            "noReservations": "No reservations found.",
+            "errors": {
+                "windowA": "Window A has no movements to show.",
+                "noCommunication": "We were unable to communicate with the PMS service. Please contact support.",
+                "support": "We were unable to fulfill your order. Please contact support."
+            }
         },
         "housekeeping": {
             "title": "Housekeeping",
