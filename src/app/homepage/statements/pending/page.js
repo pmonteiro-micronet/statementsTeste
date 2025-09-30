@@ -157,7 +157,7 @@ const PendentesPage = () => {
               const hotelInfo = parsedData[0]?.HotelInfo?.[0];
               const reservation = parsedData[0]?.Reservation?.[0];
               const guestInfo = parsedData[0]?.GuestInfo?.[0];
-              const hotelName = hotelInfo?.Description || t('statements.pending.defaultHotelName');
+              const hotelName = hotelInfo?.Description || t.statements.pending.defaultHotelName;
 
               if (!reservation || !guestInfo) {
                 return null;
