@@ -209,10 +209,6 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   }
 };
 
-
-
-
-
   const [selectedReserva, setSelectedReserva] = useState(null);
 
   const handleOpenModal = (reserva) => {
