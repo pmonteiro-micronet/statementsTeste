@@ -402,12 +402,16 @@ export default function Page() {
         }
         let missingFields = [];
 
-        if (!guestInfo.LastName) missingFields.push("Last Name");
-        if (!address.Country) missingFields.push("Country");
-        if (!personalID.IDDoc) missingFields.push("Document Type");
-        if (!personalID.NrDoc) missingFields.push("Document Number");
-        if (!personalID.CountryOfBirth) missingFields.push("Country of Birth");
-        if (!personalID.ExpDate) missingFields.push("Document Expiry Date");
+        const getValue = (dataObj, fallbackObj, field) => {
+            return dataObj?.[field] ?? fallbackObj?.[field];
+        };
+
+        if (!getValue(null, guestInfo, "LastName")) missingFields.push("Last Name");
+        if (!getValue(addressData, address, "Country")) missingFields.push("Country");
+        if (!getValue(personalIDData, personalID, "IDDoc")) missingFields.push("Document Type");
+        if (!getValue(personalIDData, personalID, "NrDoc")) missingFields.push("Document Number");
+        if (!getValue(personalIDData, personalID, "CountryOfBirth")) missingFields.push("Country of Birth");
+        if (!getValue(personalIDData, personalID, "ExpDate")) missingFields.push("Document Expiry Date");
 
         if (missingFields.length > 0) {
             setErrorMessage(
