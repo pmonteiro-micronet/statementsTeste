@@ -773,6 +773,13 @@ export default function Page() {
         }
     }, [locale, miniTermsEN, miniTermsPT, miniTermsES]);
 
+    const formatDate = (dateString) => {
+  if (!dateString) return "";
+  const d = new Date(dateString);
+  if (isNaN(d)) return ""; // caso a string não seja uma data válida
+  return d.toISOString().split("T")[0]; // devolve YYYY-MM-DD
+};
+
     return (
         <div className='bg-background main-page min-h-screen'>
             {/* Exibe o loader enquanto isLoading for verdadeiro */}
@@ -1182,7 +1189,7 @@ export default function Page() {
 
                                             <InputFieldControlled
                                                 type={
-                                                    personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
+                                                    personalIDData?.DateOfBirth && personalIDData.DateOfBirth.split('T')[0] !== '1900-01-01'
                                                         ? "date"
                                                         : "text"
                                                 }
@@ -1191,9 +1198,11 @@ export default function Page() {
                                                 label={t.frontOffice.registrationForm.dateOfBirth}
                                                 ariaLabel={"Date of Birth:"}
                                                 value={
-                                                    personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
-                                                        ? personalID.DateOfBirth.split('T')[0]
-                                                        : ""
+                                                    personalIDData?.DateOfBirth && personalIDData.DateOfBirth.split('T')[0] !== '1900-01-01'
+                                                        ? formatDate(personalIDData.DateOfBirth)
+                                                        : personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
+                                                            ? personalID.DateOfBirth.split('T')[0]
+                                                            : ""
                                                 }
                                                 style={inputStyleFullWithLine}
                                             />
@@ -1204,7 +1213,7 @@ export default function Page() {
                                                 name={"Country of Birth"}
                                                 label={`${t.frontOffice.registrationForm.countryOfBirth} *`}
                                                 ariaLabel={"Country of Birth:"}
-                                                value={personalIDData?.CountryOfBirthLabel ?? personalID.CountryOfBirth}
+                                                value={personalIDData?.CountryOfBirth ?? personalID.CountryOfBirth}
                                                 style={`${inputStyleFullWithLine}`}
                                             />
                                         </div>
@@ -1234,7 +1243,7 @@ export default function Page() {
                                                 name={"ID Doc"}
                                                 label={`${t.frontOffice.registrationForm.idDoc} *`}
                                                 ariaLabel={"ID Doc:"}
-                                                value={personalIDData?.IDDocLabel ?? personalID.IDDoc}
+                                                value={personalIDData?.IDDoc ?? personalID.IDDoc}
                                                 style={`${inputStyleFullWithLine}`}
                                             />
                                             <InputFieldControlled
@@ -1250,18 +1259,20 @@ export default function Page() {
                                         <div className='flex flex-row justify-between gap-4 mt-4'>
                                             <InputFieldControlled
                                                 type={
-                                                    personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
+                                                    personalIDData?.ExpDate && personalIDData.ExpDate.split('T')[0] !== '2050-12-31'
                                                         ? "date"
                                                         : "text"
                                                 }
                                                 id={"Exp. Date"}
                                                 name={"Exp. Date"}
-                                                label={`${t.frontOffice.registrationForm.expDate}`}
+                                                label={t.frontOffice.registrationForm.expDate}
                                                 ariaLabel={"Exp. Date:"}
                                                 value={
-                                                    personalID.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
-                                                        ? personalID.ExpDate.split('T')[0]
-                                                        : ""
+                                                    personalIDData?.ExpDate && personalIDData.ExpDate.split('T')[0] !== '2050-12-31'
+                                                        ? formatDate(personalIDData.ExpDate)
+                                                        : personalID?.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
+                                                            ? personalID.ExpDate.split('T')[0]
+                                                            : ""
                                                 }
                                                 style={inputStyleFullWithLine}
                                             />
