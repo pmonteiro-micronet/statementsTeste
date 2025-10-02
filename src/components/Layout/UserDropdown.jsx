@@ -46,21 +46,21 @@ const UserModal = ({
                     <li className={isAdmin ? "" : "opacity-50 pointer-events-none"}>
                         <div className="flex items-center gap-3 text-sm">
                             <RiHotelFill size={15} />
-                            <Link href="/homepage/allProperties">All Properties</Link>
+                            <Link href="/homepage/allProperties">{t.modals.dropdown.allProperties}</Link>
                         </div>
                     </li>
                     <li className={isAdmin ? "" : "opacity-50 pointer-events-none"}>
                         <div className="flex items-center gap-3 text-sm">
                             <FaUser />
-                            <Link href="/homepage/allProfiles">All Profiles</Link>
+                            <Link href="/homepage/allProfiles">{t.modals.dropdown.allProfiles}</Link>
                         </div>
                     </li>
                     <li>
                         <ProfileModalForm
                             formTypeModal={11}
-                            buttonName={"Profile Settings"}
+                            buttonName={t.modals.dropdown.profileSettings}
                             buttonIcon={<FaUser />}
-                            modalHeader={"Profile Settings"}
+                            modalHeader={t.modals.dropdown.profileSettings}
                             buttonColor={"transparent"}
                         />
                     </li>
