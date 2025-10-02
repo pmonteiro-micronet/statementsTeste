@@ -395,10 +395,10 @@ export default function Page() {
 
         // Validações de formulário
         if (isCanvasEmpty()) {
-            errors.push("Please fill in all required fields to submit the form.");
+            errors.push(t.frontOffice.registrationForm.errors.emptyForm);
         }
         if (email.endsWith("@guest.booking.com")) {
-            errors.push("The e-mail cannot end with @guest.booking.com.");
+            errors.push(t.frontOffice.registrationForm.errors.bookingEmail);
         }
         let missingFields = [];
 
@@ -406,22 +406,22 @@ export default function Page() {
             return dataObj?.[field] ?? fallbackObj?.[field];
         };
 
-        if (!getValue(null, guestInfo, "LastName")) missingFields.push("Last Name");
-        if (!getValue(addressData, address, "Country")) missingFields.push("Country");
-        if (!getValue(personalIDData, personalID, "IDDoc")) missingFields.push("Document Type");
-        if (!getValue(personalIDData, personalID, "NrDoc")) missingFields.push("Document Number");
-        if (!getValue(personalIDData, personalID, "CountryOfBirth")) missingFields.push("Country of Birth");
-        if (!getValue(personalIDData, personalID, "ExpDate")) missingFields.push("Document Expiry Date");
+        if (!getValue(null, guestInfo, "LastName")) missingFields.push(t.frontOffice.registrationForm.lastName);
+        if (!getValue(addressData, address, "Country")) missingFields.push(t.frontOffice.registrationForm.country);
+        if (!getValue(personalIDData, personalID, "IDDoc")) missingFields.push(t.frontOffice.registrationForm.idDoc);
+        if (!getValue(personalIDData, personalID, "NrDoc")) missingFields.push(t.frontOffice.registrationForm.idDocNumber);
+        if (!getValue(personalIDData, personalID, "CountryOfBirth")) missingFields.push(t.frontOffice.registrationForm.countryOfBirth);
+        if (!getValue(personalIDData, personalID, "ExpDate")) missingFields.push(t.frontOffice.registrationForm.expDate);
 
         if (missingFields.length > 0) {
             setErrorMessage(
-                `Please fill in the following required field(s):\n- ${missingFields.join("\n- ")}`
+                `${t.frontOffice.registrationFrom.errors.pleaseFill}\n- ${missingFields.join("\n- ")}`
             );
             setIsErrorModalOpen(true);
             return;
         }
         if (!contacts.Email) {
-            const proceed = window.confirm("O campo de e-mail está vazio. Deseja continuar mesmo assim?");
+            const proceed = window.confirm(t.frontOffice.registrationFrom.errors.emptyEmailValidation);
             if (!proceed) return;
         }
 
@@ -472,7 +472,7 @@ export default function Page() {
 
         } catch (error) {
             console.error("Erro ao salvar endereço ou Personal ID:", error);
-            errors.push("Erro ao salvar endereço ou dados do documento. Tente novamente.");
+            errors.push(t.frontOffice.registrationFrom.errors.errorSavingDocument);
             setErrorMessage(errors.join("\n"));
             setIsErrorModalOpen(true);
             return;
@@ -495,7 +495,7 @@ export default function Page() {
                 console.log('Alterações salvas com sucesso:', response.data);
             } catch (error) {
                 console.error('Erro ao salvar alterações:', error);
-                errors.push("There was an issue saving your changes. Please contact support.");
+                errors.push(t.frontOffice.registrationFrom.errors.contactSupport);
                 setErrorMessage(errors.join("\n"));
                 setIsErrorModalOpen(true);
                 return;
@@ -587,7 +587,7 @@ export default function Page() {
             setIsSuccessModalOpen(true);
         } catch (error) {
             console.error('Erro ao gerar ou enviar o PDF:', error);
-            errors.push("There was an issue generating or sending the form. Please contact support.");
+            errors.push(t.frontOffice.registrationFrom.errors.generateFormError);
             setErrorMessage(errors.join("\n"));
             setIsErrorModalOpen(true);
         }
