@@ -207,7 +207,16 @@
             "dataModalHeader": "Hotel Data Protection Policy",
             "cancel": "Cancel",
             "insertPin": "Insert PIN",
-            "attention": "Attention"
+            "attention": "Attention",
+            "errors": {
+                "emptyForm": "Please fill in all required fields to submit the form.",
+                "bookingEmail": "The e-mail cannot end with @guest.booking.com.",
+                "pleaseFill":"Please fill in the following required field(s):",
+                "emptyEmailValidation": "The email field is empty. Do you want to continue anyway?",
+                "errorSavingDocument": "Error saving address or document data. Please try again.",
+                "contactSupport": "There was an issue saving your changes. Please contact support.",
+                "generateFormError":"There was an issue generating or sending the form. Please contact support."
+            }
         },
         "infoModal": {
             "arrival": {

@@ -209,7 +209,16 @@
             "dataModalHeader": "Política de Proteção de Dados do Hotel",
             "cancel": "Cancelar",
             "insertPin": "Inserir PIN",
-            "attention": "Atenção"
+            "attention": "Atenção",
+            "errors": {
+                "emptyForm": "Por favor, preencha todos os campos obrigatórios para enviar o formulário.",
+                "bookingEmail": "O e-mail não pode terminar com @guest.booking.com.",
+                "pleaseFill": "Por favor, preencha o(s) seguinte(s) campo(s) obrigatório(s):",
+                "emptyEmailValidation": "O campo de e-mail está vazio. Deseja continuar mesmo assim?",
+                "errorSavingDocument": "Erro ao guardar o endereço ou os dados do documento. Tente novamente.",
+                "contactSupport": "Ocorreu um problema ao guardar as suas alterações. Por favor, contacte o suporte.",
+                "generateFormError": "Ocorreu um problema ao gerar ou enviar o formulário. Por favor, contacte o suporte."
+            }
         },
         "infoModal": {
             "arrival": {
