@@ -169,25 +169,34 @@ const UserPropertiesModal = ({
                             </ModalHeader>
 
                             <ModalBody className="flex flex-col space-y-8 bg-background">
-                                <div className="flex flex-col gap-2">
+                                {/* Scrollable container for properties */}
+                                <div className="flex flex-col gap-2 max-h-64 overflow-y-auto pr-2">
                                     {properties.length === 0 ? (
-                                        <p>{t.modals.user.userProperties.noResults}</p>
+                                    <p>{t.modals.user.userProperties.noResults}</p>
                                     ) : (
-                                        properties.map((property) => (
-                                            <div key={property.propertyID} className="flex justify-between items-center p-2 border-b">
-                                                <span>{property.propertyName}</span>
-                                                <Switch
-                                                    isSelected={userProperties.includes(property.propertyID)}
-                                                    onChange={(e) => handleToggleProperty(property.propertyID, e)}
-                                                />
-
-                                            </div>
-                                        ))
+                                    properties.map((property) => (
+                                        <div
+                                        key={property.propertyID}
+                                        className="flex justify-between items-center p-2 border-b"
+                                        >
+                                        <span>{property.propertyName}</span>
+                                        <Switch
+                                            isSelected={userProperties.includes(property.propertyID)}
+                                            onChange={(e) => handleToggleProperty(property.propertyID, e)}
+                                        />
+                                        </div>
+                                    ))
                                     )}
                                 </div>
-                                {successMessage && <p className="text-green-500 text-sm">{successMessage}</p>}
-                                {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
-                            </ModalBody>
+
+                                {successMessage && (
+                                    <p className="text-green-500 text-sm">{successMessage}</p>
+                                )}
+                                {errorMessage && (
+                                    <p className="text-red-500 text-sm">{errorMessage}</p>
+                                )}
+                                </ModalBody>
+
 
                             <div className="flex justify-end p-4">
                                 <Button

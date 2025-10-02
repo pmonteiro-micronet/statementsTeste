@@ -294,7 +294,8 @@
             "name": "Name",
             "lastName": "Last Name",
             "email": "Email",
-            "info": "Info"
+            "info": "Info",
+            "expirationDate": "Expiration Date"
         }
     },
     "modals": {
