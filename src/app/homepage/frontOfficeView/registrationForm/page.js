@@ -773,12 +773,18 @@ export default function Page() {
         }
     }, [locale, miniTermsEN, miniTermsPT, miniTermsES]);
 
-    const formatDate = (dateString) => {
+ const formatDate = (dateString) => {
   if (!dateString) return "";
   const d = new Date(dateString);
-  if (isNaN(d)) return ""; // caso a string não seja uma data válida
-  return d.toISOString().split("T")[0]; // devolve YYYY-MM-DD
+  if (isNaN(d)) return "";
+
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 };
+
 
     return (
         <div className='bg-background main-page min-h-screen'>
