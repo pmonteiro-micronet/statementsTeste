@@ -281,7 +281,7 @@ export default function Sidebar({ children, setExpanded }) {
                   >
                     <div className="flex flex-row gap-4 px-3 text-sm mb-3 mt-2">
                       <RiHotelFill size={15} />
-                      <Link href="/homepage/allProperties">All Properties</Link>
+                      <Link href="/homepage/allProperties">{t.modals.dropdown.allProperties}</Link>
                     </div>
                   </li>
                   <li
@@ -293,15 +293,15 @@ export default function Sidebar({ children, setExpanded }) {
                   >
                     <div className="flex flex-row gap-4 px-3 text-sm mb-1">
                       <FaUser />
-                      <Link href="/homepage/allProfiles">All Profiles</Link>
+                      <Link href="/homepage/allProfiles">{t.modals.dropdown.allProfiles}</Link>
                     </div>
                   </li>
                   <li className="">
                     <ProfileModalForm
                       formTypeModal={11}
-                      buttonName={"Profile Settings"}
+                      buttonName={t.modals.dropdown.profileSettings}
                       buttonIcon={<FaUser />}
-                      modalHeader={"Profile Settings"}
+                      modalHeader={t.modals.dropdown.profileSettings}
                       buttonColor={"transparent"}
                     />
                   </li>

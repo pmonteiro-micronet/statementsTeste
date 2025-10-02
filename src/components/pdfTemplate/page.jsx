@@ -183,53 +183,60 @@ export const generatePDFTemplate = async (reserva, signatureBase64) => {
     doc.text(`${reserva.Notes || ""}`, stayColumn1X + 40, stayTextY + 3 * lineHeight, { maxWidth: stayguestRectWidth - 50 });
     doc.setFontSize(12);
 
-    // Adiciona título e detalhes da estadia
-    doc.setFont('helvetica', 'bold');
-    const termsStartY = stayguestRectY + stayguestRectHeight + 10;
-    doc.text('Hotel GDPR', 10, termsStartY);
-    doc.setFont('helvetica', 'normal');
+// Adiciona título e detalhes da estadia
+doc.setFont('helvetica', 'bold');
+const termsStartY = stayguestRectY + stayguestRectHeight + 10;
+doc.text('Hotel GDPR', 10, termsStartY);
+doc.setFont('helvetica', 'normal');
 
-    // Retângulo para termos
-    const termsRectX = 10;
-    const termsRectY = termsStartY + 2;
-    const termsRectWidth = 190;
-    const termsRectHeight = 40; // Ajustado para acomodar checkbox e textos
+// Retângulo para termos
+const termsRectX = 10;
+const termsRectY = termsStartY + 2;
+const termsRectWidth = 190;
 
-    doc.rect(termsRectX, termsRectY, termsRectWidth, termsRectHeight, 'S');
+// Checkbox e texto "Eu aceito"
+const checkboxX = termsRectX + 5;
+const checkboxY = termsRectY + 4;
+const checkboxSize = 5;
 
-    // Checkbox e texto "Eu aceito", posicionados no topo interno do retângulo
-    const checkboxX = termsRectX + 5; // Um pouco deslocado da borda esquerda
-    const checkboxY = termsRectY + 4; // Espaço superior no retângulo
-    const checkboxSize = 5;
+// Desenha a checkbox
+doc.rect(checkboxX, checkboxY, checkboxSize, checkboxSize, 'S');
 
-    // Desenha a checkbox
-    doc.rect(checkboxX, checkboxY, checkboxSize, checkboxSize, 'S'); // Desenha o quadrado da checkbox
+// Marca X se ProtectionPolicy = true
+if (reserva.ProtectionPolicy) {
+    doc.text('X', checkboxX + 1.5, checkboxY + checkboxSize - 1);
+}
 
-    // Verifica se ProtectionPolicy é true para adicionar o "X" na checkbox
-    if (reserva.ProtectionPolicy) {
-        doc.text('X', checkboxX + 1.5, checkboxY + checkboxSize - 1); // Adiciona "X" centralizado na checkbox
-    }
+// Texto ao lado da checkbox
+doc.text(t.registrationForm.terms, checkboxX + checkboxSize + 5, checkboxY + checkboxSize - 1);
 
-    // Texto ao lado da checkbox
-    doc.text(t.registrationForm.terms, checkboxX + checkboxSize + 5, checkboxY + checkboxSize - 1);
+// Texto dos termos
+const termsColumn1X = termsRectX + 5;
+const termsTextY = checkboxY + 12;
 
-    // Colunas e textos dentro do retângulo (abaixo da checkbox)
-    const termsColumn1X = termsRectX + 5; // Margem interna do retângulo
-    const termsTextY = checkboxY + 12; // Começa logo abaixo da checkbox
+doc.setFontSize(9);
+doc.setFont('helvetica', 'normal');
 
-    // Definir o tamanho da fonte menor apenas para o texto de justificação
-    doc.setFontSize(9); // Ajuste o tamanho da fonte para ser menor
-    doc.setFont('helvetica', 'normal');
+const justificationText = `${reserva.HotelTermsEN}`;
 
-    // Texto justificado dentro do retângulo
-    const justificationText = `
-    ${reserva.HotelTermsEN}
-    `;
+// Renderiza o texto dentro do retângulo usando maxWidth
+doc.text(justificationText, termsColumn1X, termsTextY, { maxWidth: termsRectWidth - 10 });
 
-    doc.text(justificationText, termsColumn1X, termsTextY, { maxWidth: termsRectWidth - 10 });
+// Para calcular a altura dinâmica do retângulo, quebramos o texto em linhas
+const splitText = doc.splitTextToSize(justificationText, termsRectWidth - 10);
+const termsLineHeight = 4; // altura da linha
+const textHeight = splitText.length * termsLineHeight;
 
-    // Se precisar de voltar ao tamanho de fonte padrão para outros textos, faça assim:
-    doc.setFontSize(12); // Retorna ao tamanho normal da fonte
+// Altura do retângulo = espaço para checkbox + altura do texto + margem extra
+const termsRectHeight = (checkboxSize + 8) + textHeight + 5;
+
+// Redesenha o retângulo com altura dinâmica (sobre o mesmo local)
+doc.rect(termsRectX, termsRectY, termsRectWidth, termsRectHeight, 'S');
+
+// Volta fonte para padrão
+doc.setFontSize(12);
+
+
     // Adiciona a assinatura (se disponível)
     const signatureStartY = termsStartY + termsRectHeight + 10; // Ajuste a posição Y da assinatura
     doc.setFont('helvetica', 'bold');
