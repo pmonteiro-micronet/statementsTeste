@@ -18,11 +18,11 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
         NrDoc: personalID?.NrDoc || "",
         Issue: personalID?.Issue || "",
         CountryOfBirthID: personalID?.CountryOfBirthID || "",
-        CountryOfBirthLabel: personalID?.CountryOfBirth || "",
+        CountryOfBirth: personalID?.CountryOfBirth || "",
         NationalityID: personalID?.NationalityID || "",
         NationalityLabel: personalID?.Nationality || "",
         IDDocID: personalID?.IDDocID || "",
-        IDDocLabel: personalID?.IDDoc || "",
+        IDDoc: personalID?.IDDoc || "",
     }));
 
     const [isDataModified, setIsDataModified] = useState(false);
@@ -95,6 +95,7 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
 
     const handleSave = () => {
         onSave(formData); // IDs já estão em formData
+        console.log("Saved data:", formData);
         setIsDataModified(false);
         onClose();
     };
