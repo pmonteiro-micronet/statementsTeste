@@ -46,7 +46,7 @@ const CreatePropertyModal = ({
     const [hotelTermsEN, setHotelTermsEN] = useState("");
     const [hotelTermsPT, setHotelTermsPT] = useState("");
     const [hotelTermsES, setHotelTermsES] = useState("");
-    const [hotelPhone, setHotelPhone] = useState("");
+    const [hotelPhone, setHotelPhone] = useState("+351");
     const [hotelEmail, setHotelEmail] = useState("");
     const [hotelAddress, setHotelAddress] = useState("");
     const [hotelPostalCode, setHotelPostalCode] = useState("");
@@ -184,9 +184,9 @@ const CreatePropertyModal = ({
                     resetForm();
 
                     // ✅ Atualiza a página depois de salvar tudo com sucesso
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 800); // pequeno delay para mostrar a mensagem de sucesso
+                    // setTimeout(() => {
+                    //     window.location.reload();
+                    // }, 800); // pequeno delay para mostrar a mensagem de sucesso
                 } else {
                     setErrorMessage(`Failed to save hotel terms. Status: ${hotelTermsResponse.status}`);
                 }
@@ -361,7 +361,7 @@ const CreatePropertyModal = ({
     ];
 
     const hotelDetails = [
-        { key: '{{hotel_name}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelName },
+        //{ key: '{{hotel_name}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelName },
         { key: '{{hotel_email}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelEmail },
         { key: '{{hotel_phone}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelPhone },
     ];
@@ -629,7 +629,7 @@ const CreatePropertyModal = ({
                                                 </div>
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelImage}</label>
+                                                <label className="block text-sm font-medium text-gray-400">{t.modals.createProperty.hotelImage} <p><b>(.PNG 280x160)</b></p></label>
                                                 <div className="flex flex-col gap-2">
                                                     <input
                                                         type="file"
@@ -912,8 +912,8 @@ const CreatePropertyModal = ({
                                                     </div>
                                                     <p className="bg-gray-200 p-1 mb-2">Send SMTP</p>
                                                     <div className="flex flex-row gap-2 w-full">
-                                                        <div className="w-1/2 flex flex-col text-xs">
-                                                            <p>{t.modals.propertiesEdit.stay.email}</p>
+                                                        <div className="w-1/2 flex flex-col">
+                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.email}</p>
                                                             <input
                                                                 type="text"
                                                                 value={replyEmail}
@@ -921,8 +921,8 @@ const CreatePropertyModal = ({
                                                                 className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                             />
                                                         </div>
-                                                        <div className="w-1/2 flex flex-col text-xs">
-                                                            <p>{t.modals.propertiesEdit.stay.emailPassword}</p>
+                                                        <div className="w-1/2 flex flex-col">
+                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailPassword}</p>
                                                             <input
                                                                 type="text"
                                                                 value={replyPassword}
@@ -932,8 +932,8 @@ const CreatePropertyModal = ({
                                                         </div>
                                                     </div>
                                                     <div className="flex flex-row gap-2 w-full">
-                                                        <div className="w-1/2 flex flex-col text-xs">
-                                                            <p>{t.modals.propertiesEdit.stay.serverSMTP}</p>
+                                                        <div className="w-1/2 flex flex-col">
+                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.serverSMTP}</p>
                                                             <input
                                                                 type="text"
                                                                 value={sendingServer}
@@ -941,8 +941,8 @@ const CreatePropertyModal = ({
                                                                 className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                             />
                                                         </div>
-                                                        <div className="w-1/2 flex flex-col text-xs">
-                                                            <p>{t.modals.propertiesEdit.stay.portSMTP}</p>
+                                                        <div className="w-1/2 flex flex-col">
+                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.portSMTP}</p>
                                                             <input
                                                                 type="text"
                                                                 value={sendingPort}
@@ -970,8 +970,8 @@ const CreatePropertyModal = ({
                                                         />
                                                     </div> */}
                                                     <p className="bg-gray-200 p-1 mt-2 mb-2">{t.modals.propertiesEdit.stay.receiptShipment}</p>
-                                                    <div className="flex flex-col w-full text-xs">
-                                                        <p>{t.modals.propertiesEdit.stay.email}</p>
+                                                    <div className="flex flex-col w-full">
+                                                        <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.email}</p>
                                                         <input
                                                             type="text"
                                                             value={infoEmail}
@@ -985,8 +985,8 @@ const CreatePropertyModal = ({
                                             {activeStayTab === "email" && (
                                                 <div>
                                                     <p className="bg-gray-200 p-1 -mt-4 mb-2">{t.modals.propertiesEdit.stay.email}</p>
-                                                    <div className="w-1/2 flex flex-col text-xs">
-                                                        <p>{t.modals.propertiesEdit.stay.emailSubject}</p>
+                                                    <div className="w-1/2 flex flex-col">
+                                                        <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailSubject}</p>
                                                         <input
                                                             ref={subjectInputRef}
                                                             type="text"
@@ -1010,7 +1010,7 @@ const CreatePropertyModal = ({
                                                     <div className="w-full flex flex-col text-xs mt-2 -mb-8">
                                                         <div className="flex flex-row justify-between items-center mb-1 cursor-pointer">
                                                             <div>
-                                                                <p>{t.modals.propertiesEdit.stay.emailBody}</p>
+                                                                <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailBody}</p>
                                                             </div>
                                                             <div className="flex flex-row gap-2 items-center hover:text-blue-600">
                                                                 <p onClick={() => setShowTemplatesModal(true)} className="cursor-pointer">Templates</p>
@@ -1165,8 +1165,8 @@ const CreatePropertyModal = ({
                                                 </div>
                                                 <p className="bg-gray-200 p-1 mb-2">Setup Room Cloud account</p>
                                                 <div className="flex flex-row gap-2 w-full">
-                                                    <div className="w-1/3 flex flex-col text-xs">
-                                                        <p>Username</p>
+                                                    <div className="w-1/3 flex flex-col">
+                                                        <p className="block text-sm font-medium text-gray-400">Username</p>
                                                         <input
                                                             type="text"
                                                             value={roomCloudUsername}
@@ -1174,8 +1174,8 @@ const CreatePropertyModal = ({
                                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                         />
                                                     </div>
-                                                    <div className="w-1/3 flex flex-col text-xs">
-                                                        <p>Password</p>
+                                                    <div className="w-1/3 flex flex-col">
+                                                        <p className="block text-sm font-medium text-gray-400">Password</p>
                                                         <input
                                                             type="password"
                                                             value={roomCloudPassword}
@@ -1183,8 +1183,8 @@ const CreatePropertyModal = ({
                                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                         />
                                                     </div>
-                                                    <div className="w-1/3 flex flex-col text-xs">
-                                                        <p>Hotel ID</p>
+                                                    <div className="w-1/3 flex flex-col">
+                                                        <p className="block text-sm font-medium text-gray-400">Hotel ID</p>
                                                         <input
                                                             type="text"
                                                             value={roomCloudHotelID}

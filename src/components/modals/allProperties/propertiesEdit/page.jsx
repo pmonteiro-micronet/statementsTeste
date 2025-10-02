@@ -9,6 +9,7 @@ import axios from "axios";
 import { FaGripLines } from "react-icons/fa";
 import { IoCopy } from "react-icons/io5";
 import { FaUsers } from "react-icons/fa";
+import { ImInsertTemplate } from "react-icons/im";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -213,8 +214,8 @@ const PropertiesEditForm = ({
                 });
 
                 if (hotelTermsResponse.status === 200 || hotelTermsResponse.status === 201) {
-                    setIsEditing(false);
-                    onClose(); // Fecha o modal
+                    // setIsEditing(false);
+                    //onClose(); // Fecha o modal
                 } else {
                     setError("Failed to save hotel terms.");
                 }
@@ -229,7 +230,10 @@ const PropertiesEditForm = ({
 
 
     const [selectedImage, setSelectedImage] = useState(null);
-    const [imageUrl, setImageUrl] = useState(); // Estado para armazenar a URL da imagem
+    const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/dp6iart4f/image/upload/hotels/";
+    const [imageUrl, setImageUrl] = useState(
+    `${CLOUDINARY_BASE_URL}${hotel.propertyID}.png`
+    );
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
@@ -360,7 +364,7 @@ const PropertiesEditForm = ({
     ];
 
     const hotelDetails = [
-        { key: '{{hotel_name}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelName },
+        //{ key: '{{hotel_name}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelName },
         { key: '{{hotel_email}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelEmail },
         { key: '{{hotel_phone}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelPhone },
     ];
@@ -843,7 +847,7 @@ const PropertiesEditForm = ({
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelImage}</label>
+                                            <label className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.hotelImage} <p><b>(.PNG 280x160)</b></p></label>
                                             <div className="flex flex-col gap-2">
                                                 <input
                                                     type="file"
@@ -873,6 +877,7 @@ const PropertiesEditForm = ({
                                                         src={imageUrl}
                                                         alt="Current Hotel"
                                                         className="mt-4 w-20 h-20 rounded shadow -mb-8"
+                                                        onError={() => setImageUrl("")} // ou setImageUrl("/path/to/default.png")
                                                     />
                                                 )}
                                             </div>
@@ -1048,6 +1053,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setHotelTermsEN(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={2000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {hotelTermsEN.length} / 2000
@@ -1062,6 +1068,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setHotelTermsPT(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={2000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {hotelTermsPT.length} / 2000
@@ -1075,6 +1082,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setHotelTermsES(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={2000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {hotelTermsES.length} / 2000
@@ -1093,6 +1101,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setPrivacyPolicyEN(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={2000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {privacyPolicyEN.length} / 2000
@@ -1106,6 +1115,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setPrivacyPolicyPT(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={2000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {privacyPolicyPT.length} / 2000
@@ -1119,6 +1129,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setPrivacyPolicyES(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={2000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {privacyPolicyES.length} / 2000
@@ -1137,6 +1148,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setMiniTermsEN(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={1000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {miniTermsEN.length} / 1000
@@ -1150,6 +1162,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setMiniTermsPT(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={1000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {miniTermsPT.length} / 1000
@@ -1163,6 +1176,7 @@ const PropertiesEditForm = ({
                                                                                     onChange={(e) => setMiniTermsES(e.target.value)}
                                                                                     className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                                                     maxLength={1000}
+                                                                                    disabled={!isEditing}
                                                                                 />
                                                                                 <div className="text-right text-xs text-gray-500 mt-1">
                                                                                     {miniTermsES.length} / 1000
@@ -1207,8 +1221,8 @@ const PropertiesEditForm = ({
                                             <div>
                                                 <p className="bg-gray-200 p-1 mb-2">{t.modals.propertiesEdit.stay.sendSMTP}</p>
                                                 <div className="flex flex-row gap-2 w-full">
-                                                    <div className="w-1/2 flex flex-col text-xs">
-                                                        <p>{t.modals.propertiesEdit.stay.email}</p>
+                                                    <div className="w-1/2 flex flex-col">
+                                                        <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.email}</p>
                                                         <input
                                                             type="text"
                                                             value={replyEmail}
@@ -1217,8 +1231,8 @@ const PropertiesEditForm = ({
                                                             disabled={!isEditing} // Desabilita o campo quando não está em edição
                                                         />
                                                     </div>
-                                                    <div className="w-1/2 flex flex-col text-xs">
-                                                        <p>{t.modals.propertiesEdit.stay.emailPassword}</p>
+                                                    <div className="w-1/2 flex flex-col">
+                                                        <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailPassword}</p>
                                                         <input
                                                             type="text"
                                                             value={replyPassword}
@@ -1229,8 +1243,8 @@ const PropertiesEditForm = ({
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-row gap-2 w-full">
-                                                    <div className="w-1/2 flex flex-col text-xs">
-                                                        <p>{t.modals.propertiesEdit.stay.serverSMTP}</p>
+                                                    <div className="w-1/2 flex flex-col">
+                                                        <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.serverSMTP}</p>
                                                         <input
                                                             type="text"
                                                             value={sendingServer}
@@ -1239,8 +1253,8 @@ const PropertiesEditForm = ({
                                                             disabled={!isEditing} // Desabilita o campo quando não está em edição
                                                         />
                                                     </div>
-                                                    <div className="w-1/2 flex flex-col text-xs">
-                                                        <p>{t.modals.propertiesEdit.stay.portSMTP}</p>
+                                                    <div className="w-1/2 flex flex-col">
+                                                        <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.portSMTP}</p>
                                                         <input
                                                             type="text"
                                                             value={sendingPort}
@@ -1251,8 +1265,8 @@ const PropertiesEditForm = ({
                                                     </div>
                                                 </div>
                                                 <p className="bg-gray-200 p-1 mt-2 mb-2">{t.modals.propertiesEdit.stay.receiptShipment}</p>
-                                                <div className="flex flex-col w-full text-xs">
-                                                    <p>{t.modals.propertiesEdit.stay.email}</p>
+                                                <div className="flex flex-col w-full">
+                                                    <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.email}</p>
                                                     <input
                                                         type="text"
                                                         value={infoEmail}
@@ -1268,8 +1282,8 @@ const PropertiesEditForm = ({
                                         {activeStayTab === "email" && (
                                             <div>
                                                 <p className="bg-gray-200 p-1 -mt-4 mb-2">{t.modals.propertiesEdit.stay.email}</p>
-                                                <div className="w-1/2 flex flex-col text-xs">
-                                                    <p>{t.modals.propertiesEdit.stay.emailSubject}</p>
+                                                <div className="w-1/2 flex flex-col">
+                                                    <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailSubject}</p>
                                                     <input
                                                         ref={subjectInputRef}
                                                         type="text"
@@ -1294,10 +1308,10 @@ const PropertiesEditForm = ({
                                                 <div className="w-full flex flex-col text-xs mt-2 -mb-8">
                                                     <div className="flex flex-row justify-between items-center mb-1 cursor-pointer">
                                                         <div>
-                                                            <p>{t.modals.propertiesEdit.stay.emailBody}</p>
+                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailBody}</p>
                                                         </div>
                                                         <div className="flex flex-row gap-2 items-center hover:text-blue-600">
-                                                            <p onClick={() => setShowTemplatesModal(true)} className="cursor-pointer">Templates</p>
+                                                            <div onClick={() => setShowTemplatesModal(true)} className="bg-[#FC9D25] p-1 rounded-lg"><ImInsertTemplate  color="white" size={15} /></div>
                                                             <div
                                                                 className="bg-[#FC9D25] p-1 rounded-lg"
                                                                 onClick={() => setShowVariablesbar(!showVariablesbar)}
@@ -1417,7 +1431,7 @@ const PropertiesEditForm = ({
                                                                         className="cursor-pointer p-2 border rounded hover:bg-gray-100"
                                                                     >
                                                                         <strong>Template #{template.templateID}</strong>
-                                                                        <p className="text-gray-600 text-xs truncate">{template.emailSubject}</p>
+                                                                        <p className="text-gray-600 truncate">{template.emailSubject}</p>
                                                                     </div>
                                                                 ))
                                                             ) : (
@@ -1495,7 +1509,7 @@ const PropertiesEditForm = ({
                                                         className="w-4 h-4"
                                                         disabled={!isEditing}
                                                     />
-                                                    <label htmlFor="hasRoomCloud" className="text-sm">{t.modals.propertiesEdit.roomCloud.hasRoomCloud}</label>
+                                                    <label htmlFor="hasRoomCloud" className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.roomCloud.hasRoomCloud}</label>
                                                 </div>
 
                                                 <FaUsers size={15} className="cursor-pointer" onClick={handleOpenRoomCloudUserModal} />
@@ -1551,8 +1565,8 @@ const PropertiesEditForm = ({
 
                                             <p className="bg-gray-200 p-1 mb-2">{t.modals.propertiesEdit.roomCloud.title1}</p>
                                             <div className="flex flex-row gap-2 w-full">
-                                                <div className="w-1/3 flex flex-col text-xs">
-                                                    <p>{t.modals.propertiesEdit.roomCloud.username}</p>
+                                                <div className="w-1/3 flex flex-col">
+                                                    <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.roomCloud.username}</p>
                                                     <input
                                                         type="text"
                                                         value={roomCloudUsername}
@@ -1561,8 +1575,8 @@ const PropertiesEditForm = ({
                                                         disabled={!isEditing}
                                                     />
                                                 </div>
-                                                <div className="w-1/3 flex flex-col text-xs">
-                                                    <p>{t.modals.propertiesEdit.roomCloud.password}</p>
+                                                <div className="w-1/3 flex flex-col">
+                                                    <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.roomCloud.password}</p>
                                                     <input
                                                         type="password"
                                                         value={roomCloudPassword}
@@ -1571,8 +1585,8 @@ const PropertiesEditForm = ({
                                                         disabled={!isEditing}
                                                     />
                                                 </div>
-                                                <div className="w-1/3 flex flex-col text-xs">
-                                                    <p>{t.modals.propertiesEdit.roomCloud.hotelID}</p>
+                                                <div className="w-1/3 flex flex-col">
+                                                    <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.roomCloud.hotelID}</p>
                                                     <input
                                                         type="text"
                                                         value={roomCloudHotelID}

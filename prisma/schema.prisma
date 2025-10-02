@@ -202,3 +202,13 @@ model requestRecordsHousekeeping {
   responseBody    String?  @db.Text
   propertyID      Int
 }
+
+model roomCloudLogs {
+  requestID      Int       @id @default(autoincrement())
+  hotelID        Int
+  requestBody    String?   @db.Text
+  responseStatus String?   @db.VarChar(50)
+  responseBody   String?   @db.Text
+  createdAt      DateTime? @default(now()) @db.Timestamp(0)
+}
+
