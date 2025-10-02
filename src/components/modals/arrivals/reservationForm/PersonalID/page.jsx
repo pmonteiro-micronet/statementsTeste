@@ -284,7 +284,7 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                                 setFormData(prev => ({
                                                     ...prev,
                                                     CountryOfBirthID: selectedOption.value,   // <-- ID
-                                                    CountryOfBirthLabel: selectedOption.label // <-- Label
+                                                    CountryOfBirth: selectedOption.label // <-- Label
                                                 }));
                                                 setIsDataModified(true);
                                             }}
@@ -333,7 +333,7 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                                 setFormData(prev => ({
                                                     ...prev,
                                                     IDDocID: selectedOption.value,   // <-- ID
-                                                    IDDocLabel: selectedOption.label // <-- Label
+                                                    IDDoc: selectedOption.label // <-- Label
                                                 }));
                                                 setIsDataModified(true);
                                             }}

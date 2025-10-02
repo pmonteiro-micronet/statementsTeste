@@ -551,7 +551,7 @@ export default function Page() {
                 RateCode: reserva.RateCode,
                 Locale: locale, // passa a variavel de idioma
             };
-
+            console.log("Detalhes da reserva para o PDF:", reservaDetails);
             // Geração do PDF
             const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
             const pdfBlob = pdfDoc.output('blob'); // Gerar o PDF como um Blob
