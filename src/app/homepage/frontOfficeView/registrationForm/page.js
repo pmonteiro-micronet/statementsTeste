@@ -420,11 +420,10 @@ export default function Page() {
             setIsErrorModalOpen(true);
             return;
         }
-        if (!contacts.Email) {
-            const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
-            if (!proceed) return;
-        }
-
+        // if (!contacts.Email || !email) {
+        //     const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
+        //     if (!proceed) return;
+        // }
         if (errors.length > 0) {
             setErrorMessage(errors.join("\n"));
             setIsErrorModalOpen(true);
