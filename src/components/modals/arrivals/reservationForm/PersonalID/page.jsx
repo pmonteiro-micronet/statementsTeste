@@ -277,7 +277,7 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                             options={countryOptions}
                                             value={
                                                 countryOptions.find(
-                                                    option => option.value === formData.CountryOfBirthID
+                                                    option => option.label === formData.CountryOfBirth 
                                                 ) || null
                                             }
                                             onChange={(selectedOption) => {
@@ -300,7 +300,7 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                             options={countryOptions}
                                             value={
                                                 countryOptions.find(
-                                                    option => option.value === formData.NationalityID
+                                                    option => option.label === formData.NationalityLabel
                                                 ) || null
                                             }
                                             onChange={(selectedOption) => {
@@ -326,7 +326,7 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                             options={docTypeOptions}
                                             value={
                                                 docTypeOptions.find(
-                                                    option => option.value === formData.IDDocID
+                                                    option => option.label === formData.IDDoc
                                                 ) || null
                                             }
                                             onChange={(selectedOption) => {
