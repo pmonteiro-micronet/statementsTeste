@@ -415,13 +415,13 @@ export default function Page() {
 
         if (missingFields.length > 0) {
             setErrorMessage(
-                `${t.frontOffice.registrationFrom.errors.pleaseFill}\n- ${missingFields.join("\n- ")}`
+                `${t.frontOffice.registrationForm.errors.pleaseFill}\n- ${missingFields.join("\n- ")}`
             );
             setIsErrorModalOpen(true);
             return;
         }
         if (!contacts.Email) {
-            const proceed = window.confirm(t.frontOffice.registrationFrom.errors.emptyEmailValidation);
+            const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
             if (!proceed) return;
         }
 
@@ -472,7 +472,7 @@ export default function Page() {
 
         } catch (error) {
             console.error("Erro ao salvar endereço ou Personal ID:", error);
-            errors.push(t.frontOffice.registrationFrom.errors.errorSavingDocument);
+            errors.push(t.frontOffice.registrationForm.errors.errorSavingDocument);
             setErrorMessage(errors.join("\n"));
             setIsErrorModalOpen(true);
             return;
@@ -495,7 +495,7 @@ export default function Page() {
                 console.log('Alterações salvas com sucesso:', response.data);
             } catch (error) {
                 console.error('Erro ao salvar alterações:', error);
-                errors.push(t.frontOffice.registrationFrom.errors.contactSupport);
+                errors.push(t.frontOffice.registrationForm.errors.contactSupport);
                 setErrorMessage(errors.join("\n"));
                 setIsErrorModalOpen(true);
                 return;
@@ -587,7 +587,7 @@ export default function Page() {
             setIsSuccessModalOpen(true);
         } catch (error) {
             console.error('Erro ao gerar ou enviar o PDF:', error);
-            errors.push(t.frontOffice.registrationFrom.errors.generateFormError);
+            errors.push(t.frontOffice.registrationForm.errors.generateFormError);
             setErrorMessage(errors.join("\n"));
             setIsErrorModalOpen(true);
         }
