@@ -411,7 +411,7 @@ export default function Page() {
         if (!getValue(personalIDData, personalID, "IDDoc")) missingFields.push(t.frontOffice.registrationForm.idDoc);
         if (!getValue(personalIDData, personalID, "NrDoc")) missingFields.push(t.frontOffice.registrationForm.idDocNumber);
         if (!getValue(personalIDData, personalID, "CountryOfBirth")) missingFields.push(t.frontOffice.registrationForm.countryOfBirth);
-        if (!getValue(personalIDData, personalID, "ExpDate")) missingFields.push(t.frontOffice.registrationForm.expDate);
+        // if (!getValue(personalIDData, personalID, "ExpDate")) missingFields.push(t.frontOffice.registrationForm.expDate);
 
         if (missingFields.length > 0) {
             setErrorMessage(
@@ -420,11 +420,10 @@ export default function Page() {
             setIsErrorModalOpen(true);
             return;
         }
-        if (!contacts.Email) {
-            const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
-            if (!proceed) return;
-        }
-
+        // if (!contacts.Email || !email) {
+        //     const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
+        //     if (!proceed) return;
+        // }
         if (errors.length > 0) {
             setErrorMessage(errors.join("\n"));
             setIsErrorModalOpen(true);
