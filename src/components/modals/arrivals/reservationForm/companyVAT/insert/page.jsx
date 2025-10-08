@@ -94,10 +94,12 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
         }
     };
 
+    const validatePortugueseVAT = (vat) => /^\d{9}$/.test(vat);
     const handleBlur = () => {
-        if (formData.country === "Portugal" && formData.vatNo) {
-            if (!/^\d{9}$/.test(formData.vatNo)) {
-                setVatError(t.modals.companyInfo.errors.invalidVAT);
+        const vat = formData.vatNo?.trim();
+        if (formData.country === 27 && vat) {
+            if (!validatePortugueseVAT(vat)) {
+                setVatError(t.modals.errors.invalidVAT);
             } else {
                 setVatError("");
             }
@@ -106,24 +108,22 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
         }
     };
 
+    // Chamada no useEffect para validação automática
+    useEffect(() => {
+        handleBlur();
+    }, [formData.vatNo, formData.country]);
+
 
     const handleCountryChange = (selectedOption) => {
-        setFormData((prevData) => {
-            const updatedData = {
-                ...prevData,
-                country: selectedOption.value, // ID do país (codenr)
-                countryName: selectedOption.label, // Nome do país (land)
-            };
+        setFormData((prevData) => ({
+            ...prevData,
+            country: selectedOption.value,    // ID do país (codenr)
+            countryName: selectedOption.label // Nome do país (land)
+        }));
 
-            // Limpar o campo VAT No. se o país for alterado
-            if (updatedData.country !== prevData.country) {
-                updatedData.vatNo = "";
-            }
-
-            setIsDataModified(true);  // Marca os dados como modificados
-            return updatedData;
-        });
+        setIsDataModified(true); // Marca os dados como modificados
     };
+
 
     const fetchNationalities = async () => {
         try {
@@ -145,60 +145,88 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
     };
 
     const handleSave = async () => {
-        if (!formData.companyName.trim()) {
-            setErrorMessage(t.modals.companyInfo.errors.companyNameRequired);
-            return;
-        }
 
-        if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
-            setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
-            return;
-        }
+    if (vatError) {
+        setErrorMessage(t.modals.companyInfo.invalidVAT);
+        return;
+    }
 
-        // Substituir valores vazios por espaço em branco
-        const formattedData = Object.fromEntries(
-            Object.entries(formData).map(([key, value]) => [key, String(value).trim() === "" ? " " : String(value).trim()])
-        );
+    if (!formData.companyName.trim()) {
+        setErrorMessage(t.modals.companyInfo.errors.companyNameRequired);
+        return;
+    }
 
-        try {
-            const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVAT", {
-                profileID,
-                propertyID,
-                resNo,
-                countryID: formData.country,
-                countryName: formData.countryName,
-                ...formattedData // dados formatados
+    if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
+        setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
+        return;
+    }
+
+    // Substituir valores vazios por espaço em branco
+    const formattedData = Object.fromEntries(
+        Object.entries(formData).map(([key, value]) => [
+            key,
+            String(value).trim() === "" ? " " : String(value).trim()
+        ])
+    );
+
+    try {
+        // 🔍 Verificar se já existe VAT antes de criar
+        if (formData.vatNo) {
+            const vatResponse = await axios.post("/api/reservations/checkins/registrationForm/checkVatNo", {
+                vatNo: formData.vatNo,
+                propertyID: propertyID,
             });
 
-            // Atualizar localStorage
-            const existingCompanies = JSON.parse(localStorage.getItem("company") || "{}");
+            const vatData = vatResponse.data;
+            console.log("Verificação VAT:", vatData);
 
-            // Monta o objeto para salvar no localStorage, incluindo os campos extras
-            const localStorageData = {
-                profileID,
-                propertyID,
-                resNo,
-                countryID: formData.country,
-                countryName: formData.countryName,
-                ...formattedData,
-                hasCompanyVAT: 1,
-                BlockedCVatNO: 0,
-            };
+            const vatExists = Array.isArray(vatData) && vatData[0]?.result === true;
 
-            existingCompanies[profileID] = localStorageData;
-
-            localStorage.setItem("company", JSON.stringify(existingCompanies));
-
-            console.log("Success:", response.data);
-            setErrorMessage("");
-            setIsDataModified(false);
-            onClose();
-
-        } catch (error) {
-            console.log("Erro ao salvar informações de VAT:", error);
-            setErrorMessage(t.modals.companyInfo.errorSaving);
+            if (vatExists) {
+                setErrorMessage(t.modals.errors.existingVat);
+                return;
+            }
         }
-    };
+
+        // ✅ Se não existir VAT duplicado, prosseguir com criação
+        const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVAT", {
+            profileID,
+            propertyID,
+            resNo,
+            countryID: formData.country,
+            countryName: formData.countryName,
+            ...formattedData, // dados formatados
+        });
+
+        // Atualizar localStorage
+        const existingCompanies = JSON.parse(localStorage.getItem("company") || "{}");
+
+        const localStorageData = {
+            profileID,
+            propertyID,
+            resNo,
+            countryID: formData.country,
+            countryName: formData.countryName,
+            ...formattedData,
+            hasCompanyVAT: 1,
+            BlockedCVatNO: 0,
+        };
+
+        existingCompanies[profileID] = localStorageData;
+
+        localStorage.setItem("company", JSON.stringify(existingCompanies));
+
+        console.log("Empresa criada com sucesso:", response.data);
+        setErrorMessage("");
+        setIsDataModified(false);
+        onClose();
+
+    } catch (error) {
+        console.log("Erro ao salvar informações de VAT:", error);
+        setErrorMessage(t.modals.companyInfo.errorSaving);
+    }
+};
+
 
     const handleCloseModal = () => {
         if (isDataModified) {

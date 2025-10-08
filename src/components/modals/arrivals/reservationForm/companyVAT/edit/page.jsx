@@ -28,7 +28,7 @@ const customStyles = {
     })
 };
 
-const validatePortugueseVAT = (vat) => /^5\d{8}$/.test(vat);
+const validatePortugueseVAT = (vat) => /^\d{9}$/.test(vat);
 
 const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData, company }) => {
     const [formData, setFormData] = useState(() => {
@@ -135,7 +135,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 setLoading(false);
             } catch (error) {
                 console.log("Erro ao buscar países:", error);
-                setErrorMessage(t.modals.companyInfo.errors.errorCountries);
+                setErrorMessage(t.modals.errors.errorCountries);
                 setLoading(false);
             }
         };
@@ -156,88 +156,117 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
 
         if (name === "emailAddress") {
             if (!emailRegex.test(value)) {
-                setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
+                setErrorMessage(t.modals.errors.invalidEmail);
             } else {
                 setErrorMessage("");
             }
         }
     };
 
-    const handleBlur = () => {
-        if (formData.country === "Portugal" && formData.vatNo) {
-            if (!validatePortugueseVAT(formData.vatNo)) {
-                setVatError(t.modals.companyInfo.errors.invalidVAT);
-            } else {
-                setVatError("");
-            }
+const handleBlur = () => {
+    const vat = formData.vatNo?.trim();
+    if (formData.country === 27 && vat) {
+        if (!validatePortugueseVAT(vat)) {
+            setVatError(t.modals.errors.invalidVAT);
         } else {
-            setVatError(""); // Remove erro caso o VAT esteja vazio
+            setVatError("");
         }
-    };
+    } else {
+        setVatError("");
+    }
+};
 
-    const handleCountryChange = (selectedOption) => {
-        setFormData(prev => ({
-            ...prev,
-            country: selectedOption.value,
-            countryName: selectedOption.label, // Nome do país (land)
-            vatNo: prev.country !== selectedOption.value ? "" : prev.vatNo
-        }));
-    };
+// Chamada no useEffect para validação automática
+useEffect(() => {
+    handleBlur();
+}, [formData.vatNo, formData.country]);
+
+
+ const handleCountryChange = (selectedOption) => {
+    setFormData(prev => ({
+        ...prev,
+        country: selectedOption.value,
+        countryName: selectedOption.label, // Nome do país (land)
+        vatNo: prev.vatNo // mantém o VAT sempre
+    }));
+};
+
 
     const handleSave = async () => {
-        if (!formData.companyName) {
-            setErrorMessage(t.modals.companyInfo.errors.companyNameRequired);
-            return;
-        }
+    if (!formData.companyName) {
+        setErrorMessage(t.modals.errors.companyNameRequired);
+        return;
+    }
 
-        if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
-            setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
-            return;
-        }
+    if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
+        setErrorMessage(t.modals.errors.invalidEmail);
+        return;
+    }
 
-        const payload = Object.fromEntries(
-            Object.entries({
-                profileID,
-                propertyID,
-                resNo,
-                companyID: companyID || extractedCompanyID,
-                countryID: formData.country,
-                countryName: formData.countryName,
-                companyName: formData.companyName,
+    const payload = Object.fromEntries(
+        Object.entries({
+            profileID,
+            propertyID,
+            resNo,
+            companyID: companyID || extractedCompanyID,
+            countryID: formData.country,
+            countryName: formData.countryName,
+            companyName: formData.companyName,
+            vatNo: formData.vatNo,
+            emailAddress: formData.emailAddress,
+            streetAddress: formData.streetAddress,
+            zipCode: formData.zipCode,
+            city: formData.city,
+            state: formData.state,
+        }).map(([key, value]) => [key, String(value || "").trim() === "" ? "" : String(value || "").trim()])
+    );
+
+    try {
+        // 🔍 Verificar VAT se preenchido
+        if (formData.vatNo) {
+            const vatResponse = await axios.post("/api/reservations/checkins/registrationForm/checkVatNo", {
                 vatNo: formData.vatNo,
-                emailAddress: formData.emailAddress,
-                streetAddress: formData.streetAddress,
-                zipCode: formData.zipCode,
-                city: formData.city,
-                state: formData.state,
-            }).map(([key, value]) => [key, String(value || "").trim() === "" ? "" : String(value || "").trim()])
-        );
+                propertyID: propertyID,
+            });
 
-        try {
-            await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", payload);
+            const vatData = vatResponse.data;
+            console.log("OPAAA: ", vatData);
+            // Espera-se um array como [{ result: true }]
+            const vatExists = Array.isArray(vatData) && vatData[0]?.result === true;
 
-            const existingCompanies = JSON.parse(localStorage.getItem("company") || "{}");
-
-            // Clona o payload e adiciona o campo extra apenas para o localStorage
-            const localStorageData = {
-                ...payload,
-                hasCompanyVAT: 1,
-                BlockedCVatNO: 0,
-            };
-
-
-            existingCompanies[profileID] = localStorageData;
-
-            localStorage.setItem("company", JSON.stringify(existingCompanies));
-
-            onClose();
-            window.location.reload();
-
-        } catch (error) {
-            console.log("Erro ao salvar empresa:", error);
-            setErrorMessage(t.modals.companyInfo.errors.errorSaving);
+            if (vatExists) {
+                setErrorMessage(
+                    t.modals.errors.existingVat
+                );
+                return;
+            }
         }
-    };
+
+        // ✅ Prosseguir se VAT for falso ou não existir
+        await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", payload);
+
+        const existingCompanies = JSON.parse(localStorage.getItem("company") || "{}");
+
+        const localStorageData = {
+            ...payload,
+            hasCompanyVAT: 1,
+            BlockedCVatNO: 0,
+        };
+
+        existingCompanies[profileID] = localStorageData;
+
+        localStorage.setItem("company", JSON.stringify(existingCompanies));
+
+        onClose();
+        // window.location.reload();
+
+    } catch (error) {
+        console.log("Erro ao salvar empresa:", error);
+        setErrorMessage(t.modals.errors.errorSaving);
+    }
+};
+
+
 
     if (loading) return <LoadingBackdrop open={true} />;
 

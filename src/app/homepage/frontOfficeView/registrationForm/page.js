@@ -413,9 +413,9 @@ export default function Page() {
         if (!getValue(personalIDData, personalID, "CountryOfBirth")) missingFields.push(t.frontOffice.registrationForm.countryOfBirth);
         const dateOfBirth = getValue(personalIDData, personalID, "DateOfBirth");
 
-if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
-    missingFields.push(t.frontOffice.registrationForm.dateOfBirth);
-}
+        if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
+            missingFields.push(t.frontOffice.registrationForm.dateOfBirth);
+        }
 
         if (missingFields.length > 0) {
             setErrorMessage(
@@ -1066,7 +1066,12 @@ if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
                                                     type={"text"}
                                                     id={"Last Name"}
                                                     name={"Last Name"}
-                                                    label={`${t.frontOffice.registrationForm.lastName} *`}
+                                                    label={
+                                                        <div className='flex align-center gap-1'>
+                                                        {t.frontOffice.registrationForm.lastName}
+                                                        <span className='text-red-500  font-bold'>*</span>
+                                                    </div>
+                                                    }
                                                     ariaLabel={"Last Name:"}
                                                     value={guestInfo.LastName}
                                                     style={"w-72 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
@@ -1121,7 +1126,12 @@ if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
                                                 type="text"
                                                 id="Country"
                                                 name="Country"
-                                                label={`${t.frontOffice.registrationForm.country} *`}
+                                                label={
+                                                        <div className='flex align-center gap-1'>
+                                                            {t.frontOffice.registrationForm.country}
+                                                            <span className='text-red-500  font-bold'>*</span>
+                                                        </div>
+                                                    }
                                                 ariaLabel="Country:"
                                                 value={addressData?.Country ?? address.Country ?? ""}
                                                 style={inputStyleFull}
@@ -1204,14 +1214,21 @@ if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
                                                 }
                                                 id={"Date of Birth"}
                                                 name={"Date of Birth"}
-                                                label={`${t.frontOffice.registrationForm.dateOfBirth} *`}
+                                                label={
+                                                        <div className='flex align-center gap-1'>
+                                                            {t.frontOffice.registrationForm.dateOfBirth}
+                                                            <span className='text-red-500  font-bold'>*</span>
+                                                        </div>
+                                                    }
                                                 ariaLabel={"Date of Birth:"}
                                                 value={
-                                                    personalIDData?.DateOfBirth && personalIDData.DateOfBirth.split('T')[0] !== '1900-01-01'
-                                                        ? formatDate(personalIDData.DateOfBirth)
-                                                        : personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
-                                                            ? personalID.DateOfBirth.split('T')[0]
-                                                            : ""
+                                                    personalIDData?.DateOfBirth === ""
+                                                        ? ""
+                                                        : personalIDData?.DateOfBirth && personalIDData.DateOfBirth.split('T')[0] !== '1900-01-01'
+                                                            ? formatDate(personalIDData.DateOfBirth)
+                                                            : personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
+                                                                ? personalID.DateOfBirth.split('T')[0]
+                                                                : ""
                                                 }
                                                 style={inputStyleFullWithLine}
                                             />
@@ -1220,7 +1237,12 @@ if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
                                                 type={"text"}
                                                 id={"Country of Birth"}
                                                 name={"Country of Birth"}
-                                                label={`${t.frontOffice.registrationForm.countryOfBirth} *`}
+                                                label={
+                                                        <div className='flex align-center gap-1'>
+                                                            {t.frontOffice.registrationForm.countryOfBirth}
+                                                            <span className='text-red-500  font-bold'>*</span>
+                                                        </div>
+                                                    }
                                                 ariaLabel={"Country of Birth:"}
                                                 value={personalIDData?.CountryOfBirth ?? personalID.CountryOfBirth}
                                                 style={`${inputStyleFullWithLine}`}
@@ -1250,7 +1272,12 @@ if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
                                                 type={"text"}
                                                 id={"ID Doc"}
                                                 name={"ID Doc"}
-                                                label={`${t.frontOffice.registrationForm.idDoc} *`}
+                                                 label={
+                                                        <div className='flex align-center gap-1'>
+                                                            {t.frontOffice.registrationForm.idDoc}
+                                                            <span className='text-red-500  font-bold'>*</span>
+                                                        </div>
+                                                    }
                                                 ariaLabel={"ID Doc:"}
                                                 value={personalIDData?.IDDoc ?? personalID.IDDoc}
                                                 style={`${inputStyleFullWithLine}`}
@@ -1259,7 +1286,12 @@ if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
                                                 type={"text"}
                                                 id={"ID Doc Nr."}
                                                 name={"ID Doc Nr."}
-                                                label={`${t.frontOffice.registrationForm.idDocNumber} *`}
+                                                 label={
+                                                        <div className='flex align-center gap-1'>
+                                                            {t.frontOffice.registrationForm.idDocNumber}
+                                                            <span className='text-red-500  font-bold'>*</span>
+                                                        </div>
+                                                    }
                                                 ariaLabel={"ID Doc Nr.:"}
                                                 value={personalIDData?.NrDoc ?? personalID.NrDoc}
                                                 style={`${inputStyleFullWithLine}`}
@@ -1268,7 +1300,7 @@ if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
                                         <div className='flex flex-row justify-between gap-4 mt-4'>
                                             <InputFieldControlled
                                                 type={
-                                                    personalIDData?.ExpDate && personalIDData.ExpDate.split('T')[0] !== '2050-12-31'
+                                                    personalIDData?.ExpDate
                                                         ? "date"
                                                         : "text"
                                                 }
@@ -1277,9 +1309,9 @@ if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
                                                 label={t.frontOffice.registrationForm.expDate}
                                                 ariaLabel={"Exp. Date:"}
                                                 value={
-                                                    personalIDData?.ExpDate && personalIDData.ExpDate.split('T')[0] !== '2050-12-31'
+                                                    personalIDData?.ExpDate 
                                                         ? formatDate(personalIDData.ExpDate)
-                                                        : personalID?.ExpDate && personalID.ExpDate.split('T')[0] !== '2050-12-31'
+                                                         : personalID?.ExpDate //&& personalID.ExpDate.split('T')[0] !== '2050-12-31'
                                                             ? personalID.ExpDate.split('T')[0]
                                                             : ""
                                                 }

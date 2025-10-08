@@ -224,80 +224,80 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
   // Função para pegar as reservas
   const fetchReservas = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get(`/api/reservations/inHouses/${propertyID}`);
-      console.log("Response completo:", response);
+  setIsLoading(true);
+  try {
+    const response = await axios.get(`/api/reservations/inHouses/${propertyID}`);
+    console.log("Response completo:", response);
 
-      // Parse das reservas
-      const reservasArray = response.data.response.flatMap(item => {
-        try {
-          return JSON.parse(item.responseBody);
-        } catch (err) {
-          console.error("Erro ao fazer parse de requestBody:", item.responseBody, err);
-          return [];
-        }
-      });
+    // Parse das reservas adicionando requestID e propertyID
+    const reservasArray = response.data.response.flatMap(item => {
+      try {
+        const parsed = JSON.parse(item.responseBody);
 
-      console.log("Reservas após parse (todas as linhas):", reservasArray);
-
-      if (reservasArray.length === 0) {
-        console.warn("Nenhuma reserva encontrada após parse.");
-        setIsLoading(false);
-        return; // Interrompe a execução se não houver reservas
+        // Se parsed for array, adiciona os IDs a cada reserva
+        return Array.isArray(parsed)
+          ? parsed.map(reserva => ({
+              ...reserva,
+              requestID: item.requestID,
+              propertyID: item.propertyID,
+            }))
+          : [];
+      } catch (err) {
+        console.error("Erro ao fazer parse de requestBody:", item.responseBody, err);
+        return [];
       }
+    });
 
-      // Obtemos a data atual no formato YYYY-MM-DD
-      const today = dayjs(currentDate, 'YYYY-MM-DD', true);
-      console.log("Data atual formatada:", today.format());
+    console.log("Reservas após parse (todas as linhas):", reservasArray);
 
-      // Filtramos as reservas para pegar apenas as que têm a data no campo requestDateTime igual à data atual
-      const reservasFiltradas = reservasArray.filter(reserva => {
-        const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-
-        // Compara apenas a data, sem considerar a hora
-        const isSameDay = requestDateTime.isSame(today, 'day');
-
-        console.log(`Reserva: ${reserva.LastName}, RequestDateTime: ${requestDateTime.format()}`);
-        return isSameDay;
-      });
-
-      console.log("Reservas filtradas pela data atual:", reservasFiltradas);
-
-      // Agora vamos agrupar as reservas por 'LastName' e 'Room' e pegar a mais recente de cada grupo
-      const reservasMaisRecentes = [];
-
-      // Usando um Map para garantir que, para cada combinação LastName + Room, só a reserva mais recente seja adicionada
-      const seen = new Map();
-
-      reservasFiltradas.forEach(reserva => {
-        const key = `${reserva.LastName}-${reserva.Room}`;
-        const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-
-        if (!seen.has(key)) {
-          seen.set(key, reserva);
-        } else {
-          const existingReserva = seen.get(key);
-          const existingDate = dayjs(existingReserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-
-          // Se a reserva atual for mais recente, substituímos a existente
-          if (requestDateTime.isAfter(existingDate)) {
-            seen.set(key, reserva);
-          }
-        }
-      });
-
-      // Agora, obtemos todas as reservas mais recentes
-      reservasMaisRecentes.push(...seen.values());
-
-      console.log("Reservas mais recentes para o dia de hoje:", reservasMaisRecentes);
-      setReservas(reservasMaisRecentes);
-    } catch (error) {
-      console.error("Erro ao buscar reservas:", error.message);
-    } finally {
+    if (reservasArray.length === 0) {
+      console.warn("Nenhuma reserva encontrada após parse.");
       setIsLoading(false);
+      return;
     }
-  };
+
+    const today = dayjs(currentDate, 'YYYY-MM-DD', true);
+    console.log("Data atual formatada:", today.format());
+
+    const reservasFiltradas = reservasArray.filter(reserva => {
+      const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+      const isSameDay = requestDateTime.isSame(today, 'day');
+      console.log(`Reserva: ${reserva.LastName}, RequestDateTime: ${requestDateTime.format()}`);
+      return isSameDay;
+    });
+
+    console.log("Reservas filtradas pela data atual:", reservasFiltradas);
+
+    // Agrupar por LastName + Room e pegar a mais recente
+    const seen = new Map();
+
+    reservasFiltradas.forEach(reserva => {
+      const key = `${reserva.LastName}-${reserva.Room}`;
+      const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+
+      if (!seen.has(key)) {
+        seen.set(key, reserva);
+      } else {
+        const existingReserva = seen.get(key);
+        const existingDate = dayjs(existingReserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+
+        if (requestDateTime.isAfter(existingDate)) {
+          seen.set(key, reserva);
+        }
+      }
+    });
+
+    const reservasMaisRecentes = Array.from(seen.values());
+    console.log("Reservas mais recentes para o dia de hoje:", reservasMaisRecentes);
+
+    setReservas(reservasMaisRecentes);
+  } catch (error) {
+    console.error("Erro ao buscar reservas:", error.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   useEffect(() => {
     if (postSuccessful) {
@@ -388,6 +388,47 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     }
   };
 
+    const fetchPropertyDetails = async (propertyID) => {
+      try {
+        const response = await axios.get(`/api/properties?propertyID=${propertyID}`);
+  
+        if (response.data && response.data.response) {
+          console.log("RESPOSTA DE PROPERTY DETAILS:", response);
+  
+          // Busca o objeto no array cujo propertyID seja igual ao que você passou
+          const property = response.data.response.find(
+            (prop) => prop.propertyID === Number(propertyID)
+          );
+  
+          if (property) {
+            return property;
+          }
+  
+          throw new Error("Nenhuma propriedade encontrada com esse ID.");
+        }
+  
+        throw new Error("Nenhuma propriedade encontrada.");
+      } catch (error) {
+        console.error("Erro ao buscar detalhes da propriedade:", error);
+        return null;
+      }
+    };
+
+    const verifyProperty = async (propertyDetails) => {
+    const { propertyServer, propertyPort } = propertyDetails;
+
+    for (let attempts = 0; attempts < 3; attempts++) {
+      try {
+        const response = await axios.post("/api/verifyProperty", { propertyServer, propertyPort });
+        if (response.data.success) return true;
+      } catch (error) {
+        console.error(`Tentativa ${attempts + 1} falhou para a propriedade ${propertyDetails.propertyName}:`, error);
+      }
+    }
+
+    return false;
+  };
+  
   return (
     (<main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       {isLoading && <LoadingBackdrop open={isLoading} />}
@@ -498,6 +539,41 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                                   <CgFormatIndentIncrease size={15}/> {t.frontOffice.inHouses.statement}
                                   </div>
                                 </DropdownItem>
+                                 <DropdownItem
+                                key="rf"
+                                onClick={async () => {
+                                  // Busca os detalhes da propriedade
+                                  const propertyDetails = await fetchPropertyDetails(propertyID);
+                                  console.log("PROPERTY ID:", propertyID);
+                                  console.log("Detalhes da propriedade:", propertyDetails);
+
+                                  if (!propertyDetails) {
+                                    console.error("Não foi possível encontrar os detalhes da propriedade.");
+                                    return;
+                                  }
+
+                                  // Verifica se a propriedade está acessível
+                                  const isVerified = await verifyProperty(propertyDetails);
+
+                                  if (isVerified) {
+                                    // Redireciona caso seja verificado com sucesso
+                                    const url = `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.ProfileID}`;
+
+                                    console.log("👉 URL de redirecionamento:", url);
+                                    router.push(
+                                      `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.ProfileID}`
+                                    );
+                                  } else {
+                                    // Exibe mensagem de erro no modal
+                                    setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
+                                    setIsErrorModalOpen(true);
+                                  }
+                                }}
+                              >
+                                <div className="flex flex-row gap-2">
+                                  <CgFormatIndentIncrease size={16} /> {t.frontOffice.arrivals.registrationForm}
+                                </div>
+                              </DropdownItem>
                               </DropdownMenu>
                             </Dropdown>
                           </div>

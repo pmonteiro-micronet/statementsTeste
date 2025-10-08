@@ -527,7 +527,8 @@
             "errorCountries": "Erro ao carregar os países. Por favor, tente novamente.",
             "loseData": "Se continuar, todos os dados não guardados serão perdidos. Deseja continuar?",
             "emptyFields": "não pode estar vazio.",
-            "invalidFields": "é inválido. Por favor, verifique o valor."
+            "invalidFields": "é inválido. Por favor, verifique o valor.",
+            "existingVat": "Este número de IVA já está em utilização."
         },
         "dropdown": {
             "profileSettings": "Definições de Perfil",
