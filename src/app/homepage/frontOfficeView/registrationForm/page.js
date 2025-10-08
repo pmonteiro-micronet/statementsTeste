@@ -411,7 +411,11 @@ export default function Page() {
         if (!getValue(personalIDData, personalID, "IDDoc")) missingFields.push(t.frontOffice.registrationForm.idDoc);
         if (!getValue(personalIDData, personalID, "NrDoc")) missingFields.push(t.frontOffice.registrationForm.idDocNumber);
         if (!getValue(personalIDData, personalID, "CountryOfBirth")) missingFields.push(t.frontOffice.registrationForm.countryOfBirth);
-        if (!getValue(personalIDData, personalID, "ExpDate")) missingFields.push(t.frontOffice.registrationForm.expDate);
+        const dateOfBirth = getValue(personalIDData, personalID, "DateOfBirth");
+
+if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
+    missingFields.push(t.frontOffice.registrationForm.dateOfBirth);
+}
 
         if (missingFields.length > 0) {
             setErrorMessage(
@@ -420,11 +424,10 @@ export default function Page() {
             setIsErrorModalOpen(true);
             return;
         }
-        if (!contacts.Email) {
-            const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
-            if (!proceed) return;
-        }
-
+        // if (!contacts.Email || !email) {
+        //     const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
+        //     if (!proceed) return;
+        // }
         if (errors.length > 0) {
             setErrorMessage(errors.join("\n"));
             setIsErrorModalOpen(true);
@@ -773,17 +776,17 @@ export default function Page() {
         }
     }, [locale, miniTermsEN, miniTermsPT, miniTermsES]);
 
- const formatDate = (dateString) => {
-  if (!dateString) return "";
-  const d = new Date(dateString);
-  if (isNaN(d)) return "";
+    const formatDate = (dateString) => {
+        if (!dateString) return "";
+        const d = new Date(dateString);
+        if (isNaN(d)) return "";
 
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
 
-  return `${year}-${month}-${day}`;
-};
+        return `${year}-${month}-${day}`;
+    };
 
 
     return (
@@ -1201,7 +1204,7 @@ export default function Page() {
                                                 }
                                                 id={"Date of Birth"}
                                                 name={"Date of Birth"}
-                                                label={t.frontOffice.registrationForm.dateOfBirth}
+                                                label={`${t.frontOffice.registrationForm.dateOfBirth} *`}
                                                 ariaLabel={"Date of Birth:"}
                                                 value={
                                                     personalIDData?.DateOfBirth && personalIDData.DateOfBirth.split('T')[0] !== '1900-01-01'
