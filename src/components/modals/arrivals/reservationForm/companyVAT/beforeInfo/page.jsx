@@ -122,7 +122,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
             handleSearchClick(true);
         }
     };
-
+// teste
     return (
         <>
             {/* Modal de resultados */}
