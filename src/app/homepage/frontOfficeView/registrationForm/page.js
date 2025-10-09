@@ -424,10 +424,11 @@ export default function Page() {
             setIsErrorModalOpen(true);
             return;
         }
-        // if (!contacts.Email || !email) {
-        //     const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
-        //     if (!proceed) return;
-        // }
+        if (!contacts.Email) {
+            const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
+            if (!proceed) return;
+        }
+
         if (errors.length > 0) {
             setErrorMessage(errors.join("\n"));
             setIsErrorModalOpen(true);
@@ -571,7 +572,7 @@ export default function Page() {
                 {
                     PropertyID: propertyID,
                     pdfBase64: pdfBase64, // Envia o PDF comprimido em Base64
-                    fileName: `RegistrationForm_ResNo_${reserva.ResNo}_TC_${termsAccepted ? 0 : 1}_DPP_${policyAccepted ? 0 : 1}_ProfileID_${guestInfo.ProfileID}.pdf`,
+                    fileName: `RegistrationForm_ResNo_${reserva.ResNo}_TC_${termsAccepted ? 1 : 0}_DPP_${policyAccepted ? 1 : 0}_ProfileID_${guestInfo.ProfileID}.pdf`,
                 }
             );
 
@@ -776,17 +777,17 @@ export default function Page() {
         }
     }, [locale, miniTermsEN, miniTermsPT, miniTermsES]);
 
-    const formatDate = (dateString) => {
-        if (!dateString) return "";
-        const d = new Date(dateString);
-        if (isNaN(d)) return "";
+ const formatDate = (dateString) => {
+  if (!dateString) return "";
+  const d = new Date(dateString);
+  if (isNaN(d)) return "";
 
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, "0");
-        const day = String(d.getDate()).padStart(2, "0");
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
 
-        return `${year}-${month}-${day}`;
-    };
+  return `${year}-${month}-${day}`;
+};
 
 
     return (
@@ -910,6 +911,7 @@ export default function Page() {
                                                 ariaLabel={"Room:"}
                                                 value={reserva.Room}
                                                 style={halfInputStyle}
+                                                disabled
                                             />
                                             <InputFieldControlled
                                                 type={"text"}
@@ -919,6 +921,7 @@ export default function Page() {
                                                 ariaLabel={"Room Type:"}
                                                 value={reserva.RoomType}
                                                 style={inputStyleFull}
+                                                disabled
                                             />
                                             <div className='flex flex-row gap-2'>
                                                 <InputFieldControlled
@@ -929,6 +932,7 @@ export default function Page() {
                                                     ariaLabel={"Adults:"}
                                                     value={reserva.Adults}
                                                     style={`${halfInputStyle}`}
+                                                disabled
                                                 />
                                                 <InputFieldControlled
                                                     type={"text"}
@@ -938,6 +942,7 @@ export default function Page() {
                                                     ariaLabel={"Childs:"}
                                                     value={reserva.Childs}
                                                     style={halfInputStyle}
+                                                disabled
                                                 />
                                             </div>
                                         </div>
@@ -950,6 +955,7 @@ export default function Page() {
                                                 ariaLabel={"Arrival:"}
                                                 value={reserva.DateCI}
                                                 style={inputStyleFull}
+                                                disabled
                                             />
                                             <InputFieldControlled
                                                 type={"text"}
@@ -959,6 +965,7 @@ export default function Page() {
                                                 ariaLabel={"Nights:"}
                                                 value={nights}
                                                 style={halfInputStyle}
+                                                disabled
                                             />
                                             <InputFieldControlled
                                                 type={"date"}
@@ -968,6 +975,7 @@ export default function Page() {
                                                 ariaLabel={"Departure:"}
                                                 value={reserva.DateCO}
                                                 style={inputStyleFull}
+                                                disabled
                                             />
                                         </div>
                                     </div>
@@ -984,6 +992,7 @@ export default function Page() {
                                                 ariaLabel={"Rate Code:"}
                                                 value={reserva.RateCode}
                                                 style={inputStyleFull}
+                                                disabled
                                             />
                                             <InputFieldControlled
                                                 type={"text"}
@@ -993,6 +1002,7 @@ export default function Page() {
                                                 ariaLabel={"City Tax:"}
                                                 value={reserva.CityTax}
                                                 style={inputStyleFull}
+                                                disabled
                                             />
                                         </div>
                                         <div className='flex flex-row justify-between items-center gap-4 mt-2'>
@@ -1006,6 +1016,7 @@ export default function Page() {
                                                         ariaLabel={"Price:"}
                                                         value={reserva.Price === 0 ? "" : `${reserva.Price.toFixed(2)} €`} // Se Price for 0, exibe como vazio
                                                         style={inputStyleFull}
+                                                disabled
                                                     />
 
                                                     <InputFieldControlled
@@ -1016,6 +1027,7 @@ export default function Page() {
                                                         ariaLabel={"Total:"}
                                                         value={reserva.Total === 0 ? "" : `${reserva.Total.toFixed(2)} €`} // Se Total for 0, exibe como vazio
                                                         style={inputStyleFull}
+                                                disabled
                                                     />
                                                 </>
                                             ) : (
@@ -1028,6 +1040,7 @@ export default function Page() {
                                                         ariaLabel={"Price:"}
                                                         value={""} // Campos vazios
                                                         style={inputStyleFull}
+                                                disabled
                                                     />
 
                                                     <InputFieldControlled
@@ -1038,6 +1051,7 @@ export default function Page() {
                                                         ariaLabel={"Total:"}
                                                         value={""} // Campos vazios
                                                         style={inputStyleFull}
+                                                disabled
                                                     />
                                                 </>
                                             )}
@@ -1058,6 +1072,7 @@ export default function Page() {
                                                 ariaLabel={"Salutation:"}
                                                 value={guestInfo.Salution}
                                                 style={"w-10 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
+                                                disabled
                                             />
                                         </div>
                                         <div className='w-full flex flex-row'>
@@ -1075,6 +1090,7 @@ export default function Page() {
                                                     ariaLabel={"Last Name:"}
                                                     value={guestInfo.LastName}
                                                     style={"w-72 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
+                                                disabled
                                                 />
                                             </div>
                                             <div className='w-1/2 -ml-2'>
@@ -1086,6 +1102,7 @@ export default function Page() {
                                                     ariaLabel={"First Name:"}
                                                     value={guestInfo.FirstName}
                                                     style={"w-full h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
+                                                disabled
                                                 />
                                             </div>
                                         </div>
@@ -1135,6 +1152,7 @@ export default function Page() {
                                                 ariaLabel="Country:"
                                                 value={addressData?.Country ?? address.Country ?? ""}
                                                 style={inputStyleFull}
+                                                disabled
                                             />
 
                                             <InputFieldControlled
@@ -1145,6 +1163,7 @@ export default function Page() {
                                                 ariaLabel="Street Address:"
                                                 value={addressData?.Street ?? address.Street ?? ""}
                                                 style={inputStyleFull}
+                                                disabled
                                             />
 
                                             <InputFieldControlled
@@ -1155,6 +1174,7 @@ export default function Page() {
                                                 ariaLabel="ZIP / Postal Code:"
                                                 value={addressData?.PostalCode ?? address.PostalCode ?? ""}
                                                 style={inputStyleFull}
+                                                disabled
                                             />
 
                                             <InputFieldControlled
@@ -1165,6 +1185,7 @@ export default function Page() {
                                                 ariaLabel="City:"
                                                 value={addressData?.City ?? address.City ?? ""}
                                                 style={inputStyleFull}
+                                                disabled
                                             />
                                             {/* <InputFieldControlled
                                                 type={"text"}
@@ -1231,6 +1252,7 @@ export default function Page() {
                                                                 : ""
                                                 }
                                                 style={inputStyleFullWithLine}
+                                                disabled
                                             />
 
                                             <InputFieldControlled
@@ -1246,6 +1268,7 @@ export default function Page() {
                                                 ariaLabel={"Country of Birth:"}
                                                 value={personalIDData?.CountryOfBirth ?? personalID.CountryOfBirth}
                                                 style={`${inputStyleFullWithLine}`}
+                                                disabled
                                             />
                                         </div>
                                         {/* <CountryAutocomplete
@@ -1261,6 +1284,7 @@ export default function Page() {
                                             ariaLabel={"Nationality:"}
                                             value={personalIDData?.NationalityLabel ?? personalID.Nationality}
                                             style={`${inputStyleFullWithLine}`}
+                                                disabled
                                         />
                                         <div className='flex flex-row justify-between items-center gap-4 mt-4'>
                                             {/* <CountryAutocomplete
@@ -1281,6 +1305,7 @@ export default function Page() {
                                                 ariaLabel={"ID Doc:"}
                                                 value={personalIDData?.IDDoc ?? personalID.IDDoc}
                                                 style={`${inputStyleFullWithLine}`}
+                                                disabled
                                             />
                                             <InputFieldControlled
                                                 type={"text"}
@@ -1295,6 +1320,7 @@ export default function Page() {
                                                 ariaLabel={"ID Doc Nr.:"}
                                                 value={personalIDData?.NrDoc ?? personalID.NrDoc}
                                                 style={`${inputStyleFullWithLine}`}
+                                                disabled
                                             />
                                         </div>
                                         <div className='flex flex-row justify-between gap-4 mt-4'>
@@ -1316,6 +1342,7 @@ export default function Page() {
                                                             : ""
                                                 }
                                                 style={inputStyleFullWithLine}
+                                                disabled
                                             />
                                             <InputFieldControlled
                                                 type={"text"}
@@ -1325,6 +1352,7 @@ export default function Page() {
                                                 ariaLabel={"Country issue:"}
                                                 value={personalIDData?.Issue ?? personalID.Issue}
                                                 style={inputStyleFullWithLine}
+                                                disabled
                                             />
                                         </div>
                                     </div>
