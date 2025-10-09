@@ -128,72 +128,91 @@ export default function Page({ params }) {
   }, [propertyID]);
 
   const sendResToAPI = async (ResNo) => {
-    console.log("Enviando ResNumber para a API:", ResNo);
-    const windowValue = 0;
+  console.log("Enviando ResNumber para a API:", ResNo);
+  const windowValue = 0;
 
-    try {
-      // Faz a requisição para enviar os dados do statement
-      const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
-        params: {
-          ResNo,
-          window: windowValue,
-          propertyID,
-        },
-      });
+  try {
+    // 🔹 Faz a requisição para buscar dados da reserva
+    const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
+      params: { ResNo, window: windowValue, propertyID },
+    });
 
-      console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
-      console.log("Resposta da API ao salvar statement:", saveResponse.data);
+    console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
+    console.log("Resposta da API:", saveResponse.data);
 
-      // Se a resposta de salvar o statement foi bem-sucedida, agora verificamos
-      // se o statement foi atualizado ou criado, e pegamos o requestID
-      if (saveResponse.data && saveResponse.data.data && saveResponse.data.data.requestID) {
-        const updatedRecord = saveResponse.data.data;
-        const updatedRequestID = updatedRecord.requestID;
+    // 🔹 Captura o corpo da resposta (pode ser objeto ou string)
+    let updatedRecord = saveResponse.data?.data?.responseBody || saveResponse.data?.data;
 
-        // Redireciona para a página jsonView com o requestID do registro atualizado
-        console.log("Statement atualizado com requestID:", updatedRequestID);
-        router.push(`/homepage/jsonView?recordID=${updatedRequestID}&propertyID=${propertyID}`);
-      } else {
-        console.warn("Resposta da API não contém requestID.");
-      }
-
-    } catch (error) {
-      console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
-
-      if (error.response) {
-        if (error.response.status === 409) {
-          // O status 409 indica que já existe um registro com a mesma uniqueKey
-          console.warn("Registro já existente, buscando o requestID do registro existente.");
-
-          // Extraia o requestID do erro, caso a API o forneça
-          const existingRequestID = error.response.data?.existingRequestID;
-
-          if (existingRequestID) {
-            console.log("Registro existente encontrado com requestID:", existingRequestID);
-
-            // Redireciona para a página jsonView com o requestID do registro existente
-            router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
-          } else {
-            console.error("Não foi possível encontrar o requestID do registro existente.");
-          }
-        } else if (error.response.status === 500) {
-          // Trata o erro 500
-          setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
-          setIsErrorModalOpen(true);
-        } else {
-          // Outros erros
-          console.log("Erro inesperado:", error.response.data);
-          setErrorMessage("We were unable to fulfill your order. Please contact support.");
-          setIsErrorModalOpen(true);
-        }
-      } else {
-        // Erros que não possuem uma resposta da API (ex: problemas de rede)
-        console.log("Erro inesperado:", error.message);
-        setErrorMessage("We were unable to fulfill your order. Please contact support.");
+    if (typeof updatedRecord === "string") {
+      try {
+        updatedRecord = JSON.parse(updatedRecord);
+      } catch (err) {
+        console.error("Erro ao fazer parse do JSON da API:", err);
+        setErrorMessage("Erro ao processar os dados da reserva.");
         setIsErrorModalOpen(true);
+        return;
       }
     }
-  };
+
+    console.log("UPDATED RECORD:", updatedRecord);
+
+    // 🔹 Pega GuestInfo dentro do objeto retornado
+    const guestInfo = Array.isArray(updatedRecord?.["0"]?.GuestInfo)
+      ? updatedRecord["0"].GuestInfo
+      : [];
+
+    console.log("GUESTINFO:", guestInfo);
+
+    // ⚠️ Se não houver movimentos, mostra erro e encerra
+    if (guestInfo.length === 0) {
+      console.log("GuestInfo vazio → não há movimentos para mostrar.");
+      setErrorMessage(t.frontOffice.inHouses.errors.windowA);
+      setIsErrorModalOpen(true);
+      return;
+    }
+
+    // 🔹 Se tudo ok, obtém o requestID e redireciona
+    const updatedRequestID = updatedRecord?.requestID;
+    if (updatedRequestID) {
+      console.log("Statement atualizado com requestID:", updatedRequestID);
+      router.push(`/homepage/jsonView?recordID=${updatedRequestID}&propertyID=${propertyID}`);
+    } else {
+      console.warn("Resposta da API não contém requestID.");
+    }
+
+  } catch (error) {
+    console.error("Erro ao enviar dados ou buscar recordID:", error.response ? error.response.data : error.message);
+
+    if (error.response) {
+      if (error.response.status === 409) {
+        console.warn("Registro já existente, buscando o requestID do registro existente.");
+        const existingRequestID = error.response.data?.existingRequestID;
+
+        if (existingRequestID) {
+          console.log("Registro existente encontrado com requestID:", existingRequestID);
+          router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
+        } else {
+          console.error("Não foi possível encontrar o requestID do registro existente.");
+        }
+
+      } else if (error.response.status === 500) {
+        setErrorMessage(t.frontOffice.inHouses.errors.noCommunication);
+        setIsErrorModalOpen(true);
+
+      } else {
+        console.log("Erro inesperado:", error.response.data);
+        setErrorMessage(t.frontOffice.inHouses.errors.support);
+        setIsErrorModalOpen(true);
+      }
+
+    } else {
+      console.log("Erro inesperado:", error.message);
+      setErrorMessage(t.frontOffice.inHouses.errors.support);
+      setIsErrorModalOpen(true);
+    }
+  }
+};
+
 
   const [selectedReserva, setSelectedReserva] = useState(null);
 

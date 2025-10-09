@@ -94,6 +94,10 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
 
 
     const handleSave = () => {
+
+        if (dobError || !formData.DateOfBirth) {
+            return;
+        }
         onSave(formData); // IDs já estão em formData
         console.log("Saved data:", formData);
         setIsDataModified(false);
@@ -164,6 +168,9 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
         }
         return null;
     };
+
+    const [dobError, setDobError] = useState("");
+
     return (
         <Modal isOpen={true} onOpenChange={handleCloseModal} className="z-50" size="5xl" hideCloseButton={true}>
             <ModalContent>
@@ -192,7 +199,6 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                         </label>
 
                                         <div className="flex items-center gap-2">
-                                            {/* Input da data de nascimento */}
                                             <input
                                                 type="text"
                                                 name="DateOfBirth"
@@ -200,7 +206,7 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                                 onChange={(e) => {
                                                     let value = e.target.value.replace(/\D/g, ""); // só números
 
-                                                    // Aplica a máscara: aaaa/mm/dd
+                                                    // Aplica máscara: aaaa/mm/dd
                                                     if (value.length > 4 && value.length <= 6) {
                                                         value = value.slice(0, 4) + "/" + value.slice(4);
                                                     } else if (value.length > 6) {
@@ -212,13 +218,24 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                                             value.slice(6, 8);
                                                     }
 
+                                                    const today = new Date();
+                                                    const inputDate = new Date(value);
+
+                                                    // ⚠️ Verifica se é uma data futura
+                                                    if (value.length === 10 && !isNaN(inputDate.getTime()) && inputDate > today) {
+                                                        setDobError("A data de nascimento não pode ser superior à data de hoje.");
+                                                    } else {
+                                                        setDobError("");
+                                                    }
+
                                                     setFormData((prev) => ({ ...prev, DateOfBirth: value }));
                                                     setIsDataModified(true);
                                                 }}
                                                 placeholder="aaaa/mm/dd"
                                                 maxLength={10}
-                                                className="w-full border border-gray-300 rounded-md px-2 py-2
-        focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                                className={`w-full border rounded-md px-2 py-2 
+        focus:outline focus:outline-black focus:ring-2 focus:ring-black 
+        ${dobError ? "border-red-500" : "border-gray-300"}`}
                                             />
 
                                             {/* Ícone do calendário */}
@@ -229,14 +246,26 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                             />
                                         </div>
 
-                                        {/* DatePicker invisível, controlado pelo ícone */}
+                                        {/* Mensagem de erro abaixo do input */}
+                                        {dobError && (
+                                            <p className="text-red-500 text-xs mt-1">{dobError}</p>
+                                        )}
+
+                                        {/* DatePicker invisível */}
                                         <DatePicker
                                             ref={dobRef}
                                             selected={parseDate(formData.DateOfBirth)}
                                             onChange={(date) => {
                                                 if (!date) {
                                                     setFormData((prev) => ({ ...prev, DateOfBirth: "" }));
+                                                    setDobError("");
                                                     setIsDataModified(true);
+                                                    return;
+                                                }
+
+                                                const today = new Date();
+                                                if (date > today) {
+                                                    setDobError("A data de nascimento não pode ser superior à data de hoje.");
                                                     return;
                                                 }
 
@@ -247,6 +276,7 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                                 const formatted = `${year}/${month}/${day}`;
 
                                                 setFormData((prev) => ({ ...prev, DateOfBirth: formatted }));
+                                                setDobError("");
                                                 setIsDataModified(true);
                                             }}
                                             dateFormat="yyyy/MM/dd"
@@ -254,20 +284,17 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                             showYearDropdown
                                             dropdownMode="select"
                                             withPortal={false}
-                                            popperPlacement="bottom-end"   // abre embaixo do ícone
+                                            popperPlacement="bottom-end"
                                             popperModifiers={[
                                                 {
                                                     name: "preventOverflow",
-                                                    options: {
-                                                        boundary: "viewport", // evita cortar no fim da tela
-                                                    },
+                                                    options: { boundary: "viewport" },
                                                 },
                                             ]}
+                                            maxDate={new Date()} // ainda impede clicar em datas futuras
                                             className="hidden"
                                         />
                                     </div>
-
-
 
                                     <div className="w-1/3">
                                         <label className="block text-sm font-medium">
@@ -277,7 +304,7 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                             options={countryOptions}
                                             value={
                                                 countryOptions.find(
-                                                    option => option.label === formData.CountryOfBirth 
+                                                    option => option.label === formData.CountryOfBirth
                                                 ) || null
                                             }
                                             onChange={(selectedOption) => {
@@ -456,7 +483,11 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                     <Button color="error" onClick={handleCloseModal}>
                                         {t.modals.companyInfo.cancel}
                                     </Button>
-                                    <Button color="primary" onClick={handleSave}>
+                                    <Button
+                                        color="primary"
+                                        onClick={handleSave}
+                                        disabled={!!dobError || !formData.DateOfBirth}
+                                    >
                                         {t.modals.companyInfo.save}
                                     </Button>
                                 </div>

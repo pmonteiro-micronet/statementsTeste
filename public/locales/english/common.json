@@ -526,7 +526,8 @@
             "errorCountries": "Error loading countries. Please try again.",
             "loseData": "If you continue, all unsaved data will be lost. Do you want to continue?",
             "emptyFields": "cannot be empty.",
-            "invalidFields": "is invalid. Please check the value."
+            "invalidFields": "is invalid. Please check the value.",
+            "existingVat": "This VAT number is already in use."
         },
         "dropdown": {
             "profileSettings": "Profile Settings",
