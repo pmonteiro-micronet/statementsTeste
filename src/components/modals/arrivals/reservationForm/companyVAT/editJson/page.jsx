@@ -28,7 +28,7 @@ const customStyles = {
     })
 };
 
-const validatePortugueseVAT = (vat) => /^5\d{8}$/.test(vat);
+const validatePortugueseVAT = (vat) => /^\d{9}$/.test(vat);
 
 const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData, company }) => {
     const [formData, setFormData] = useState(() => {
@@ -135,7 +135,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                 setLoading(false);
             } catch (error) {
                 console.log("Erro ao buscar países:", error);
-                setErrorMessage(t.modals.companyInfo.errors.errorCountries);
+                setErrorMessage(t.modals.errors.errorCountries);
                 setLoading(false);
             }
         };
@@ -156,42 +156,68 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
 
         if (name === "emailAddress") {
             if (!emailRegex.test(value)) {
-                setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
+                setErrorMessage(t.modals.errors.invalidEmail);
             } else {
                 setErrorMessage("");
             }
         }
     };
 
+    // const handleBlur = () => {
+    //     if (formData.country === "Portugal" && formData.vatNo) {
+    //         if (!validatePortugueseVAT(formData.vatNo)) {
+    //             setVatError(t.modals.companyInfo.errors.invalidVAT);
+    //         } else {
+    //             setVatError("");
+    //         }
+    //     } else {
+    //         setVatError(""); // Remove erro caso o VAT esteja vazio
+    //     }
+    // };
     const handleBlur = () => {
-        if (formData.country === "Portugal" && formData.vatNo) {
-            if (!validatePortugueseVAT(formData.vatNo)) {
-                setVatError(t.modals.companyInfo.errors.invalidVAT);
+        const vat = formData.vatNo?.trim();
+        if (formData.country === 27 && vat) {
+            if (!validatePortugueseVAT(vat)) {
+                setVatError(t.modals.errors.invalidVAT);
             } else {
                 setVatError("");
             }
         } else {
-            setVatError(""); // Remove erro caso o VAT esteja vazio
+            setVatError("");
         }
     };
+    
+    // Chamada no useEffect para validação automática
+    useEffect(() => {
+        handleBlur();
+    }, [formData.vatNo, formData.country]);
 
-    const handleCountryChange = (selectedOption) => {
-        setFormData(prev => ({
-            ...prev,
-            country: selectedOption.value,
-            countryName: selectedOption.label, // Nome do país (land)
-            vatNo: prev.country !== selectedOption.value ? "" : prev.vatNo
-        }));
-    };
+    // const handleCountryChange = (selectedOption) => {
+    //     setFormData(prev => ({
+    //         ...prev,
+    //         country: selectedOption.value,
+    //         countryName: selectedOption.label, // Nome do país (land)
+    //         vatNo: prev.country !== selectedOption.value ? "" : prev.vatNo
+    //     }));
+    // };
+
+     const handleCountryChange = (selectedOption) => {
+    setFormData(prev => ({
+        ...prev,
+        country: selectedOption.value,
+        countryName: selectedOption.label, // Nome do país (land)
+        vatNo: prev.vatNo // mantém o VAT sempre
+    }));
+};
 
     const handleSave = async () => {
         if (!formData.companyName) {
-            setErrorMessage(t.modals.companyInfo.errors.companyNameRequired);
+            setErrorMessage(t.modals.errors.companyNameRequired);
             return;
         }
 
         if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
-            setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
+            setErrorMessage(t.modals.errors.invalidEmail);
             return;
         }
 

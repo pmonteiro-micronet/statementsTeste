@@ -57,13 +57,13 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
 
         if (name === "emailAddress") {
             const emailRegex = /\S+@\S+\.\S+/;
-            setErrorMessage(emailRegex.test(value) ? "" : t.modals.companyInfo.errors.invalidEmail);
+            setErrorMessage(emailRegex.test(value) ? "" : t.modals.errors.invalidEmail);
         }
     };
 
     const handleBlur = () => {
         if (formData.country === "Portugal" && formData.vatNo && !/^\d{9}$/.test(formData.vatNo)) {
-            setVatError(t.modals.companyInfo.errors.invalidVAT);
+            setVatError(t.modals.errors.invalidVAT);
         } else {
             setVatError("");
         }
@@ -122,7 +122,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
             handleSearchClick(true);
         }
     };
-
+// teste
     return (
         <>
             {/* Modal de resultados */}
@@ -271,6 +271,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                                     <div className="flex flex-col">
                                         <div className="flex flex-row gap-2 mb-0.5 items-end">
                                             <div className="w-1/3">
+                                            <p>OPAAA</p>
                                                 <label className="block text-sm font-medium text-textPrimaryColor">
                                                     {t.modals.companyInfo.vatNO}
                                                 </label>
