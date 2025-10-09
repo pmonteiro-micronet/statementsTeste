@@ -87,7 +87,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
 
         if (name === "emailAddress") {
             if (!emailRegex.test(value)) {
-                setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
+                setErrorMessage(t.modals.errors.invalidEmail);
             } else {
                 setErrorMessage("");
             }
@@ -147,17 +147,17 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
     const handleSave = async () => {
 
     if (vatError) {
-        setErrorMessage(t.modals.companyInfo.invalidVAT);
+        setErrorMessage(t.modals.errors.invalidVAT);
         return;
     }
 
     if (!formData.companyName.trim()) {
-        setErrorMessage(t.modals.companyInfo.errors.companyNameRequired);
+        setErrorMessage(t.modals.errors.companyNameRequired);
         return;
     }
 
     if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
-        setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
+        setErrorMessage(t.modals.errors.invalidEmail);
         return;
     }
 
@@ -223,7 +223,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
 
     } catch (error) {
         console.log("Erro ao salvar informações de VAT:", error);
-        setErrorMessage(t.modals.companyInfo.errorSaving);
+        setErrorMessage(t.modals.errors.errorSaving);
     }
 };
 
@@ -231,7 +231,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
     const handleCloseModal = () => {
         if (isDataModified) {
             // Pergunta ao usuário se ele deseja perder os dados
-            const confirmLeave = window.confirm(t.modals.companyInfo.loseData);
+            const confirmLeave = window.confirm(t.modals.errors.loseData);
             if (confirmLeave) {
                 onClose();
             }

@@ -35,6 +35,7 @@ export async function PATCH(request, context) {
       propertyTag,
       propertyServer,
       propertyPort,
+      propertyPortStay,
       mpehotel,
       hotelName,
       hotelTermsEN,
@@ -70,6 +71,7 @@ export async function PATCH(request, context) {
 
       // Verifique se mpehotel e propertyPort são números inteiros
       const formattedMpehotel = parseInt(mpehotel, 10);
+      const formattedPropertyPortStay = parseInt(propertyPortStay, 10);
       const formattedSendingPort = parseInt(sendingPort, 10);
 
       if (isNaN(formattedMpehotel)) {
@@ -93,6 +95,7 @@ export async function PATCH(request, context) {
               propertyTag,
               propertyServer,
               propertyPort,
+              propertyPortStay: formattedPropertyPortStay,
               mpehotel: formattedMpehotel,
               hotelName,
               hotelTermsEN,

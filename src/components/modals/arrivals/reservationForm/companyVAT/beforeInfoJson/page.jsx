@@ -57,13 +57,13 @@ const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo }) => {
 
         if (name === "emailAddress") {
             const emailRegex = /\S+@\S+\.\S+/;
-            setErrorMessage(emailRegex.test(value) ? "" : t.modals.companyInfo.errors.invalidEmail);
+            setErrorMessage(emailRegex.test(value) ? "" : t.modals.errors.invalidEmail);
         }
     };
 
     const handleBlur = () => {
         if (formData.country === "Portugal" && formData.vatNo && !/^\d{9}$/.test(formData.vatNo)) {
-            setVatError(t.modals.companyInfo.errors.invalidVAT);
+            setVatError(t.modals.errors.invalidVAT);
         } else {
             setVatError("");
         }
