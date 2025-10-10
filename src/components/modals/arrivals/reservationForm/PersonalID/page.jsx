@@ -6,6 +6,7 @@ import Select from "react-select";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import { AiOutlineCalendar } from "react-icons/ai";
+import ConfirmRegistrationForm from "@/components/modals/templates/confirm/page.jsx";
 import "react-datepicker/dist/react-datepicker.css";
 
 const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
@@ -30,12 +31,26 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
     const dobRef = useRef(null);
     const expDateRef = useRef(null);
 
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+    // Lógica principal de fechamento
     const handleCloseModal = () => {
         if (isDataModified) {
-            if (window.confirm("Você vai perder os dados, continuar?")) onClose();
+            setShowConfirmModal(true);
         } else {
-            onClose();
+            onClose(); // fecha o modal principal
         }
+    };
+
+    // Quando o usuário confirma no modal de confirmação
+    const handleConfirmClose = () => {
+        setShowConfirmModal(false);
+        onClose(); // fecha o modal principal
+    };
+
+    // Quando o usuário cancela o fechamento
+    const handleCancelClose = () => {
+        setShowConfirmModal(false); // fecha apenas o modal de confirmação
     };
 
     const handleChange = (e) => {
@@ -498,7 +513,17 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                     </>
                 )}
             </ModalContent>
+            {showConfirmModal && (
+                <ConfirmRegistrationForm
+                    modalHeader={t.frontOffice.registrationForm.attention}
+                    errorMessage={t.modals.errors.loseData}
+                    onConfirm={handleConfirmClose} // confirma -> fecha ambos
+                    onCancel={handleCancelClose}   // cancela -> fecha só o modal de confirmação
+                    t={t}
+                />
+            )}
         </Modal>
+
     );
 };
 
