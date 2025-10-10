@@ -45,7 +45,8 @@ const JsonViewPage = () => {
   const [companyID, setCompanyID] = useState("");
   const [initialVatNo, setInitialVatNo] = useState("");
   const [profileID, setProfileID] = useState(null);
-
+  const [jsonInfoReal, setJsonInfoReal] = useState(null);
+  console.log(jsonInfoReal);
   useEffect(() => {
     const preventBackNavigation = () => {
       window.history.pushState(null, null, window.location.href);
@@ -189,6 +190,37 @@ const JsonViewPage = () => {
 
     loadVatNo();
   }, [reservationData]);
+
+  const sendResToAPI = async (ResNo) => {
+    console.log("Enviando ResNumber para a API:", ResNo);
+    const windowValue = 0;
+
+    try {
+      const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
+        params: { ResNo, window: windowValue, propertyID },
+      });
+
+      console.log(
+        `Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`
+      );
+      console.log("Resposta da API ao salvar statement:", saveResponse.data);
+
+      // Armazena os dados recebidos na variável jsonInfoReal
+      setJsonInfoReal(saveResponse.data);
+
+    } catch (error) {
+      console.error("Erro ao enviar os dados para a API:", error);
+    }
+  };
+
+  // ----> Novo useEffect que chama a função automaticamente
+  useEffect(() => {
+    if (resNo && propertyID) {
+      console.log("Chamando sendResToAPI com:", resNo, propertyID);
+      sendResToAPI(resNo);
+    }
+  }, [resNo, propertyID]);
+
 
   const handleOkClick = async () => {
     const vatNoToSend = vatNo !== initialVatNo ? vatNo : undefined;
