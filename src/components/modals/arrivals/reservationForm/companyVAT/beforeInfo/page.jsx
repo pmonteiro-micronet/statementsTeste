@@ -271,7 +271,6 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                                     <div className="flex flex-col">
                                         <div className="flex flex-row gap-2 mb-0.5 items-end">
                                             <div className="w-1/3">
-                                            <p>OPAAA</p>
                                                 <label className="block text-sm font-medium text-textPrimaryColor">
                                                     {t.modals.companyInfo.vatNO}
                                                 </label>
