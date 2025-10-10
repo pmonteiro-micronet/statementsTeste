@@ -56,17 +56,17 @@ const EditRegistrationForm = ({
         const invalidDomain = /@guest\.booking\.com$/i;
 
         if (!trimmedEmail && !trimmedPhone) {
-            setErrorMessage(t.modals.companyInfo.errors.phoneOrEmail);
+            setErrorMessage(t.modals.errors.phoneOrEmail);
             return;
         }
 
         if (trimmedEmail) {
             if (!emailRegex.test(trimmedEmail)) {
-                setErrorMessage(t.modals.companyInfo.errors.invalidEmail);
+                setErrorMessage(t.modals.errors.invalidEmail);
                 return;
             }
             if (invalidDomain.test(trimmedEmail)) {
-                setErrorMessage(t.modals.companyInfo.errors.invalidEmailBooking);
+                setErrorMessage(t.modals.errors.invalidEmailBooking);
                 return;
             }
         }
@@ -80,7 +80,7 @@ const EditRegistrationForm = ({
         const trimmed = newValue.trim();
 
         if (!trimmed) {
-            setErrorMessage(`${currentLabel} {t.modals.companyInfo.emptyFields}`);
+            setErrorMessage(`${currentLabel} ${t.modals.errors.emptyFields}`);
             return;
         }
 
