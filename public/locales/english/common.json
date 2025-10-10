@@ -215,7 +215,8 @@
                 "emptyEmailValidation": "The email field is empty. Do you want to continue anyway?",
                 "errorSavingDocument": "Error saving address or document data. Please try again.",
                 "contactSupport": "There was an issue saving your changes. Please contact support.",
-                "generateFormError":"There was an issue generating or sending the form. Please contact support."
+                "generateFormError":"There was an issue generating or sending the form. Please contact support.",
+                "invalidDate":"The date entered is invalid. Please check the value."
             }
         },
         "infoModal": {
