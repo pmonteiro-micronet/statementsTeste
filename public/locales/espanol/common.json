@@ -217,7 +217,8 @@
                 "emptyEmailValidation": "El campo de correo electrónico está vacío. ¿Desea continuar de todos modos?",
                 "errorSavingDocument": "Error al guardar la dirección o los datos del documento. Inténtelo de nuevo.",
                 "contactSupport": "Hubo un problema al guardar los cambios. Por favor, contacte con el soporte.",
-                "generateFormError": "Hubo un problema al generar o enviar el formulario. Por favor, contacte con el soporte."
+                "generateFormError": "Hubo un problema al generar o enviar el formulario. Por favor, contacte con el soporte.",
+                "invalidDate": "La fecha introducida no es válida. Por favor, verifique el valor."
             }
 
         },

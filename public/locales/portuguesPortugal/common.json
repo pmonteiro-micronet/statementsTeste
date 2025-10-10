@@ -217,7 +217,8 @@
                 "emptyEmailValidation": "O campo de e-mail está vazio. Deseja continuar mesmo assim?",
                 "errorSavingDocument": "Erro ao guardar o endereço ou os dados do documento. Tente novamente.",
                 "contactSupport": "Ocorreu um problema ao guardar as suas alterações. Por favor, contacte o suporte.",
-                "generateFormError": "Ocorreu um problema ao gerar ou enviar o formulário. Por favor, contacte o suporte."
+                "generateFormError": "Ocorreu um problema ao gerar ou enviar o formulário. Por favor, contacte o suporte.",
+                "invalidDate": "A data inserida é inválida. Por favor, verifique o valor."
             }
         },
         "infoModal": {
