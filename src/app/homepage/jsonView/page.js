@@ -46,7 +46,7 @@ const JsonViewPage = () => {
   const [initialVatNo, setInitialVatNo] = useState("");
   const [profileID, setProfileID] = useState(null);
   const [jsonInfoReal, setJsonInfoReal] = useState(null);
-  
+  console.log(jsonInfoReal);
   useEffect(() => {
     const preventBackNavigation = () => {
       window.history.pushState(null, null, window.location.href);
