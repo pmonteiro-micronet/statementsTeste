@@ -4,7 +4,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/rea
 import { MdClose } from "react-icons/md";
 import Select from "react-select";
 import axios from "axios";
-
+import ConfirmRegistrationForm from "@/components/modals/templates/confirm/page.jsx";
 
 const AddressForm = ({ onClose, onSave, address, propertyID, t }) => {
     //popula o select de pais
@@ -26,13 +26,26 @@ const AddressForm = ({ onClose, onSave, address, propertyID, t }) => {
     const [isDataModified, setIsDataModified] = useState(false);
     const inputRef = useRef(null);
 
+   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+    // Lógica principal de fechamento
     const handleCloseModal = () => {
         if (isDataModified) {
-            const confirmLeave = window.confirm("Você vai perder os dados, continuar?");
-            if (confirmLeave) onClose();
+            setShowConfirmModal(true);
         } else {
-            onClose();
+            onClose(); // fecha o modal principal
         }
+    };
+
+    // Quando o usuário confirma no modal de confirmação
+    const handleConfirmClose = () => {
+        setShowConfirmModal(false);
+        onClose(); // fecha o modal principal
+    };
+
+    // Quando o usuário cancela o fechamento
+    const handleCancelClose = () => {
+        setShowConfirmModal(false); // fecha apenas o modal de confirmação
     };
 
     const handleChange = (e) => {
@@ -234,6 +247,15 @@ const AddressForm = ({ onClose, onSave, address, propertyID, t }) => {
                     </>
                 )}
             </ModalContent>
+            {showConfirmModal && (
+                <ConfirmRegistrationForm
+                    modalHeader={t.frontOffice.registrationForm.attention}
+                    errorMessage={t.modals.errors.loseData}
+                    onConfirm={handleConfirmClose} // confirma -> fecha ambos
+                    onCancel={handleCancelClose}   // cancela -> fecha só o modal de confirmação
+                    t={t}
+                />
+            )}
         </Modal>
     );
 };
