@@ -19,7 +19,7 @@ import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
 import en from "../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../../public/locales/espanol/common.json";
-
+// teste
 import ArrivalInfoForm from "@/components/modals/arrivals/info/page";
 import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
