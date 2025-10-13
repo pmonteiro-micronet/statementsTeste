@@ -162,83 +162,96 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
     };
 
     const handleSave = async () => {
+  if (vatError) {
+    setErrorMessage(t.modals.errors.invalidVAT);
+    return;
+  }
 
-        if (vatError) {
-            setErrorMessage(t.modals.errors.invalidVAT);
-            return;
+  if (!formData.companyName.trim()) {
+    setErrorMessage(t.modals.errors.companyNameRequired);
+    return;
+  }
+
+  if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
+    setErrorMessage(t.modals.errors.invalidEmail);
+    return;
+  }
+
+  // Substituir valores vazios por um espaço em branco
+  const formattedData = Object.fromEntries(
+    Object.entries(formData).map(([key, value]) => [
+      key,
+      String(value).trim() === "" ? " " : String(value).trim(),
+    ])
+  );
+
+  try {
+    // 🔍 Verificar se já existe VAT antes de criar
+    if (formData.vatNo) {
+      const vatResponse = await axios.post(
+        "/api/reservations/checkins/registrationForm/checkVatNo",
+        {
+          vatNo: formData.vatNo,
+          propertyID: propertyID,
         }
+      );
 
-        if (!formData.companyName.trim()) {
-            setErrorMessage(t.modals.errors.companyNameRequired);
-            return;
-        }
+      const vatData = vatResponse.data;
+      console.log("Verificação VAT:", vatData);
 
-        if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
-            setErrorMessage(t.modals.errors.invalidEmail);
-            return;
-        }
+      const vatExists = Array.isArray(vatData) && vatData[0]?.result === true;
+      if (vatExists) {
+        setErrorMessage(t.modals.errors.existingVat);
+        return;
+      }
+    }
 
-        // Substituir valores vazios por um espaço em branco
-        const formattedData = Object.fromEntries(
-            Object.entries(formData).map(([key, value]) => [key, String(value).trim() === "" ? " " : String(value).trim()])
-        );
+    const response = await axios.post(
+      "/api/reservations/checkins/registrationForm/createCompanyVATJson",
+      {
+        profileID,
+        propertyID,
+        resNo,
+        countryID: formData.country,
+        countryName: formData.countryName,
+        ...formattedData,
+      }
+    );
 
-        try {
-            // 🔍 Verificar se já existe VAT antes de criar
-        if (formData.vatNo) {
-            const vatResponse = await axios.post("/api/reservations/checkins/registrationForm/checkVatNo", {
-                vatNo: formData.vatNo,
-                propertyID: propertyID,
-            });
+    console.log("✅ Empresa criada com sucesso:", response.data);
 
-            const vatData = vatResponse.data;
-            console.log("Verificação VAT:", vatData);
+    // Atualizar localStorage
+    const existingCompanies = JSON.parse(localStorage.getItem("JSONcompany") || "{}");
 
-            const vatExists = Array.isArray(vatData) && vatData[0]?.result === true;
-
-            if (vatExists) {
-                setErrorMessage(t.modals.errors.existingVat);
-                return;
-            }
-        }
-
-            const response = await axios.post("/api/reservations/checkins/registrationForm/createCompanyVATJson", {
-                profileID,
-                propertyID,
-                resNo,
-                countryID: formData.country,
-                countryName: formData.countryName,
-                ...formattedData // Enviar os dados formatados
-            });
-
-            // Atualizar localStorage
-            const existingCompanies = JSON.parse(localStorage.getItem("JSONcompany") || "{}");
-
-            // Monta o objeto para salvar no localStorage, incluindo os campos extras
-            const localStorageData = {
-                profileID,
-                propertyID,
-                resNo,
-                countryID: formData.country,
-                countryName: formData.countryName,
-                ...formattedData,
-                hasCompanyVAT: 1,
-                BlockedCVatNO: 0,
-            };
-
-            existingCompanies[profileID] = localStorageData;
-
-            localStorage.setItem("JSONcompany", JSON.stringify(existingCompanies));
-
-            console.log("Success:", response.data);
-            setErrorMessage("");
-            setIsDataModified(false);
-            onClose();
-        } catch (error) {
-            console.log("Erro ao salvar informações de VAT:", error);
-            setErrorMessage(t.modals.errors.errorSaving);
-        }
+    const localStorageData = {
+      profileID,
+      propertyID,
+      resNo,
+      countryID: formData.country,
+      countryName: formData.countryName,
+      ...formattedData,
+      hasCompanyVAT: 1,
+      BlockedCVatNO: 0,
     };
+
+    existingCompanies[profileID] = localStorageData;
+    localStorage.setItem("JSONcompany", JSON.stringify(existingCompanies));
+
+    setErrorMessage("");
+    setIsDataModified(false);
+    onClose();
+
+    // 🔄 Atualiza a página após salvar com sucesso (reload suave)
+    setTimeout(() => {
+      window.location.reload();
+    }, 400);
+
+  } catch (error) {
+    console.error("❌ Erro ao salvar informações de VAT:", error);
+    setErrorMessage(t.modals.errors.errorSaving);
+  }
+};
+
 
     const handleCloseModal = () => {
         if (isDataModified) {
