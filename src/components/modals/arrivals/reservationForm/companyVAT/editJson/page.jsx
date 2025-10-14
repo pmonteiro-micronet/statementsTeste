@@ -37,7 +37,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                 companyName: company.name1 || "",
                 vatNo: company.vatno || "",
                 emailAddress: company.email || "",
-                country: "",
+                country: company.gebland || "",
                 countryName: company.landkz || "",
                 streetAddress: company.strasse || "",
                 zipCode: company.plz || "",
@@ -49,8 +49,8 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                 companyName: companyVATData.companyName || "",
                 vatNo: companyVATData.vatNo || "",
                 emailAddress: companyVATData.emailAddress || "",
-                country: "",
-                countryName: companyVATData.country || "",
+                country: companyVATData.country || "",
+                countryName: "",
                 streetAddress: companyVATData.streetAddress || "",
                 zipCode: companyVATData.zipCode || "",
                 city: companyVATData.city || "",
@@ -186,7 +186,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
             setVatError("");
         }
     };
-    
+
     // Chamada no useEffect para validação automática
     useEffect(() => {
         handleBlur();
@@ -201,14 +201,14 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
     //     }));
     // };
 
-     const handleCountryChange = (selectedOption) => {
-    setFormData(prev => ({
-        ...prev,
-        country: selectedOption.value,
-        countryName: selectedOption.label, // Nome do país (land)
-        vatNo: prev.vatNo // mantém o VAT sempre
-    }));
-};
+    const handleCountryChange = (selectedOption) => {
+        setFormData(prev => ({
+            ...prev,
+            country: selectedOption.value,
+            countryName: selectedOption.label, // Nome do país (land)
+            vatNo: prev.vatNo // mantém o VAT sempre
+        }));
+    };
 
     const handleSave = async () => {
         if (!formData.companyName) {
@@ -240,6 +240,25 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
         );
 
         try {
+
+            // 🔍 Verificar VAT se preenchido
+            if (formData.vatNo) {
+                const vatResponse = await axios.post("/api/reservations/checkins/registrationForm/checkVatNo", {
+                    vatNo: formData.vatNo,
+                    propertyID: propertyID,
+                });
+
+                const vatData = vatResponse.data;
+                // Espera-se um array como [{ result: true }]
+                const vatExists = Array.isArray(vatData) && vatData[0]?.result === true;
+
+                if (vatExists) {
+                    setErrorMessage(
+                        t.modals.errors.existingVat
+                    );
+                    return;
+                }
+            }
             await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVATJson", payload);
 
             const existingCompanies = JSON.parse(localStorage.getItem("company") || "{}");
@@ -418,7 +437,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                                             <label className="block text-sm font-medium">{t.modals.companyInfo.country}</label>
                                             <Select
                                                 options={countryOptions}
-                                                value={countryOptions.find(option => option.value === formData.countryName)}
+                                                value={countryOptions.find(option => option.value === formData.country)}
                                                 onChange={handleCountryChange}
                                                 isSearchable
                                                 styles={customStyles}

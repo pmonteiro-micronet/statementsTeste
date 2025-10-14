@@ -233,24 +233,46 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                                             value.slice(6, 8);
                                                     }
 
-                                                    const today = new Date();
-                                                    const inputDate = new Date(value);
+                                                    let dobErrorMsg = "";
 
-                                                    // ⚠️ Verifica se é uma data futura
-                                                    if (value.length === 10 && !isNaN(inputDate.getTime()) && inputDate > today) {
-                                                        setDobError(t.modals.errors.invalidDate);
-                                                    } else {
-                                                        setDobError("");
+                                                    // Função auxiliar para verificar se a data é válida
+                                                    const isValidDate = (y, m, d) => {
+                                                        const date = new Date(y, m - 1, d);
+                                                        return (
+                                                            date.getFullYear() === +y &&
+                                                            date.getMonth() === m - 1 &&
+                                                            date.getDate() === +d
+                                                        );
+                                                    };
+
+                                                    if (value.length === 10) {
+                                                        const parts = value.split("/");
+                                                        const [year, month, day] = parts;
+
+                                                        if (!isValidDate(year, month, day)) {
+                                                            dobErrorMsg = t.modals.errors.invalidDate || "Data inválida.";
+                                                        } else {
+                                                            const formattedDateStr = `${year}-${month}-${day}`; // ISO válido
+                                                            const inputDate = new Date(formattedDateStr);
+                                                            const today = new Date();
+
+                                                            if (inputDate > today) {
+                                                                dobErrorMsg =
+                                                                    t.modals.errors.invalidDate ||
+                                                                    "A data de nascimento não pode ser superior à data de hoje.";
+                                                            }
+                                                        }
                                                     }
 
+                                                    setDobError(dobErrorMsg);
                                                     setFormData((prev) => ({ ...prev, DateOfBirth: value }));
                                                     setIsDataModified(true);
                                                 }}
                                                 placeholder="aaaa/mm/dd"
                                                 maxLength={10}
                                                 className={`w-full border rounded-md px-2 py-2 
-                                                focus:outline focus:outline-black focus:ring-2 focus:ring-black 
-                                                ${dobError ? "border-red-500" : "border-gray-300"}`}
+        focus:outline focus:outline-black focus:ring-2 focus:ring-black 
+        ${dobError ? "border-red-500" : "border-gray-300"}`}
                                             />
 
                                             {/* Ícone do calendário */}
@@ -262,9 +284,7 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                         </div>
 
                                         {/* Mensagem de erro abaixo do input */}
-                                        {dobError && (
-                                            <p className="text-red-500 text-xs mt-1">{dobError}</p>
-                                        )}
+                                        {dobError && <p className="text-red-500 text-xs mt-1">{dobError}</p>}
 
                                         {/* DatePicker invisível */}
                                         <DatePicker
@@ -280,7 +300,9 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
 
                                                 const today = new Date();
                                                 if (date > today) {
-                                                    setDobError("A data de nascimento não pode ser superior à data de hoje.");
+                                                    setDobError(
+                                                        t.modals.errors.invalidDate
+                                                    );
                                                     return;
                                                 }
 
@@ -306,11 +328,10 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                                     options: { boundary: "viewport" },
                                                 },
                                             ]}
-                                            maxDate={new Date()} // ainda impede clicar em datas futuras
+                                            maxDate={new Date()} // impede clicar em datas futuras
                                             className="hidden"
                                         />
                                     </div>
-
                                     <div className="w-1/3">
                                         <label className="block text-sm font-medium">
                                             {t.modals.PersonalID.countryofBirth} *

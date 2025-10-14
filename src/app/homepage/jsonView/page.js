@@ -46,7 +46,7 @@ const JsonViewPage = () => {
   const [initialVatNo, setInitialVatNo] = useState("");
   const [profileID, setProfileID] = useState(null);
   const [jsonInfoReal, setJsonInfoReal] = useState(null);
-  console.log(jsonInfoReal);
+
   useEffect(() => {
     const preventBackNavigation = () => {
       window.history.pushState(null, null, window.location.href);
@@ -191,27 +191,29 @@ const JsonViewPage = () => {
     loadVatNo();
   }, [reservationData]);
 
-  const sendResToAPI = async (ResNo) => {
-    console.log("Enviando ResNumber para a API:", ResNo);
-    const windowValue = 0;
+const sendResToAPI = async (ResNo) => {
+  console.log("Enviando ResNumber para a API:", ResNo);
+  const windowValue = 0;
 
-    try {
-      const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
-        params: { ResNo, window: windowValue, propertyID },
-      });
+  try {
+    const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
+      params: { ResNo, window: windowValue, propertyID },
+    });
 
-      console.log(
-        `Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`
-      );
-      console.log("Resposta da API ao salvar statement:", saveResponse.data);
+    console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
+    console.log("Resposta da API ao salvar statement:", saveResponse.data);
 
-      // Armazena os dados recebidos na variável jsonInfoReal
-      setJsonInfoReal(saveResponse.data);
+    // 👉 Pega só o objeto que interessa dentro de `data`
+    const jsonReal = saveResponse?.data?.data?.[0];
+    setJsonInfoReal(jsonReal);
 
-    } catch (error) {
-      console.error("Erro ao enviar os dados para a API:", error);
-    }
-  };
+    console.log("jsonInfoReal guardado:", jsonReal);
+
+  } catch (error) {
+    console.error("Erro ao enviar os dados para a API:", error);
+  }
+};
+
 
   // ----> Novo useEffect que chama a função automaticamente
   useEffect(() => {
@@ -231,6 +233,7 @@ const JsonViewPage = () => {
         const dataToSend = {
           vatNo: vatNoToSend,
           email: '',
+          phone: '',
           registerID: String(profileID),
           propertyID: propertyID
         };
@@ -400,8 +403,7 @@ const JsonViewPage = () => {
                               const blockedVatNO = parsedData[0]?.Reservation?.[0]?.BlockedVatNO;
                               return blockedVatNO === 1 ? "gray" : "#FC9D25";
                             } catch {
-                              console.error("Erro ao analisar requestBody:", error);
-                              return "#FC9D25"; // Cor padrão caso haja erro
+                              return "#FC9D25";
                             }
                           })(),
                           cursor: (() => {
@@ -410,7 +412,7 @@ const JsonViewPage = () => {
                               const blockedVatNO = parsedData[0]?.Reservation?.[0]?.BlockedVatNO;
                               return blockedVatNO === 1 ? "not-allowed" : "pointer";
                             } catch {
-                              return "pointer"; // Padrão caso haja erro
+                              return "pointer";
                             }
                           })(),
                         }}
@@ -426,29 +428,29 @@ const JsonViewPage = () => {
                         onClick={handleEditClick}
                       />
                     ) : (
-                      reservationData.hasCompanyVAT === 1 ? (
+                      jsonInfoReal?.Reservation?.[0]?.hasCompanyVAT === 1 ? (
                         <FaPencilAlt
                           size={15}
-                          color={reservationData.BlockedCVatNO === 1 ? "gray" : "#FC9D25"}
+                          color={jsonInfoReal.Reservation[0].BlockedCVatNO === 1 ? "gray" : "#FC9D25"}
                           style={{
-                            cursor: reservationData.BlockedCVatNO === 1 ? "not-allowed" : "pointer",
+                            cursor: jsonInfoReal.Reservation[0].BlockedCVatNO === 1 ? "not-allowed" : "pointer",
                           }}
-                          title={reservationData.BlockedCVatNO === 1 ? "Fiscalizado" : ""}
+                          title={jsonInfoReal.Reservation[0].BlockedCVatNO === 1 ? "Fiscalizado" : ""}
                           onClick={() => {
-                            if (reservationData.BlockedCVatNO === 0) {
+                            if (jsonInfoReal.Reservation[0].BlockedCVatNO === 0) {
+                              const company = jsonInfoReal.Reservation[0];
                               const companyData = {
-                                companyName: reservationData.Company || "",
-                                vatNo: reservationData.CompanyVatNo || "",
-                                emailAddress: reservationData.CompanyEmail || "",
-                                country: reservationData.CompanyCountryName || "",
-                                streetAddress: reservationData.CompanyStreetAddress || "",
-                                zipCode: reservationData.CompanyZipCode || "",
-                                city: reservationData.CompanyCity || "",
-                                state: reservationData.CompanyState || "",
+                                companyName: company.Company || "",
+                                vatNo: company.CompanyVatNo || "",
+                                emailAddress: company.CompanyEmail || "",
+                                country: company.CompanyCountryID || "",
+                                streetAddress: company.CompanyStreetAddress || "",
+                                zipCode: company.CompanyZipCode || "",
+                                city: company.CompanyCity || "",
+                                state: company.CompanyState || "",
                               };
-
-                              console.log("Definindo companyVATData:", companyData);
                               setCompanyVATData(companyData);
+                              setIsCVATModalOpen(true);
                             }
                           }}
                         />
