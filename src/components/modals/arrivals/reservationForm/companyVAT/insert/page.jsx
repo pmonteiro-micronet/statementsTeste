@@ -221,6 +221,11 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
         setIsDataModified(false);
         onClose();
 
+        // 🔄 Atualiza a página após salvar com sucesso (reload suave)
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+
     } catch (error) {
         console.log("Erro ao salvar informações de VAT:", error);
         setErrorMessage(t.modals.errors.errorSaving);
