@@ -223,24 +223,24 @@ useEffect(() => {
     );
 
     try {
-        // 🔍 Verificar VAT se preenchido
-        if (formData.vatNo) {
-            const vatResponse = await axios.post("/api/reservations/checkins/registrationForm/checkVatNo", {
-                vatNo: formData.vatNo,
-                propertyID: propertyID,
-            });
+        // // 🔍 Verificar VAT se preenchido
+        // if (formData.vatNo) {
+        //     const vatResponse = await axios.post("/api/reservations/checkins/registrationForm/checkVatNo", {
+        //         vatNo: formData.vatNo,
+        //         propertyID: propertyID,
+        //     });
 
-            const vatData = vatResponse.data;
-            // Espera-se um array como [{ result: true }]
-            const vatExists = Array.isArray(vatData) && vatData[0]?.result === true;
+        //     const vatData = vatResponse.data;
+        //     // Espera-se um array como [{ result: true }]
+        //     const vatExists = Array.isArray(vatData) && vatData[0]?.result === true;
 
-            if (vatExists) {
-                setErrorMessage(
-                    t.modals.errors.existingVat
-                );
-                return;
-            }
-        }
+        //     if (vatExists) {
+        //         setErrorMessage(
+        //             t.modals.errors.existingVat
+        //         );
+        //         return;
+        //     }
+        // }
 
         // ✅ Prosseguir se VAT for falso ou não existir
         await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", payload);
