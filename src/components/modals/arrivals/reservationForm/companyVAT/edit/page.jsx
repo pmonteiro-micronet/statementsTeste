@@ -30,7 +30,7 @@ const customStyles = {
 
 const validatePortugueseVAT = (vat) => /^\d{9}$/.test(vat);
 
-const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData, company }) => {
+const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData, company, OldCompanyID }) => {
     console.log("company", company);
     const [formData, setFormData] = useState(() => {
         if (company) {
@@ -90,6 +90,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
     const [showSearchCompanyModal, setShowSearchCompanyModal] = useState(false);
 
     const extractedCompanyID = company?.CompanyID;
+    console.log("extractedCompanyID", extractedCompanyID);
 
     const handleCloseModal = () => {
         if (isDataModified) {
@@ -219,28 +220,29 @@ useEffect(() => {
             zipCode: formData.zipCode,
             city: formData.city,
             state: formData.state,
+            oldCompany: OldCompanyID,
         }).map(([key, value]) => [key, String(value || "").trim() === "" ? "" : String(value || "").trim()])
     );
 
     try {
         // 🔍 Verificar VAT se preenchido
-        if (formData.vatNo) {
-            const vatResponse = await axios.post("/api/reservations/checkins/registrationForm/checkVatNo", {
-                vatNo: formData.vatNo,
-                propertyID: propertyID,
-            });
+        // if (formData.vatNo) {
+        //     const vatResponse = await axios.post("/api/reservations/checkins/registrationForm/checkVatNo", {
+        //         vatNo: formData.vatNo,
+        //         propertyID: propertyID,
+        //     });
 
-            const vatData = vatResponse.data;
-            // Espera-se um array como [{ result: true }]
-            const vatExists = Array.isArray(vatData) && vatData[0]?.result === true;
+        //     const vatData = vatResponse.data;
+        //     // Espera-se um array como [{ result: true }]
+        //     const vatExists = Array.isArray(vatData) && vatData[0]?.result === true;
 
-            if (vatExists) {
-                setErrorMessage(
-                    t.modals.errors.existingVat
-                );
-                return;
-            }
-        }
+        //     if (vatExists) {
+        //         setErrorMessage(
+        //             t.modals.errors.existingVat
+        //         );
+        //         return;
+        //     }
+        // }
 
         // ✅ Prosseguir se VAT for falso ou não existir
         await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", payload);
@@ -282,6 +284,7 @@ useEffect(() => {
                     profileID={profileID}
                     propertyID={propertyID}
                     resNo={resNo}
+                    OldCompanyID={OldCompanyID}
                 />
             )}
 
@@ -291,6 +294,7 @@ useEffect(() => {
                     profileID={profileID}
                     propertyID={propertyID}
                     resNo={resNo}
+                    OldCompanyID={OldCompanyID}
                 />
             )}
 

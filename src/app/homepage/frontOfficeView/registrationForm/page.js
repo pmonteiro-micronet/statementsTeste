@@ -1537,6 +1537,7 @@ export default function Page() {
                                             resNo={reserva.ResNo}
                                             companyID={reserva.CompanyID}
                                             companyVATData={companyVATData}
+                                            OldCompanyID={reserva.CompanyID}
                                         />
                                     )}
 
@@ -1546,6 +1547,7 @@ export default function Page() {
                                             profileID={guestInfo.ProfileID}
                                             propertyID={propertyID}
                                             resNo={reserva.ResNo}
+                                            OldCompanyID={reserva.CompanyID}
                                         />
                                     )}
                                 </div>
