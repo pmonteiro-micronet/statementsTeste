@@ -13,7 +13,7 @@ import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/c
 
 const translations = { en, pt, es };
 
-const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
+const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo, OldCompanyID }) => {
     const [locale, setLocale] = useState("pt");
     const [formData, setFormData] = useState({ companyName: "", vatNo: "" });
     const [errorMessage, setErrorMessage] = useState("");
@@ -233,6 +233,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                     propertyID={propertyID}
                     resNo={resNo}
                     defaultData={insertFormData}
+                    OldCompanyID={OldCompanyID}
                 />
             )}
 
@@ -244,6 +245,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo }) => {
                     propertyID={propertyID}
                     resNo={resNo}
                     company={selectedCompany}
+                    OldCompanyID={OldCompanyID}
                 />
             ) : (
                 <Modal

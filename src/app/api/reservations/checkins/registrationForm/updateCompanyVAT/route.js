@@ -21,6 +21,7 @@ export async function POST(request) {
       city, 
       state,
       companyID,
+      oldCompany
     } = body;
 
     if (!profileID || !propertyID || !resNo || !companyID)  {
@@ -60,9 +61,10 @@ export async function POST(request) {
         Email: emailAddress,
         ResNo: resNo,
         CompanyID: companyID,
+        OldCompany: oldCompany || "-1",
       },
     });
-
+    console.log(oldCompany);
     console.log("Resposta da API externa:", response.data);
 
     return new NextResponse(

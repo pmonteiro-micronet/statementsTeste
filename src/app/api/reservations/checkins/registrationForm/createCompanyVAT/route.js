@@ -19,7 +19,8 @@ export async function POST(request) {
       streetAddress, 
       zipCode, 
       city, 
-      state 
+      state,
+      oldCompany
     } = body;
 
     // Verificar se os campos obrigatórios estão presentes
@@ -62,6 +63,7 @@ export async function POST(request) {
         VatNo: vatNo,
         Email: emailAddress,
         ResNo : resNo,
+        OldCompany: oldCompany || "-1",
       },
     });
 

@@ -30,7 +30,7 @@ const customStyles = {
 
 const validatePortugueseVAT = (vat) => /^\d{9}$/.test(vat);
 
-const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData, company }) => {
+const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData, company, OldCompanyID }) => {
     console.log("company", company);
     const [formData, setFormData] = useState(() => {
         if (company) {
@@ -90,6 +90,7 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
     const [showSearchCompanyModal, setShowSearchCompanyModal] = useState(false);
 
     const extractedCompanyID = company?.CompanyID;
+    console.log("extractedCompanyID", extractedCompanyID);
 
     const handleCloseModal = () => {
         if (isDataModified) {
@@ -219,6 +220,7 @@ useEffect(() => {
             zipCode: formData.zipCode,
             city: formData.city,
             state: formData.state,
+            oldCompany: OldCompanyID,
         }).map(([key, value]) => [key, String(value || "").trim() === "" ? "" : String(value || "").trim()])
     );
 
@@ -282,6 +284,7 @@ useEffect(() => {
                     profileID={profileID}
                     propertyID={propertyID}
                     resNo={resNo}
+                    OldCompanyID={OldCompanyID}
                 />
             )}
 
@@ -291,6 +294,7 @@ useEffect(() => {
                     profileID={profileID}
                     propertyID={propertyID}
                     resNo={resNo}
+                    OldCompanyID={OldCompanyID}
                 />
             )}
 
