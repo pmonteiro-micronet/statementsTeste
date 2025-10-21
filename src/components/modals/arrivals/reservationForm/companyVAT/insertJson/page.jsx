@@ -285,7 +285,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
                             <div className="flex flex-col">
                                 <div className="flex flex-row gap-2 mb-0.5 items-center">
                                     <div className="w-2/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.companyName}</label>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.companyName} *</label>
                                         <input
                                             ref={inputRef}
                                             type="text"
@@ -296,7 +296,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
                                         />
                                     </div>
                                     <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.vatNO}</label>
+                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.vatNO} *</label>
                                         <input
                                             type="text"
                                             name="vatNo"
@@ -356,7 +356,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
                                         />
                                     </div>
                                     <div className="w-1/3">
-                                        <label className="block text-sm font-medium">{t.modals.companyInfo.country}</label>
+                                        <label className="block text-sm font-medium">{t.modals.companyInfo.country} *</label>
                                         <Select
                                             options={countryOptions}
                                             value={countryOptions.find(option => option.label === formData.country)}
