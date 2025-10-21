@@ -85,6 +85,9 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
 
     const [isInsertModalOpen, setIsInsertModalOpen] = useState(false);
 
+    // track whether a save request is in progress to prevent double submissions
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const [showConfirmNewCompanyModal, setShowConfirmNewCompanyModal] = useState(false);
     const [showSearchCompanyModal, setShowSearchCompanyModal] = useState(false);
 
@@ -211,8 +214,11 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
     };
 
     const handleSave = async () => {
+        if (isSubmitting) return; // prevent double click
+        setIsSubmitting(true);
         if (!formData.companyName) {
             setErrorMessage(t.modals.errors.companyNameRequired);
+            setIsSubmitting(false);
             return;
         }
 
@@ -280,9 +286,13 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
             onClose();
             window.location.reload();
 
+            // reset submitting (reload will refresh state anyway)
+            setIsSubmitting(false);
+
         } catch (error) {
             console.log("Erro ao salvar empresa:", error);
             setErrorMessage(t.modals.errors.errorSaving);
+            setIsSubmitting(false);
         }
     };
 
@@ -467,22 +477,22 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
 
                                 {errorMessage && <p className="text-red-500 text-xs -mt-4">{errorMessage}</p>}
                                 <div className="flex justify-end space-x-2 -mt-4">
-                                    <Button color="error" onClick={handleCloseModal}>{t.modals.companyInfo.cancel}</Button>
-                                    <Button color="primary" onClick={handleSave}>
-                                        {t.modals.companyInfo.selectCompany}
+                                    <Button color="error" onClick={handleCloseModal} disabled={isSubmitting}>{t.modals.companyInfo.cancel}</Button>
+                                    <Button color="primary" onClick={handleSave} disabled={isSubmitting}>
+                                        {isSubmitting ? t.modals.companyInfo.saving || 'Saving...' : t.modals.companyInfo.selectCompany}
                                     </Button>
-                                    <Button color="primary" onClick={() => setShowConfirmNewCompanyModal(true)}>
+                                    <Button color="primary" onClick={() => setShowConfirmNewCompanyModal(true)} disabled={isSubmitting}>
                                         {t.modals.companyInfo.newCompany}
                                     </Button>
-                                    <Button color="primary" onClick={() => setShowSearchCompanyModal(true)}>
+                                    <Button color="primary" onClick={() => setShowSearchCompanyModal(true)} disabled={isSubmitting}>
                                         {t.modals.companyInfo.searchCompany}
                                     </Button>
                                     {isEditing ? (
-                                        <Button color="primary" onClick={handleSave}>
-                                            {t.modals.companyInfo.save}
+                                        <Button color="primary" onClick={handleSave} disabled={isSubmitting}>
+                                            {isSubmitting ? t.modals.companyInfo.saving || 'Saving...' : t.modals.companyInfo.save}
                                         </Button>
                                     ) : (
-                                        <Button color="primary" onClick={handleEdit}>
+                                        <Button color="primary" onClick={handleEdit} disabled={isSubmitting}>
                                             {t.modals.companyInfo.edit}
                                         </Button>
                                     )}
