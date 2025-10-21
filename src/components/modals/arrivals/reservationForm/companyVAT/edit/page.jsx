@@ -225,7 +225,7 @@ useEffect(() => {
     );
 
     try {
-        // 🔍 Verificar VAT se preenchido
+        // // 🔍 Verificar VAT se preenchido
         // if (formData.vatNo) {
         //     const vatResponse = await axios.post("/api/reservations/checkins/registrationForm/checkVatNo", {
         //         vatNo: formData.vatNo,
