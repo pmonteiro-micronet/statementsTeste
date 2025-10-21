@@ -19,7 +19,8 @@ export async function POST(request) {
       streetAddress, 
       zipCode, 
       city, 
-      state 
+      state,
+      oldCompany
     } = body;
 
     if (!profileID || !propertyID || !resNo) {
@@ -60,6 +61,7 @@ export async function POST(request) {
         VatNo: vatNo,
         Email: emailAddress,
         ResNo: resNo,
+        OldCompany: oldCompany || "-1",
       },
     });
 

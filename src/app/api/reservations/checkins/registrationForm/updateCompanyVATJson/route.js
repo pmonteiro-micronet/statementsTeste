@@ -21,6 +21,7 @@ export async function POST(request) {
       city, 
       state,
       companyID,
+      oldCompany
     } = body;
 
     if (!profileID || !propertyID || !resNo || !companyID) {
@@ -63,6 +64,7 @@ export async function POST(request) {
         Email: emailAddress,
         ResNo: resNo,
         CompanyID: companyID,
+        OldCompany: oldCompany || "-1",
       },
     });
 

@@ -30,7 +30,7 @@ const customStyles = {
 
 const validatePortugueseVAT = (vat) => /^\d{9}$/.test(vat);
 
-const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData, company }) => {
+const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData, company, OldCompanyID }) => {
     const [formData, setFormData] = useState(() => {
         if (company) {
             return {
@@ -236,8 +236,10 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                 zipCode: formData.zipCode,
                 city: formData.city,
                 state: formData.state,
+                oldCompany: OldCompanyID,
             }).map(([key, value]) => [key, String(value || "").trim() === "" ? "" : String(value || "").trim()])
         );
+        console.log("Payload para salvar:", payload);
 
         try {
 
@@ -298,6 +300,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                     profileID={profileID}
                     propertyID={propertyID}
                     resNo={resNo}
+                    OldCompanyID={OldCompanyID}
                 />
             )}
 
@@ -307,6 +310,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                     profileID={profileID}
                     propertyID={propertyID}
                     resNo={resNo}
+                    OldCompanyID={companyID}
                 />
             )}
             <Modal isOpen={showConfirmNewCompanyModal} onOpenChange={setShowConfirmNewCompanyModal}>

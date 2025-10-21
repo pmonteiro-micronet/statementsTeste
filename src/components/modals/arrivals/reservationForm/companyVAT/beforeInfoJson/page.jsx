@@ -13,7 +13,7 @@ import CompanyVATFormInsertJson from "@/components/modals/arrivals/reservationFo
 
 const translations = { en, pt, es };
 
-const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo }) => {
+const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo, OldCompanyID }) => {
     const [locale, setLocale] = useState("pt");
     const [formData, setFormData] = useState({ companyName: "", vatNo: "" });
     const [errorMessage, setErrorMessage] = useState("");
@@ -27,7 +27,7 @@ const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo }) => {
 
     const vatRef = useRef(null);
     const [insertFormData, setInsertFormData] = useState(null);
-
+    console.log("OldCompanyID", OldCompanyID)
     console.log(errorMessage, isDataModified);
     // Estado para controlar o modal principal
     const [isMainModalOpen, setIsMainModalOpen] = useState(true);
@@ -233,6 +233,7 @@ const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo }) => {
                     propertyID={propertyID}
                     resNo={resNo}
                     defaultData={insertFormData}
+                    OldCompanyID={OldCompanyID}
                 />
             )}
 
@@ -244,6 +245,7 @@ const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo }) => {
                     propertyID={propertyID}
                     resNo={resNo}
                     company={selectedCompany}
+                    OldCompanyID={OldCompanyID}
                 />
             ) : (
                 <Modal
