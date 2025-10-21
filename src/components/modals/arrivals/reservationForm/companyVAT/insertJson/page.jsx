@@ -24,7 +24,7 @@ const customStyles = {
     })
 };
 
-const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultData }) => {
+const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultData, OldCompanyID }) => {
     console.log("ResNo", resNo, "ProfileID", profileID, "PropertyID", propertyID);
     const [formData, setFormData] = useState({
         companyName: "",
@@ -214,6 +214,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
         resNo,
         countryID: formData.country,
         countryName: formData.countryName,
+        oldCompany: OldCompanyID,
         ...formattedData,
       }
     );

@@ -552,6 +552,7 @@ const sendResToAPI = async (ResNo) => {
                   resNo={resNo}
                   companyID={companyID}
                   companyVATData={companyVATData}
+                  OldCompanyID={companyID}
                 />
               )}
 
@@ -561,6 +562,7 @@ const sendResToAPI = async (ResNo) => {
                   profileID={profileID}
                   propertyID={propertyID}
                   resNo={resNo}
+                  OldCompanyID={companyID}
                 />
               )}
             </div>
