@@ -359,7 +359,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
                                         <label className="block text-sm font-medium">{t.modals.companyInfo.country} *</label>
                                         <Select
                                             options={countryOptions}
-                                            value={countryOptions.find(option => option.label === formData.country)}
+                                            value={countryOptions.find(option => option.value === formData.country)}
                                             onChange={handleCountryChange}
                                             isSearchable
                                             styles={customStyles}

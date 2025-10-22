@@ -347,7 +347,7 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
                                             // value={countryOptions.find(option => option.label === formData.country)}
                                             value={
                                                 countryOptions.find(
-                                                    option => option.label === formData.country
+                                                    option => option.value === formData.country
                                                 ) || null
                                             }
                                             onChange={handleCountryChange}
