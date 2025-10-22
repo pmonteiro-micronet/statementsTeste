@@ -310,7 +310,7 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                     profileID={profileID}
                     propertyID={propertyID}
                     resNo={resNo}
-                    OldCompanyID={OldCompanyID}
+                    OldCompanyID={companyID}
                 />
             )}
 
