@@ -424,7 +424,9 @@ export default function Page() {
             setIsErrorModalOpen(true);
             return;
         }
-        if (!contacts.Email) {
+        const effectiveEmail = email || initialEmail || contacts.Email;
+
+        if (!effectiveEmail) {
             const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
             if (!proceed) return;
         }
@@ -777,17 +779,17 @@ export default function Page() {
         }
     }, [locale, miniTermsEN, miniTermsPT, miniTermsES]);
 
- const formatDate = (dateString) => {
-  if (!dateString) return "";
-  const d = new Date(dateString);
-  if (isNaN(d)) return "";
+    const formatDate = (dateString) => {
+        if (!dateString) return "";
+        const d = new Date(dateString);
+        if (isNaN(d)) return "";
 
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
 
-  return `${year}-${month}-${day}`;
-};
+        return `${year}-${month}-${day}`;
+    };
 
 
     return (
@@ -932,7 +934,7 @@ export default function Page() {
                                                     ariaLabel={"Adults:"}
                                                     value={reserva.Adults}
                                                     style={`${halfInputStyle}`}
-                                                disabled
+                                                    disabled
                                                 />
                                                 <InputFieldControlled
                                                     type={"text"}
@@ -942,7 +944,7 @@ export default function Page() {
                                                     ariaLabel={"Childs:"}
                                                     value={reserva.Childs}
                                                     style={halfInputStyle}
-                                                disabled
+                                                    disabled
                                                 />
                                             </div>
                                         </div>
@@ -1016,7 +1018,7 @@ export default function Page() {
                                                         ariaLabel={"Price:"}
                                                         value={reserva.Price === 0 ? "" : `${reserva.Price.toFixed(2)} €`} // Se Price for 0, exibe como vazio
                                                         style={inputStyleFull}
-                                                disabled
+                                                        disabled
                                                     />
 
                                                     <InputFieldControlled
@@ -1027,7 +1029,7 @@ export default function Page() {
                                                         ariaLabel={"Total:"}
                                                         value={reserva.Total === 0 ? "" : `${reserva.Total.toFixed(2)} €`} // Se Total for 0, exibe como vazio
                                                         style={inputStyleFull}
-                                                disabled
+                                                        disabled
                                                     />
                                                 </>
                                             ) : (
@@ -1040,7 +1042,7 @@ export default function Page() {
                                                         ariaLabel={"Price:"}
                                                         value={""} // Campos vazios
                                                         style={inputStyleFull}
-                                                disabled
+                                                        disabled
                                                     />
 
                                                     <InputFieldControlled
@@ -1051,7 +1053,7 @@ export default function Page() {
                                                         ariaLabel={"Total:"}
                                                         value={""} // Campos vazios
                                                         style={inputStyleFull}
-                                                disabled
+                                                        disabled
                                                     />
                                                 </>
                                             )}
@@ -1083,14 +1085,14 @@ export default function Page() {
                                                     name={"Last Name"}
                                                     label={
                                                         <div className='flex align-center gap-1'>
-                                                        {t.frontOffice.registrationForm.lastName}
-                                                        <span className='text-red-500  font-bold'>*</span>
-                                                    </div>
+                                                            {t.frontOffice.registrationForm.lastName}
+                                                            <span className='text-red-500  font-bold'>*</span>
+                                                        </div>
                                                     }
                                                     ariaLabel={"Last Name:"}
                                                     value={guestInfo.LastName}
                                                     style={"w-72 h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
-                                                disabled
+                                                    disabled
                                                 />
                                             </div>
                                             <div className='w-1/2 -ml-2'>
@@ -1102,7 +1104,7 @@ export default function Page() {
                                                     ariaLabel={"First Name:"}
                                                     value={guestInfo.FirstName}
                                                     style={"w-full h-5 outline-none my-2 text-lg !text-textSecondaryLabelColor bg-cardColor"}
-                                                disabled
+                                                    disabled
                                                 />
                                             </div>
                                         </div>
@@ -1144,11 +1146,11 @@ export default function Page() {
                                                 id="Country"
                                                 name="Country"
                                                 label={
-                                                        <div className='flex align-center gap-1'>
-                                                            {t.frontOffice.registrationForm.country}
-                                                            <span className='text-red-500  font-bold'>*</span>
-                                                        </div>
-                                                    }
+                                                    <div className='flex align-center gap-1'>
+                                                        {t.frontOffice.registrationForm.country}
+                                                        <span className='text-red-500  font-bold'>*</span>
+                                                    </div>
+                                                }
                                                 ariaLabel="Country:"
                                                 value={addressData?.Country ?? address.Country ?? ""}
                                                 style={inputStyleFull}
@@ -1236,11 +1238,11 @@ export default function Page() {
                                                 id={"Date of Birth"}
                                                 name={"Date of Birth"}
                                                 label={
-                                                        <div className='flex align-center gap-1'>
-                                                            {t.frontOffice.registrationForm.dateOfBirth}
-                                                            <span className='text-red-500  font-bold'>*</span>
-                                                        </div>
-                                                    }
+                                                    <div className='flex align-center gap-1'>
+                                                        {t.frontOffice.registrationForm.dateOfBirth}
+                                                        <span className='text-red-500  font-bold'>*</span>
+                                                    </div>
+                                                }
                                                 ariaLabel={"Date of Birth:"}
                                                 value={
                                                     personalIDData?.DateOfBirth === ""
@@ -1260,11 +1262,11 @@ export default function Page() {
                                                 id={"Country of Birth"}
                                                 name={"Country of Birth"}
                                                 label={
-                                                        <div className='flex align-center gap-1'>
-                                                            {t.frontOffice.registrationForm.countryOfBirth}
-                                                            <span className='text-red-500  font-bold'>*</span>
-                                                        </div>
-                                                    }
+                                                    <div className='flex align-center gap-1'>
+                                                        {t.frontOffice.registrationForm.countryOfBirth}
+                                                        <span className='text-red-500  font-bold'>*</span>
+                                                    </div>
+                                                }
                                                 ariaLabel={"Country of Birth:"}
                                                 value={personalIDData?.CountryOfBirth ?? personalID.CountryOfBirth}
                                                 style={`${inputStyleFullWithLine}`}
@@ -1284,7 +1286,7 @@ export default function Page() {
                                             ariaLabel={"Nationality:"}
                                             value={personalIDData?.NationalityLabel ?? personalID.Nationality}
                                             style={`${inputStyleFullWithLine}`}
-                                                disabled
+                                            disabled
                                         />
                                         <div className='flex flex-row justify-between items-center gap-4 mt-4'>
                                             {/* <CountryAutocomplete
@@ -1296,12 +1298,12 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"ID Doc"}
                                                 name={"ID Doc"}
-                                                 label={
-                                                        <div className='flex align-center gap-1'>
-                                                            {t.frontOffice.registrationForm.idDoc}
-                                                            <span className='text-red-500  font-bold'>*</span>
-                                                        </div>
-                                                    }
+                                                label={
+                                                    <div className='flex align-center gap-1'>
+                                                        {t.frontOffice.registrationForm.idDoc}
+                                                        <span className='text-red-500  font-bold'>*</span>
+                                                    </div>
+                                                }
                                                 ariaLabel={"ID Doc:"}
                                                 value={personalIDData?.IDDoc ?? personalID.IDDoc}
                                                 style={`${inputStyleFullWithLine}`}
@@ -1311,12 +1313,12 @@ export default function Page() {
                                                 type={"text"}
                                                 id={"ID Doc Nr."}
                                                 name={"ID Doc Nr."}
-                                                 label={
-                                                        <div className='flex align-center gap-1'>
-                                                            {t.frontOffice.registrationForm.idDocNumber}
-                                                            <span className='text-red-500  font-bold'>*</span>
-                                                        </div>
-                                                    }
+                                                label={
+                                                    <div className='flex align-center gap-1'>
+                                                        {t.frontOffice.registrationForm.idDocNumber}
+                                                        <span className='text-red-500  font-bold'>*</span>
+                                                    </div>
+                                                }
                                                 ariaLabel={"ID Doc Nr.:"}
                                                 value={personalIDData?.NrDoc ?? personalID.NrDoc}
                                                 style={`${inputStyleFullWithLine}`}
@@ -1335,9 +1337,9 @@ export default function Page() {
                                                 label={t.frontOffice.registrationForm.expDate}
                                                 ariaLabel={"Exp. Date:"}
                                                 value={
-                                                    personalIDData?.ExpDate 
+                                                    personalIDData?.ExpDate
                                                         ? formatDate(personalIDData.ExpDate)
-                                                         : personalID?.ExpDate //&& personalID.ExpDate.split('T')[0] !== '2050-12-31'
+                                                        : personalID?.ExpDate //&& personalID.ExpDate.split('T')[0] !== '2050-12-31'
                                                             ? personalID.ExpDate.split('T')[0]
                                                             : ""
                                                 }
