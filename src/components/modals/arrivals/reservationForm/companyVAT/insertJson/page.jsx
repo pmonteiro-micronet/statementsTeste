@@ -42,6 +42,9 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
     const [countryOptions, setCountryOptions] = useState([]);
     const [isDataModified, setIsDataModified] = useState(false);  // Estado para monitorar mudanças nos dados
 
+    // prevent double submissions
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     useEffect(() => {
@@ -162,20 +165,26 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
     };
 
     const handleSave = async () => {
-  if (vatError) {
-    setErrorMessage(t.modals.errors.invalidVAT);
-    return;
-  }
+    if (isSubmitting) return; // prevent double click
+    setIsSubmitting(true);
 
-  if (!formData.companyName.trim()) {
-    setErrorMessage(t.modals.errors.companyNameRequired);
-    return;
-  }
+    if (vatError) {
+        setErrorMessage(t.modals.errors.invalidVAT);
+        setIsSubmitting(false);
+        return;
+    }
 
-  if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
-    setErrorMessage(t.modals.errors.invalidEmail);
-    return;
-  }
+    if (!formData.companyName.trim()) {
+        setErrorMessage(t.modals.errors.companyNameRequired);
+        setIsSubmitting(false);
+        return;
+    }
+
+    if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
+        setErrorMessage(t.modals.errors.invalidEmail);
+        setIsSubmitting(false);
+        return;
+    }
 
   // Substituir valores vazios por um espaço em branco
   const formattedData = Object.fromEntries(
@@ -200,10 +209,11 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
       console.log("Verificação VAT:", vatData);
 
       const vatExists = Array.isArray(vatData) && vatData[0]?.result === true;
-      if (vatExists) {
-        setErrorMessage(t.modals.errors.existingVat);
-        return;
-      }
+            if (vatExists) {
+                setErrorMessage(t.modals.errors.existingVat);
+                setIsSubmitting(false);
+                return;
+            }
     }
 
     const response = await axios.post(
@@ -238,19 +248,21 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
     existingCompanies[profileID] = localStorageData;
     localStorage.setItem("JSONcompany", JSON.stringify(existingCompanies));
 
-    setErrorMessage("");
-    setIsDataModified(false);
-    onClose();
+        setErrorMessage("");
+        setIsDataModified(false);
+        onClose();
+        setIsSubmitting(false);
 
-    // 🔄 Atualiza a página após salvar com sucesso (reload suave)
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+        // 🔄 Atualiza a página após salvar com sucesso (reload suave)
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
 
-  } catch (error) {
-    console.error("Erro ao salvar informações de VAT:", error);
-    setErrorMessage(t.modals.errors.errorSaving);
-  }
+    } catch (error) {
+        console.error("❌ Erro ao salvar informações de VAT:", error);
+        setErrorMessage(t.modals.errors.errorSaving);
+        setIsSubmitting(false);
+    }
 };
 
 
@@ -398,8 +410,8 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
 
                             {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
                             <div className="flex justify-end space-x-2">
-                                <Button color="error" onClick={handleCloseModal}>{t.modals.companyInfo.cancel}</Button>
-                                <Button color="primary" onClick={handleSave}>{t.modals.companyInfo.save}</Button>
+                                <Button color="error" onClick={handleCloseModal} disabled={isSubmitting}>{t.modals.companyInfo.cancel}</Button>
+                                <Button color="primary" onClick={handleSave} disabled={isSubmitting}>{isSubmitting ? t.modals.companyInfo.saving || 'Saving...' : t.modals.companyInfo.save}</Button>
                             </div>
                         </ModalBody>
                     </>
