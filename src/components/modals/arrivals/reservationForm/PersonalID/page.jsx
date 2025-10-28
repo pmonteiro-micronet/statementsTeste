@@ -352,6 +352,21 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
+                                            classNames={{
+                                                control: (state) =>
+                                                    `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''
+                                                    }`,
+                                                menu: () => '!bg-background !text-textPrimaryColor',
+                                                option: (state) =>
+                                                    `!cursor-pointer ${state.isSelected
+                                                        ? '!bg-primary !text-white'
+                                                        : state.isFocused
+                                                            ? '!bg-primary-100 !text-black'
+                                                            : '!bg-background !text-textPrimaryColor'
+                                                    }`,
+                                                singleValue: () => '!text-textPrimaryColor',
+                                                placeholder: () => '!text-gray-400',
+                                            }}
                                         />
                                     </div>
 
@@ -375,6 +390,21 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
+                                            classNames={{
+                                                control: (state) =>
+                                                    `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''
+                                                    }`,
+                                                menu: () => '!bg-background !text-textPrimaryColor',
+                                                option: (state) =>
+                                                    `!cursor-pointer ${state.isSelected
+                                                        ? '!bg-primary !text-white'
+                                                        : state.isFocused
+                                                            ? '!bg-primary-100 !text-black'
+                                                            : '!bg-background !text-textPrimaryColor'
+                                                    }`,
+                                                singleValue: () => '!text-textPrimaryColor',
+                                                placeholder: () => '!text-gray-400',
+                                            }}
                                         />
                                     </div>
                                 </div>
@@ -401,6 +431,21 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                                 setIsDataModified(true);
                                             }}
                                             isSearchable
+                                            classNames={{
+                                                control: (state) =>
+                                                    `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''
+                                                    }`,
+                                                menu: () => '!bg-background !text-textPrimaryColor',
+                                                option: (state) =>
+                                                    `!cursor-pointer ${state.isSelected
+                                                        ? '!bg-primary !text-white'
+                                                        : state.isFocused
+                                                            ? '!bg-primary-100 !text-black'
+                                                            : '!bg-background !text-textPrimaryColor'
+                                                    }`,
+                                                singleValue: () => '!text-textPrimaryColor',
+                                                placeholder: () => '!text-gray-400',
+                                            }}
                                         />
                                     </div>
 

@@ -144,6 +144,12 @@ const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo, OldCompan
                                                 <p>{t.modals.companyInfo.noResults}</p>
                                                 <div className="flex justify-end space-x-2 mt-2">
                                                     <Button
+                                                        onClick={() => setIsResultsModalOpen(false)}
+                                                        className="bg-transparent text-textPrimaryColor"
+                                                    >
+                                                        {t.modals.companyInfo.showCompany.cancel}
+                                                    </Button>
+                                                    <Button
                                                         onClick={() => {
                                                             setInsertFormData(formData);
                                                             setIsInsertModalOpen(true);
@@ -173,11 +179,11 @@ const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo, OldCompan
                                                             </th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
+                                                    <tbody className="text-textPrimaryColor">
                                                         {searchResults.map((company, index) => (
                                                             <tr
                                                                 key={company.kdnr || index}
-                                                                className="hover:bg-gray-100 cursor-pointer"
+                                                                className="hover:bg-primary-100 cursor-pointer hover:text-black"
                                                                 onClick={() => handleSelectCompany(company)}
                                                             >
                                                                 <td className="pl-2 pr-2 border-r border-[#e6e6e6] py-2">
@@ -196,7 +202,7 @@ const BeforeCompanyVatJson = ({ onClose, propertyID, profileID, resNo, OldCompan
                                             </div>
 
                                             {/* Botões fixos no fundo */}
-                                            <div className="sticky bottom-0 bg-gray-100 px-4 py-2 flex justify-end gap-4 z-40 border-t border-gray-200">
+                                            <div className="sticky bottom-0 bg-tableFooterBorder px-4 py-2 flex justify-end gap-4 z-40 border-t border-gray-200">
                                                 <Button
                                                     onClick={() => setIsResultsModalOpen(false)}
                                                     className="bg-gray-200 text-black"
