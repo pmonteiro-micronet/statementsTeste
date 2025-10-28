@@ -15,18 +15,18 @@ import BeforeCompanyVat from "@/components/modals/arrivals/reservationForm/compa
 
 const translations = { en, pt, es };
 
-const customStyles = {
-    control: (provided) => ({
-        ...provided,
-        border: "1px solid #D1D5DB",
-        borderRadius: "0.375rem",
-        padding: "1px 4px",
-        boxShadow: "none",
-        '&:hover': {
-            borderColor: "black"
-        },
-    })
-};
+// const customStyles = {
+//     control: (provided) => ({
+//         ...provided,
+//         border: "1px solid #D1D5DB",
+//         borderRadius: "0.375rem",
+//         padding: "1px 4px",
+//         boxShadow: "none",
+//         '&:hover': {
+//             borderColor: "black"
+//         },
+//     })
+// };
 
 const validatePortugueseVAT = (vat) => /^\d{9}$/.test(vat);
 
@@ -454,8 +454,23 @@ const CompanyVATFormEditJson = ({ onClose, profileID, propertyID, resNo, company
                                                 value={countryOptions.find(option => option.value === formData.country)}
                                                 onChange={handleCountryChange}
                                                 isSearchable
-                                                styles={customStyles}
+                                                // styles={customStyles}
                                                 disabled={!isEditing}
+                                                classNames={{
+                                                control: (state) =>
+                                                    `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''
+                                                    }`,
+                                                menu: () => '!bg-background !text-textPrimaryColor',
+                                                option: (state) =>
+                                                    `!cursor-pointer ${state.isSelected
+                                                        ? '!bg-primary !text-white'
+                                                        : state.isFocused
+                                                            ? '!bg-primary-100 !text-black'
+                                                            : '!bg-background !text-textPrimaryColor'
+                                                    }`,
+                                                singleValue: () => '!text-textPrimaryColor',
+                                                placeholder: () => '!text-gray-400',
+                                            }}
                                             />
                                         </div>
                                     </div>

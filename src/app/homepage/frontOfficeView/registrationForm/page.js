@@ -542,9 +542,9 @@ export default function Page() {
                 IDDocSelect: personalIDData?.IDDocSelect ?? personalID.IDDocSelect,
                 IDNationality: personalIDData?.IDNationality ?? personalID.IDNationality,
 
-                Phone: contacts.PhoneNumber,
-                VatNo: contacts.VatNo,
-                PersonalEmail: contacts.Email,
+                Phone: phoneToSend,
+                VatNo: vatNoToSend,
+                PersonalEmail: emailToSend,
                 ProtectionPolicy: policyAccepted,
                 HotelName: hotelName,
                 HotelTermsEN: hotelTerms,

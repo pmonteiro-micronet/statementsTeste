@@ -528,7 +528,9 @@
             "loseData": "If you continue, all unsaved data will be lost. Do you want to continue?",
             "emptyFields": "cannot be empty.",
             "invalidFields": "is invalid. Please check the value.",
-            "existingVat": "This VAT number is already in use."
+            "existingVat": "This VAT number is already in use.",
+            "updateCheckinError": "Error updating check-in. Please try again.",
+            "updateCheckinSuccess": "Check-in updated successfully."
         },
         "dropdown": {
             "profileSettings": "Profile Settings",

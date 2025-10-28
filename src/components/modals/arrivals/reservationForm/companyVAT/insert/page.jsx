@@ -11,18 +11,18 @@ import es from "../../../../../../../public/locales/espanol/common.json";
 
 const translations = { en, pt, es };
 
-const customStyles = {
-    control: (provided) => ({
-        ...provided,
-        border: "1px solid #D1D5DB",
-        borderRadius: "0.375rem",
-        padding: "1px 4px",
-        boxShadow: "none",
-        '&:hover': {
-            borderColor: "black"
-        },
-    })
-};
+// const customStyles = {
+//     control: (provided) => ({
+//         ...provided,
+//         border: "1px solid #D1D5DB",
+//         borderRadius: "0.375rem",
+//         padding: "1px 4px",
+//         boxShadow: "none",
+//         '&:hover': {
+//             borderColor: "black"
+//         },
+//     })
+// };
 
 const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultData, OldCompanyID }) => {
     console.log("ResNo", resNo, "ProfileID", profileID, "PropertyID", propertyID);
@@ -364,7 +364,22 @@ const CompanyVATFormInsert = ({ onClose, profileID, propertyID, resNo, defaultDa
                                             }
                                             onChange={handleCountryChange}
                                             isSearchable
-                                            styles={customStyles}
+                                            // styles={customStyles}
+                                            classNames={{
+                                                control: (state) =>
+                                                    `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''
+                                                    }`,
+                                                menu: () => '!bg-background !text-textPrimaryColor',
+                                                option: (state) =>
+                                                    `!cursor-pointer ${state.isSelected
+                                                        ? '!bg-primary !text-white'
+                                                        : state.isFocused
+                                                            ? '!bg-primary-100 !text-black'
+                                                            : '!bg-background !text-textPrimaryColor'
+                                                    }`,
+                                                singleValue: () => '!text-textPrimaryColor',
+                                                placeholder: () => '!text-gray-400',
+                                            }}
                                         />
                                     </div>
                                 </div>

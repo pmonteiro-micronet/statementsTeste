@@ -356,13 +356,15 @@ export default function Arrivals({ params }) {
 
       if (response.status === 200) {
         console.log('Check-in atualizado com sucesso:', response.data);
+        setErrorMessage(t.modals.errors.updateCheckinSuccess);
+        setIsErrorModalOpen(true);
       } else {
-        setErrorMessage("Erro ao atualizar check-in");
+        setErrorMessage(t.modals.errors.updateCheckinError);
         setIsErrorModalOpen(true);
       }
     } catch (error) {
       console.error('Erro:', error);
-      setErrorMessage("Erro ao atualizar check-in");
+      setErrorMessage(t.modals.errors.updateCheckinError);
       setIsErrorModalOpen(true);
     }
   };

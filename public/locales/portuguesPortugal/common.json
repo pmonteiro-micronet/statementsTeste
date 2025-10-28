@@ -529,7 +529,9 @@
             "loseData": "Se continuar, todos os dados não guardados serão perdidos. Deseja continuar?",
             "emptyFields": "não pode estar vazio.",
             "invalidFields": "é inválido. Por favor, verifique o valor.",
-            "existingVat": "Este número de IVA já está em utilização."
+            "existingVat": "Este NIF já está em utilização.",
+            "updateCheckinError": "Erro ao atualizar o check-in. Por favor, tente novamente.",
+            "updateCheckinSuccess": "Check-in atualizado com sucesso."
         },
         "dropdown": {
             "profileSettings": "Definições de Perfil",
