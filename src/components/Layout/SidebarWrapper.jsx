@@ -161,12 +161,14 @@ export default function SidebarWrapper({ children }) {
               onClick: () => router.push(`/homepage/frontOfficeView/${selectedHotelID}`),
               icon: <TbLayoutDashboardFilled />,
             },
-            {
-              ref: `/homepage/frontOfficeView/reservations/${selectedHotelID}`,
-              label: `Reservations`,
-              onClick: () => handleRedirect("reservations"),
-              icon: <GiArchiveRegister />,
-            },
+            ...(isAdmin
+            ? [{
+                ref: `/homepage/frontOfficeView/reservations/${selectedHotelID}`,
+                label: `Reservations`,
+                onClick: () => handleRedirect("reservations"),
+                icon: <GiArchiveRegister />,
+              }]
+            : []),
             {
               ref: `/homepage/frontOfficeView/checkinRequest`,
               label: `Registration Form`,
