@@ -32,14 +32,15 @@ const validatePortugueseVAT = (vat) => /^\d{9}$/.test(vat);
 
 const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData, company, OldCompanyID }) => {
     console.log("company", company);
+    console.log("companyVATData", companyVATData);
     const [formData, setFormData] = useState(() => {
         if (company) {
             return {
                 companyName: company.name1 || "",
                 vatNo: company.vatno || "",
                 emailAddress: company.email || "",
-                country: company.gebland || "",
-                countryName: company.landkz || "",
+                country: company.landkz || "",
+                countryName: company.land || "",
                 streetAddress: company.strasse || "",
                 zipCode: company.plz || "",
                 city: company.city || "",
@@ -50,8 +51,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
                 companyName: companyVATData.companyName || "",
                 vatNo: companyVATData.vatNo || "",
                 emailAddress: companyVATData.emailAddress || "",
-                country: "",
-                countryName: companyVATData.country || "",
+                country: companyVATData.country || "",
+                countryName: "",
                 streetAddress: companyVATData.streetAddress || "",
                 zipCode: companyVATData.zipCode || "",
                 city: companyVATData.city || "",
@@ -285,6 +286,8 @@ useEffect(() => {
     const handleEdit = () => {
         setIsEditing(true);
     };
+
+    console.log("formData", formData);
 
     return (
         <>

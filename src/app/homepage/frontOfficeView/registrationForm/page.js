@@ -1457,7 +1457,7 @@ export default function Page() {
                                                                         companyName: reserva.Company || "",
                                                                         vatNo: reserva.CompanyVatNo || "",
                                                                         emailAddress: reserva.CompanyEmail || "",
-                                                                        country: reserva.CompanyCountryName || "",
+                                                                        country: reserva.CompanyCountryID || "",
                                                                         streetAddress: reserva.CompanyStreetAddress || "",
                                                                         zipCode: reserva.CompanyZipCode || "",
                                                                         city: reserva.CompanyCity || "",
