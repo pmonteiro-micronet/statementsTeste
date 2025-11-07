@@ -103,8 +103,17 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo, OldCompanyID 
     };
 
     // Quando o usuário seleciona uma empresa na lista, abrir o modal de edição e fechar o principal
+    // Map the incoming company fields to the shape expected by the edit form.
+    // The edit component expects `gebland` (country code) and `landkz` (country name).
     const handleSelectCompany = (company) => {
-        setSelectedCompany(company);
+        const mappedCompany = {
+            ...company,
+            // prefer explicit fields from search result if present
+            //gebland: company.codenr ?? company.gebland ?? company.CompanyCountryID ?? company.gebland,
+            landkz: company.landkz ??company.land ??  company.CompanyCountryName ?? company.land,
+        };
+
+        setSelectedCompany(mappedCompany);
         setIsMainModalOpen(false);
         setIsResultsModalOpen(false);
     };
@@ -252,6 +261,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo, OldCompanyID 
                     resNo={resNo}
                     company={selectedCompany}
                     OldCompanyID={OldCompanyID}
+                    companyVATData={formData}
                 />
             ) : (
                 <Modal

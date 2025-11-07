@@ -211,4 +211,3 @@ model roomCloudLogs {
   responseBody   String?   @db.Text
   createdAt      DateTime? @default(now()) @db.Timestamp(0)
 }
-
