@@ -30,7 +30,7 @@ const translations = { en, pt, es };
 
 const validatePortugueseVAT = (vat) => /^\d{9}$/.test(vat);
 
-const CompanyVATFormEdit = ({ onSave, onClose, profileID, propertyID, resNo, companyID, companyVATData, company, OldCompanyID }) => {
+const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, companyVATData, company, OldCompanyID }) => {
     console.log("company", company);
     console.log("companyVATData", companyVATData);
     const [formData, setFormData] = useState(() => {
