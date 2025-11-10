@@ -14,9 +14,10 @@ import SignaturePad from 'signature_pad';
 import TermsConditionsForm from "@/components/terms&conditions/page";
 import ProtectionPolicyForm from "@/components/protectionPolicy/page";
 import EditRegistrationForm from "@/components/modals/arrivals/reservationForm/edit/page";
-import CompanyVATFormEdit from "@/components/modals/arrivals/reservationForm/companyVAT/edit/page";
+// import CompanyVATFormEdit from "@/components/modals/arrivals/reservationForm/companyVAT/edit/page";
 // import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/companyVAT/insert/page";
-import BeforeCompanyVat from "@/components/modals/arrivals/reservationForm/companyVAT/beforeInfo/page";
+// import BeforeCompanyVat from "@/components/modals/arrivals/reservationForm/companyVAT/beforeInfo/page";
+import MultiModalManager from "@/components/modals/arrivals/reservationForm/companyVAT/page";
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
 import SuccessRegistrationForm from "@/components/modals/arrivals/reservationForm/success/page";
 import LoadingBackdrop from "@/components/Loader/page";
@@ -76,6 +77,8 @@ export default function Page() {
     // const [localCompanyData, setLocalCompanyData] = useState(null);
     const [addressData, setAddressData] = useState({});
     const [personalIDData, setPersonalIDData] = useState({});
+
+    const [newCompany, setNewCompany] = useState(null);
 
 
     // useEffect(() => {
@@ -476,6 +479,28 @@ export default function Page() {
             );
             console.log("Personal ID salvo com sucesso:", responsePersonalID.data);
 
+            // ✅ Atualiza dados da empresa (Company VAT)
+
+            console.log("🧩 Estado atual de newCompany:", newCompany);
+
+            const payload = Object.fromEntries(
+                Object.entries({
+                    ...newCompany, // usa diretamente o estado da empresa
+                }).map(([key, value]) => [
+                    key,
+                    String(value ?? "").trim() === "" ? "" : String(value ?? "").trim(),
+                ])
+            );
+
+            console.log("📦 Payload final enviado para updateCompanyVAT:", payload);
+
+            // Chamada à API
+            const responseCompany = await axios.post(
+                "/api/reservations/checkins/registrationForm/updateCompanyVAT",
+                payload
+            );
+
+            console.log("✅ Company VAT atualizado com sucesso:", responseCompany.data);
         } catch (error) {
             console.error("Erro ao salvar endereço ou Personal ID:", error);
             errors.push(t.frontOffice.registrationForm.errors.errorSavingDocument);
@@ -634,6 +659,7 @@ export default function Page() {
     const [initialPhone, setInitialPhone] = useState("");
 
     const [initialVatNo, setInitialVatNo] = useState("");
+    const [openModal, setOpenModal] = useState("");
 
     useEffect(() => {
         if (contacts?.Email && initialEmail === "") {
@@ -687,6 +713,7 @@ export default function Page() {
     useEffect(() => {
         if (companyVATData && Object.keys(companyVATData).length > 0) {
             console.log("companyVATData atualizado, abrindo modal...", companyVATData);
+            setOpenModal("edit");
             setIsCVATModalOpen(true);
         }
     }, [companyVATData]);
@@ -790,6 +817,10 @@ export default function Page() {
 
         return `${year}-${month}-${day}`;
     };
+
+    useEffect(() => {
+        console.log("🧩 Estado atual de newCompany:", newCompany);
+    }, [newCompany]);
 
 
     return (
@@ -1475,6 +1506,7 @@ export default function Page() {
                                                             color="#FC9D25"
                                                             style={{ cursor: "pointer" }}
                                                             onClick={() => {
+                                                                setOpenModal("search");
                                                                 setIsCVATModalOpenInsert(true); // Abre o modal
                                                             }}
                                                         />
@@ -1485,8 +1517,8 @@ export default function Page() {
                                         <div className="mt-2">
                                             <p className="!text-textLabelColor text-lg">
                                                 {activeKey === "company"
-                                                    ? reserva.hasCompanyVAT === 1
-                                                        ? reserva.Company || ""
+                                                    ? (reserva.hasCompanyVAT === 1 || newCompany?.hasCompanyVAT === 1)
+                                                        ? (newCompany?.companyName || reserva.Company || "")
                                                         : ""
                                                     : `${guestInfo.LastName}, ${guestInfo.FirstName}`}
                                             </p>
@@ -1499,8 +1531,8 @@ export default function Page() {
                                                     ariaLabel="VAT Nr.:"
                                                     value={
                                                         activeKey === "company"
-                                                            ? reserva.hasCompanyVAT === 1
-                                                                ? reserva.CompanyVatNo || ""
+                                                            ? (reserva.hasCompanyVAT === 1 || newCompany?.hasCompanyVAT === 1)
+                                                                ? (newCompany?.vatNo || reserva.CompanyVatNo || "")
                                                                 : ""
                                                             : reserva.BlockedVatNO === 1 && !vatNo
                                                                 ? "999999990"
@@ -1531,26 +1563,85 @@ export default function Page() {
 
                                     {/** Modal Dinâmico */}
                                     {isCVATModalOpen && (
-                                        <CompanyVATFormEdit
-                                            onClose={() => setIsCVATModalOpen(false)}
-                                            profileID={guestInfo.ProfileID}
+                                        // <CompanyVATFormEdit
+                                        //     onClose={() => setIsCVATModalOpen(false)}
+                                        //     onSave={(newData) => {
+                                        //         console.log("Dados finais vindos de BeforeCompanyVat:", newData);
+                                        //         setNewCompany({
+                                        //             companyName: newData.companyName,
+                                        //             companyID: newData.companyID,
+                                        //             vatNo: newData.vatNo,
+                                        //             emailAddress: newData.emailAddress,
+                                        //             countryName: newData.countryName,
+                                        //             streetAddress: newData.streetAddress,
+                                        //             zipCode: newData.zipCode,
+                                        //             city: newData.city,
+                                        //             state: newData.state,
+                                        //             hasCompanyVAT: 1,
+                                        //             BlockedCVatNO: 0,
+                                        //             profileID: guestInfo.ProfileID,
+                                        //             propertyID: propertyID,
+                                        //             resNo: reserva.ResNo,
+                                        //             OldCompanyID: reserva.CompanyID
+                                        //         });
+                                        //     }}
+                                        //     profileID={guestInfo.ProfileID}
+                                        //     propertyID={propertyID}
+                                        //     initialData={companyVATData}
+                                        //     resNo={reserva.ResNo}
+                                        //     companyID={reserva.CompanyID}
+                                        //     companyVATData={companyVATData}
+                                        //     OldCompanyID={reserva.CompanyID}
+                                        // />
+                                        <MultiModalManager
+                                            openModal={openModal}
+                                            setOpenModal={setOpenModal}
                                             propertyID={propertyID}
-                                            initialData={companyVATData}
+                                            profileID={guestInfo.ProfileID}
                                             resNo={reserva.ResNo}
                                             companyID={reserva.CompanyID}
-                                            companyVATData={companyVATData}
-                                            OldCompanyID={reserva.CompanyID}
+                                            companyData={companyVATData}
+                                            onSave={(payload) => setNewCompany(payload)}
                                         />
                                     )}
 
                                     {isCVATModalOpenInsert && (
-                                        <BeforeCompanyVat
-                                            onClose={() => setIsCVATModalOpenInsert(false)}
+                                        // <BeforeCompanyVat
+                                        //     onClose={() => setIsCVATModalOpenInsert(false)}
+                                        //     onSave={(newData) => {
+                                        //         console.log("Dados finais vindos de BeforeCompanyVat:", newData);
+                                        //         setNewCompany({
+                                        //             companyName: newData.companyName,
+                                        //             companyID: newData.companyID,
+                                        //             vatNo: newData.vatNo,
+                                        //             emailAddress: newData.emailAddress,
+                                        //             countryName: newData.countryName,
+                                        //             streetAddress: newData.streetAddress,
+                                        //             zipCode: newData.zipCode,
+                                        //             city: newData.city,
+                                        //             state: newData.state,
+                                        //             hasCompanyVAT: 1,
+                                        //             BlockedCVatNO: 0,
+                                        //             profileID: guestInfo.ProfileID,
+                                        //             propertyID: propertyID,
+                                        //             resNo: reserva.ResNo,
+                                        //             OldCompanyID: reserva.CompanyID
+                                        //         });
+                                        //     }}
+                                        //     profileID={guestInfo.ProfileID}
+                                        //     propertyID={propertyID}
+                                        //     resNo={reserva.ResNo}
+                                        //     OldCompanyID={reserva.CompanyID}
+                                        // />
+                                        <MultiModalManager 
+                                            openModal={openModal}
+                                            setOpenModal={setOpenModal}
+                                            propertyID={propertyID} 
                                             profileID={guestInfo.ProfileID}
-                                            propertyID={propertyID}
                                             resNo={reserva.ResNo}
-                                            OldCompanyID={reserva.CompanyID}
-                                        />
+                                            companyID={reserva.CompanyID}
+                                            onSave={(payload) => setNewCompany(payload)}
+                                            />
                                     )}
                                 </div>
                             </div>
