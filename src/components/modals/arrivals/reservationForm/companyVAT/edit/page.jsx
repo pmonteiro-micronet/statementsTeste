@@ -96,6 +96,8 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
     const extractedCompanyID = company?.CompanyID;
     console.log("extractedCompanyID", extractedCompanyID);
 
+    const [newCompany, setNewCompany] = useState(null);
+    console.log("newCompany", newCompany);
     const handleCloseModal = () => {
         if (isDataModified) {
             // Pergunta ao usuário se ele deseja perder os dados
@@ -169,34 +171,108 @@ const CompanyVATFormEdit = ({ onClose, profileID, propertyID, resNo, companyID, 
         }
     };
 
-const handleBlur = () => {
-    const vat = formData.vatNo?.trim();
-    if (formData.country === 27 && vat) {
-        if (!validatePortugueseVAT(vat)) {
-            setVatError(t.modals.errors.invalidVAT);
+    const handleBlur = () => {
+        const vat = formData.vatNo?.trim();
+        if (formData.country === 27 && vat) {
+            if (!validatePortugueseVAT(vat)) {
+                setVatError(t.modals.errors.invalidVAT);
+            } else {
+                setVatError("");
+            }
         } else {
             setVatError("");
         }
-    } else {
-        setVatError("");
-    }
-};
+    };
 
-// Chamada no useEffect para validação automática
-useEffect(() => {
-    handleBlur();
-}, [formData.vatNo, formData.country]);
+    // Chamada no useEffect para validação automática
+    useEffect(() => {
+        handleBlur();
+    }, [formData.vatNo, formData.country]);
 
 
- const handleCountryChange = (selectedOption) => {
-    setFormData(prev => ({
-        ...prev,
-        country: selectedOption.value,
-        countryName: selectedOption.label, // Nome do país (land)
-        vatNo: prev.vatNo // mantém o VAT sempre
-    }));
-};
+    const handleCountryChange = (selectedOption) => {
+        setFormData(prev => ({
+            ...prev,
+            country: selectedOption.value,
+            countryName: selectedOption.label, // Nome do país (land)
+            vatNo: prev.vatNo // mantém o VAT sempre
+        }));
+    };
 
+
+    //     const handleSave = async () => {
+    //     if (!formData.companyName) {
+    //         setErrorMessage(t.modals.errors.companyNameRequired);
+    //         return;
+    //     }
+
+    //     if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
+    //         setErrorMessage(t.modals.errors.invalidEmail);
+    //         return;
+    //     }
+
+    //     const payload = Object.fromEntries(
+    //         Object.entries({
+    //             profileID,
+    //             propertyID,
+    //             resNo,
+    //             companyID: companyID || extractedCompanyID,
+    //             countryID: formData.country,
+    //             countryName: formData.countryName,
+    //             companyName: formData.companyName,
+    //             vatNo: formData.vatNo,
+    //             emailAddress: formData.emailAddress,
+    //             streetAddress: formData.streetAddress,
+    //             zipCode: formData.zipCode,
+    //             city: formData.city,
+    //             state: formData.state,
+    //             oldCompany: OldCompanyID,
+    //         }).map(([key, value]) => [key, String(value || "").trim() === "" ? "" : String(value || "").trim()])
+    //     );
+
+    //     try {
+    //         // // 🔍 Verificar VAT se preenchido
+    //         // if (formData.vatNo) {
+    //         //     const vatResponse = await axios.post("/api/reservations/checkins/registrationForm/checkVatNo", {
+    //         //         vatNo: formData.vatNo,
+    //         //         propertyID: propertyID,
+    //         //     });
+
+    //         //     const vatData = vatResponse.data;
+    //         //     // Espera-se um array como [{ result: true }]
+    //         //     const vatExists = Array.isArray(vatData) && vatData[0]?.result === true;
+
+    //         //     if (vatExists) {
+    //         //         setErrorMessage(
+    //         //             t.modals.errors.existingVat
+    //         //         );
+    //         //         return;
+    //         //     }
+    //         // }
+
+    //         // ✅ Prosseguir se VAT for falso ou não existir
+    //         await axios.post("/api/reservations/checkins/registrationForm/updateCompanyVAT", payload);
+
+    //         const existingCompanies = JSON.parse(localStorage.getItem("company") || "{}");
+
+    //         const localStorageData = {
+    //             ...payload,
+    //             hasCompanyVAT: 1,
+    //             BlockedCVatNO: 0,
+    //         };
+
+    //         existingCompanies[profileID] = localStorageData;
+
+    //         localStorage.setItem("company", JSON.stringify(existingCompanies));
+
+    //         onClose();
+    //         window.location.reload();
+
+    //     } catch (error) {
+    //         console.log("Erro ao salvar empresa:", error);
+    //         setErrorMessage(t.modals.errors.errorSaving);
+    //     }
+    // };
 
     const handleSave = async () => {
     if (isSubmitting) return; // prevent double click
@@ -207,10 +283,11 @@ useEffect(() => {
         return;
     }
 
-    if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
-        setErrorMessage(t.modals.errors.invalidEmail);
-        return;
-    }
+
+        if (formData.emailAddress && !emailRegex.test(formData.emailAddress)) {
+            setErrorMessage("Email inválido");
+            return;
+        }
 
     const payload = Object.fromEntries(
         Object.entries({
@@ -304,6 +381,26 @@ useEffect(() => {
             {showSearchCompanyModal && (
                 <BeforeCompanyVat
                     onClose={() => setShowSearchCompanyModal(false)}
+                    onSave={(newData) => {
+                        console.log("Dados finais vindos de BeforeCompanyVat:", newData);
+                        setNewCompany({
+                            companyName: newData.companyName,
+                            companyID: newData.companyID,
+                            vatNo: newData.vatNo,
+                            emailAddress: newData.emailAddress,
+                            countryName: newData.countryName,
+                            streetAddress: newData.streetAddress,
+                            zipCode: newData.zipCode,
+                            city: newData.city,
+                            state: newData.state,
+                            hasCompanyVAT: 1,
+                            BlockedCVatNO: 0,
+                            profileID: profileID,
+                            propertyID: propertyID,
+                            resNo: resNo,
+                            OldCompanyID: OldCompanyID
+                        });
+                    }}
                     profileID={profileID}
                     propertyID={propertyID}
                     resNo={resNo}
@@ -444,20 +541,20 @@ useEffect(() => {
                                                 isSearchable
                                                 // styles={customStyles}
                                                 classNames={{
-                                                control: (state) =>
-                                                    `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''
-                                                    }`,
-                                                menu: () => '!bg-background !text-textPrimaryColor',
-                                                option: (state) =>
-                                                    `!cursor-pointer ${state.isSelected
-                                                        ? '!bg-primary !text-white'
-                                                        : state.isFocused
-                                                            ? '!bg-primary-100 !text-black'
-                                                            : '!bg-background !text-textPrimaryColor'
-                                                    }`,
-                                                singleValue: () => '!text-textPrimaryColor',
-                                                placeholder: () => '!text-gray-400',
-                                            }}
+                                                    control: (state) =>
+                                                        `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''
+                                                        }`,
+                                                    menu: () => '!bg-background !text-textPrimaryColor',
+                                                    option: (state) =>
+                                                        `!cursor-pointer ${state.isSelected
+                                                            ? '!bg-primary !text-white'
+                                                            : state.isFocused
+                                                                ? '!bg-primary-100 !text-black'
+                                                                : '!bg-background !text-textPrimaryColor'
+                                                        }`,
+                                                    singleValue: () => '!text-textPrimaryColor',
+                                                    placeholder: () => '!text-gray-400',
+                                                }}
                                                 disabled={!isEditing}
                                             />
                                         </div>

@@ -13,7 +13,7 @@ import CompanyVATFormInsert from "@/components/modals/arrivals/reservationForm/c
 
 const translations = { en, pt, es };
 
-const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo, OldCompanyID }) => {
+const BeforeCompanyVat = ({ onClose, onSave, propertyID, profileID, resNo, OldCompanyID }) => {
     const [locale, setLocale] = useState("pt");
     const [formData, setFormData] = useState({ companyName: "", vatNo: "" });
     const [errorMessage, setErrorMessage] = useState("");
@@ -255,7 +255,16 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo, OldCompanyID 
             {/* Modal principal ou modal de edição */}
             {selectedCompany ? (
                 <CompanyVATFormEdit
-                    onClose={handleCloseCompanyEdit}
+                     onClose={handleCloseCompanyEdit}
+                     onSave={(newData) => {
+                        console.log("Dados novos vindos do filho (CompanyVATFormEdit):", newData);
+                        // Repassa para o componente pai principal
+                        if (typeof onSave === "function") {
+                            onSave(newData);
+                        }
+                        // Fecha o modal atual
+                        onClose();
+                    }}
                     profileID={profileID}
                     propertyID={propertyID}
                     resNo={resNo}
@@ -263,6 +272,7 @@ const BeforeCompanyVat = ({ onClose, propertyID, profileID, resNo, OldCompanyID 
                     OldCompanyID={OldCompanyID}
                     companyVATData={formData}
                 />
+
             ) : (
                 <Modal
                     isOpen={isMainModalOpen}
