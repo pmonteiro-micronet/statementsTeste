@@ -61,6 +61,7 @@ const MultiModalManager = ({ openModal, setOpenModal, propertyID, onSave, profil
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showConfirmNewCompanyModal, setShowConfirmNewCompanyModal] = useState(false);
+    console.log(showConfirmNewCompanyModal,setIsSubmitting);
 
     // Simple email and VAT validators (small, safe implementations)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
