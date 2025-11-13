@@ -52,6 +52,7 @@ export default function Page() {
 
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // Controle do modal de erro
+    const [isSubmitting, setIsSubmitting] = useState(false);
     // Estados para armazenar as informações do hotel
     const [hotelName, setHotelName] = useState('');
     const [hotelTermsEN, setHotelTermsEN] = useState("");
@@ -396,6 +397,11 @@ export default function Page() {
     const handleOkClick = async () => {
         let errors = [];
 
+        if (isSubmitting) return; // prevent multiple clicks
+        setIsSubmitting(true);
+        
+        try {
+
         // Validações de formulário
         if (isCanvasEmpty()) {
             errors.push(t.frontOffice.registrationForm.errors.emptyForm);
@@ -492,15 +498,124 @@ export default function Page() {
                 ])
             );
 
-            console.log("📦 Payload final enviado para updateCompanyVAT:", payload);
+            console.log("📦 Payload final enviado para company endpoint:", payload);
 
-            // Chamada à API
-            const responseCompany = await axios.post(
-                "/api/reservations/checkins/registrationForm/updateCompanyVAT",
-                payload
-            );
+            // Decide whether to create or update the company on the server.
+            if (newCompany?.createdViaModal) {
 
-            console.log("✅ Company VAT atualizado com sucesso:", responseCompany.data);
+                const resNo = payload?.resNo;       // ✅ Make sure this exists
+                const profileID = payload?.profileID;
+                const propertyID = payload?.propertyID;
+                // Company was created via the modal — perform createCompanyVAT now.
+                try {
+                    const createResp = await axios.post(
+                        "/api/reservations/checkins/registrationForm/createCompanyVAT",
+                        {
+                            profileID,
+                            propertyID,
+                            resNo,
+                            countryID: payload.countryID,
+                            countryName: payload.countryName,
+                            oldCompany: payload.oldCompany || payload.OldCompanyID || "",
+                            companyName: payload.companyName,
+                            vatNo: payload.vatNo,
+                            emailAddress: payload.emailAddress,
+                            streetAddress: payload.streetAddress,
+                            zipCode: payload.zipCode,
+                            city: payload.city,
+                            state: payload.state,
+                        }
+                    );
+
+                    console.log("✅ Company created via modal:", createResp.data);
+
+                    const server = createResp.data || {};
+                    const updatedCompany = {
+                        companyName: server.companyName || server.CompanyName || payload.companyName || "",
+                        companyID: server.companyID || server.CompanyID || payload.companyID || "",
+                        vatNo: server.vatNo || server.VATNo || payload.vatNo || "",
+                        emailAddress: server.emailAddress || payload.emailAddress || "",
+                        countryID: server.countryID || payload.countryID || "",
+                        countryName: server.countryName || payload.countryName || "",
+                        streetAddress: server.streetAddress || payload.streetAddress || "",
+                        zipCode: server.zipCode || payload.zipCode || "",
+                        city: server.city || payload.city || "",
+                        state: server.state || payload.state || "",
+                        hasCompanyVAT: 1,
+                        BlockedCVatNO: 0,
+                        profileID,
+                        propertyID,
+                        resNo,
+                        OldCompanyID: payload.oldCompany || payload.OldCompanyID || "",
+                    };
+
+                    // Update parent state so UI shows company and edit button
+                    setNewCompany(updatedCompany);
+                    setReserva((r) => ({
+                        ...r,
+                        hasCompanyVAT: 1,
+                        BlockedCVatNO: 0,
+                        Company: updatedCompany.companyName,
+                        CompanyVatNo: updatedCompany.vatNo,
+                        CompanyID: updatedCompany.companyID,
+                    }));
+                } catch (err) {
+                    console.error("Erro ao criar Company VAT:", err);
+                    errors.push(t.frontOffice.registrationForm.errors.errorSavingDocument);
+                    setErrorMessage(errors.join("\n"));
+                    setIsErrorModalOpen(true);
+                    return;
+                }
+            } else if (!newCompany?.createdViaModal) {
+                // Company was picked / existing — perform updateCompanyVAT.
+                const resNo = payload?.resNo;       // ✅ Make sure this exists
+                const profileID = payload?.profileID;
+                const propertyID = payload?.propertyID;
+                try {
+                    const responseCompany = await axios.post(
+                        "/api/reservations/checkins/registrationForm/updateCompanyVAT",
+                        payload
+                    );
+
+                    console.log("✅ Company VAT atualizado com sucesso:", responseCompany.data);
+
+                    const updated = responseCompany.data || {};
+                    const updatedCompany = {
+                        companyName: updated.companyName || updated.CompanyName || payload.companyName || newCompany?.companyName || "",
+                        companyID: updated.companyID || updated.CompanyID || payload.companyID || newCompany?.companyID || "",
+                        vatNo: updated.vatNo || updated.VATNo || payload.vatNo || newCompany?.vatNo || "",
+                        emailAddress: updated.emailAddress || payload.emailAddress || newCompany?.emailAddress || "",
+                        countryID: updated.countryID || payload.countryID || newCompany?.countryID || "",
+                        countryName: updated.countryName || payload.countryName || newCompany?.countryName || "",
+                        streetAddress: updated.streetAddress || payload.streetAddress || newCompany?.streetAddress || "",
+                        zipCode: updated.zipCode || payload.zipCode || newCompany?.zipCode || "",
+                        city: updated.city || payload.city || newCompany?.city || "",
+                        state: updated.state || payload.state || newCompany?.state || "",
+                        hasCompanyVAT: 1,
+                        BlockedCVatNO: 0,
+                        profileID,
+                        propertyID,
+                        resNo,
+                        OldCompanyID: payload.oldCompany || payload.OldCompanyID || "",
+                    };
+
+                    setNewCompany(updatedCompany);
+                    setReserva((r) => ({
+                        ...r,
+                        hasCompanyVAT: 1,
+                        BlockedCVatNO: 0,
+                        Company: updatedCompany.companyName,
+                        CompanyVatNo: updatedCompany.vatNo,
+                        CompanyID: updatedCompany.companyID,
+                    }));
+                } catch (err) {
+                    console.error("Erro ao salvar Company VAT:", err);
+                    errors.push(t.frontOffice.registrationForm.errors.errorSavingDocument);
+                    setErrorMessage(errors.join("\n"));
+                    setIsErrorModalOpen(true);
+                    return;
+                }
+            }
         } catch (error) {
             console.error("Erro ao salvar endereço ou Personal ID:", error);
             errors.push(t.frontOffice.registrationForm.errors.errorSavingDocument);
@@ -621,6 +736,13 @@ export default function Page() {
             errors.push(t.frontOffice.registrationForm.errors.generateFormError);
             setErrorMessage(errors.join("\n"));
             setIsErrorModalOpen(true);
+        }
+
+        } catch (error) {
+            console.error("Erro no envio:", error);
+        } finally {
+            // 🔹 Re-enable the button once everything is finished
+            setIsSubmitting(false);
         }
     };
 
@@ -1640,7 +1762,21 @@ export default function Page() {
                                             profileID={guestInfo.ProfileID}
                                             resNo={reserva.ResNo}
                                             companyID={reserva.CompanyID}
-                                            onSave={(payload) => setNewCompany(payload)}
+                                            onSave={(payload) => {
+                                            // force hasCompanyVAT to 1 on insert
+                                            setNewCompany({
+                                                ...payload,
+                                                hasCompanyVAT: 1,
+                                                BlockedCVatNO: 0,
+                                                OldCompanyID: reserva.CompanyID,
+                                                profileID: guestInfo.ProfileID,
+                                                propertyID: propertyID,
+                                                resNo: reserva.ResNo,
+                                            });
+
+                                            // Also update reserva locally if needed
+                                            reserva.hasCompanyVAT = 1;
+                                        }}
                                             />
                                     )}
                                 </div>
@@ -1805,10 +1941,15 @@ export default function Page() {
 
                                         {/** Botão de aceitar */}
                                         <button
-                                            className='bg-primary font-semibold text-white py-2 px-2 rounded-lg w-20 h-10'
-                                            onClick={handleOkClick}>
-                                            Ok
+                                            onClick={handleOkClick}
+                                            disabled={isSubmitting}
+                                            className={`bg-primary font-semibold text-white py-2 px-4 rounded-lg w-20 h-10 ${
+                                                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                                            }`}
+                                            >
+                                            {isSubmitting ? "Processing..." : "OK"}
                                         </button>
+
 
                                         {/** Modal de erro */}
                                         {isErrorModalOpen && errorMessage && (
