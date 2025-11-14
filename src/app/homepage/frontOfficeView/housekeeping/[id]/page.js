@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
 import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "@heroui/react";
@@ -10,9 +10,13 @@ import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
 import { IoMdInformationCircle } from "react-icons/io";
-import { CgFormatIndentIncrease } from "react-icons/cg";
+import { FaThList } from "react-icons/fa";
+import { IoSettingsSharp } from "react-icons/io5";
 
-import InHousesInfoForm from "@/components/modals/inhouses/info/page";
+import HousekeepingInfoForm from "@/components/modals/housekeeping/info/page";
+import HousekeepingMaintenanceForm from "@/components/modals/housekeeping/maintenance/page";
+import HousekeepingTracesForm from "@/components/modals/housekeeping/traces/page";
+
 import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 import { MdOutlineDryCleaning } from "react-icons/md";
@@ -44,6 +48,9 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalMaintenanceOpen, setIsModalMaintenanceOpen] = useState(false);
+  const [isModalTracesOpen, setIsModalTracesOpen] = useState(false);
+
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
@@ -209,9 +216,30 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     setSelectedReserva(reserva); // Armazena os dados da reserva clicada
     setIsModalOpen(true);
   };
+  const handleOpenMaintenanceModal = (reserva) => {
+    setSelectedReserva(reserva); // Armazena os dados da reserva clicada
+    setIsModalMaintenanceOpen(true);
+  };
+
+  const handleOpenTracesModal = (reserva) => {
+    setSelectedReserva(reserva); // Armazena os dados da reserva clicada
+    setIsModalTracesOpen(true);
+  };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setSelectedReserva(null); // Limpa os dados ao fechar a modal
+    window.location.reload(); // Recarrega a página
+  };
+
+  const handleCloseMaintenanceModal = () => {
+    setIsModalMaintenanceOpen(false);
+    setSelectedReserva(null); // Limpa os dados ao fechar a modal
+    window.location.reload(); // Recarrega a página
+  };
+
+  const handleCloseTracesModal = () => {
+    setIsModalTracesOpen(false);
     setSelectedReserva(null); // Limpa os dados ao fechar a modal
     window.location.reload(); // Recarrega a página
   };
@@ -382,6 +410,28 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     }
   };
 
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Fecha dropdown ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+        setOpenDropdownIndex(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [setOpenDropdownIndex]);
+
+  const toggleDropdown = (e) => {
+    e.stopPropagation();
+    const newState = !isOpen;
+    setIsOpen(newState);
+    setOpenDropdownIndex(newState ? index : null);
+  };
+
   return (
     (<main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       {isLoading && <LoadingBackdrop open={isLoading} />}
@@ -421,15 +471,15 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                 <thead className="sticky top-0 z-30">
                   <tr className="bg-primary text-white h-16">
                     <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.arrival}</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.departure}</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.room}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.arrival}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.departure}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.room}</td>
                     <td
                       className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase cursor-pointer select-none"
                       onClick={() => toggleSort("guestName")}
                     >
                       <div className="flex justify-between items-center gap-1">
-                        {t.frontOffice.arrivals.guestName}
+                        {t.frontOffice.housekeeping.guestName}
                         {sortField === "guestName" ? (
                           sortOrder === "asc" ? (
                             <FaArrowUp size={16} />
@@ -441,84 +491,69 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                         )}
                       </div>
                     </td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">Housekeeping</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">Room Status</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.inHouses.resNo}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.title}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.roomStatus}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.resNo}</td>
                   </tr>
                 </thead>
                 <tbody>
                   {sortedItems.map((reserva, index) => {
                     const isOpen = openDropdownIndex === index;
-                    // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
+
                     return (
-                      <tr key={index} onClick={() => setOpenDropdownIndex(index)} className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">
+                      <tr
+                        key={index}
+                        className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50"
+                      >
+                        {/* Dropdown Cell */}
                         <td className="pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center">
-                          <div className="flex items-center justify-center w-full h-full">
-                            <Dropdown isOpen={isOpen} onOpenChange={(open) => setOpenDropdownIndex(open ? index : null)}>
-                              <DropdownTrigger>
-                                <Button
-                                  variant="light"
-                                  className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative z-10"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOpenDropdownIndex(index);
-                                  }}
-                                >
-                                  <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
-                                </Button>
-                              </DropdownTrigger>
-                              <DropdownMenu
-                                aria-label="Static Actions"
-                                closeOnSelect={true}
-                                isOpen={true}
-                                className="relative z-10 text-textPrimaryColor"
-                              >
-                                <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
-                                  <div className="flex flex-row gap-2">
-                                    <IoMdInformationCircle size={15} /> {t.frontOffice.inHouses.info}
-                                  </div>
-                                </DropdownItem>
-                                <DropdownItem
-                                  key="show"
+                          <div className="flex items-center justify-center w-full h-full relative">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenDropdownIndex(isOpen ? null : index);
+                              }}
+                              className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative z-10 bg-gray-100 rounded"
+                            >
+                              <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
+                            </button>
+
+                            {isOpen && (
+                              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-20 text-textPrimaryColor translate-x-32 translate-y-4">
+                                <button
+                                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
                                   onClick={() => {
-                                    if (reserva.ResNo) {
-                                      sendResToAPI(reserva.ResNo);
-                                    } else {
-                                      console.warn("ReservationNumber não encontrado.");
-                                    }
+                                    handleOpenMaintenanceModal(reserva);
+                                    setOpenDropdownIndex(null); // Fecha o dropdown
                                   }}
                                 >
-                                  <div className="flex flex-row gap-2">
-                                    <CgFormatIndentIncrease size={15} /> {t.frontOffice.inHouses.statement}
-                                  </div>
-                                </DropdownItem>
-                              </DropdownMenu>
-                            </Dropdown>
+                                  <IoSettingsSharp size={15} /> {t.frontOffice.housekeeping.maintenance}
+                                </button>
+                                <button
+                                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                                  onClick={() => {
+                                    handleOpenTracesModal(reserva);
+                                    setOpenDropdownIndex(null); // Fecha o dropdown
+                                  }}
+                                >
+                                  <FaThList size={15} /> {t.frontOffice.housekeeping.traces}
+                                </button>
+                                <button
+                                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                                  onClick={() => {
+                                    handleOpenModal(reserva);
+                                    setOpenDropdownIndex(null); // Fecha o dropdown
+                                  }}
+                                >
+                                  <IoMdInformationCircle size={15} /> {t.frontOffice.housekeeping.info}
+                                </button>
+                              </div>
+                            )}
+
                           </div>
-
-                          <InHousesInfoForm
-                            buttonName={t.frontOffice.inHouses.info}
-                            buttonColor={"transparent"}
-                            modalHeader={"Res. No.: " + selectedReserva?.ResNo}
-                            formTypeModal={11}
-                            roomNumber={selectedReserva?.Room}
-                            dateCI={selectedReserva?.DateCI}
-                            booker={selectedReserva?.Booker}
-                            salutation={selectedReserva?.Salutation}
-                            lastName={selectedReserva?.LastName}
-                            firstName={selectedReserva?.FirstName}
-                            roomType={selectedReserva?.RoomType}
-                            resStatus={selectedReserva?.resStatus}
-                            childs={selectedReserva?.Childs}
-                            adults={selectedReserva?.Adults}
-                            balance={selectedReserva?.balance}
-                            country={selectedReserva?.Country}
-                            isBackdropVisible={true}
-                            isOpen={isModalOpen}
-                            onClose={handleCloseModal}
-                          />
-
                         </td>
+
+                        {/* Other Cells */}
                         <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.DateCI}</td>
                         <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.DateCO}</td>
                         <td className="text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.Room}</td>
@@ -526,18 +561,85 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                           {`${reserva.LastName}, ${reserva.FirstName}`}
                         </td>
                         <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-32 truncate whitespace-nowrap overflow-hidden">
-                          {reserva.housekeeping === 1 && <MdOutlineDryCleaning size={20}/>}
+                          {reserva.housekeeping === 1 && <MdOutlineDryCleaning size={20} />}
                         </td>
                         <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate whitespace-nowrap overflow-hidden">{reserva.roomStatus}</td>
-                        <td className="h-14 pr-2 pr-2 border-r border-[#e6e6e6] text-right w-20 truncate whitespace-nowrap overflow-hidden">{reserva.ResNo}</td>
+                        <td className="h-14 pr-2 border-r border-[#e6e6e6] text-right w-20 truncate whitespace-nowrap overflow-hidden">{reserva.ResNo}</td>
                       </tr>
                     );
                   })}
+
+                  {/* Modals */}
+                  <HousekeepingInfoForm
+                    buttonName={t.frontOffice.housekeeping.info}
+                    buttonColor="transparent"
+                    modalHeader={"Res. No.: " + selectedReserva?.ResNo}
+                    formTypeModal={11}
+                    roomNumber={selectedReserva?.Room}
+                    dateCI={selectedReserva?.DateCI}
+                    booker={selectedReserva?.Booker}
+                    salutation={selectedReserva?.Salutation}
+                    lastName={selectedReserva?.LastName}
+                    firstName={selectedReserva?.FirstName}
+                    roomType={selectedReserva?.RoomType}
+                    resStatus={selectedReserva?.resStatus}
+                    childs={selectedReserva?.Childs}
+                    adults={selectedReserva?.Adults}
+                    balance={selectedReserva?.balance}
+                    country={selectedReserva?.Country}
+                    isBackdropVisible
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                  />
+
+                  <HousekeepingMaintenanceForm
+                    buttonName={t.frontOffice.housekeeping.maintenance}
+                    buttonColor="transparent"
+                    modalHeader={t.modals.housekeeping.maintenance.title + " - Res. No.: " + selectedReserva?.ResNo}
+                    formTypeModal={11}
+                    roomNumber={selectedReserva?.Room}
+                    dateCI={selectedReserva?.DateCI}
+                    booker={selectedReserva?.Booker}
+                    salutation={selectedReserva?.Salutation}
+                    lastName={selectedReserva?.LastName}
+                    firstName={selectedReserva?.FirstName}
+                    roomType={selectedReserva?.RoomType}
+                    resStatus={selectedReserva?.resStatus}
+                    childs={selectedReserva?.Childs}
+                    adults={selectedReserva?.Adults}
+                    balance={selectedReserva?.balance}
+                    country={selectedReserva?.Country}
+                    isBackdropVisible
+                    isOpen={isModalMaintenanceOpen}
+                    onClose={handleCloseMaintenanceModal}
+                  />
+
+                  <HousekeepingTracesForm
+                    buttonName={t.frontOffice.housekeeping.traces}
+                    buttonColor="transparent"
+                    modalHeader={t.modals.housekeeping.traces.title + " - Res. No.: " + selectedReserva?.ResNo}
+                    formTypeModal={11}
+                    roomNumber={selectedReserva?.Room}
+                    dateCI={selectedReserva?.DateCI}
+                    booker={selectedReserva?.Booker}
+                    salutation={selectedReserva?.Salutation}
+                    lastName={selectedReserva?.LastName}
+                    firstName={selectedReserva?.FirstName}
+                    roomType={selectedReserva?.RoomType}
+                    resStatus={selectedReserva?.resStatus}
+                    childs={selectedReserva?.Childs}
+                    adults={selectedReserva?.Adults}
+                    balance={selectedReserva?.balance}
+                    country={selectedReserva?.Country}
+                    isBackdropVisible
+                    isOpen={isModalTracesOpen}
+                    onClose={handleCloseTracesModal}
+                  />
                 </tbody>
               </table>
             </div>
           ) : (
-            <p className="text-textLabelColor">{t.frontOffice.inHouses.noReservations}</p>
+            <p className="text-textLabelColor">{t.frontOffice.housekeeping.noReservations}</p>
           )}
         </div>
 
@@ -565,7 +667,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
       {/** Modal de erro */}
       {isErrorModalOpen && errorMessage && (
         <ErrorRegistrationForm
-          modalHeader={t.frontOffice.arrivals.attention}
+          modalHeader={t.frontOffice.housekeeping.attention}
           errorMessage={errorMessage}
           onClose={() => setIsErrorModalOpen(false)} // Fecha o modal quando o erro for resolvido
         />

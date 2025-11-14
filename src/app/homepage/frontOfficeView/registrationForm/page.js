@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react';
 import axios from "axios";
+import { flushSync } from 'react-dom';
 import InputFieldControlled from "@/components/input/page";
 // import CountryAutocomplete from "@/components/autocompletes/country/page";
 import { IoIosArrowForward } from "react-icons/io";
@@ -393,40 +394,54 @@ export default function Page() {
 
     console.log(signatureDataUrl);
 
-    const handleOkClick = async () => {
-        let errors = [];
+    const [missingFields, setMissingFields] = useState([]);
+    const [isMissingFieldsModalOpen, setIsMissingFieldsModalOpen] = useState(false);
+    const [formData, setFormData] = useState({});
 
-        // Validações de formulário
-        if (isCanvasEmpty()) {
-            errors.push(t.frontOffice.registrationForm.errors.emptyForm);
-        }
-        if (email.endsWith("@guest.booking.com")) {
-            errors.push(t.frontOffice.registrationForm.errors.bookingEmail);
-        }
+   const handleOkClick = async ({ skipMissingCheck = false } = {}) => {
+    let errors = [];
+
+    // Validações de formulário
+    if (isCanvasEmpty()) {
+        errors.push(t.frontOffice.registrationForm.errors.emptyForm);
+    }
+    if (email.endsWith("@guest.booking.com")) {
+        errors.push(t.frontOffice.registrationForm.errors.bookingEmail);
+    }
+
+    if (!skipMissingCheck) {
         let missingFields = [];
 
         const getValue = (dataObj, fallbackObj, field) => {
             return dataObj?.[field] ?? fallbackObj?.[field];
         };
 
-        if (!getValue(null, guestInfo, "LastName")) missingFields.push(t.frontOffice.registrationForm.lastName);
-        if (!getValue(addressData, address, "Country")) missingFields.push(t.frontOffice.registrationForm.country);
-        if (!getValue(personalIDData, personalID, "IDDoc")) missingFields.push(t.frontOffice.registrationForm.idDoc);
-        if (!getValue(personalIDData, personalID, "NrDoc")) missingFields.push(t.frontOffice.registrationForm.idDocNumber);
-        if (!getValue(personalIDData, personalID, "CountryOfBirth")) missingFields.push(t.frontOffice.registrationForm.countryOfBirth);
-        const dateOfBirth = getValue(personalIDData, personalID, "DateOfBirth");
+        if (!getValue(null, guestInfo, "LastName"))
+            missingFields.push({ key: "LastName", label: t.frontOffice.registrationForm.lastName, target: "guestInfo" });
 
+        if (!getValue(addressData, address, "Country"))
+            missingFields.push({ key: "Country", label: t.frontOffice.registrationForm.country, target: "addressData" });
+
+        if (!getValue(personalIDData, personalID, "IDDoc"))
+            missingFields.push({ key: "IDDoc", label: t.frontOffice.registrationForm.idDoc, target: "personalIDData" });
+
+        if (!getValue(personalIDData, personalID, "NrDoc"))
+            missingFields.push({ key: "NrDoc", label: t.frontOffice.registrationForm.idDocNumber, target: "personalIDData" });
+
+        if (!getValue(personalIDData, personalID, "CountryOfBirth"))
+            missingFields.push({ key: "CountryOfBirth", label: t.frontOffice.registrationForm.countryOfBirth, target: "personalIDData" });
+
+        const dateOfBirth = getValue(personalIDData, personalID, "DateOfBirth");
         if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
-            missingFields.push(t.frontOffice.registrationForm.dateOfBirth);
+            missingFields.push({ key: "DateOfBirth", label: t.frontOffice.registrationForm.dateOfBirth, target: "personalIDData" });
         }
 
         if (missingFields.length > 0) {
-            setErrorMessage(
-                `${t.frontOffice.registrationForm.errors.pleaseFill}\n- ${missingFields.join("\n- ")}`
-            );
-            setIsErrorModalOpen(true);
+            setMissingFields(missingFields);
+            setIsMissingFieldsModalOpen(true);
             return;
         }
+    }
         const effectiveEmail = email || initialEmail || contacts.Email;
 
         if (!effectiveEmail) {
@@ -822,6 +837,45 @@ export default function Page() {
         console.log("🧩 Estado atual de newCompany:", newCompany);
     }, [newCompany]);
 
+    const handleChange = (field, value) => {
+        setFormData((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
+
+const handleSaveMissing = () => {
+    let updatedGuestInfo = { ...guestInfo };
+    let updatedAddressData = { ...addressData };
+    let updatedPersonalIDData = { ...personalIDData };
+
+    missingFields.forEach((field) => {
+        const value = field.ref?.value || "";
+        switch (field.target) {
+            case "guestInfo":
+                updatedGuestInfo[field.key] = value;
+                break;
+            case "addressData":
+                updatedAddressData[field.key] = value;
+                break;
+            case "personalIDData":
+                updatedPersonalIDData[field.key] = value;
+                break;
+        }
+    });
+
+    flushSync(() => {
+        setGuestInfo(updatedGuestInfo);
+        setAddressData(updatedAddressData);
+        setPersonalIDData(updatedPersonalIDData);
+        setIsMissingFieldsModalOpen(false);
+    });
+
+    // Passa os dados atualizados para handleOkClick diretamente
+    setTimeout(() => {
+        handleOkClick({ skipMissingCheck: true }); // você precisará adicionar esse parâmetro
+    }, 3000);
+};
 
     return (
         <div className='bg-background main-page min-h-screen'>
@@ -1633,15 +1687,15 @@ export default function Page() {
                                         //     resNo={reserva.ResNo}
                                         //     OldCompanyID={reserva.CompanyID}
                                         // />
-                                        <MultiModalManager 
+                                        <MultiModalManager
                                             openModal={openModal}
                                             setOpenModal={setOpenModal}
-                                            propertyID={propertyID} 
+                                            propertyID={propertyID}
                                             profileID={guestInfo.ProfileID}
                                             resNo={reserva.ResNo}
                                             companyID={reserva.CompanyID}
                                             onSave={(payload) => setNewCompany(payload)}
-                                            />
+                                        />
                                     )}
                                 </div>
                             </div>
@@ -1825,6 +1879,46 @@ export default function Page() {
                                                 modalHeader={t.frontOffice.registrationForm.attention}
                                                 successMessage={successMessage}
                                             />
+                                        )}
+
+                                        {isMissingFieldsModalOpen && (
+                                            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                                                <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
+                                                    <h2 className="text-lg font-bold mb-4">{t.frontOffice.registrationForm.errors.pleaseFill}</h2>
+
+                                                    <form className="space-y-3">
+                                                        {missingFields.map((field) => (
+                                                            <div key={field.key} className="flex flex-col">
+                                                                <label className="font-medium mb-1">{field.label}</label>
+                                                                <input
+                                                                    type="text"
+                                                                    className="border rounded-md px-2 py-1"
+                                                                    defaultValue={formData[field.key] || ""}
+                                                                    onChange={(e) =>
+                                                                        setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))
+                                                                    }
+                                                                    // salvamos a ref para pegar o valor atual ao clicar no botão
+                                                                    ref={(el) => (field.ref = el)}
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </form>
+                                                    <div className="mt-4 flex justify-end space-x-2">
+                                                        <button
+                                                            onClick={() => setIsMissingFieldsModalOpen(false)}
+                                                            className="bg-gray-300 px-3 py-1 rounded-md"
+                                                        >
+                                                            Cancelar
+                                                        </button>
+                                                        <button
+                                                            onMouseDown={handleSaveMissing}
+                                                            className="bg-blue-600 text-white px-3 py-1 rounded-md"
+                                                        >
+                                                            Salvar
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
                                 )}

@@ -143,22 +143,19 @@
                 "support": "No hemos podido completar su solicitud. Por favor, contacte con soporte."
             }
         },
-        "housekeeping": {
+         "housekeeping": {
             "title": "Housekeeping",
-            "tomorrow": "Tomorrow",
-            "room": "Room",
-            "roomStatus": "ST",
-            "guestName": "Guest Name",
-            "travelAgency": "Travel Agency",
-            "company": "Company",
-            "group": "Group",
-            "notes": "Notes",
-            "resNo": "Res. No.",
-            "arrival": "Arrival",
+            "arrival": "Llegada",
+            "departure": "Salida",
+            "room": "Habitación",
+            "roomStatus": "Estado de la Habitación",
+            "guestName": "Nombre del invitado",
+            "maintenance": "Mantenimiento",
+            "traces": "Lista",
+            "resNo": "N.º Res.",
             "info": "Info",
-            "registrationForm": "Registration Form",
-            "noReservations": "No reservations found.",
-            "attention": "Attention"
+            "noReservations": "No se encontraron reservas.",
+            "attention": "Atención"
         },
         "registrationForm": {
             "title": "Formulario de Registro",
@@ -518,6 +515,22 @@
             "newPhone": "Nuevo número de teléfono:",
             "current": "Actual",
             "new": "Nuevo"
+        },
+        "housekeeping": {
+            "maintenance": {
+                "title": "Órdenes de Trabajo",
+                "search": "Buscar...",
+                "own": "Propio",
+                "all": "Todos",
+                "add": "Agregar"
+            },
+              "traces": {
+                "title": "Lista",
+                "search": "Buscar...",
+                "all": "Todos",
+                "open": "Abierto",
+                "done": "Concluido"
+            }
         },
         "errors": {
             "invalidEmail": "Correo electrónico no válido.",
