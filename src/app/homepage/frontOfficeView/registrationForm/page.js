@@ -53,6 +53,7 @@ export default function Page() {
 
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // Controle do modal de erro
+    const [isSubmitting, setIsSubmitting] = useState(false);
     // Estados para armazenar as informações do hotel
     const [hotelName, setHotelName] = useState('');
     const [hotelTermsEN, setHotelTermsEN] = useState("");
@@ -395,250 +396,736 @@ export default function Page() {
     console.log(signatureDataUrl);
 
     const [missingFields, setMissingFields] = useState([]);
+    const [missingValues, setMissingValues] = useState([]);
     const [isMissingFieldsModalOpen, setIsMissingFieldsModalOpen] = useState(false);
     const [formData, setFormData] = useState({});
 
-   const handleOkClick = async ({ skipMissingCheck = false } = {}) => {
-    let errors = [];
+    //    const handleOkClick = async ({ skipMissingCheck = false } = {}) => {
+    //     let errors = [];
 
-    // Validações de formulário
-    if (isCanvasEmpty()) {
-        errors.push(t.frontOffice.registrationForm.errors.emptyForm);
-    }
-    if (email.endsWith("@guest.booking.com")) {
-        errors.push(t.frontOffice.registrationForm.errors.bookingEmail);
-    }
+    //     // Validações de formulário
+    //     if (isCanvasEmpty()) {
+    //         errors.push(t.frontOffice.registrationForm.errors.emptyForm);
+    //     }
+    //     if (email.endsWith("@guest.booking.com")) {
+    //         errors.push(t.frontOffice.registrationForm.errors.bookingEmail);
+    //     }
 
-    if (!skipMissingCheck) {
-        let missingFields = [];
+    //     if (!skipMissingCheck) {
+    //         let missingFields = [];
 
-        const getValue = (dataObj, fallbackObj, field) => {
-            return dataObj?.[field] ?? fallbackObj?.[field];
-        };
+    //         const getValue = (dataObj, fallbackObj, field) => {
+    //             return dataObj?.[field] ?? fallbackObj?.[field];
+    //         };
 
-        if (!getValue(null, guestInfo, "LastName"))
-            missingFields.push({ key: "LastName", label: t.frontOffice.registrationForm.lastName, target: "guestInfo" });
+    //         if (!getValue(null, guestInfo, "LastName"))
+    //             missingFields.push({ key: "LastName", label: t.frontOffice.registrationForm.lastName, target: "guestInfo" });
 
-        if (!getValue(addressData, address, "Country"))
-            missingFields.push({ key: "Country", label: t.frontOffice.registrationForm.country, target: "addressData" });
+    //         if (!getValue(addressData, address, "Country"))
+    //             missingFields.push({ key: "Country", label: t.frontOffice.registrationForm.country, target: "addressData" });
 
-        if (!getValue(personalIDData, personalID, "IDDoc"))
-            missingFields.push({ key: "IDDoc", label: t.frontOffice.registrationForm.idDoc, target: "personalIDData" });
+    //         if (!getValue(personalIDData, personalID, "IDDoc"))
+    //             missingFields.push({ key: "IDDoc", label: t.frontOffice.registrationForm.idDoc, target: "personalIDData" });
 
-        if (!getValue(personalIDData, personalID, "NrDoc"))
-            missingFields.push({ key: "NrDoc", label: t.frontOffice.registrationForm.idDocNumber, target: "personalIDData" });
+    //         if (!getValue(personalIDData, personalID, "NrDoc"))
+    //             missingFields.push({ key: "NrDoc", label: t.frontOffice.registrationForm.idDocNumber, target: "personalIDData" });
 
-        if (!getValue(personalIDData, personalID, "CountryOfBirth"))
-            missingFields.push({ key: "CountryOfBirth", label: t.frontOffice.registrationForm.countryOfBirth, target: "personalIDData" });
+    //         if (!getValue(personalIDData, personalID, "CountryOfBirth"))
+    //             missingFields.push({ key: "CountryOfBirth", label: t.frontOffice.registrationForm.countryOfBirth, target: "personalIDData" });
 
-        const dateOfBirth = getValue(personalIDData, personalID, "DateOfBirth");
-        if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
-            missingFields.push({ key: "DateOfBirth", label: t.frontOffice.registrationForm.dateOfBirth, target: "personalIDData" });
-        }
+    //         const dateOfBirth = getValue(personalIDData, personalID, "DateOfBirth");
+    //         if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
+    //             missingFields.push({ key: "DateOfBirth", label: t.frontOffice.registrationForm.dateOfBirth, target: "personalIDData" });
+    //         }
 
-        if (missingFields.length > 0) {
-            setMissingFields(missingFields);
-            setIsMissingFieldsModalOpen(true);
-            return;
-        }
-    }
-        const effectiveEmail = email || initialEmail || contacts.Email;
+    //         if (missingFields.length > 0) {
+    //             setMissingFields(missingFields);
+    //             setIsMissingFieldsModalOpen(true);
+    //             return;
+    //         }
+    //     }
+    //         const effectiveEmail = email || initialEmail || contacts.Email;
 
-        if (!effectiveEmail) {
-            const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
-            if (!proceed) return;
-        }
+    //         if (!effectiveEmail) {
+    //             const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
+    //             if (!proceed) return;
+    //         }
 
-        if (errors.length > 0) {
-            setErrorMessage(errors.join("\n"));
-            setIsErrorModalOpen(true);
-            return;
-        }
+    //         if (errors.length > 0) {
+    //             setErrorMessage(errors.join("\n"));
+    //             setIsErrorModalOpen(true);
+    //             return;
+    //         }
 
-        setErrorMessage('');
-        setIsErrorModalOpen(false);
+    //         setErrorMessage('');
+    //         setIsErrorModalOpen(false);
+
+    //         try {
+    //             // atualiza o address
+    //             const payloadAddress = {
+    //                 countryID: addressData.CountryID,
+    //                 address: addressData.Street,
+    //                 postalcode: addressData.PostalCode,
+    //                 city: addressData.City,
+    //                 profileID: profileID,
+    //                 propertyID: propertyID
+    //             };
+
+    //             const responseAddress = await axios.post(
+    //                 '/api/reservations/checkins/registrationForm/editaddress',
+    //                 payloadAddress
+    //             );
+    //             console.log("Endereço salvo com sucesso:", responseAddress.data);
+
+    //             // atualiza o personalID
+    //             const payloadPersonalID = {
+    //                 DateOfBirth: personalIDData.DateOfBirth,
+    //                 CountryOfBirth: personalIDData.CountryOfBirthID, // assumindo que você guardou o ID aqui
+    //                 Nationality: personalIDData.NationalityID,       // idem
+    //                 IDDoc: personalIDData.IDDocID,                   // idem
+    //                 DocNr: personalIDData.NrDoc,
+    //                 ExpDate: personalIDData.ExpDate,
+    //                 Issue: personalIDData.Issue,
+    //                 profileID: profileID,
+    //                 propertyID: propertyID
+    //             };
+
+    //             const responsePersonalID = await axios.post(
+    //                 '/api/reservations/checkins/registrationForm/editpersonalID',
+    //                 payloadPersonalID
+    //             );
+    //             console.log("Personal ID salvo com sucesso:", responsePersonalID.data);
+
+    //             // ✅ Atualiza dados da empresa (Company VAT)
+
+    //             console.log("🧩 Estado atual de newCompany:", newCompany);
+
+    //             const payload = Object.fromEntries(
+    //                 Object.entries({
+    //                     ...newCompany, // usa diretamente o estado da empresa
+    //                 }).map(([key, value]) => [
+    //                     key,
+    //                     String(value ?? "").trim() === "" ? "" : String(value ?? "").trim(),
+    //                 ])
+    //             );
+
+    //             console.log("📦 Payload final enviado para company endpoint:", payload);
+
+    //             // Decide whether to create or update the company on the server.
+    //             if (newCompany?.createdViaModal) {
+
+    //                 const resNo = payload?.resNo;       // ✅ Make sure this exists
+    //                 const profileID = payload?.profileID;
+    //                 const propertyID = payload?.propertyID;
+    //                 // Company was created via the modal — perform createCompanyVAT now.
+    //                 try {
+    //                     const createResp = await axios.post(
+    //                         "/api/reservations/checkins/registrationForm/createCompanyVAT",
+    //                         {
+    //                             profileID,
+    //                             propertyID,
+    //                             resNo,
+    //                             countryID: payload.countryID,
+    //                             countryName: payload.countryName,
+    //                             oldCompany: payload.oldCompany || payload.OldCompanyID || "",
+    //                             companyName: payload.companyName,
+    //                             vatNo: payload.vatNo,
+    //                             emailAddress: payload.emailAddress,
+    //                             streetAddress: payload.streetAddress,
+    //                             zipCode: payload.zipCode,
+    //                             city: payload.city,
+    //                             state: payload.state,
+    //                         }
+    //                     );
+
+    //                     console.log("✅ Company created via modal:", createResp.data);
+
+    //                     const server = createResp.data || {};
+    //                     const updatedCompany = {
+    //                         companyName: server.companyName || server.CompanyName || payload.companyName || "",
+    //                         companyID: server.companyID || server.CompanyID || payload.companyID || "",
+    //                         vatNo: server.vatNo || server.VATNo || payload.vatNo || "",
+    //                         emailAddress: server.emailAddress || payload.emailAddress || "",
+    //                         countryID: server.countryID || payload.countryID || "",
+    //                         countryName: server.countryName || payload.countryName || "",
+    //                         streetAddress: server.streetAddress || payload.streetAddress || "",
+    //                         zipCode: server.zipCode || payload.zipCode || "",
+    //                         city: server.city || payload.city || "",
+    //                         state: server.state || payload.state || "",
+    //                         hasCompanyVAT: 1,
+    //                         BlockedCVatNO: 0,
+    //                         profileID,
+    //                         propertyID,
+    //                         resNo,
+    //                         OldCompanyID: payload.oldCompany || payload.OldCompanyID || "",
+    //                     };
+
+    //                     // Update parent state so UI shows company and edit button
+    //                     setNewCompany(updatedCompany);
+    //                     setReserva((r) => ({
+    //                         ...r,
+    //                         hasCompanyVAT: 1,
+    //                         BlockedCVatNO: 0,
+    //                         Company: updatedCompany.companyName,
+    //                         CompanyVatNo: updatedCompany.vatNo,
+    //                         CompanyID: updatedCompany.companyID,
+    //                     }));
+    //                 } catch (err) {
+    //                     console.error("Erro ao criar Company VAT:", err);
+    //                     errors.push(t.frontOffice.registrationForm.errors.errorSavingDocument);
+    //                     setErrorMessage(errors.join("\n"));
+    //                     setIsErrorModalOpen(true);
+    //                     return;
+    //                 }
+    //             } else if (!newCompany?.createdViaModal) {
+    //                 // Company was picked / existing — perform updateCompanyVAT.
+    //                 const resNo = payload?.resNo;       // ✅ Make sure this exists
+    //                 const profileID = payload?.profileID;
+    //                 const propertyID = payload?.propertyID;
+    //                 try {
+    //                     const responseCompany = await axios.post(
+    //                         "/api/reservations/checkins/registrationForm/updateCompanyVAT",
+    //                         payload
+    //                     );
+
+    //                     console.log("✅ Company VAT atualizado com sucesso:", responseCompany.data);
+
+    //                     const updated = responseCompany.data || {};
+    //                     const updatedCompany = {
+    //                         companyName: updated.companyName || updated.CompanyName || payload.companyName || newCompany?.companyName || "",
+    //                         companyID: updated.companyID || updated.CompanyID || payload.companyID || newCompany?.companyID || "",
+    //                         vatNo: updated.vatNo || updated.VATNo || payload.vatNo || newCompany?.vatNo || "",
+    //                         emailAddress: updated.emailAddress || payload.emailAddress || newCompany?.emailAddress || "",
+    //                         countryID: updated.countryID || payload.countryID || newCompany?.countryID || "",
+    //                         countryName: updated.countryName || payload.countryName || newCompany?.countryName || "",
+    //                         streetAddress: updated.streetAddress || payload.streetAddress || newCompany?.streetAddress || "",
+    //                         zipCode: updated.zipCode || payload.zipCode || newCompany?.zipCode || "",
+    //                         city: updated.city || payload.city || newCompany?.city || "",
+    //                         state: updated.state || payload.state || newCompany?.state || "",
+    //                         hasCompanyVAT: 1,
+    //                         BlockedCVatNO: 0,
+    //                         profileID,
+    //                         propertyID,
+    //                         resNo,
+    //                         OldCompanyID: payload.oldCompany || payload.OldCompanyID || "",
+    //                     };
+
+    //                     setNewCompany(updatedCompany);
+    //                     setReserva((r) => ({
+    //                         ...r,
+    //                         hasCompanyVAT: 1,
+    //                         BlockedCVatNO: 0,
+    //                         Company: updatedCompany.companyName,
+    //                         CompanyVatNo: updatedCompany.vatNo,
+    //                         CompanyID: updatedCompany.companyID,
+    //                     }));
+    //                 } catch (err) {
+    //                     console.error("Erro ao salvar Company VAT:", err);
+    //                     errors.push(t.frontOffice.registrationForm.errors.errorSavingDocument);
+    //                     setErrorMessage(errors.join("\n"));
+    //                     setIsErrorModalOpen(true);
+    //                     return;
+    //                 }
+    //             }
+    //         } catch (error) {
+    //             console.error("Erro ao salvar endereço ou Personal ID:", error);
+    //             errors.push(t.frontOffice.registrationForm.errors.errorSavingDocument);
+    //             setErrorMessage(errors.join("\n"));
+    //             setIsErrorModalOpen(true);
+    //             return;
+    //         }
+
+    //         let emailToSend = email !== initialEmail ? email : initialEmail; // Envia undefined se não houver alteração
+    //         let vatNoToSend = vatNo !== initialVatNo ? vatNo : initialVatNo; // Envia undefined se não houver alteração
+    //         let phoneToSend = phone !== initialPhone ? phone : initialPhone;
+
+    //         // Se houver alterações (ou valores a serem enviados), envia para a API
+    //         if (emailToSend || vatNoToSend) {
+    //             try {
+    //                 const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
+    //                     email: emailToSend,
+    //                     vatNo: vatNoToSend,
+    //                     phone: phoneToSend,
+    //                     registerID: profileID,
+    //                     propertyID: propertyID
+    //                 });
+    //                 console.log('Alterações salvas com sucesso:', response.data);
+    //             } catch (error) {
+    //                 console.error('Erro ao salvar alterações:', error);
+    //                 errors.push(t.frontOffice.registrationForm.errors.contactSupport);
+    //                 setErrorMessage(errors.join("\n"));
+    //                 setIsErrorModalOpen(true);
+    //                 return;
+    //             }
+    //         }
+
+    //         // Captura a assinatura e gera o PDF
+    //         try {
+    //             const canvas = canvasRef.current;
+    //             if (!canvas) return;
+
+    //             const signatureBase64 = canvas.toDataURL().split(',')[1]; // Remove prefixo "data:..."
+
+    //             const reservaDetails = {
+    //                 // Detalhes da reserva
+    //                 PropertyID: propertyID,
+    //                 ResNo: reserva.ResNo,
+    //                 Room: reserva.Room,
+    //                 DateCI: reserva.DateCI,
+    //                 DateCO: reserva.DateCO,
+    //                 Adults: reserva.Adults,
+    //                 Childs: reserva.Childs,
+    //                 LastName: guestInfo.LastName,
+    //                 FirstName: guestInfo.FirstName,
+
+    //                 // Usa addressData se existir, senão fallback para address
+    //                 Street: addressData?.Street ?? address.Street,
+    //                 Country: addressData?.Country ?? address.Country,
+
+    //                 // Usa personalIDData se existir, senão fallback para personalID
+    //                 IdDoc: personalIDData?.IDDoc ?? personalID.IDDoc,
+    //                 NrDoc: personalIDData?.NrDoc ?? personalID.NrDoc,
+    //                 ExpDate: personalIDData?.ExpDate ?? personalID.ExpDate,
+    //                 DateOfBirth: personalIDData?.DateOfBirth ?? personalID.DateOfBirth,
+    //                 Issue: personalIDData?.Issue ?? personalID.Issue,
+    //                 CountryOfBirth: personalIDData?.CountryOfBirth ?? personalID.CountryOfBirth,
+    //                 IDCountryOfBirth: personalIDData?.IDCountryOfBirth ?? personalID.IDCountryOfBirth,
+    //                 IDDocSelect: personalIDData?.IDDocSelect ?? personalID.IDDocSelect,
+    //                 IDNationality: personalIDData?.IDNationality ?? personalID.IDNationality,
+
+    //                 Phone: phoneToSend,
+    //                 VatNo: vatNoToSend,
+    //                 PersonalEmail: emailToSend,
+    //                 ProtectionPolicy: policyAccepted,
+    //                 HotelName: hotelName,
+    //                 HotelTermsEN: hotelTerms,
+    //                 HotelPhone: hotelPhone,
+    //                 HotelEmail: hotelEmail,
+    //                 HotelAddress: hotelAddress,
+    //                 HotelPostalCode: hotelPostalCode,
+    //                 HotelNIF: hotelNIF,
+    //                 HotelRNET: hotelRNET,
+    //                 RateCode: reserva.RateCode,
+    //                 Locale: locale, // passa a variavel de idioma
+    //             };
+    //             console.log("Detalhes da reserva para o PDF:", reservaDetails);
+    //             // Geração do PDF
+    //             const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
+    //             const pdfBlob = pdfDoc.output('blob'); // Gerar o PDF como um Blob
+    //             // Compressão do PDF com pako (gzip)
+    //             const pdfArrayBuffer = await pdfBlob.arrayBuffer();
+    //             const compressedPdf = pako.gzip(new Uint8Array(pdfArrayBuffer)); // Comprime usando gzip
+
+    //             // Codificação do PDF comprimido em Base64
+    //             const pdfBase64 = btoa(String.fromCharCode(...compressedPdf));
+    //             console.log(pdfBase64);
+    //             // Envia os dados via Axios
+    //             const response = await axios.post(
+    //                 "/api/reservations/checkins/registration_form_base64",
+    //                 {
+    //                     PropertyID: propertyID,
+    //                     pdfBase64: pdfBase64, // Envia o PDF comprimido em Base64
+    //                     fileName: `RegistrationForm_ResNo_${reserva.ResNo}_TC_${termsAccepted ? 1 : 0}_DPP_${policyAccepted ? 1 : 0}_ProfileID_${guestInfo.ProfileID}.pdf`,
+    //                 }
+    //             );
+
+    //             console.log('Resposta da API:', response.data);
+    //             // Atualiza o campo 'seen' no backend
+    //             try {
+    //                 await axios.post('/api/reservations/checkins/registrationForm/updateSeen', {
+    //                     requestID: requestID
+    //                 });
+    //                 console.log("Campo 'seen' atualizado com sucesso.");
+    //             } catch (err) {
+    //                 console.error("Erro ao atualizar campo 'seen':", err);
+    //             }
+
+    //             setSuccessMessage("Registration sent successfully");
+    //             setIsSuccessModalOpen(true);
+    //         } catch (error) {
+    //             console.error('Erro ao gerar ou enviar o PDF:', error);
+    //             errors.push(t.frontOffice.registrationForm.errors.generateFormError);
+    //             setErrorMessage(errors.join("\n"));
+    //             setIsErrorModalOpen(true);
+    //         }
+
+    //         } catch (error) {
+    //             console.error("Erro no envio:", error);
+    //         } finally {
+    //             // 🔹 Re-enable the button once everything is finished
+    //             setIsSubmitting(false);
+    //         }
+    //     };
+
+    const handleOkClick = async ({
+        skipMissingCheck = false,
+        guestInfo: gi = guestInfo,
+        addressData: ad = addressData,
+        personalIDData: pid = personalIDData,
+    } = {}) => {
+
+        let errors = [];
+
+        if (isSubmitting) return; // prevent multiple clicks
+        setIsSubmitting(true);
 
         try {
-            // atualiza o address
-            const payloadAddress = {
-                countryID: addressData.CountryID,
-                address: addressData.Street,
-                postalcode: addressData.PostalCode,
-                city: addressData.City,
-                profileID: profileID,
-                propertyID: propertyID
-            };
 
-            const responseAddress = await axios.post(
-                '/api/reservations/checkins/registrationForm/editaddress',
-                payloadAddress
-            );
-            console.log("Endereço salvo com sucesso:", responseAddress.data);
+            // Validações de formulário
+            if (isCanvasEmpty()) {
+                errors.push(t.frontOffice.registrationForm.errors.emptyForm);
+            }
+            if (email.endsWith("@guest.booking.com")) {
+                errors.push(t.frontOffice.registrationForm.errors.bookingEmail);
+            }
+            if (!skipMissingCheck) {
+                let missingFields = [];
 
-            // atualiza o personalID
-            const payloadPersonalID = {
-                DateOfBirth: personalIDData.DateOfBirth,
-                CountryOfBirth: personalIDData.CountryOfBirthID, // assumindo que você guardou o ID aqui
-                Nationality: personalIDData.NationalityID,       // idem
-                IDDoc: personalIDData.IDDocID,                   // idem
-                DocNr: personalIDData.NrDoc,
-                ExpDate: personalIDData.ExpDate,
-                Issue: personalIDData.Issue,
-                profileID: profileID,
-                propertyID: propertyID
-            };
+                const getValue = (dataObj, fallbackObj, field) => {
+                    return dataObj?.[field] ?? fallbackObj?.[field];
+                };
 
-            const responsePersonalID = await axios.post(
-                '/api/reservations/checkins/registrationForm/editpersonalID',
-                payloadPersonalID
-            );
-            console.log("Personal ID salvo com sucesso:", responsePersonalID.data);
+                if (!getValue(null, guestInfo, "LastName"))
+                    missingFields.push({ key: "LastName", label: t.frontOffice.registrationForm.lastName, target: "guestInfo" });
 
-            // ✅ Atualiza dados da empresa (Company VAT)
+                if (!getValue(addressData, address, "Country"))
+                    missingFields.push({ key: "Country", label: t.frontOffice.registrationForm.country, target: "addressData" });
 
-            console.log("🧩 Estado atual de newCompany:", newCompany);
+                if (!getValue(personalIDData, personalID, "IDDoc"))
+                    missingFields.push({ key: "IDDoc", label: t.frontOffice.registrationForm.idDoc, target: "personalIDData" });
 
-            const payload = Object.fromEntries(
-                Object.entries({
-                    ...newCompany, // usa diretamente o estado da empresa
-                }).map(([key, value]) => [
-                    key,
-                    String(value ?? "").trim() === "" ? "" : String(value ?? "").trim(),
-                ])
-            );
+                if (!getValue(personalIDData, personalID, "NrDoc"))
+                    missingFields.push({ key: "NrDoc", label: t.frontOffice.registrationForm.idDocNumber, target: "personalIDData" });
 
-            console.log("📦 Payload final enviado para updateCompanyVAT:", payload);
+                if (!getValue(personalIDData, personalID, "CountryOfBirth"))
+                    missingFields.push({ key: "CountryOfBirth", label: t.frontOffice.registrationForm.countryOfBirth, target: "personalIDData" });
 
-            // Chamada à API
-            const responseCompany = await axios.post(
-                "/api/reservations/checkins/registrationForm/updateCompanyVAT",
-                payload
-            );
+                const dateOfBirth = getValue(personalIDData, personalID, "DateOfBirth");
+                if (!dateOfBirth || dateOfBirth.split("T")[0] === "1900-01-01") {
+                    missingFields.push({ key: "DateOfBirth", label: t.frontOffice.registrationForm.dateOfBirth, target: "personalIDData" });
+                }
 
-            console.log("✅ Company VAT atualizado com sucesso:", responseCompany.data);
-        } catch (error) {
-            console.error("Erro ao salvar endereço ou Personal ID:", error);
-            errors.push(t.frontOffice.registrationForm.errors.errorSavingDocument);
-            setErrorMessage(errors.join("\n"));
-            setIsErrorModalOpen(true);
-            return;
-        }
+                if (missingFields.length > 0) {
+                    setMissingFields(missingFields);
+                    setIsMissingFieldsModalOpen(true);
+                    return;
+                }
+            }
+            const effectiveEmail = email || initialEmail || contacts.Email;
 
-        let emailToSend = email !== initialEmail ? email : initialEmail; // Envia undefined se não houver alteração
-        let vatNoToSend = vatNo !== initialVatNo ? vatNo : initialVatNo; // Envia undefined se não houver alteração
-        let phoneToSend = phone !== initialPhone ? phone : initialPhone;
+            if (!effectiveEmail) {
+                const proceed = window.confirm(t.frontOffice.registrationForm.errors.emptyEmailValidation);
+                if (!proceed) return;
+            }
 
-        // Se houver alterações (ou valores a serem enviados), envia para a API
-        if (emailToSend || vatNoToSend) {
-            try {
-                const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
-                    email: emailToSend,
-                    vatNo: vatNoToSend,
-                    phone: phoneToSend,
-                    registerID: profileID,
-                    propertyID: propertyID
-                });
-                console.log('Alterações salvas com sucesso:', response.data);
-            } catch (error) {
-                console.error('Erro ao salvar alterações:', error);
-                errors.push(t.frontOffice.registrationForm.errors.contactSupport);
+            if (errors.length > 0) {
                 setErrorMessage(errors.join("\n"));
                 setIsErrorModalOpen(true);
                 return;
             }
-        }
 
-        // Captura a assinatura e gera o PDF
-        try {
-            const canvas = canvasRef.current;
-            if (!canvas) return;
+            setErrorMessage('');
+            setIsErrorModalOpen(false);
 
-            const signatureBase64 = canvas.toDataURL().split(',')[1]; // Remove prefixo "data:..."
-
-            const reservaDetails = {
-                // Detalhes da reserva
-                PropertyID: propertyID,
-                ResNo: reserva.ResNo,
-                Room: reserva.Room,
-                DateCI: reserva.DateCI,
-                DateCO: reserva.DateCO,
-                Adults: reserva.Adults,
-                Childs: reserva.Childs,
-                LastName: guestInfo.LastName,
-                FirstName: guestInfo.FirstName,
-
-                // Usa addressData se existir, senão fallback para address
-                Street: addressData?.Street ?? address.Street,
-                Country: addressData?.Country ?? address.Country,
-
-                // Usa personalIDData se existir, senão fallback para personalID
-                IdDoc: personalIDData?.IDDoc ?? personalID.IDDoc,
-                NrDoc: personalIDData?.NrDoc ?? personalID.NrDoc,
-                ExpDate: personalIDData?.ExpDate ?? personalID.ExpDate,
-                DateOfBirth: personalIDData?.DateOfBirth ?? personalID.DateOfBirth,
-                Issue: personalIDData?.Issue ?? personalID.Issue,
-                CountryOfBirth: personalIDData?.CountryOfBirth ?? personalID.CountryOfBirth,
-                IDCountryOfBirth: personalIDData?.IDCountryOfBirth ?? personalID.IDCountryOfBirth,
-                IDDocSelect: personalIDData?.IDDocSelect ?? personalID.IDDocSelect,
-                IDNationality: personalIDData?.IDNationality ?? personalID.IDNationality,
-
-                Phone: phoneToSend,
-                VatNo: vatNoToSend,
-                PersonalEmail: emailToSend,
-                ProtectionPolicy: policyAccepted,
-                HotelName: hotelName,
-                HotelTermsEN: hotelTerms,
-                HotelPhone: hotelPhone,
-                HotelEmail: hotelEmail,
-                HotelAddress: hotelAddress,
-                HotelPostalCode: hotelPostalCode,
-                HotelNIF: hotelNIF,
-                HotelRNET: hotelRNET,
-                RateCode: reserva.RateCode,
-                Locale: locale, // passa a variavel de idioma
-            };
-            console.log("Detalhes da reserva para o PDF:", reservaDetails);
-            // Geração do PDF
-            const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
-            const pdfBlob = pdfDoc.output('blob'); // Gerar o PDF como um Blob
-            // Compressão do PDF com pako (gzip)
-            const pdfArrayBuffer = await pdfBlob.arrayBuffer();
-            const compressedPdf = pako.gzip(new Uint8Array(pdfArrayBuffer)); // Comprime usando gzip
-
-            // Codificação do PDF comprimido em Base64
-            const pdfBase64 = btoa(String.fromCharCode(...compressedPdf));
-            console.log(pdfBase64);
-            // Envia os dados via Axios
-            const response = await axios.post(
-                "/api/reservations/checkins/registration_form_base64",
-                {
-                    PropertyID: propertyID,
-                    pdfBase64: pdfBase64, // Envia o PDF comprimido em Base64
-                    fileName: `RegistrationForm_ResNo_${reserva.ResNo}_TC_${termsAccepted ? 1 : 0}_DPP_${policyAccepted ? 1 : 0}_ProfileID_${guestInfo.ProfileID}.pdf`,
-                }
-            );
-
-            console.log('Resposta da API:', response.data);
-            // Atualiza o campo 'seen' no backend
             try {
-                await axios.post('/api/reservations/checkins/registrationForm/updateSeen', {
-                    requestID: requestID
-                });
-                console.log("Campo 'seen' atualizado com sucesso.");
-            } catch (err) {
-                console.error("Erro ao atualizar campo 'seen':", err);
+                // atualiza o address
+                const payloadAddress = {
+                    countryID: ad.CountryID || missingValues.CountryID,
+                    address: addressData.Street,
+                    postalcode: addressData.PostalCode,
+                    city: addressData.City,
+                    profileID: profileID,
+                    propertyID: propertyID
+                };
+
+                const responseAddress = await axios.post(
+                    '/api/reservations/checkins/registrationForm/editaddress',
+                    payloadAddress
+                );
+                console.log("Endereço salvo com sucesso:", responseAddress.data);
+
+                // atualiza o personalID
+                const payloadPersonalID = {
+                    DateOfBirth: pid.DateOfBirth || missingValues.DateOfBirth,
+                    CountryOfBirth: pid.CountryOfBirth || missingValues.CountryOfBirth, // assumindo que você guardou o ID aqui
+                    Nationality: personalIDData.NationalityID,       // idem
+                    IDDoc: pid.IDDocID || missingValues.IDDocID,                   // idem
+                    DocNr: pid.NrDoc || missingValues.NrDoc,
+                    ExpDate: personalIDData.ExpDate,
+                    Issue: personalIDData.Issue,
+                    profileID: profileID,
+                    propertyID: propertyID
+                };
+
+                const responsePersonalID = await axios.post(
+                    '/api/reservations/checkins/registrationForm/editpersonalID',
+                    payloadPersonalID
+                );
+                console.log("Personal ID salvo com sucesso:", responsePersonalID.data);
+
+                // ✅ Atualiza dados da empresa (Company VAT)
+
+                console.log("🧩 Estado atual de newCompany:", newCompany);
+
+                const payload = Object.fromEntries(
+                    Object.entries({
+                        ...newCompany, // usa diretamente o estado da empresa
+                    }).map(([key, value]) => [
+                        key,
+                        String(value ?? "").trim() === "" ? "" : String(value ?? "").trim(),
+                    ])
+                );
+
+                console.log("📦 Payload final enviado para company endpoint:", payload);
+
+                // Decide whether to create or update the company on the server.
+                if (newCompany?.createdViaModal) {
+
+                    const resNo = payload?.resNo;       // ✅ Make sure this exists
+                    const profileID = payload?.profileID;
+                    const propertyID = payload?.propertyID;
+                    // Company was created via the modal — perform createCompanyVAT now.
+                    try {
+                        const createResp = await axios.post(
+                            "/api/reservations/checkins/registrationForm/createCompanyVAT",
+                            {
+                                profileID,
+                                propertyID,
+                                resNo,
+                                countryID: payload.countryID,
+                                countryName: payload.countryName,
+                                oldCompany: payload.oldCompany || payload.OldCompanyID || "",
+                                companyName: payload.companyName,
+                                vatNo: payload.vatNo,
+                                emailAddress: payload.emailAddress,
+                                streetAddress: payload.streetAddress,
+                                zipCode: payload.zipCode,
+                                city: payload.city,
+                                state: payload.state,
+                            }
+                        );
+
+                        console.log("✅ Company created via modal:", createResp.data);
+
+                        const server = createResp.data || {};
+                        const updatedCompany = {
+                            companyName: server.companyName || server.CompanyName || payload.companyName || "",
+                            companyID: server.companyID || server.CompanyID || payload.companyID || "",
+                            vatNo: server.vatNo || server.VATNo || payload.vatNo || "",
+                            emailAddress: server.emailAddress || payload.emailAddress || "",
+                            countryID: server.countryID || payload.countryID || "",
+                            countryName: server.countryName || payload.countryName || "",
+                            streetAddress: server.streetAddress || payload.streetAddress || "",
+                            zipCode: server.zipCode || payload.zipCode || "",
+                            city: server.city || payload.city || "",
+                            state: server.state || payload.state || "",
+                            hasCompanyVAT: 1,
+                            BlockedCVatNO: 0,
+                            profileID,
+                            propertyID,
+                            resNo,
+                            OldCompanyID: payload.oldCompany || payload.OldCompanyID || "",
+                        };
+
+                        // Update parent state so UI shows company and edit button
+                        setNewCompany(updatedCompany);
+                        setReserva((r) => ({
+                            ...r,
+                            hasCompanyVAT: 1,
+                            BlockedCVatNO: 0,
+                            Company: updatedCompany.companyName,
+                            CompanyVatNo: updatedCompany.vatNo,
+                            CompanyID: updatedCompany.companyID,
+                        }));
+                    } catch (err) {
+                        console.error("Erro ao criar Company VAT:", err);
+                        errors.push(t.frontOffice.registrationForm.errors.errorSavingDocument);
+                        setErrorMessage(errors.join("\n"));
+                        setIsErrorModalOpen(true);
+                        return;
+                    }
+                } else if (!newCompany) {
+
+
+                } else if (!newCompany?.createdViaModal) {
+                    // Company was picked / existing — perform updateCompanyVAT.
+                    const resNo = payload?.resNo;       // ✅ Make sure this exists
+                    const profileID = payload?.profileID;
+                    const propertyID = payload?.propertyID;
+                    try {
+                        const responseCompany = await axios.post(
+                            "/api/reservations/checkins/registrationForm/updateCompanyVAT",
+                            payload
+                        );
+
+                        console.log("✅ Company VAT atualizado com sucesso:", responseCompany.data);
+
+                        const updated = responseCompany.data || {};
+                        const updatedCompany = {
+                            companyName: updated.companyName || updated.CompanyName || payload.companyName || newCompany?.companyName || "",
+                            companyID: updated.companyID || updated.CompanyID || payload.companyID || newCompany?.companyID || "",
+                            vatNo: updated.vatNo || updated.VATNo || payload.vatNo || newCompany?.vatNo || "",
+                            emailAddress: updated.emailAddress || payload.emailAddress || newCompany?.emailAddress || "",
+                            countryID: updated.countryID || payload.countryID || newCompany?.countryID || "",
+                            countryName: updated.countryName || payload.countryName || newCompany?.countryName || "",
+                            streetAddress: updated.streetAddress || payload.streetAddress || newCompany?.streetAddress || "",
+                            zipCode: updated.zipCode || payload.zipCode || newCompany?.zipCode || "",
+                            city: updated.city || payload.city || newCompany?.city || "",
+                            state: updated.state || payload.state || newCompany?.state || "",
+                            hasCompanyVAT: 1,
+                            BlockedCVatNO: 0,
+                            profileID,
+                            propertyID,
+                            resNo,
+                            OldCompanyID: payload.oldCompany || payload.OldCompanyID || "",
+                        };
+
+                        setNewCompany(updatedCompany);
+                        setReserva((r) => ({
+                            ...r,
+                            hasCompanyVAT: 1,
+                            BlockedCVatNO: 0,
+                            Company: updatedCompany.companyName,
+                            CompanyVatNo: updatedCompany.vatNo,
+                            CompanyID: updatedCompany.companyID,
+                        }));
+                    } catch (err) {
+                        console.error("Erro ao salvar Company VAT:", err);
+                        errors.push(t.frontOffice.registrationForm.errors.errorSavingDocument);
+                        setErrorMessage(errors.join("\n"));
+                        setIsErrorModalOpen(true);
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao salvar endereço ou Personal ID:", error);
+                errors.push(t.frontOffice.registrationForm.errors.errorSavingDocument);
+                setErrorMessage(errors.join("\n"));
+                setIsErrorModalOpen(true);
+                return;
             }
 
-            setSuccessMessage("Registration sent successfully");
-            setIsSuccessModalOpen(true);
+            let emailToSend = email !== initialEmail ? email : initialEmail; // Envia undefined se não houver alteração
+            let vatNoToSend = vatNo !== initialVatNo ? vatNo : initialVatNo; // Envia undefined se não houver alteração
+            let phoneToSend = phone !== initialPhone ? phone : initialPhone;
+
+            // Se houver alterações (ou valores a serem enviados), envia para a API
+            if (emailToSend || vatNoToSend) {
+                try {
+                    const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
+                        email: emailToSend,
+                        vatNo: vatNoToSend,
+                        phone: phoneToSend,
+                        registerID: profileID,
+                        propertyID: propertyID
+                    });
+                    console.log('Alterações salvas com sucesso:', response.data);
+                } catch (error) {
+                    console.error('Erro ao salvar alterações:', error);
+                    errors.push(t.frontOffice.registrationForm.errors.contactSupport);
+                    setErrorMessage(errors.join("\n"));
+                    setIsErrorModalOpen(true);
+                    return;
+                }
+            }
+
+            // Captura a assinatura e gera o PDF
+            try {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+
+                const signatureBase64 = canvas.toDataURL().split(',')[1]; // Remove prefixo "data:..."
+
+                const reservaDetails = {
+                    // Detalhes da reserva
+                    PropertyID: propertyID,
+                    ResNo: reserva.ResNo,
+                    Room: reserva.Room,
+                    DateCI: reserva.DateCI,
+                    DateCO: reserva.DateCO,
+                    Adults: reserva.Adults,
+                    Childs: reserva.Childs,
+                    LastName: guestInfo.LastName,
+                    FirstName: guestInfo.FirstName,
+
+                    // Usa addressData se existir, senão fallback para address
+                    Street: addressData?.Street ?? address.Street,
+                    Country: addressData?.Country ?? address.Country,
+
+                    // Usa personalIDData se existir, senão fallback para personalID
+                    IdDoc: personalIDData?.IDDoc ?? personalID.IDDoc,
+                    NrDoc: pid.NrDoc ?? personalIDData?.NrDoc ?? personalID.NrDoc,
+                    ExpDate: personalIDData?.ExpDate ?? personalID.ExpDate,
+                    DateOfBirth: personalIDData?.DateOfBirth ?? personalID.DateOfBirth,
+                    Issue: personalIDData?.Issue ?? personalID.Issue,
+                    CountryOfBirth: personalIDData?.CountryOfBirth ?? personalID.CountryOfBirth,
+                    IDCountryOfBirth: personalIDData?.IDCountryOfBirth ?? personalID.IDCountryOfBirth,
+                    IDDocSelect: personalIDData?.IDDocSelect ?? personalID.IDDocSelect,
+                    IDNationality: personalIDData?.IDNationality ?? personalID.IDNationality,
+
+                    Phone: phoneToSend,
+                    VatNo: vatNoToSend,
+                    PersonalEmail: emailToSend,
+                    ProtectionPolicy: policyAccepted,
+                    HotelName: hotelName,
+                    HotelTermsEN: hotelTerms,
+                    HotelPhone: hotelPhone,
+                    HotelEmail: hotelEmail,
+                    HotelAddress: hotelAddress,
+                    HotelPostalCode: hotelPostalCode,
+                    HotelNIF: hotelNIF,
+                    HotelRNET: hotelRNET,
+                    RateCode: reserva.RateCode,
+                    Locale: locale, // passa a variavel de idioma
+                };
+                console.log("Detalhes da reserva para o PDF:", reservaDetails);
+                // Geração do PDF
+                const pdfDoc = await generatePDFTemplate(reservaDetails, `data:image/png;base64,${signatureBase64}`);
+                const pdfBlob = pdfDoc.output('blob'); // Gerar o PDF como um Blob
+                // Compressão do PDF com pako (gzip)
+                const pdfArrayBuffer = await pdfBlob.arrayBuffer();
+                const compressedPdf = pako.gzip(new Uint8Array(pdfArrayBuffer)); // Comprime usando gzip
+
+                // Codificação do PDF comprimido em Base64
+                const pdfBase64 = btoa(String.fromCharCode(...compressedPdf));
+                console.log(pdfBase64);
+                // Envia os dados via Axios
+                const response = await axios.post(
+                    "/api/reservations/checkins/registration_form_base64",
+                    {
+                        PropertyID: propertyID,
+                        pdfBase64: pdfBase64, // Envia o PDF comprimido em Base64
+                        fileName: `RegistrationForm_ResNo_${reserva.ResNo}_TC_${termsAccepted ? 1 : 0}_DPP_${policyAccepted ? 1 : 0}_ProfileID_${guestInfo.ProfileID}.pdf`,
+                    }
+                );
+
+                console.log('Resposta da API:', response.data);
+                // Atualiza o campo 'seen' no backend
+                try {
+                    await axios.post('/api/reservations/checkins/registrationForm/updateSeen', {
+                        requestID: requestID
+                    });
+                    console.log("Campo 'seen' atualizado com sucesso.");
+                } catch (err) {
+                    console.error("Erro ao atualizar campo 'seen':", err);
+                }
+
+                setSuccessMessage("Registration sent successfully");
+                setIsSuccessModalOpen(true);
+            } catch (error) {
+                console.error('Erro ao gerar ou enviar o PDF:', error);
+                errors.push(t.frontOffice.registrationForm.errors.generateFormError);
+                setErrorMessage(errors.join("\n"));
+                setIsErrorModalOpen(true);
+            }
+
         } catch (error) {
-            console.error('Erro ao gerar ou enviar o PDF:', error);
-            errors.push(t.frontOffice.registrationForm.errors.generateFormError);
-            setErrorMessage(errors.join("\n"));
-            setIsErrorModalOpen(true);
+            console.error("Erro no envio:", error);
+        } finally {
+            // 🔹 Re-enable the button once everything is finished
+            setIsSubmitting(false);
         }
     };
-
     const clearSignature = () => {
         const canvas = canvasRef.current;
         if (canvas) {
@@ -844,38 +1331,39 @@ export default function Page() {
         }));
     };
 
-const handleSaveMissing = () => {
-    let updatedGuestInfo = { ...guestInfo };
-    let updatedAddressData = { ...addressData };
-    let updatedPersonalIDData = { ...personalIDData };
+    const handleSaveMissing = () => {
+        let updatedGuestInfo = { ...guestInfo };
+        let updatedAddressData = { ...addressData };
+        let updatedPersonalIDData = { ...personalIDData };
 
-    missingFields.forEach((field) => {
-        const value = field.ref?.value || "";
-        switch (field.target) {
-            case "guestInfo":
-                updatedGuestInfo[field.key] = value;
-                break;
-            case "addressData":
-                updatedAddressData[field.key] = value;
-                break;
-            case "personalIDData":
-                updatedPersonalIDData[field.key] = value;
-                break;
-        }
-    });
+        missingFields.forEach((field) => {
+            const value = missingValues[field.key] ?? "";
+            switch (field.target) {
+                case "guestInfo":
+                    updatedGuestInfo[field.key] = value;
+                    break;
+                case "addressData":
+                    updatedAddressData[field.key] = value;
+                    break;
+                case "personalIDData":
+                    updatedPersonalIDData[field.key] = value;
+                    break;
+            }
+        });
 
-    flushSync(() => {
-        setGuestInfo(updatedGuestInfo);
-        setAddressData(updatedAddressData);
-        setPersonalIDData(updatedPersonalIDData);
-        setIsMissingFieldsModalOpen(false);
-    });
+        flushSync(() => {
+            setGuestInfo(updatedGuestInfo);
+            setAddressData(updatedAddressData);
+            setPersonalIDData(updatedPersonalIDData);
+            setPersonalID(updatedPersonalIDData);
+            setIsMissingFieldsModalOpen(false);
+        });
 
-    // Passa os dados atualizados para handleOkClick diretamente
-    setTimeout(() => {
-        handleOkClick({ skipMissingCheck: true }); // você precisará adicionar esse parâmetro
-    }, 3000);
-};
+        // Chama handleOkClick passando os dados atualizados
+        handleOkClick({ skipMissingCheck: true, guestInfo: updatedGuestInfo, addressData: updatedAddressData, personalIDData: updatedPersonalIDData });
+    };
+
+
 
     return (
         <div className='bg-background main-page min-h-screen'>
@@ -1307,7 +1795,7 @@ const handleSaveMissing = () => {
                                                         console.log("Dados recebidos do modal PersonalID:", newPersonalIDData);
                                                         setPersonalIDData(newPersonalIDData); // armazena no state local
                                                     }}
-                                                    personalID={personalID} // passa o state atual
+                                                    personalID={personalID}
                                                     profileID={profileID}
                                                     propertyID={propertyID}
                                                     t={t}
@@ -1694,7 +2182,21 @@ const handleSaveMissing = () => {
                                             profileID={guestInfo.ProfileID}
                                             resNo={reserva.ResNo}
                                             companyID={reserva.CompanyID}
-                                            onSave={(payload) => setNewCompany(payload)}
+                                            onSave={(payload) => {
+                                                // force hasCompanyVAT to 1 on insert
+                                                setNewCompany({
+                                                    ...payload,
+                                                    hasCompanyVAT: 1,
+                                                    BlockedCVatNO: 0,
+                                                    OldCompanyID: reserva.CompanyID,
+                                                    profileID: guestInfo.ProfileID,
+                                                    propertyID: propertyID,
+                                                    resNo: reserva.ResNo,
+                                                });
+
+                                                // Also update reserva locally if needed
+                                                reserva.hasCompanyVAT = 1;
+                                            }}
                                         />
                                     )}
                                 </div>
@@ -1859,10 +2361,14 @@ const handleSaveMissing = () => {
 
                                         {/** Botão de aceitar */}
                                         <button
-                                            className='bg-primary font-semibold text-white py-2 px-2 rounded-lg w-20 h-10'
-                                            onClick={handleOkClick}>
-                                            Ok
+                                            onClick={handleOkClick}
+                                            disabled={isSubmitting}
+                                            className={`bg-primary font-semibold text-white py-2 px-4 rounded-lg w-20 h-10 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                                                }`}
+                                        >
+                                            {isSubmitting ? "Processing..." : "OK"}
                                         </button>
+
 
                                         {/** Modal de erro */}
                                         {isErrorModalOpen && errorMessage && (
@@ -1883,43 +2389,59 @@ const handleSaveMissing = () => {
 
                                         {isMissingFieldsModalOpen && (
                                             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                                                <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
-                                                    <h2 className="text-lg font-bold mb-4">{t.frontOffice.registrationForm.errors.pleaseFill}</h2>
-
-                                                    <form className="space-y-3">
-                                                        {missingFields.map((field) => (
-                                                            <div key={field.key} className="flex flex-col">
-                                                                <label className="font-medium mb-1">{field.label}</label>
-                                                                <input
-                                                                    type="text"
-                                                                    className="border rounded-md px-2 py-1"
-                                                                    defaultValue={formData[field.key] || ""}
-                                                                    onChange={(e) =>
-                                                                        setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))
-                                                                    }
-                                                                    // salvamos a ref para pegar o valor atual ao clicar no botão
-                                                                    ref={(el) => (field.ref = el)}
-                                                                />
-                                                            </div>
-                                                        ))}
-                                                    </form>
-                                                    <div className="mt-4 flex justify-end space-x-2">
+                                                <div className="bg-white rounded-xl shadow-lg w-full max-w-xl">
+                                                    {/* Header do Modal com cantos superiores arredondados */}
+                                                    <div className="flex items-center justify-between p-4 border-b bg-primary rounded-t-xl">
+                                                        <h2 className="font-bold text-white">{t.frontOffice.registrationForm.errors.pleaseFill}</h2>
                                                         <button
                                                             onClick={() => setIsMissingFieldsModalOpen(false)}
-                                                            className="bg-gray-300 px-3 py-1 rounded-md"
+                                                            className="text-white hover:text-gray-200"
                                                         >
-                                                            Cancelar
+                                                            ✕
                                                         </button>
-                                                        <button
-                                                            onMouseDown={handleSaveMissing}
-                                                            className="bg-blue-600 text-white px-3 py-1 rounded-md"
-                                                        >
-                                                            Salvar
-                                                        </button>
+                                                    </div>
+
+                                                    {/* Conteúdo do Modal */}
+                                                    <div className="p-6">
+                                                        <form className="space-y-3">
+                                                            {missingFields.map((field) => (
+                                                                <div key={field.key} className="flex flex-col">
+                                                                    <label className="font-medium mb-1">{field.label}</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        className="border rounded-md px-2 py-1"
+                                                                        value={missingValues[field.key] ?? ""}
+                                                                        onChange={(e) =>
+                                                                            setMissingValues((prev) => ({
+                                                                                ...prev,
+                                                                                [field.key]: e.target.value,
+                                                                            }))
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            ))}
+                                                        </form>
+
+                                                        <div className="mt-4 flex justify-end space-x-2">
+                                                            <button
+                                                                onClick={() => setIsMissingFieldsModalOpen(false)}
+                                                                className="bg-gray-300 px-3 py-1 rounded-md"
+                                                            >
+                                                                Cancelar
+                                                            </button>
+                                                            <button
+                                                                onMouseDown={handleSaveMissing}
+                                                                className="bg-primary text-white px-3 py-1 rounded-md"
+                                                            >
+                                                                Salvar
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         )}
+
+
                                     </div>
                                 )}
                             </div>
