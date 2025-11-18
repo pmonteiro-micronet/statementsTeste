@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
-import { Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "@heroui/react";
 
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaGear } from "react-icons/fa6";
@@ -142,73 +141,73 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     sendDataToAPI();
   }, [propertyID]);
 
-  const sendResToAPI = async (ResNo) => {
-    console.log("Enviando ResNumber para a API:", ResNo);
-    const windowValue = 0;
+  // const sendResToAPI = async (ResNo) => {
+  //   console.log("Enviando ResNumber para a API:", ResNo);
+  //   const windowValue = 0;
 
-    try {
-      // Faz a requisição para enviar os dados do statement
-      const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
-        params: {
-          ResNo,
-          window: windowValue,
-          propertyID,
-        },
-      });
+  //   try {
+  //     // Faz a requisição para enviar os dados do statement
+  //     const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
+  //       params: {
+  //         ResNo,
+  //         window: windowValue,
+  //         propertyID,
+  //       },
+  //     });
 
-      console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
-      console.log("Resposta da API ao salvar statement:", saveResponse.data);
+  //     console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
+  //     console.log("Resposta da API ao salvar statement:", saveResponse.data);
 
-      // Se a resposta de salvar o statement foi bem-sucedida, agora verificamos
-      // se o statement foi atualizado ou criado, e pegamos o requestID
-      if (saveResponse.data && saveResponse.data.data && saveResponse.data.data.requestID) {
-        const updatedRecord = saveResponse.data.data;
-        const updatedRequestID = updatedRecord.requestID;
+  //     // Se a resposta de salvar o statement foi bem-sucedida, agora verificamos
+  //     // se o statement foi atualizado ou criado, e pegamos o requestID
+  //     if (saveResponse.data && saveResponse.data.data && saveResponse.data.data.requestID) {
+  //       const updatedRecord = saveResponse.data.data;
+  //       const updatedRequestID = updatedRecord.requestID;
 
-        // Redireciona para a página jsonView com o requestID do registro atualizado
-        console.log("Statement atualizado com requestID:", updatedRequestID);
-        router.push(`/homepage/jsonView?recordID=${updatedRequestID}&propertyID=${propertyID}`);
-      } else {
-        console.warn("Resposta da API não contém requestID.");
-      }
+  //       // Redireciona para a página jsonView com o requestID do registro atualizado
+  //       console.log("Statement atualizado com requestID:", updatedRequestID);
+  //       router.push(`/homepage/jsonView?recordID=${updatedRequestID}&propertyID=${propertyID}`);
+  //     } else {
+  //       console.warn("Resposta da API não contém requestID.");
+  //     }
 
-    } catch (error) {
-      console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
+  //   } catch (error) {
+  //     console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
 
-      if (error.response) {
-        if (error.response.status === 409) {
-          // O status 409 indica que já existe um registro com a mesma uniqueKey
-          console.warn("Registro já existente, buscando o requestID do registro existente.");
+  //     if (error.response) {
+  //       if (error.response.status === 409) {
+  //         // O status 409 indica que já existe um registro com a mesma uniqueKey
+  //         console.warn("Registro já existente, buscando o requestID do registro existente.");
 
-          // Extraia o requestID do erro, caso a API o forneça
-          const existingRequestID = error.response.data?.existingRequestID;
+  //         // Extraia o requestID do erro, caso a API o forneça
+  //         const existingRequestID = error.response.data?.existingRequestID;
 
-          if (existingRequestID) {
-            console.log("Registro existente encontrado com requestID:", existingRequestID);
+  //         if (existingRequestID) {
+  //           console.log("Registro existente encontrado com requestID:", existingRequestID);
 
-            // Redireciona para a página jsonView com o requestID do registro existente
-            router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
-          } else {
-            console.error("Não foi possível encontrar o requestID do registro existente.");
-          }
-        } else if (error.response.status === 500) {
-          // Trata o erro 500
-          setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
-          setIsErrorModalOpen(true);
-        } else {
-          // Outros erros
-          console.log("Erro inesperado:", error.response.data);
-          setErrorMessage("We were unable to fulfill your order. Please contact support.");
-          setIsErrorModalOpen(true);
-        }
-      } else {
-        // Erros que não possuem uma resposta da API (ex: problemas de rede)
-        console.log("Erro inesperado:", error.message);
-        setErrorMessage("We were unable to fulfill your order. Please contact support.");
-        setIsErrorModalOpen(true);
-      }
-    }
-  };
+  //           // Redireciona para a página jsonView com o requestID do registro existente
+  //           router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
+  //         } else {
+  //           console.error("Não foi possível encontrar o requestID do registro existente.");
+  //         }
+  //       } else if (error.response.status === 500) {
+  //         // Trata o erro 500
+  //         setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
+  //         setIsErrorModalOpen(true);
+  //       } else {
+  //         // Outros erros
+  //         console.log("Erro inesperado:", error.response.data);
+  //         setErrorMessage("We were unable to fulfill your order. Please contact support.");
+  //         setIsErrorModalOpen(true);
+  //       }
+  //     } else {
+  //       // Erros que não possuem uma resposta da API (ex: problemas de rede)
+  //       console.log("Erro inesperado:", error.message);
+  //       setErrorMessage("We were unable to fulfill your order. Please contact support.");
+  //       setIsErrorModalOpen(true);
+  //     }
+  //   }
+  // };
 
   const [selectedReserva, setSelectedReserva] = useState(null);
 
@@ -411,6 +410,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   };
 
   const [isOpen, setIsOpen] = useState(false);
+  console.log(isOpen);
   const dropdownRef = useRef(null);
 
   // Fecha dropdown ao clicar fora
@@ -425,12 +425,12 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [setOpenDropdownIndex]);
 
-  const toggleDropdown = (e) => {
-    e.stopPropagation();
-    const newState = !isOpen;
-    setIsOpen(newState);
-    setOpenDropdownIndex(newState ? index : null);
-  };
+  // const toggleDropdown = (e) => {
+  //   e.stopPropagation();
+  //   const newState = !isOpen;
+  //   setIsOpen(newState);
+  //   setOpenDropdownIndex(newState ? index : null);
+  // };
 
   return (
     (<main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">

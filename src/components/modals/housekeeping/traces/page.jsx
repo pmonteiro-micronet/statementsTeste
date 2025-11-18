@@ -16,23 +16,23 @@ const HousekeepingTracesForm = ({
     modalEditArrow,
     modalEdit,
     formTypeModal,
-    roomNumber,
-    dateCI,
-    booker,
-    salutation,
-    lastName,
-    firstName,
-    roomType,
-    resStatus,
-    childs,
-    adults,
-    balance,
-    country,
+    // roomNumber,
+    // dateCI,
+    // booker,
+    // salutation,
+    // lastName,
+    // firstName,
+    // roomType,
+    // resStatus,
+    // childs,
+    // adults,
+    // balance,
+    // country,
     isOpen,
     onClose,
 }) => {
     const [locale, setLocale] = useState("pt");
-
+    
     useEffect(() => {
         // Carregar o idioma do localStorage
         const storedLanguage = localStorage.getItem("language");
