@@ -143,18 +143,15 @@
         },
         "housekeeping": {
             "title": "Housekeeping",
-            "tomorrow": "Tomorrow",
-            "room": "Room",
-            "roomStatus": "ST",
-            "guestName": "Guest Name",
-            "travelAgency": "Travel Agency",
-            "company": "Company",
-            "group": "Group",
-            "notes": "Notes",
-            "resNo": "Res. No.",
             "arrival": "Arrival",
+            "departure": "Departure",
+            "room": "Room",
+            "roomStatus": "Room Status",
+            "guestName": "Guest Name",
+            "maintenance": "Maintenance",
+            "traces": "Traces",
+            "resNo": "Res. No.",
             "info": "Info",
-            "registrationForm": "Registration Form",
             "noReservations": "No reservations found.",
             "attention": "Attention"
         },
@@ -516,6 +513,22 @@
             "newPhone": "New phone number:",
             "current": "Current",
             "new": "New"
+        },
+        "housekeeping": {
+            "maintenance": {
+                "title": "Work Orders",
+                "search": "Search...",
+                "own": "Own",
+                "all": "All",
+                "add": "Add"
+            },
+             "traces": {
+                "title": "Traces",
+                "search": "Search...",
+                "all": "All",
+                "open": "Open",
+                "done": "Done"
+            }
         },
         "errors": {
             "invalidEmail": "Invalid email.",
