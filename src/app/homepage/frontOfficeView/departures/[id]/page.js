@@ -96,7 +96,7 @@ export default function Page({ params }) {
         await sleep(1000);
         //teste
 
-        await axios.get("/api/reservations/info", {
+        await axios.get("/api/reservations/info", { //vai buscar as reservas para hoje e amanha
           params: { mpehotel, propertyID },
         });
 
