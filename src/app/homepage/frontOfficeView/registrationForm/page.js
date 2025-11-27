@@ -1692,6 +1692,26 @@ export default function Page() {
     const [rating, setRating] = useState(0);       // Estrelas selecionadas
     const [hover, setHover] = useState(0);         // Efeito hover (opcional)
 
+    const [isOkEnabled, setIsOkEnabled] = useState(false);
+    // const checkRequiredFields = (fields) => {
+    //     return fields.every(field => {
+    //         if (!field.value || field.value.toString().trim() === "") {
+    //             return false;
+    //         }
+    //         return true;
+    //     });
+    // };
+
+    // const handleFieldChange = (key, value) => {
+    //     setMissingValues(prev => {
+    //         const updated = { ...prev, [key]: value };
+    //         // revalida todos os campos obrigatórios
+    //         const allFilled = requiredFields.every(f => updated[f.key] && updated[f.key].toString().trim() !== "");
+    //         setIsOkEnabled(allFilled);
+    //         return updated;
+    //     });
+    // };
+
     return (
         <div className='bg-background main-page min-h-screen'>
             {/* Exibe o loader enquanto isLoading for verdadeiro */}
@@ -3264,7 +3284,9 @@ export default function Page() {
                                                             <div className="">
                                                                 <button
                                                                     onClick={handleSaveMissing}
-                                                                    className="bg-green text-white text-4xl font-bold px-6 rounded-md h-[70px] w-full flex items-center justify-center"
+                                                                    disabled={!isOkEnabled} // ← desabilitado até preencher
+                                                                    className={`bg-green text-white text-4xl font-bold px-6 rounded-md h-[70px] w-full flex items-center justify-center ${!isOkEnabled ? "opacity-50 cursor-not-allowed" : ""
+                                                                        }`}
                                                                 >
                                                                     OK
                                                                 </button>
