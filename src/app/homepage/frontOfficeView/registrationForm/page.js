@@ -1693,6 +1693,7 @@ export default function Page() {
     const [hover, setHover] = useState(0);         // Efeito hover (opcional)
 
     const [isOkEnabled, setIsOkEnabled] = useState(false);
+    console.log(setIsOkEnabled);
     // const checkRequiredFields = (fields) => {
     //     return fields.every(field => {
     //         if (!field.value || field.value.toString().trim() === "") {
