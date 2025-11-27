@@ -186,7 +186,7 @@
             "countryOfBirth": "Country of Birth",
             "nationality": "Nationality",
             "idDoc": "ID Doc",
-            "idDocNumber": "Nr.",
+            "idDocNumber": "Nr. ID",
             "expDate": "Exp. Date",
             "issue": "Issue",
             "contacts": "Contacts",
@@ -206,14 +206,18 @@
             "insertPin": "Insert PIN",
             "attention": "Attention",
             "errors": {
-                "emptyForm": "Please fill in all required fields to submit the form.",
+                "emptyForm": "Please sign to continue.",
                 "bookingEmail": "The e-mail cannot end with @guest.booking.com.",
-                "pleaseFill":"Please fill in the following required field(s):",
+                "pleaseFill":"Please fill in the required fields",
                 "emptyEmailValidation": "The email field is empty. Do you want to continue anyway?",
                 "errorSavingDocument": "Error saving address or document data. Please try again.",
                 "contactSupport": "There was an issue saving your changes. Please contact support.",
                 "generateFormError":"There was an issue generating or sending the form. Please contact support.",
                 "invalidDate":"The date entered is invalid. Please check the value."
+            },
+            "rating": {
+                "header": "Thank you for your cooperation",
+                "ratingScore": "On a scale of 1 to 5 stars, how would you rate your check-in?"
             }
         },
         "infoModal": {
@@ -494,7 +498,7 @@
             "countryofBirth": "Country of birth",
             "nationality": "Nationality",
             "idDoc": "ID DOC",
-            "idDocNumber": "Nr.",
+            "idDocNumber": "Nr. ID",
             "expDate": "Exp Date",
             "issue": "Issue"
         },

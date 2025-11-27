@@ -143,7 +143,7 @@
                 "support": "No hemos podido completar su solicitud. Por favor, contacte con soporte."
             }
         },
-         "housekeeping": {
+        "housekeeping": {
             "title": "Housekeeping",
             "arrival": "Llegada",
             "departure": "Salida",
@@ -188,7 +188,7 @@
             "countryOfBirth": "País de Nacimiento",
             "nationality": "Nacionalidad",
             "idDoc": "Documento de Identidad",
-            "idDocNumber": "N.º",
+            "idDocNumber": "N.º ID",
             "expDate": "Fecha de Expiración",
             "issue": "Emisión",
             "contacts": "Contactos",
@@ -208,16 +208,19 @@
             "insertPin": "Insertar PIN",
             "attention": "Atención",
             "errors": {
-                "emptyForm": "Por favor, complete todos los campos obligatorios para enviar el formulario.",
+                "emptyForm": "Por favor firme para continuar.",
                 "bookingEmail": "El correo electrónico no puede terminar en @guest.booking.com.",
-                "pleaseFill": "Por favor, complete el/los siguiente(s) campo(s) obligatorio(s):",
+                "pleaseFill": "Por favor, complete los campos obligatorios",
                 "emptyEmailValidation": "El campo de correo electrónico está vacío. ¿Desea continuar de todos modos?",
                 "errorSavingDocument": "Error al guardar la dirección o los datos del documento. Inténtelo de nuevo.",
                 "contactSupport": "Hubo un problema al guardar los cambios. Por favor, contacte con el soporte.",
                 "generateFormError": "Hubo un problema al generar o enviar el formulario. Por favor, contacte con el soporte.",
                 "invalidDate": "La fecha introducida no es válida. Por favor, verifique el valor."
+            },
+            "rating": {
+                "header": "Gracias por su cooperación.",
+                "ratingScore": "En una escala de 1 a 5 estrellas, ¿cómo calificarías tu check-in?"
             }
-
         },
         "infoModal": {
             "arrival": {
@@ -524,7 +527,7 @@
                 "all": "Todos",
                 "add": "Agregar"
             },
-              "traces": {
+            "traces": {
                 "title": "Lista",
                 "search": "Buscar...",
                 "all": "Todos",

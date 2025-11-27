@@ -188,7 +188,7 @@
             "countryOfBirth": "País de Nascimento",
             "nationality": "Nacionalidade",
             "idDoc": "Documento de Identificação",
-            "idDocNumber": "N.º",
+            "idDocNumber": "N.º ID",
             "expDate": "Data de Expiração",
             "issue": "Emissão",
             "contacts": "Contactos",
@@ -208,14 +208,18 @@
             "insertPin": "Inserir PIN",
             "attention": "Atenção",
             "errors": {
-                "emptyForm": "Por favor, preencha todos os campos obrigatórios para enviar o formulário.",
+                "emptyForm": "Por favor, assine para continuar",
                 "bookingEmail": "O e-mail não pode terminar com @guest.booking.com.",
-                "pleaseFill": "Por favor, preencha o(s) seguinte(s) campo(s) obrigatório(s):",
+                "pleaseFill": "Por favor, preencha os campos obrigatórios",
                 "emptyEmailValidation": "O campo de e-mail está vazio. Deseja continuar mesmo assim?",
                 "errorSavingDocument": "Erro ao guardar o endereço ou os dados do documento. Tente novamente.",
                 "contactSupport": "Ocorreu um problema ao guardar as suas alterações. Por favor, contacte o suporte.",
                 "generateFormError": "Ocorreu um problema ao gerar ou enviar o formulário. Por favor, contacte o suporte.",
                 "invalidDate": "A data inserida é inválida. Por favor, verifique o valor."
+            },
+              "rating": {
+                "header": "Agradecemos a sua colaboração",
+                "ratingScore": "De 1 a 5 estrelas, como avalia o seu check-in?"
             }
         },
         "infoModal": {
@@ -456,8 +460,8 @@
         "companyInfo": {
             "insert": "Empresa",
             "update": "Empresa",
-            "companyName": "Nome da empresa:",
-            "vatNO": "N.º de contribuinte:",
+            "companyName": "Nome da empresa",
+            "vatNO": "N.º de contribuinte",
             "streetAddress": "Morada:",
             "zipCode": "Código postal:",
             "city": "Cidade:",
