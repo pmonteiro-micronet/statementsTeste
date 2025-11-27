@@ -21,11 +21,19 @@ import EditRegistrationForm from "@/components/modals/arrivals/reservationForm/e
 // import BeforeCompanyVat from "@/components/modals/arrivals/reservationForm/companyVAT/beforeInfo/page";
 import MultiModalManager from "@/components/modals/arrivals/reservationForm/companyVAT/page";
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
+import RatingForm from "@/components/modals/rating/page.jsx";
 import SuccessRegistrationForm from "@/components/modals/arrivals/reservationForm/success/page";
 import LoadingBackdrop from "@/components/Loader/page";
 import PersonalIDForm from "@/components/modals/arrivals/reservationForm/PersonalID/page";
 import { FaPlusCircle } from "react-icons/fa";
 import AddressForm from "@/components/modals/arrivals/reservationForm/address/page"
+
+import DatePicker from "react-datepicker";
+import { AiOutlineCalendar } from "react-icons/ai";
+import { FaRegStar } from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
+import { FaPhone } from "react-icons/fa";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -82,6 +90,7 @@ export default function Page() {
     const [personalIDData, setPersonalIDData] = useState({});
 
     const [newCompany, setNewCompany] = useState(null);
+    const [showRatingModal, setShowRatingModal] = useState(false);
 
 
     // useEffect(() => {
@@ -402,8 +411,6 @@ export default function Page() {
     const [requiredFields, setRequiredFields] = useState([]);
 
     const [isMissingFieldsModalOpen, setIsMissingFieldsModalOpen] = useState(false);
-    const [formData, setFormData] = useState({});
-    console.log(formData);
 
     //    const handleOkClick = async ({ skipMissingCheck = false } = {}) => {
     //     let errors = [];
@@ -767,8 +774,10 @@ export default function Page() {
         guestInfo: gi = guestInfo,
         addressData: ad = addressData,
         personalIDData: pid = personalIDData,
+        contactsData: ct = contacts,
+        reservaData: rs = reserva
     } = {}) => {
-        console.log("Address: ", ad);
+        console.log("Contactos: ", rs);
         let errors = [];
 
         if (isSubmitting) return; // prevent multiple clicks
@@ -785,96 +794,144 @@ export default function Page() {
             }
             if (!skipMissingCheck) {
 
-    // 1️⃣ Detectar campos em falta (lógica original)
-    let missingFields = [];
+                // 1️⃣ Detectar campos em falta (lógica original)
+                let missingFields = [];
 
-    const getValue = (dataObj, fallbackObj, field) => {
-        return dataObj?.[field] ?? fallbackObj?.[field];
-    };
+                const getValue = (dataObj, fallbackObj, field) => {
+                    return dataObj?.[field] ?? fallbackObj?.[field];
+                };
 
-    if (!getValue(null, guestInfo, "LastName"))
-        missingFields.push({ key: "LastName" });
+                if (!getValue(null, guestInfo, "LastName"))
+                    missingFields.push({ key: "LastName" });
 
-    if (!getValue(addressData, address, "Country"))
-        missingFields.push({ key: "Country" });
+                if (!getValue(addressData, address, "Country"))
+                    missingFields.push({ key: "Country" });
 
-    if (!getValue(personalIDData, personalID, "IDDoc"))
-        missingFields.push({ key: "IDDoc" });
+                if (!getValue(personalIDData, personalID, "IDDoc"))
+                    missingFields.push({ key: "IDDoc" });
 
-    if (!getValue(personalIDData, personalID, "NrDoc"))
-        missingFields.push({ key: "NrDoc" });
+                if (!getValue(personalIDData, personalID, "NrDoc"))
+                    missingFields.push({ key: "NrDoc" });
 
-    if (!getValue(personalIDData, personalID, "CountryOfBirth"))
-        missingFields.push({ key: "CountryOfBirth" });
+                if (!getValue(personalIDData, personalID, "CountryOfBirth"))
+                    missingFields.push({ key: "CountryOfBirth" });
 
-    const dob = getValue(personalIDData, personalID, "DateOfBirth");
-    if (!dob || dob.split("T")[0] === "1900-01-01")
-        missingFields.push({ key: "DateOfBirth" });
+                const dob = getValue(personalIDData, personalID, "DateOfBirth");
+                if (!dob || dob.split("T")[0] === "1900-01-01")
+                    missingFields.push({ key: "DateOfBirth" });
 
-    console.log("🔎 Missing fields detected:", missingFields);
+                console.log("🔎 Missing fields detected:", missingFields);
 
-    // 2️⃣ criar allFields AGORA (antes de usar)
-    const allFields = [
-        {
-            key: "LastName",
-            label: t.frontOffice.registrationForm.lastName,
-            value: getValue(null, guestInfo, "LastName") ?? "",
-            target: "guestInfo"
-        },
-        {
-            key: "Country",
-            label: t.frontOffice.registrationForm.country,
-            value: getValue(addressData, address, "Country") ?? "",
-            CountryID: getValue(addressData, address, "CountryID") ?? "",
-            target: "addressData"
-        },
-        {
-            key: "IDDoc",
-            label: t.frontOffice.registrationForm.idDoc,
-            value: getValue(personalIDData, personalID, "IDDoc") ?? "",
-            target: "personalIDData"
-        },
-        {
-            key: "NrDoc",
-            label: t.frontOffice.registrationForm.idDocNumber,
-            value: getValue(personalIDData, personalID, "NrDoc") ?? "",
-            target: "personalIDData"
-        },
-        {
-            key: "CountryOfBirth",
-            label: t.frontOffice.registrationForm.countryOfBirth,
-            value: getValue(personalIDData, personalID, "CountryOfBirth") ?? "",
-            target: "personalIDData"
-        },
-        {
-            key: "DateOfBirth",
-            label: t.frontOffice.registrationForm.dateOfBirth,
-            value: dob && dob.split("T")[0] !== "1900-01-01" ? dob : "",
-            target: "personalIDData"
-        },
-    ];
+                // 2️⃣ criar allFields AGORA (antes de usar)
+                const allFields = [
+                    {
+                        key: "LastName",
+                        label: t.frontOffice.registrationForm.lastName,
+                        value: getValue(null, guestInfo, "LastName") ?? "",
+                        target: "guestInfo"
+                    },
+                    {
+                        key: "email",
+                        label: t.frontOffice.registrationForm.personalEmail,
+                        value: getValue(null, contacts, "Email") ?? "",
+                        target: "contacts"
+                    },
+                    {
+                        key: "phone",
+                        label: t.frontOffice.registrationForm.phoneNumber,
+                        value: getValue(null, contacts, "PhoneNumber") ?? "",
+                        target: "contacts"
+                    },
+                    {
+                        key: "vatNo",
+                        label: t.frontOffice.registrationForm.vatNr,
+                        value: getValue(null, contacts, "VatNo") ?? "",
+                        target: "contacts"
+                    },
+                    {
+                        key: "CompanyName",
+                        label: t.modals.companyInfo.companyName,
+                        value: getValue(null, reserva, "companyName") ?? "",
+                        target: "reserva"
+                    },
+                    {
+                        key: "CompanyVatNo",
+                        label: t.frontOffice.registrationForm.vatNr,
+                        value: getValue(null, reserva, "CompanyVatNo") ?? "",
+                        target: "reserva"
+                    },
+                    {
+                        key: "Country",
+                        label: t.frontOffice.registrationForm.country,
+                        value: getValue(addressData, address, "Country") ?? "",
+                        CountryID: getValue(addressData, address, "CountryID") ?? "",
+                        target: "addressData"
+                    },
+                    {
+                        key: "IDDoc",
+                        label: t.frontOffice.registrationForm.idDoc,
+                        value: getValue(personalIDData, personalID, "IDDoc") ?? "",
+                        IDDocID: getValue(personalIDData, personalID, "IDDocID") ?? "",
+                        target: "personalIDData"
+                    },
+                    {
+                        key: "NrDoc",
+                        label: t.frontOffice.registrationForm.idDocNumber,
+                        value: getValue(personalIDData, personalID, "NrDoc") ?? "",
+                        target: "personalIDData"
+                    },
+                    {
+                        key: "CountryOfBirth",
+                        label: t.frontOffice.registrationForm.countryOfBirth,
+                        value: getValue(personalIDData, personalID, "CountryOfBirth") ?? "",
+                        CountryOfBirthID: getValue(personalIDData, personalID, "CountryOfBirthID") ?? "",
+                        target: "personalIDData"
+                    },
+                    {
+                        key: "Nationality",
+                        label: t.frontOffice.registrationForm.nationality,
+                        value: getValue(personalIDData, personalID, "Nationality") ?? "",
+                        NationalityID: getValue(personalIDData, personalID, "NationalityID") ?? "",
+                        target: "personalIDData"
+                    },
+                    {
+                        key: "DateOfBirth",
+                        label: t.frontOffice.registrationForm.dateOfBirth,
+                        value: dob && dob.split("T")[0] !== "1900-01-01" ? dob : "",
+                        target: "personalIDData"
+                    },
+                ];
 
-    // 3️⃣ Abrir modal APENAS se houver missing fields
-    if (missingFields.length > 0) {
-        console.log("⚠️ Existem campos em falta. Abrindo modal...");
+                // 3️⃣ Abrir modal APENAS se houver missing fields
+                if (missingFields.length > 0) {
+                    console.log("⚠️ Existem campos em falta. Abrindo modal...");
 
-        setRequiredFields(allFields);
-        setMissingValues(
-            allFields.reduce((acc, f) => {
-                acc[f.key] = f.value ?? "";
-                if (f.key === "Country") {
-                    acc["CountryID"] = f.CountryID ?? "";
+                    setRequiredFields(allFields);
+                    setMissingValues(
+                        allFields.reduce((acc, f) => {
+                            acc[f.key] = f.value ?? "";
+                            if (f.key === "Country") {
+                                acc["CountryID"] = f.CountryID ?? "";
+                            }
+                            if (f.key === "CountryOfBirth") {
+                                acc["CountryOfBirthID"] = f.CountryOfBirthID ?? "";
+                            }
+                            if (f.key === "Nationality") {
+                                acc["NationalityID"] = f.NationalityID ?? "";
+                            }
+                            if (f.key === "IDDoc") {
+                                acc["IDDocID"] = f.IDDocID ?? "";
+                            }
+                            return acc;
+                        }, {})
+                    );
+                    setIsMissingFieldsModalOpen(true);
+                    return;  // ← impede abrir quando não há missing!
                 }
-                return acc;
-            }, {})
-        );
-        setIsMissingFieldsModalOpen(true);
-        return;  // ← impede abrir quando não há missing!
-    }
 
-    // 4️⃣ Se chegou aqui → nenhum campo em falta
-    console.log("Nenhum campo em falta → continuar sem mostrar modal.");
-}
+                // 4️⃣ Se chegou aqui → nenhum campo em falta
+                console.log("Nenhum campo em falta → continuar sem mostrar modal.");
+            }
 
 
             // const effectiveEmail = email || initialEmail || contacts.Email;
@@ -915,9 +972,9 @@ export default function Page() {
                 // atualiza o personalID
                 const payloadPersonalID = {
                     DateOfBirth: pid.DateOfBirth || missingValues.DateOfBirth,
-                    CountryOfBirth: pid.CountryOfBirth || missingValues.CountryOfBirth, // assumindo que você guardou o ID aqui
-                    Nationality: personalIDData.NationalityID,       // idem
-                    IDDoc: pid.IDDocID || missingValues.IDDocID,                   // idem
+                    CountryOfBirth: pid.CountryOfBirthID || missingValues.CountryOfBirthID || personalIDData.CountryOfBirthID, // assumindo que você guardou o ID aqui
+                    Nationality: pid.NationalityID || missingValues.NationalityID || personalIDData.NationalityID,       // idem
+                    IDDoc: pid.IDDocID || missingValues.IDDocID || personalIDData.IDDocID,                   // idem
                     DocNr: pid.NrDoc || missingValues.NrDoc,
                     ExpDate: personalIDData.ExpDate,
                     Issue: personalIDData.Issue,
@@ -1073,12 +1130,53 @@ export default function Page() {
                 return;
             }
 
-            let emailToSend = email !== initialEmail ? email : initialEmail; // Envia undefined se não houver alteração
-            let vatNoToSend = vatNo !== initialVatNo ? vatNo : initialVatNo; // Envia undefined se não houver alteração
-            let phoneToSend = phone !== initialPhone ? phone : initialPhone;
+            let emailToSend;
+
+            // 1️⃣ Se ct.email tiver valor, este tem prioridade
+            if (ct.email && ct.email.trim() !== "") {
+                emailToSend = ct.email.trim();
+            }
+            // 2️⃣ Se ct.email estiver vazio mas o email foi alterado
+            else if (email.trim() !== initialEmail.trim()) {
+                emailToSend = email.trim();
+            }
+            // 3️⃣ Caso contrário, não envia nada
+            else {
+                emailToSend = undefined;
+            } // Envia undefined se não houver alteração
+
+            let vatNoToSend;
+
+            // 1️⃣ Se ct.phone tiver valor, este tem prioridade
+            if (ct.vatNo && ct.vatNo.trim() !== "") {
+                vatNoToSend = ct.vatNo.trim();
+            }
+            // 2️⃣ Se ct.email estiver vazio mas o email foi alterado
+            else if (vatNo.trim() !== initialVatNo.trim()) {
+                vatNoToSend = vatNo.trim();
+            }
+            // 3️⃣ Caso contrário, não envia nada
+            else {
+                vatNoToSend = undefined;
+            } // Envia undefined se não houver alteração
+
+            let phoneToSend;
+
+            // 1️⃣ Se ct.phone tiver valor, este tem prioridade
+            if (ct.phone && ct.phone.trim() !== "") {
+                phoneToSend = ct.phone.trim();
+            }
+            // 2️⃣ Se ct.email estiver vazio mas o email foi alterado
+            else if (phone.trim() !== initialPhone.trim()) {
+                phoneToSend = phone.trim();
+            }
+            // 3️⃣ Caso contrário, não envia nada
+            else {
+                phoneToSend = undefined;
+            } // Envia undefined se não houver alteração
 
             // Se houver alterações (ou valores a serem enviados), envia para a API
-            if (emailToSend || vatNoToSend) {
+            if (emailToSend || vatNoToSend || phoneToSend) {
                 try {
                     const response = await axios.post(`/api/reservations/checkins/registrationForm/valuesEdited`, {
                         email: emailToSend,
@@ -1254,12 +1352,12 @@ export default function Page() {
 
                 if (newEmail) {
                     setEmail(newEmail);
-                    setInitialEmail(newEmail); // atualiza valor inicial também
+                    // setInitialEmail(newEmail); // atualiza valor inicial também
                 }
 
                 if (newPhone) {
                     setPhone(newPhone);
-                    setInitialPhone(newPhone);
+                    // setInitialPhone(newPhone); //mudar aqui talvez !!!!!!!
                 }
             }
         } else if (modalField === "VAT No.") {
@@ -1400,10 +1498,17 @@ export default function Page() {
     // };
 
     const handleSaveMissing = () => {
+        if (!rating) {
+            // usuário não avaliou → abre o modal
+            setShowRatingModal(true);
+            return;
+        }
         // Cria cópias dos states atuais
         let updatedGuestInfo = { ...guestInfo };
         let updatedAddressData = { ...addressData };
         let updatedPersonalIDData = { ...personalIDData };
+        let updatedContactsData = { ...contacts };
+        let updatedCompanyData = { ...reserva };
 
         // Atualiza os campos que estavam em falta
         missingFields.forEach((field) => {
@@ -1421,15 +1526,59 @@ export default function Page() {
                 case "personalIDData":
                     updatedPersonalIDData[field.key] = value;
                     break;
+
+                case "contacts":
+                    updatedContactsData[field.key] = value;
+                    break;
+
+                case "reserva":
+                    updatedCompanyData[field.key] = value;
+                    break;
             }
         });
 
-        // 🔥 Garantir que Country e CountryID são sempre atualizados
+        // Garantir que Country e CountryID são sempre atualizados
         if (missingValues["Country"]) {
             updatedAddressData["Country"] = missingValues["Country"];
         }
         if (missingValues["CountryID"]) {
             updatedAddressData["CountryID"] = missingValues["CountryID"];
+        }
+        if (missingValues["CountryOfBirth"]) {
+            updatedPersonalIDData["CountryOfBirth"] = missingValues["CountryOfBirth"];
+        }
+        if (missingValues["CountryOfBirthID"]) {
+            updatedPersonalIDData["CountryOfBirthID"] = missingValues["CountryOfBirthID"];
+        }
+        if (missingValues["Nationality"]) {
+            updatedPersonalIDData["Nationality"] = missingValues["Nationality"];
+        }
+        if (missingValues["NationalityID"]) {
+            updatedPersonalIDData["NationalityID"] = missingValues["NationalityID"];
+        }
+        if (missingValues["IDDoc"]) {
+            updatedPersonalIDData["IDDoc"] = missingValues["IDDoc"];
+        }
+        if (missingValues["IDDocID"]) {
+            updatedPersonalIDData["IDDocID"] = missingValues["IDDocID"];
+        }
+        if (missingValues["DateOfBirth"]) {
+            updatedPersonalIDData["DateOfBirth"] = missingValues["DateOfBirth"];
+        }
+        if (missingValues["email"]) {
+            updatedContactsData["email"] = missingValues["email"];
+        }
+        if (missingValues["phone"]) {
+            updatedContactsData["phone"] = missingValues["phone"];
+        }
+        if (missingValues["vatNo"]) {
+            updatedContactsData["vatNo"] = missingValues["vatNo"];
+        }
+        if (missingValues["CompanyName"]) {
+            updatedCompanyData["CompanyName"] = missingValues["CompanyName"];
+        }
+        if (missingValues["CompanyVatNo"]) {
+            updatedCompanyData["CompanyVatNo"] = missingValues["CompanyVatNo"];
         }
 
         // Atualiza os states de forma síncrona
@@ -1437,7 +1586,9 @@ export default function Page() {
             setGuestInfo(updatedGuestInfo);
             setAddressData(updatedAddressData);
             setPersonalIDData(updatedPersonalIDData);
+            setContacts(updatedContactsData);
             setPersonalID(updatedPersonalIDData);
+            setReserva(updatedCompanyData);
             setIsMissingFieldsModalOpen(false);
         });
 
@@ -1446,34 +1597,11 @@ export default function Page() {
             skipMissingCheck: true,
             guestInfo: updatedGuestInfo,
             addressData: updatedAddressData,
-            personalIDData: updatedPersonalIDData
+            personalIDData: updatedPersonalIDData,
+            contacts: updatedContactsData,
+            reserva: updatedCompanyData
         });
     };
-
-    const blockFieldLine1 = [
-        "DateOfBirth",
-        "Country",
-        "CountryOfBirth",
-        "IDDoc",
-        "NrDoc",
-        "Nationality"
-    ];
-
-    const blockFieldLine3 = [
-        "Email",
-        "Phone"
-    ];
-
-    const blockFieldLine4 = [
-        "LastName",
-        "VatIndividual",
-        "Company",
-        "VatCompany"
-    ];
-
-    const filledBlock1 = blockFieldLine1.every(f => missingValues[f]);
-    const filledBlock3 = blockFieldLine3.every(f => missingValues[f]);
-    const filledBlock4 = blockFieldLine4.every(f => missingValues[f]);
 
     const [countryOptions, setCountryOptions] = useState([]);
     const [docTypeOptions, setDocTypeOptions] = useState([]);
@@ -1524,6 +1652,45 @@ export default function Page() {
         };
         fetchDocTypes();
     }, [propertyID]);
+
+    const [missingDobError, setMissingDobError] = useState("");
+    const missingDobRef = useRef();
+
+    // Converte string "aaaa/mm/dd" para Date
+    const parseDate = (value) => {
+        if (!value || typeof value !== "string") return null;
+
+        const parts = value.split("-");
+        if (parts.length !== 3) return null;
+
+        const [yyyy, mm, dd] = parts;
+
+        const year = Number(yyyy);
+        const month = Number(mm);
+        const day = Number(dd);
+
+        // Verifica se os números são válidos
+        if (!year || !month || !day) return null;
+
+        // Cria a data
+        const date = new Date(year, month - 1, day);
+
+        // Verifica se a data é REAL
+        if (
+            date.getFullYear() !== year ||
+            date.getMonth() !== month - 1 ||
+            date.getDate() !== day
+        ) {
+            return null; // ⚠ Se a data não é válida → devolve null
+        }
+
+        return date;
+    };
+
+    const [selectedType, setSelectedType] = useState("individual");
+
+    const [rating, setRating] = useState(0);       // Estrelas selecionadas
+    const [hover, setHover] = useState(0);         // Efeito hover (opcional)
 
     return (
         <div className='bg-background main-page min-h-screen'>
@@ -2526,7 +2693,7 @@ export default function Page() {
                                             className={`bg-primary font-semibold text-white py-2 px-4 rounded-lg w-20 h-10 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                                                 }`}
                                         >
-                                            {isSubmitting ? "Processing..." : "OK"}
+                                            {isSubmitting ? "OK" : "OK"}
                                         </button>
 
 
@@ -2549,7 +2716,7 @@ export default function Page() {
 
                                         {isMissingFieldsModalOpen && (
                                             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                                                <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl">
+                                                <div className="bg-white rounded-xl shadow-lg w-full max-w-6xl">
 
                                                     {/* HEADER */}
                                                     <div className="flex items-center justify-between p-4 border-b bg-primary rounded-t-xl">
@@ -2563,255 +2730,557 @@ export default function Page() {
                                                     </div>
 
                                                     {/* CONTENT */}
-                                                    <div className="p-6 space-y-6">
+                                                    <div className="p-4 grid grid-cols-6 gap-2 h-full -mt-2">
 
-                                                        {/* ✔️ LINHA 1 + 2 COM BOTÃO ANTES */}
-                                                        <div className="grid grid-cols-6 gap-4 items-end">
+                                                        <div className="col-span-5 space-y-6 h-full">
 
-                                                            {/* Botão ANTES que ocupa as 2 linhas */}
-                                                            <button
-                                                                className="bg-gray-100 text-white px-3 py-2 rounded-md h-full row-span-2"
-                                                            >
-                                                                {filledBlock1 ? "✔️" : "✖️"}
-                                                            </button>
+                                                            {/* ✔️ LINHA 1 + 2 COM BOTÃO ANTES */}
+                                                            <div className="gap-2 items-end flex flex-col bg-gray-100 p-1 rounded-lg w-full">
 
-                                                            {/* Container cinzento (inputs linha 1 e 2) */}
-                                                            <div className="col-span-4 row-span-2 grid grid-cols-3 gap-4 bg-gray-200 p-2 rounded-lg">
+                                                                {/* Container cinzento (inputs linha 1 e 2) */}
+                                                                {/* <div className="row-span-2 grid grid-cols-3 gap-y-0.25 gap-2 bg-gray-100 p-2 rounded-lg"> */}
+                                                                {/* --- COLUNA 1: DateOfBirth (completo) --- */}
+                                                                <div className='flex flex-row gap-2 w-full justify-between'>
+                                                                    <div className="gap-2 flex-1">
+                                                                        <p className='text-xs text-gray-500'>{t.frontOffice.registrationForm.dateOfBirth}</p>
+                                                                        <div className="flex items-center gap-2 w-full">
 
-                                                                {/* Linha 1 */}
-                                                                {/* DateOfBirth continua como input */}
-                                                                <input
-                                                                    type="text"
-                                                                    className="border rounded-md px-2 py-1"
-                                                                    placeholder={requiredFields.find(f => f.key === "DateOfBirth")?.label}
-                                                                    value={missingValues["DateOfBirth"] ?? ""}
-                                                                    onChange={(e) =>
-                                                                        setMissingValues(prev => ({ ...prev, DateOfBirth: e.target.value }))
-                                                                    }
-                                                                />
+                                                                            <input
+                                                                                type="text"
+                                                                                className={`border rounded-md px-2 py-1 w-full 
+                                                                                ${missingDobError ? "border-red-500" : "border-gray-300"}
+                                                                                ${!missingValues["DateOfBirth"] ? "border-red-500" : "border-gray-300"}
+                                                                                `}
+                                                                                placeholder={
+                                                                                    requiredFields.find(f => f.key === "DateOfBirth")?.label || "aaaa-mm-dd"
+                                                                                }
+                                                                                value={missingValues["DateOfBirth"] ?? ""}
+                                                                                maxLength={10}
+                                                                                onChange={(e) => {
+                                                                                    let value = e.target.value.replace(/\D/g, "");
 
-                                                                {/* Country */}
-                                                                <Select
-                                                                    options={countryOptions}
-                                                                    value={countryOptions.find(
-                                                                        option => option.label === missingValues["Country"]
-                                                                    )}
-                                                                    onChange={(selectedOption) => {
+                                                                                    if (value.length > 4 && value.length <= 6) {
+                                                                                        value = value.slice(0, 4) + "-" + value.slice(4);
+                                                                                    } else if (value.length > 6) {
+                                                                                        value =
+                                                                                            value.slice(0, 4) +
+                                                                                            "-" +
+                                                                                            value.slice(4, 6) +
+                                                                                            "-" +
+                                                                                            value.slice(6, 8);
+                                                                                    }
 
-                                                                        console.log("Country changed:", {
-                                                                            selectedLabel: selectedOption.label,
-                                                                            selectedValue: selectedOption.value,
-                                                                            previousLabel: missingValues["Country"],
-                                                                            previousID: missingValues["CountryID"]
-                                                                        });
+                                                                                    let err = "";
 
-                                                                        setMissingValues(prev => ({
-                                                                            ...prev,
-                                                                            Country: selectedOption.label,
-                                                                            CountryID: selectedOption.value,
-                                                                        }));
+                                                                                    const isValidDate = (y, m, d) => {
+                                                                                        const date = new Date(y, m - 1, d);
+                                                                                        return (
+                                                                                            date.getFullYear() === +y &&
+                                                                                            date.getMonth() === m - 1 &&
+                                                                                            date.getDate() === +d
+                                                                                        );
+                                                                                    };
 
-                                                                        setAddressData(prev => ({
-                                                                            ...prev,
-                                                                            Country: selectedOption.label,
-                                                                            CountryID: selectedOption.value,
-                                                                        }));
+                                                                                    if (value.length === 10) {
+                                                                                        const [year, month, day] = value.split("-");
 
-                                                                        setCountryIDSelected({ CountryID: selectedOption.value });
-                                                                    }}
-                                                                    isSearchable
-                                                                    classNames={{
-                                                                        control: (state) =>
-                                                                            `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''
-                                                                            }`,
-                                                                        menu: () => '!bg-background !text-textPrimaryColor',
-                                                                        option: (state) =>
-                                                                            `!cursor-pointer ${state.isSelected
-                                                                                ? '!bg-primary !text-white'
-                                                                                : state.isFocused
-                                                                                    ? '!bg-primary-100 !text-black'
-                                                                                    : '!bg-background !text-textPrimaryColor'
-                                                                            }`,
-                                                                        singleValue: () => '!text-textPrimaryColor',
-                                                                        placeholder: () => '!text-gray-400',
-                                                                    }}
-                                                                />
+                                                                                        if (!isValidDate(year, month, day)) {
+                                                                                            err = t.modals.errors.invalidDate || "Data inválida.";
+                                                                                        } else {
+                                                                                            const inputDate = new Date(`${year}-${month}-${day}`);
+                                                                                            const today = new Date();
+
+                                                                                            if (inputDate > today) {
+                                                                                                err =
+                                                                                                    t.modals.errors.invalidDate ||
+                                                                                                    "A data de nascimento não pode ser superior à data de hoje.";
+                                                                                            }
+                                                                                        }
+                                                                                    }
+
+                                                                                    setMissingDobError(err);
+                                                                                    setMissingValues(prev => ({ ...prev, DateOfBirth: value }));
+                                                                                }}
+                                                                            />
+
+                                                                            <AiOutlineCalendar
+                                                                                size={22}
+                                                                                className="cursor-pointer text-gray-500 hover:text-orange-500"
+                                                                                onClick={() => missingDobRef.current?.setOpen(true)}
+                                                                            />
+                                                                        </div>
+
+                                                                        {missingDobError && (
+                                                                            <p className="text-red-500 text-xs mt-1">{missingDobError}</p>
+                                                                        )}
+
+                                                                        <DatePicker
+                                                                            ref={missingDobRef}
+                                                                            selected={parseDate(missingValues.DateOfBirth) || null}
+                                                                            onChange={(date) => {
+                                                                                if (!date) {
+                                                                                    setMissingValues(prev => ({ ...prev, DateOfBirth: "" }));
+                                                                                    setMissingDobError("");
+                                                                                    return;
+                                                                                }
+
+                                                                                const today = new Date();
+                                                                                if (date > today) {
+                                                                                    setMissingDobError(t.modals.errors.invalidDate);
+                                                                                    return;
+                                                                                }
+
+                                                                                const year = date.getFullYear();
+                                                                                const month = String(date.getMonth() + 1).padStart(2, "0");
+                                                                                const day = String(date.getDate()).padStart(2, "0");
+
+                                                                                const formatted = `${year}-${month}-${day}`;
+
+                                                                                setMissingValues(prev => ({ ...prev, DateOfBirth: formatted }));
+                                                                                setMissingDobError("");
+                                                                            }}
+                                                                            dateFormat="yyyy-MM-dd"
+                                                                            maxDate={new Date()}
+                                                                            className="hidden"
+                                                                        />
+                                                                    </div>
+
+                                                                    {/* Country */}
+                                                                    <div className='flex-1'>
+                                                                        <p className='text-xs text-gray-500'>{t.frontOffice.registrationForm.country}</p>
+                                                                        <Select
+                                                                            options={countryOptions}
+                                                                            value={countryOptions.find(
+                                                                                option => option.label === missingValues["Country"]
+                                                                            )}
+                                                                            onChange={(selectedOption) => {
+
+                                                                                console.log("Country changed:", {
+                                                                                    selectedLabel: selectedOption.label,
+                                                                                    selectedValue: selectedOption.value,
+                                                                                    previousLabel: missingValues["Country"],
+                                                                                    previousID: missingValues["CountryID"]
+                                                                                });
+
+                                                                                setMissingValues(prev => ({
+                                                                                    ...prev,
+                                                                                    Country: selectedOption.label,
+                                                                                    CountryID: selectedOption.value,
+                                                                                }));
+
+                                                                                setAddressData(prev => ({
+                                                                                    ...prev,
+                                                                                    Country: selectedOption.label,
+                                                                                    CountryID: selectedOption.value,
+                                                                                }));
+
+                                                                                setCountryIDSelected({ CountryID: selectedOption.value });
+                                                                            }}
+                                                                            isSearchable
+                                                                            classNames={{
+                                                                                control: (state) =>
+                                                                                    `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md 
+                                                                                ${!missingValues["Country"] ? "border-red-500" : "border-gray-300"}
+                                                                                ${state.isFocused ? '!border-blue-500' : ''
+                                                                                    }`,
+                                                                                menu: () => '!bg-background !text-textPrimaryColor',
+                                                                                option: (state) =>
+                                                                                    `!cursor-pointer ${state.isSelected
+                                                                                        ? '!bg-primary !text-white'
+                                                                                        : state.isFocused
+                                                                                            ? '!bg-primary-100 !text-black'
+                                                                                            : '!bg-background !text-textPrimaryColor'
+                                                                                    }`,
+                                                                                singleValue: () => '!text-textPrimaryColor',
+                                                                                placeholder: () => '!text-gray-400',
+                                                                            }}
+                                                                        />
+                                                                    </div>
 
 
 
-                                                                {/* CountryOfBirth */}
-                                                                <Select
-                                                                    options={countryOptions}
-                                                                    value={countryOptions.find(option => option.label === missingValues["CountryOfBirth"])}
-                                                                    onChange={(selectedOption) => {
-                                                                        setFormData(prev => ({ ...prev, CountryOfBirth: selectedOption.label }));
-                                                                        setCountryIDSelected({ CountryID: selectedOption.value });
-                                                                    }}
-                                                                    isSearchable
-                                                                    classNames={{
-                                                                        control: (state) =>
-                                                                            `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''}`,
-                                                                        menu: () => '!bg-background !text-textPrimaryColor',
-                                                                        option: (state) =>
-                                                                            `!cursor-pointer ${state.isSelected ? '!bg-primary !text-white' : state.isFocused ? '!bg-primary-100 !text-black' : '!bg-background !text-textPrimaryColor'}`,
-                                                                        singleValue: () => '!text-textPrimaryColor',
-                                                                        placeholder: () => '!text-gray-400',
-                                                                    }}
-                                                                />
+                                                                    {/* CountryOfBirth */}
+                                                                    <div className='flex-1'>
+                                                                        <p className='text-xs text-gray-500'>{t.frontOffice.registrationForm.countryOfBirth}</p>
+                                                                        <Select
+                                                                            options={countryOptions}
+                                                                            value={countryOptions.find(option => option.label === missingValues["CountryOfBirth"])}
+                                                                            onChange={(selectedOption) => {
+
+                                                                                console.log("CountryOfBirth changed:", {
+                                                                                    selectedLabel: selectedOption.label,
+                                                                                    selectedValue: selectedOption.value,
+                                                                                    previousLabel: missingValues["CountryOfBirth"]
+                                                                                });
+
+                                                                                setMissingValues(prev => ({
+                                                                                    ...prev,
+                                                                                    CountryOfBirth: selectedOption.label,
+                                                                                    CountryOfBirthID: selectedOption.value,
+                                                                                }));
+
+                                                                                setPersonalIDData(prev => ({
+                                                                                    ...prev,
+                                                                                    CountryOfBirth: selectedOption.label,
+                                                                                    CountryOfBirthID: selectedOption.value,
+                                                                                }));
+
+                                                                            }}
+                                                                            isSearchable
+                                                                            classNames={{
+                                                                                control: (state) =>
+                                                                                    `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md 
+                                                                                ${!missingValues["CountryOfBirth"] ? "border-red-500" : "border-gray-300"}
+                                                                                ${state.isFocused ? '!border-blue-500' : ''}`,
+                                                                                menu: () => '!bg-background !text-textPrimaryColor',
+                                                                                option: (state) =>
+                                                                                    `!cursor-pointer ${state.isSelected ? '!bg-primary !text-white' : state.isFocused ? '!bg-primary-100 !text-black' : '!bg-background !text-textPrimaryColor'}`,
+                                                                                singleValue: () => '!text-textPrimaryColor',
+                                                                                placeholder: () => '!text-gray-400',
+                                                                            }}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
 
                                                                 {/* Linha 2 */}
                                                                 {/* IDDoc */}
-                                                                <Select
-                                                                    options={docTypeOptions}
-                                                                    value={countryOptions.find(option => option.label === missingValues["IDDoc"])}
-                                                                    onChange={(selectedOption) => {
-                                                                        setMissingValues(prev => ({
-                                                                            ...prev,
-                                                                            IDDoc: selectedOption.label,      // <-- label correto
-                                                                            IDDocID: selectedOption.value,    // <-- guarda ID também
-                                                                        }));
-                                                                    }}
-                                                                    isSearchable
-                                                                    classNames={{
-                                                                        control: (state) =>
-                                                                            `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''
-                                                                            }`,
-                                                                        menu: () => '!bg-background !text-textPrimaryColor',
-                                                                        option: (state) =>
-                                                                            `!cursor-pointer ${state.isSelected
-                                                                                ? '!bg-primary !text-white'
-                                                                                : state.isFocused
-                                                                                    ? '!bg-primary-100 !text-black'
-                                                                                    : '!bg-background !text-textPrimaryColor'
-                                                                            }`,
-                                                                        singleValue: () => '!text-textPrimaryColor',
-                                                                        placeholder: () => '!text-gray-400',
-                                                                    }}
-                                                                />
+                                                                <div className='flex flex-row gap-2 w-full justify-between -mt-6'>
+                                                                    <div className='flex-1'>
+                                                                        <p className='text-xs text-gray-500'>{t.frontOffice.registrationForm.idDoc}</p>
+                                                                        <Select
+                                                                            options={docTypeOptions}
+                                                                            value={countryOptions.find(option => option.label === missingValues["IDDoc"])}
+                                                                            onChange={(selectedOption) => {
 
-                                                                {/* NrDoc */}
-                                                                <input
-                                                                    type="text"
-                                                                    className="border rounded-md px-2 py-1"
-                                                                    placeholder={requiredFields.find(f => f.key === "NrDoc")?.label}
-                                                                    value={missingValues["NrDoc"] ?? ""}
-                                                                    onChange={(e) =>
-                                                                        setMissingValues(prev => ({ ...prev, NrDoc: e.target.value }))
-                                                                    }
-                                                                />
+                                                                                console.log("IDDoc changed:", {
+                                                                                    selectedLabel: selectedOption.label,
+                                                                                    selectedValue: selectedOption.value,
+                                                                                    previousLabel: missingValues["IDDoc"]
+                                                                                });
 
-                                                                {/* Nationality */}
-                                                                <Select
-                                                                    options={countryOptions}
-                                                                    value={countryOptions.find(option => option.label === missingValues["Nationality"])}
-                                                                    onChange={(selectedOption) => {
-                                                                        setFormData(prev => ({ ...prev, Nationality: selectedOption.label }));
-                                                                        setCountryIDSelected({ CountryID: selectedOption.value });
-                                                                    }}
-                                                                    isSearchable
-                                                                    classNames={{
-                                                                        control: (state) =>
-                                                                            `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''}`,
-                                                                        menu: () => '!bg-background !text-textPrimaryColor',
-                                                                        option: (state) =>
-                                                                            `!cursor-pointer ${state.isSelected ? '!bg-primary !text-white' : state.isFocused ? '!bg-primary-100 !text-black' : '!bg-background !text-textPrimaryColor'}`,
-                                                                        singleValue: () => '!text-textPrimaryColor',
-                                                                        placeholder: () => '!text-gray-400',
-                                                                    }}
-                                                                />
-                                                            </div>
+                                                                                setMissingValues(prev => ({
+                                                                                    ...prev,
+                                                                                    IDDoc: selectedOption.label,
+                                                                                    IDDocID: selectedOption.value,
+                                                                                }));
 
-                                                            {/* Botão OK que também ocupa as 2 linhas */}
-                                                            <button
-                                                                onMouseDown={handleSaveMissing}
-                                                                className="bg-primary text-white px-3 py-2 rounded-md h-full row-span-2"
-                                                            >
-                                                                OK
-                                                            </button>
-                                                        </div>
+                                                                                setPersonalIDData(prev => ({
+                                                                                    ...prev,
+                                                                                    IDDoc: selectedOption.label,
+                                                                                    IDDocID: selectedOption.value,
+                                                                                }));
 
-                                                        {/* ✔️ LINHA 3 */}
-                                                        <div className="grid grid-cols-6 gap-4 items-end">
+                                                                            }}
+                                                                            isSearchable
+                                                                            classNames={{
+                                                                                control: (state) =>
+                                                                                    `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md 
+                                                                                ${!missingValues["IDDoc"] ? "border-red-500" : "border-gray-300"} 
+                                                                                ${state.isFocused ? '!border-blue-500' : ''
+                                                                                    }`,
+                                                                                menu: () => '!bg-background !text-textPrimaryColor',
+                                                                                option: (state) =>
+                                                                                    `!cursor-pointer ${state.isSelected
+                                                                                        ? '!bg-primary !text-white'
+                                                                                        : state.isFocused
+                                                                                            ? '!bg-primary-100 !text-black'
+                                                                                            : '!bg-background !text-textPrimaryColor'
+                                                                                    }`,
+                                                                                singleValue: () => '!text-textPrimaryColor',
+                                                                                placeholder: () => '!text-gray-400',
+                                                                            }}
+                                                                        />
+                                                                    </div>
 
-                                                            {/* Botão de verificação com altura e largura iguais ao bloco 1 */}
-                                                            <button className="bg-gray-100 text-black px-3 py-2 rounded-md h-full col-span-1">
-                                                                {filledBlock3 ? "✔️" : "✔️"}
-                                                            </button>
+                                                                    {/* NrDoc */}
+                                                                    <div className='flex-1'>
+                                                                        <p className='text-xs text-gray-500'>
+                                                                            {t.frontOffice.registrationForm.idDocNumber}
+                                                                        </p>
 
-                                                            {/* Container cinzento com inputs */}
-                                                            <div className="col-span-5 bg-gray-200 p-2 rounded-lg grid grid-cols-2 gap-4">
-                                                                {["Email", "Phone"].map((key) => (
-                                                                    <input
-                                                                        key={key}
-                                                                        type="text"
-                                                                        className="border rounded-md px-2 py-1"
-                                                                        placeholder={requiredFields.find(f => f.key === key)?.label}
-                                                                        value={missingValues[key] ?? ""}
-                                                                        onChange={(e) =>
-                                                                            setMissingValues(prev => ({ ...prev, [key]: e.target.value }))
-                                                                        }
-                                                                    />
-                                                                ))}
-                                                            </div>
-                                                        </div>
+                                                                        <input
+                                                                            type="text"
+                                                                            className={`border rounded-md px-2 py-1 w-full
+                                                                                    ${!missingValues["NrDoc"] ? "border-red-500" : "border-gray-300"}
+                                                                                `}
+                                                                            placeholder={requiredFields.find(f => f.key === "NrDoc")?.label}
+                                                                            value={missingValues["NrDoc"] ?? ""}
+                                                                            onChange={(e) =>
+                                                                                setMissingValues(prev => ({ ...prev, NrDoc: e.target.value }))
+                                                                            }
+                                                                        />
+                                                                    </div>
 
-                                                        {/* ✔️ LINHA 4 + LINHA 5 AGRUPADAS COM 1 BOTÃO DE VERIFICAÇÃO */}
-                                                        <div className="grid grid-cols-6 gap-4 items-stretch">
+                                                                    {/* Nationality */}
+                                                                    <div className='flex-1'>
+                                                                        <p className='text-xs text-gray-500'>{t.frontOffice.registrationForm.nationality}</p>
+                                                                        <Select
+                                                                            options={countryOptions}
+                                                                            value={countryOptions.find(option => option.label === missingValues["Nationality"])}
+                                                                            onChange={(selectedOption) => {
 
-                                                            {/* Botão de verificação do bloco */}
-                                                            <button className="bg-gray-100 text-black px-3 py-2 rounded-md h-full col-span-1">
-                                                                {filledBlock4 ? "✔️" : "✔️"}
-                                                            </button>
+                                                                                console.log("Nationality changed:", {
+                                                                                    selectedLabel: selectedOption.label,
+                                                                                    selectedValue: selectedOption.value,
+                                                                                    previousLabel: missingValues["Nationality"]
+                                                                                });
 
-                                                            {/* Container cinza com duas colunas de inputs */}
-                                                            <div className="col-span-5 grid grid-cols-5 gap-4 h-full">
+                                                                                setMissingValues(prev => ({
+                                                                                    ...prev,
+                                                                                    Nationality: selectedOption.label,
+                                                                                    NationalityID: selectedOption.value,
+                                                                                }));
 
-                                                                {/* Coluna 1: LastName + VatIndividual */}
-                                                                <div className="col-span-2 flex flex-col gap-2 bg-gray-200 p-2 rounded-lg h-full">
-                                                                    <input
-                                                                        type="text"
-                                                                        className="border rounded-md px-2 py-1"
-                                                                        placeholder={requiredFields.find(f => f.key === "LastName")?.label}
-                                                                        value={missingValues["LastName"] ?? ""}
-                                                                        onChange={(e) =>
-                                                                            setMissingValues(prev => ({ ...prev, LastName: e.target.value }))
-                                                                        }
-                                                                    />
-                                                                    <input
-                                                                        type="text"
-                                                                        className="border rounded-md px-2 py-1"
-                                                                        placeholder={requiredFields.find(f => f.key === "VatIndividual")?.label}
-                                                                        value={missingValues["VatIndividual"] ?? ""}
-                                                                        onChange={(e) =>
-                                                                            setMissingValues(prev => ({ ...prev, VatIndividual: e.target.value }))
-                                                                        }
-                                                                    />
-                                                                </div>
+                                                                                setPersonalIDData(prev => ({
+                                                                                    ...prev,
+                                                                                    Nationality: selectedOption.label,
+                                                                                    NationalityID: selectedOption.value,
+                                                                                }));
 
-                                                                {/* Coluna 2: Company + VatCompany */}
-                                                                <div className="col-span-3 flex flex-col gap-2 bg-gray-200 p-2 rounded-lg h-full">
-                                                                    <input
-                                                                        type="text"
-                                                                        className="border rounded-md px-2 py-1"
-                                                                        placeholder={requiredFields.find(f => f.key === "Company")?.label}
-                                                                        value={missingValues["Company"] ?? ""}
-                                                                        onChange={(e) =>
-                                                                            setMissingValues(prev => ({ ...prev, Company: e.target.value }))
-                                                                        }
-                                                                    />
-                                                                    <input
-                                                                        type="text"
-                                                                        className="border rounded-md px-2 py-1"
-                                                                        placeholder={requiredFields.find(f => f.key === "VatCompany")?.label}
-                                                                        value={missingValues["VatCompany"] ?? ""}
-                                                                        onChange={(e) =>
-                                                                            setMissingValues(prev => ({ ...prev, VatCompany: e.target.value }))
-                                                                        }
-                                                                    />
+                                                                            }}
+                                                                            isSearchable
+                                                                            classNames={{
+                                                                                control: (state) =>
+                                                                                    `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md 
+                                                                                ${!missingValues["Nationality"] ? "border-red-500" : "border-gray-300"}
+                                                                                ${state.isFocused ? '!border-blue-500' : ''}`,
+                                                                                menu: () => '!bg-background !text-textPrimaryColor',
+                                                                                option: (state) =>
+                                                                                    `!cursor-pointer ${state.isSelected ? '!bg-primary !text-white' : state.isFocused ? '!bg-primary-100 !text-black' : '!bg-background !text-textPrimaryColor'}`,
+                                                                                singleValue: () => '!text-textPrimaryColor',
+                                                                                placeholder: () => '!text-gray-400',
+                                                                            }}
+                                                                        />
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
 
+                                                            {/* ✔️ LINHA 3 */}
+                                                            <div className=" gap-2 items-end">
+
+                                                                {/* Container cinzento com inputs */}
+                                                                <div className="bg-gray-100 p-1 rounded-lg flex gap-4 -mt-5">
+
+                                                                    {/* EMAIL */}
+                                                                    <div className="flex flex-row gap-2 items-center w-4/6">
+                                                                        <MdEmail size={20} color='gray' />
+                                                                        <input
+                                                                            type="text"
+                                                                            className="border rounded-md px-2 py-1 w-full"
+                                                                            placeholder={requiredFields.find(f => f.key === "email")?.label}
+                                                                            value={missingValues["email"] ?? ""}
+                                                                            onChange={(e) => {
+                                                                                const value = e.target.value;
+                                                                                setMissingValues(prev => ({ ...prev, email: value }));
+                                                                                setContacts(prev => ({ ...prev, email: value }));
+                                                                            }}
+                                                                        />
+                                                                    </div>
+
+                                                                    {/* PHONE*/}
+                                                                    <div className="w-2/6 flex flex-row gap-2 items-center">
+                                                                        <FaPhone size={15} color='gray' />
+                                                                        <input
+                                                                            type="text"
+                                                                            className="border rounded-md px-2 py-1 w-full"
+                                                                            placeholder={requiredFields.find(f => f.key === "phone")?.label}
+                                                                            value={missingValues["phone"] ?? ""}
+                                                                            onChange={(e) => {
+                                                                                const value = e.target.value;
+                                                                                setMissingValues(prev => ({ ...prev, phone: value }));
+                                                                                setContacts(prev => ({ ...prev, phone: value }));
+                                                                            }}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+
+                                                            {/* ✔️ LINHA 4 + LINHA 5 AGRUPADAS COM 1 BOTÃO DE VERIFICAÇÃO */}
+                                                            <div className="w-full bg-gray-100 rounded-xl -mt-5">
+
+                                                                {/* WRAPPER DOS CARDS */}
+                                                                <div className="col-span-5 flex gap-4 w-full -mt-5 p-1">
+
+                                                                    {/* ====================== CARD 1 — INDIVIDUAL ====================== */}
+                                                                    <div
+                                                                        className={`flex-1 flex flex-col gap-3 p-1 rounded-xl border
+                                                                    ${selectedType === "individual" ? "border-primary bg-primary-50" : "border-gray-300 bg-gray-100"}`}
+                                                                        onClick={() => setSelectedType("individual")}
+                                                                    >
+                                                                        {/* Radio + Título */}
+
+                                                                        {/* Inputs do INDIVIDUAL */}
+                                                                        <div className='flex flex-row cursor-pointer justify-between'>
+                                                                            <div className='flex flex-row items-center gap-2'>
+                                                                                <input
+                                                                                    type="radio"
+                                                                                    name="personType"
+                                                                                    checked={selectedType === "individual"}
+                                                                                    onChange={() => setSelectedType("individual")}
+                                                                                />
+                                                                                <InputFieldControlled
+                                                                                    type="text"
+                                                                                    id={"LastName"}
+                                                                                    name={"LastName"}
+                                                                                    label={requiredFields.find(f => f.key === "LastName")?.label}
+                                                                                    ariaLabel={"LastName"}
+                                                                                    value={missingValues["LastName"] ?? ""}
+                                                                                    style={"border rounded-md px-2 py-1 !bg-gray-100 text-gray-500 h-7 w-full"}
+                                                                                    disabled
+                                                                                />
+                                                                            </div>
+                                                                            <InputFieldControlled
+                                                                                type="text"
+                                                                                id={"vatNo"}
+                                                                                name={"vatNo"}
+                                                                                label={requiredFields.find(f => f.key === "vatNo")?.label}
+                                                                                ariaLabel={"vatNo"}
+                                                                                value={missingValues["vatNo"] ?? ""}
+                                                                                onChange={(e) => {
+                                                                                    const value = e.target.value;
+                                                                                    setMissingValues(prev => ({ ...prev, vatNo: value }));
+                                                                                    setContacts(prev => ({ ...prev, vatNo: value }));
+                                                                                }}
+                                                                                style={"border rounded-md px-2 py-1 w-full"}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+
+
+                                                                    {/* ====================== CARD 2 — COMPANY ====================== */}
+                                                                    <div
+                                                                        className={`flex-1 flex flex-col gap-3 p-2 rounded-xl border cursor-pointer
+                                                                    ${selectedType === "company" ? "border-primary bg-primary-50" : "border-gray-300 bg-gray-100"}`}
+                                                                        onClick={() => {
+                                                                            setSelectedType("company")
+                                                                            const companyNameValue =
+                                                                                missingValues["CompanyName"] !== undefined && missingValues["CompanyName"] !== ""
+                                                                                    ? missingValues["CompanyName"]
+                                                                                    : (reserva.hasCompanyVAT === 1 || newCompany?.hasCompanyVAT === 1
+                                                                                        ? (newCompany?.companyName || reserva.Company || "")
+                                                                                        : "");
+                                                                            const companyVatValue =
+                                                                                missingValues["CompanyVatNo"] !== undefined ? missingValues["CompanyVatNo"]
+                                                                                    : (reserva.hasCompanyVAT === 1 || newCompany?.hasCompanyVAT === 1)
+                                                                                        ? (newCompany?.vatNo || reserva.CompanyVatNo || "")
+                                                                                        : "";
+                                                                            if (!companyNameValue || !companyVatValue) {
+                                                                                setOpenModal("search");
+                                                                                setIsCVATModalOpenInsert(true);
+                                                                            } else { // 👉 CARREGAR OS DADOS AQUI 
+                                                                                setCompanyVATData({
+                                                                                    companyName: reserva.Company || "",
+                                                                                    vatNo: reserva.CompanyVatNo || "",
+                                                                                    emailAddress: reserva.CompanyEmail || "",
+                                                                                    country: reserva.CompanyCountryID || "",
+                                                                                    streetAddress: reserva.CompanyStreetAddress || "",
+                                                                                    zipCode: reserva.CompanyZipCode || "",
+                                                                                    city: reserva.CompanyCity || "",
+                                                                                    state: reserva.CompanyState || "",
+                                                                                });
+                                                                            }
+                                                                        }}
+                                                                    >
+
+                                                                        {/* Radio + Título */}
+
+                                                                        {/* Inputs da COMPANY */}
+                                                                        <div className='flex flex-row gap-2 justify-between'>
+                                                                            <div className='flex flex-row items-center gap-2'>
+                                                                                <input
+                                                                                    type="radio"
+                                                                                    name="personType"
+                                                                                    checked={selectedType === "company"}
+                                                                                    onChange={() => setSelectedType("company")}
+                                                                                />
+                                                                                <InputFieldControlled
+                                                                                    type="text"
+                                                                                    id={"CompanyName"}
+                                                                                    name={"CompanyName"}
+                                                                                    label={requiredFields.find(f => f.key === "CompanyName")?.label}
+                                                                                    ariaLabel={"CompanyName"}
+                                                                                    value={
+                                                                                        missingValues["CompanyName"] && missingValues["CompanyName"] !== ""
+                                                                                            ? missingValues["CompanyName"]
+                                                                                            : (reserva.hasCompanyVAT === 1 || newCompany?.hasCompanyVAT === 1)
+                                                                                                ? (newCompany?.companyName || reserva.Company || "")
+                                                                                                : ""
+                                                                                    }
+                                                                                    onChange={(e) => setMissingValues(prev => ({ ...prev, CompanyName: e.target.value }))}
+                                                                                    style={"border rounded-md px-2 py-1 w-full"}
+                                                                                />
+                                                                            </div>
+
+                                                                            <InputFieldControlled
+                                                                                type="text"
+                                                                                id={"CompanyVatNo"}
+                                                                                name={"CompanyVatNo"}
+                                                                                label={requiredFields.find(f => f.key === "CompanyVatNo")?.label}
+                                                                                ariaLabel={"CompanyVatNo"}
+                                                                                value={
+                                                                                    missingValues["CompanyVatNo"] && missingValues["CompanyVatNo"] !== ""
+                                                                                        ? missingValues["CompanyVatNo"]
+                                                                                        : (reserva.hasCompanyVAT === 1 || newCompany?.hasCompanyVAT === 1)
+                                                                                            ? (newCompany?.vatNo || reserva.CompanyVatNo || "")
+                                                                                            : ""
+                                                                                }
+                                                                                onChange={(e) => setMissingValues(prev => ({ ...prev, CompanyVatNo: e.target.value }))}
+                                                                                style={"border rounded-md px-2 py-1 w-full"}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className='flex flex-col col-span-1 self-end'>
+                                                            <div className='flex flex-col text-center items-center gap-2'>
+                                                                <p className='text-lg font-bold'>{t.frontOffice.registrationForm.rating.header}</p>
+                                                                <p className='text-xs'>{t.frontOffice.registrationForm.rating.ratingScore}</p>
+                                                                {/* Estrelas */}
+                                                                <div className="flex space-x-2 text-4xl cursor-pointer items-center justify-center mb-5">
+                                                                    {[1, 2, 3, 4, 5].map((star) => {
+                                                                        const filled = (hover || rating) >= star;
+
+                                                                        return (
+                                                                            <span
+                                                                                key={star}
+                                                                                onClick={() => setRating(star)}
+                                                                                onMouseEnter={() => setHover(star)}
+                                                                                onMouseLeave={() => setHover(0)}
+                                                                            >
+                                                                                {filled ? (
+                                                                                    <FaStar className="text-primary" size={30} />
+                                                                                ) : (
+                                                                                    <FaRegStar className="text-gray-400" size={30} />
+                                                                                )}
+                                                                            </span>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            </div>
+                                                            <div className="">
+                                                                <button
+                                                                    onClick={handleSaveMissing}
+                                                                    className="bg-green text-white text-4xl font-bold px-6 rounded-md h-[70px] w-full flex items-center justify-center"
+                                                                >
+                                                                    OK
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        {showRatingModal && (
+                                                            <RatingForm
+                                                                isOpen={showRatingModal}
+                                                                onClose={() => setShowRatingModal(false)}
+                                                                onSelectRating={(value) => {
+                                                                    setRating(value);        // guardar rating selecionado
+                                                                    setShowRatingModal(false);
+                                                                    handleSaveMissing();     // ← CONTINUA AUTOMATICAMENTE
+                                                                }}
+                                                            />
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
