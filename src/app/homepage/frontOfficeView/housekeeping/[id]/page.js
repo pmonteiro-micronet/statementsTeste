@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
 
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
+import { IoInformationCircleOutline } from "react-icons/io5";
+import { CiViewList } from "react-icons/ci";
+
 import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
-import { IoMdInformationCircle } from "react-icons/io";
-import { FaThList } from "react-icons/fa";
-import { IoSettingsSharp } from "react-icons/io5";
 
 import HousekeepingInfoForm from "@/components/modals/housekeeping/info/page";
 import HousekeepingMaintenanceForm from "@/components/modals/housekeeping/maintenance/page";
@@ -384,7 +384,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     }
   };
 
-  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+  // const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
 
   const [sortOrder, setSortOrder] = useState('asc');
   const [sortField, setSortField] = useState('');
@@ -409,21 +409,21 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     }
   };
 
-  const [isOpen, setIsOpen] = useState(false);
-  console.log(isOpen);
-  const dropdownRef = useRef(null);
+  // const [isOpen, setIsOpen] = useState(false);
+  // console.log(isOpen);
+  // const dropdownRef = useRef(null);
 
   // Fecha dropdown ao clicar fora
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-        setOpenDropdownIndex(null);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [setOpenDropdownIndex]);
+  // useEffect(() => {
+  //   function handleClickOutside(event) {
+  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+  //       setIsOpen(false);
+  //       setOpenDropdownIndex(null);
+  //     }
+  //   }
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, [setOpenDropdownIndex]);
 
   // const toggleDropdown = (e) => {
   //   e.stopPropagation();
@@ -470,7 +470,11 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
               <table className="w-full text-left min-w-max border-collapse">
                 <thead className="sticky top-0 z-30">
                   <tr className="bg-primary text-white h-16">
-                    <td className="pl-2 pr-2 w-8 border-r border-[#e6e6e6]"><FaGear size={18} color="white" /></td>
+                    <td className="pl-2 pr-2 h-full border-r border-[#e6e6e6]">
+                      <div className="w-full h-full flex justify-center items-center">
+                        <FaGear size={18} color="white" />
+                      </div>
+                    </td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.arrival}</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.departure}</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.room}</td>
@@ -498,61 +502,41 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                 </thead>
                 <tbody>
                   {sortedItems.map((reserva, index) => {
-                    const isOpen = openDropdownIndex === index;
+                    // const isOpen = openDropdownIndex === index;
 
                     return (
                       <tr
                         key={index}
                         className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50"
                       >
-                        {/* Dropdown Cell */}
-                        <td className="pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center">
-                          <div className="flex items-center justify-center w-full h-full relative">
+                        <td className="pl-1 pr-1 w-32 border-r border-[#e6e6e6] align-middle text-center">
+                          <div className="flex items-center justify-center gap-2 w-full h-full">
+
+                            {/* Botão de manutenção */}
                             <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setOpenDropdownIndex(isOpen ? null : index);
-                              }}
-                              className="flex justify-center items-center w-auto min-w-0 p-0 m-0 relative z-10 bg-gray-100 rounded"
+                              className="p-1 rounded flex items-center"
+                              onClick={() => handleOpenMaintenanceModal(reserva)}
                             >
-                              <BsThreeDotsVertical size={20} className="text-textPrimaryColor" />
+                              <HiOutlineWrenchScrewdriver size={20} color="gray"/>
                             </button>
 
-                            {isOpen && (
-                              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-20 text-textPrimaryColor translate-x-32 translate-y-4">
-                                <button
-                                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
-                                  onClick={() => {
-                                    handleOpenMaintenanceModal(reserva);
-                                    setOpenDropdownIndex(null); // Fecha o dropdown
-                                  }}
-                                >
-                                  <IoSettingsSharp size={15} /> {t.frontOffice.housekeeping.maintenance}
-                                </button>
-                                <button
-                                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
-                                  onClick={() => {
-                                    handleOpenTracesModal(reserva);
-                                    setOpenDropdownIndex(null); // Fecha o dropdown
-                                  }}
-                                >
-                                  <FaThList size={15} /> {t.frontOffice.housekeeping.traces}
-                                </button>
-                                <button
-                                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
-                                  onClick={() => {
-                                    handleOpenModal(reserva);
-                                    setOpenDropdownIndex(null); // Fecha o dropdown
-                                  }}
-                                >
-                                  <IoMdInformationCircle size={15} /> {t.frontOffice.housekeeping.info}
-                                </button>
-                              </div>
-                            )}
+                            {/* Botão de traces */}
+                            <button
+                              className="p-1 rounded flex items-center"
+                              onClick={() => handleOpenTracesModal(reserva)}
+                            >
+                              <CiViewList size={20} color="gray" />
+                            </button>
 
+                            {/* Botão de info */}
+                            <button
+                              className="p-1 rounded flex items-center"
+                              onClick={() => handleOpenModal(reserva)}
+                            >
+                              <IoInformationCircleOutline size={20} color="gray" />
+                            </button>
                           </div>
                         </td>
-
                         {/* Other Cells */}
                         <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.DateCI}</td>
                         <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.DateCO}</td>
@@ -561,7 +545,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                           {`${reserva.LastName}, ${reserva.FirstName}`}
                         </td>
                         <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-32 truncate whitespace-nowrap overflow-hidden">
-                          {reserva.housekeeping === 1 && <MdOutlineDryCleaning size={20} />}
+                          {reserva.housekeeping === 1 && <MdOutlineDryCleaning size={30} />}
                         </td>
                         <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate whitespace-nowrap overflow-hidden">{reserva.roomStatus}</td>
                         <td className="h-14 pr-2 border-r border-[#e6e6e6] text-right w-20 truncate whitespace-nowrap overflow-hidden">{reserva.ResNo}</td>

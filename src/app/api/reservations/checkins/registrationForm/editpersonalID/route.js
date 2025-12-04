@@ -71,7 +71,7 @@ export async function POST(request) {
             CountryOfBirth: isNaN(parseInt(CountryOfBirth)) ? null : parseInt(CountryOfBirth),
             Nationality: isNaN(parseInt(Nationality)) ? null : parseInt(Nationality),
             IDDoc: isNaN(parseInt(IDDoc)) ? null : parseInt(IDDoc),
-            DocNr: isNaN(parseInt(DocNr)) ? null : parseInt(DocNr),
+            DocNr: DocNr ?? null,
             ExpDate: ExpDate,
             Issue: Issue,
             ProfileID: parseInt(profileID),
