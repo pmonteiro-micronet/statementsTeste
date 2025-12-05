@@ -1017,7 +1017,7 @@ export default function Page() {
             }
         } else if (modalField === "VAT No.") {
             setVatNo(newValue);
-            setInitialVatNo(newValue);
+            // setInitialVatNo(newValue);
         }
 
         setIsModalOpen(false);
