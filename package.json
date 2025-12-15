@@ -2,12 +2,12 @@
    "name": "extensions",
    "version": "0.1.0",
    "private": true,
-  "scripts": {
-    "dev": "next dev --webpack",
-    "build": "prisma generate && next build --webpack",
-    "start": "NODE_ENV=production node server.js",
-    "lint": "next lint"
-  },
+   "scripts": {
+      "dev": "next dev --webpack",
+      "build": "prisma generate && next build --webpack",
+      "start": "NODE_ENV=production node server.js",
+      "lint": "next lint"
+   },
    "dependencies": {
       "@emotion/react": "^11.13.3",
       "@emotion/styled": "^11.13.0",
@@ -26,13 +26,13 @@
       "html5-qrcode": "^2.3.8",
       "jsonwebtoken": "^9.0.2",
       "jspdf": "^2.5.2",
-      "next": "^16.0.10",
+      "next": "^15.5.9",
       "next-auth": "^4.24.8",
       "pako": "^2.1.0",
       "prisma": "^5.21.1",
-      "react": "^19.2.3",
+      "react": "^18.3.1",
       "react-datepicker": "^8.7.0",
-      "react-dom": "^19.2.3",
+      "react-dom": "^18.3.1",
       "react-icons": "^5.4.0",
       "react-responsive": "^10.0.0",
       "react-select": "^5.10.0",
