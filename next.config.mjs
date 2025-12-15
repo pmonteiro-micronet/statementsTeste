@@ -12,6 +12,7 @@ const nextConfig = {
     locales: ['english', 'portuguesPortugal', 'espanol'], // Idiomas suportados
     defaultLocale: 'english',        // Idioma padrão
   },
+  turbopack: {},
 };
 
 export default nextConfig;
