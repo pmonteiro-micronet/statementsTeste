@@ -581,6 +581,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     buttonColor="transparent"
                     modalHeader={t.modals.housekeeping.maintenance.title + " - Res. No.: " + selectedReserva?.ResNo}
                     formTypeModal={11}
+                    propertyID={propertyID}
                     roomNumber={selectedReserva?.Room}
                     dateCI={selectedReserva?.DateCI}
                     booker={selectedReserva?.Booker}

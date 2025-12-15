@@ -37,8 +37,11 @@
     "src/components/ClientComponentWrapper/page.js",
     "tailwind.config.js",
     "src/app/layout.tsx",
-    "src/app/page.js"
-, "src/app/qrcode_user/page.js", "src/app/qrcode_user/QrCodeUser.js"  ],
+    "src/app/page.js",
+    "src/app/qrcode_user/page.js",
+    "src/app/qrcode_user/QrCodeUser.js",
+    ".next/dev/types/**/*.ts"
+  ],
   "exclude": [
     "node_modules"
   ]

@@ -1,11 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { CiImageOn } from "react-icons/ci";
 import { CiViewList } from "react-icons/ci";
+import { useSession } from "next-auth/react";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -17,6 +19,7 @@ const HousekeepingMaintenanceForm = ({
     modalHeader,
     editIcon,
     modalEditArrow,
+    propertyID,
     modalEdit,
     formTypeModal,
     isOpen,
@@ -26,18 +29,29 @@ const HousekeepingMaintenanceForm = ({
     const [searchTerm, setSearchTerm] = useState("");
     const [isAdding, setIsAdding] = useState(false); // ← controla se está no modo "Adicionar"
     const [selectedRoom, setSelectedRoom] = useState("");
-    const [selectedReason, setSelectedReason] = useState("");
+    const [selectedReasonID, setSelectedReasonID] = useState("");
+    const [selectedReasonText, setSelectedReasonText] = useState("");
     const [selectedImage, setSelectedImage] = useState(null);
     const today = new Date().toISOString().split("T")[0];
     const [startDate, setStartDate] = useState(today);
     const [endDate, setEndDate] = useState(today);
     const [isEditing, setIsEditing] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [createdBy, setCreatedBy] = useState("");
+
+    const { data: session } = useSession();
 
     useEffect(() => {
         const storedLanguage = localStorage.getItem("language");
         if (storedLanguage) setLocale(storedLanguage);
     }, []);
+
+    useEffect(() => {
+        if (session?.user) {
+            setCreatedBy(session.user.firstName);
+        }
+    }, [session]);
+
 
     const t = translations[locale] || translations["pt"];
 
@@ -88,16 +102,29 @@ const HousekeepingMaintenanceForm = ({
         }
     ];
 
-    const rooms = [
-        { room: 234 },
-        { room: 123 }
-    ];
+    const [roomsOptions, setRoomsOptions] = useState([]);
+    const [reasonsOptions, setReasonsOptions] = useState([]);
 
-    const reason = [
-        { reason: "001 - Ar-condicionado não funciona" },
-        { reason: "002 - Lâmpada queimada no banheiro" },
-        { reason: "003 -Cofre não abre com o código" }
-    ]
+
+    const fetchOptions = async (url, setOptions) => {
+        if (!propertyID) return;
+        try {
+            const response = await axios.get(url);
+            const options = response.data
+                .map(d => ({ value: d.value, label: d.label }))
+                .sort((a, b) => a.label.localeCompare(b.label));
+            setOptions(options);
+        } catch (error) {
+            console.error("Erro ao buscar dados:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchOptions(`/api/reservations/housekeeping/getrooms?propertyID=${propertyID}`, setRoomsOptions);
+        fetchOptions(`/api/reservations/housekeeping/getreasons?propertyID=${propertyID}`, setReasonsOptions);
+    }, [propertyID]);
+
+
     const filteredInfo = info.filter((item) => {
         const search = searchTerm.toLowerCase();
         const itemDate = item.data; // YYYY-MM-DD
@@ -114,21 +141,111 @@ const HousekeepingMaintenanceForm = ({
         return inDateRange && matchesSearch;
     });
 
+    // const handleImageUpload = (e) => {
+    //     const file = e.target.files[0];
+    //     if (file) {
+    //         // Cria uma URL temporária para exibir a imagem
+    //         const imageUrl = URL.createObjectURL(file);
+    //         setSelectedImage(imageUrl);
+    //     }
+    // };
 
-
+    const [imagePreview, setImagePreview] = useState(null);
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Cria uma URL temporária para exibir a imagem
-            const imageUrl = URL.createObjectURL(file);
-            setSelectedImage(imageUrl);
+            setSelectedImage(file); // ⭐ agora guardamos o FILE original
+
+            // opcional: preview em base64
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
         }
     };
+
 
     const handleEditClick = (item) => {
         setSelectedItem(item); // define qual item será editado
         setIsEditing(true);    // muda para modo edição
     };
+
+    const [isOOS, setIsOOS] = useState(false);
+    const [description, setDescription] = useState("");
+    const [localText, setLocalText] = useState("");
+
+    const [existingImageUrl, setExistingImageUrl] = useState(null);
+console.log(setExistingImageUrl);
+
+    const handleSubmit = async () => {
+        try {
+            let imageUrl = null;
+
+            // ⚠️ Se existir imagem, fazemos upload para Cloudinary
+            if (selectedImage) {
+                const formData = new FormData();
+                formData.append("file", selectedImage);
+                formData.append("propertyID", propertyID);
+                formData.append("room", selectedRoom);
+                formData.append("reasonID", selectedReasonID);
+
+                if (existingImageUrl) {
+                    formData.append("existingImage", existingImageUrl);
+                }
+
+                const uploadResponse = await fetch("/api/upload-maintenance-image", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const uploadResult = await uploadResponse.json();
+
+                if (uploadResponse.ok) {
+                    imageUrl = uploadResult.imageUrl;
+                } else {
+                    console.error("Erro ao enviar imagem:", uploadResult.error);
+                }
+            }
+
+            // Gerar data e hora atuais
+            const now = new Date();
+            const createdDate = now.toISOString().split("T")[0];      // YYYY-MM-DD
+            const createdTime = now.toTimeString().split(" ")[0];     // HH:mm:ss
+
+            // Payload da manutenção
+            const payload = {
+                propertyID,
+                room: selectedRoom,
+                reasonID: selectedReasonID,
+                reasonText: selectedReasonText,
+                isOOS,
+                description,
+                localText,
+                image: imageUrl,
+                createdDate,
+                createdTime,
+                createdBy,
+            };
+
+            // Enviar para a API
+            const response = await fetch(
+                "/api/reservations/housekeeping/insertMaintenance",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                }
+            );
+
+            const data = await response.json();
+            console.log("Resposta da API:", data);
+
+        } catch (error) {
+            console.error("Erro ao submeter manutenção:", error);
+        }
+    };
+
 
     return (
         <>
@@ -183,6 +300,7 @@ const HousekeepingMaintenanceForm = ({
                                             color="transparent"
                                             variant="light"
                                             className="text-white"
+                                            onClick={handleSubmit}
                                         >
                                             Create
                                         </Button>
@@ -302,34 +420,58 @@ const HousekeepingMaintenanceForm = ({
                                                     className="border border-gray-300 rounded px-2 py-1"
                                                 >
                                                     <option value="">Select a room</option>
-                                                    {rooms.map((item, index) => (
-                                                        <option key={index} value={item.room}>{item.room}</option>
+                                                    {roomsOptions.map((roomOption) => (
+                                                        <option key={roomOption.value} value={roomOption.value}>
+                                                            {roomOption.label}
+                                                        </option>
                                                     ))}
                                                 </select>
 
                                                 <select
-                                                    value={selectedReason}
-                                                    onChange={(e) => setSelectedReason(e.target.value)}
+                                                    value={selectedReasonID}
+                                                    onChange={(e) => {
+                                                        const value = parseInt(e.target.value, 10); // converte para número
+                                                        setSelectedReasonID(value);
+
+                                                        const selected = reasonsOptions.find(r => r.value === value);
+                                                        setSelectedReasonText(selected?.label || "");
+                                                    }}
                                                     className="border border-gray-300 rounded px-2 py-1"
                                                 >
                                                     <option value="">Select a reason</option>
-                                                    {reason.map((item, index) => (
-                                                        <option key={index} value={item.reason}>{item.reason}</option>
+                                                    {reasonsOptions.map((reasonOption) => (
+                                                        <option key={reasonOption.value} value={reasonOption.value}>
+                                                            {reasonOption.label}
+                                                        </option>
                                                     ))}
                                                 </select>
 
-                                                <input type="checkbox" id="oos" className="accent-blue-500 w-4 h-4" />
+                                                <input
+                                                    type="checkbox"
+                                                    id="oos"
+                                                    className="accent-blue-500 w-4 h-4"
+                                                    checked={isOOS}
+                                                    onChange={(e) => setIsOOS(e.target.checked)}
+                                                />
                                             </div>
                                         </div>
 
                                         <div>
                                             <p>Description</p>
-                                            <textarea className="w-full h-16 resize-none rounded border border-gray-300 px-2 py-1"></textarea>
+                                            <textarea
+                                                className="w-full h-16 resize-none rounded border border-gray-300 px-2 py-1"
+                                                value={description}
+                                                onChange={(e) => setDescription(e.target.value)}
+                                            ></textarea>
                                         </div>
 
                                         <div>
                                             <p>Local Text</p>
-                                            <textarea className="w-full h-16 resize-none rounded border border-gray-300 px-2 py-1"></textarea>
+                                            <textarea
+                                                className="w-full h-16 resize-none rounded border border-gray-300 px-2 py-1"
+                                                value={localText}
+                                                onChange={(e) => setLocalText(e.target.value)}
+                                            ></textarea>
                                         </div>
 
                                         <input
@@ -436,8 +578,8 @@ const HousekeepingMaintenanceForm = ({
                                         <div>
                                             <p>Image</p>
                                             <div className="w-full h-12 bg-gray-100 flex items-center justify-center rounded overflow-hidden">
-                                                {selectedImage ? (
-                                                    <img src={selectedImage} alt="Uploaded" className="w-full h-full object-cover" />
+                                                {imagePreview ? (
+                                                    <img src={imagePreview} alt="Uploaded" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <CiImageOn size={30} color="gray" />
                                                 )}
