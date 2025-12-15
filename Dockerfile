@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as a base image
-FROM node:18-buster
+FROM node:20-buster
 
 # Set the working directory in the container
 WORKDIR /app
