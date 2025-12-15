@@ -12,7 +12,6 @@ export async function POST(request) {
             room,
             reasonID,
             reasonText,
-            isOOS,
             description,
             localText,
             image,

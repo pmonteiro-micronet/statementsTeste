@@ -37,8 +37,6 @@ const HousekeepingMaintenanceForm = ({
     const [endDate, setEndDate] = useState(today);
     const [isEditing, setIsEditing] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
-    const [createdDate, setCreatedDate] = useState("");
-    const [createdTime, setCreatedTime] = useState("");
     const [createdBy, setCreatedBy] = useState("");
 
     const { data: session } = useSession();
@@ -178,7 +176,7 @@ const HousekeepingMaintenanceForm = ({
     const [localText, setLocalText] = useState("");
 
     const [existingImageUrl, setExistingImageUrl] = useState(null);
-
+console.log(setExistingImageUrl);
 
     const handleSubmit = async () => {
         try {
