@@ -21,7 +21,7 @@ import LoadingBackdrop from "@/components/Loader/page";
 import { MdOutlineDryCleaning } from "react-icons/md";
 
 import { useRouter } from "next/navigation";
-import dayjs from 'dayjs';
+// import dayjs from 'dayjs';
 
 import en from "../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
@@ -40,9 +40,10 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowDate = tomorrow.toISOString().split("T")[0];
 
-  const [currentDate] = useState(today);
+  // const [currentDate] = useState(today);
   const [reservas, setReservas] = useState([]);
-  const [postSuccessful, setPostSuccessful] = useState(false);
+  console.log(setReservas);
+  // const [postSuccessful, setPostSuccessful] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
@@ -52,6 +53,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
 
   const [errorMessage, setErrorMessage] = useState('');
+  console.log("Error Message State:", setErrorMessage);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
 
   const [locale, setLocale] = useState("pt");
@@ -70,78 +72,78 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
   const router = useRouter();
-  console.log(router);
+
 
   const [propertyName, setPropertyName] = useState([]);
 
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  // const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  // Função para enviar os dados para a API
-  const sendDataToAPI = async () => {
-    try {
-      setIsLoading(true); // Inicia o carregamento
+  // // Função para enviar os dados para a API
+  // const sendDataToAPI = async () => {
+  //   try {
+  //     setIsLoading(true); // Inicia o carregamento
 
-      const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
+  //     const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
 
-      if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
-        const mpehotel = propertyResponse.data.response[0].mpehotel;
-        console.log('Mpehotel encontrado:', mpehotel);
+  //     if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
+  //       const mpehotel = propertyResponse.data.response[0].mpehotel;
+  //       console.log('Mpehotel encontrado:', mpehotel);
 
-        // Faz as requisições com delay
-        await axios.get("/api/reservations/checkins/reservations_4_tat", {
-          params: { mpehotel, propertyID },
-        });
+  //       // Faz as requisições com delay
+  //       await axios.get("/api/reservations/checkins/reservations_4_tat", {
+  //         params: { mpehotel, propertyID },
+  //       });
 
-        // Aguarda 1 segundo antes de fazer a próxima requisição
-        await sleep(1000);
+  //       // Aguarda 1 segundo antes de fazer a próxima requisição
+  //       await sleep(1000);
 
-        await axios.get("/api/reservations/inHouses/reservations_4_tat", {
-          params: { mpehotel, propertyID },
-        });
+  //       await axios.get("/api/reservations/inHouses/reservations_4_tat", {
+  //         params: { mpehotel, propertyID },
+  //       });
 
-        // Aguarda mais 1 segundo antes de fazer a última requisição
-        await sleep(1000);
+  //       // Aguarda mais 1 segundo antes de fazer a última requisição
+  //       await sleep(1000);
 
-        // await axios.get("/api/reservations/housekeeping/reservations_4_tat", {
-        //   params: { mpehotel, propertyID },
-        // });
+  //       // await axios.get("/api/reservations/housekeeping/reservations_4_tat", {
+  //       //   params: { mpehotel, propertyID },
+  //       // });
 
-        // // Aguarda mais 1 segundo antes de fazer a última requisição
-        // await sleep(1000);
+  //       // // Aguarda mais 1 segundo antes de fazer a última requisição
+  //       // await sleep(1000);
 
-        await axios.get("/api/reservations/info", {
-          params: { mpehotel, propertyID },
-        });
+  //       await axios.get("/api/reservations/info", {
+  //         params: { mpehotel, propertyID },
+  //       });
 
-        setPostSuccessful(true);
+  //       setPostSuccessful(true);
 
-        // Aguarda um curto tempo antes de buscar as reservas para garantir que os dados sejam atualizados no backend
-        setTimeout(fetchReservas, 1000);
+  //       // Aguarda um curto tempo antes de buscar as reservas para garantir que os dados sejam atualizados no backend
+  //       setTimeout(fetchReservas, 1000);
 
-      } else {
-        console.error('Mpehotel não encontrado para o propertyID:', propertyID);
-        setPostSuccessful(false);
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 500) {
-        console.log("Erro 500: Não conseguimos comunicar com o serviço PMS.");
-        setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
-      } else {
-        console.log("Erro inesperado:", error.response ? error.response.data : error.message);
-        setErrorMessage("We were unable to fulfill your order. Please contact support.");
-      }
-      setIsErrorModalOpen(true);
-      setPostSuccessful(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     } else {
+  //       console.error('Mpehotel não encontrado para o propertyID:', propertyID);
+  //       setPostSuccessful(false);
+  //     }
+  //   } catch (error) {
+  //     if (error.response && error.response.status === 500) {
+  //       console.log("Erro 500: Não conseguimos comunicar com o serviço PMS.");
+  //       setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
+  //     } else {
+  //       console.log("Erro inesperado:", error.response ? error.response.data : error.message);
+  //       setErrorMessage("We were unable to fulfill your order. Please contact support.");
+  //     }
+  //     setIsErrorModalOpen(true);
+  //     setPostSuccessful(false);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
 
-  // Chama a função sendDataToAPI ao carregar a página
-  useEffect(() => {
-    sendDataToAPI();
-  }, [propertyID]);
+  // // Chama a função sendDataToAPI ao carregar a página
+  // useEffect(() => {
+  //   sendDataToAPI();
+  // }, [propertyID]);
 
   // const sendResToAPI = async (ResNo) => {
   //   console.log("Enviando ResNumber para a API:", ResNo);
@@ -245,88 +247,88 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     window.location.reload(); // Recarrega a página
   };
 
-  // Função para pegar as reservas
-  const fetchReservas = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get(`/api/reservations/housekeeping/${propertyID}`);
-      console.log("Response completo:", response);
+  // // Função para pegar as reservas
+  // const fetchReservas = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const response = await axios.get(`/api/reservations/housekeeping/${propertyID}`);
+  //     console.log("Response completo:", response);
 
-      // Parse das reservas
-      const reservasArray = response.data.response.flatMap(item => {
-        try {
-          return JSON.parse(item.responseBody);
-        } catch (err) {
-          console.error("Erro ao fazer parse de requestBody:", item.responseBody, err);
-          return [];
-        }
-      });
+  //     // Parse das reservas
+  //     const reservasArray = response.data.response.flatMap(item => {
+  //       try {
+  //         return JSON.parse(item.responseBody);
+  //       } catch (err) {
+  //         console.error("Erro ao fazer parse de requestBody:", item.responseBody, err);
+  //         return [];
+  //       }
+  //     });
 
-      console.log("Reservas após parse (todas as linhas):", reservasArray);
+  //     console.log("Reservas após parse (todas as linhas):", reservasArray);
 
-      if (reservasArray.length === 0) {
-        console.warn("Nenhuma reserva encontrada após parse.");
-        setIsLoading(false);
-        return; // Interrompe a execução se não houver reservas
-      }
+  //     if (reservasArray.length === 0) {
+  //       console.warn("Nenhuma reserva encontrada após parse.");
+  //       setIsLoading(false);
+  //       return; // Interrompe a execução se não houver reservas
+  //     }
 
-      // Obtemos a data atual no formato YYYY-MM-DD
-      const today = dayjs(currentDate, 'YYYY-MM-DD', true);
-      console.log("Data atual formatada:", today.format());
+  //     // Obtemos a data atual no formato YYYY-MM-DD
+  //     const today = dayjs(currentDate, 'YYYY-MM-DD', true);
+  //     console.log("Data atual formatada:", today.format());
 
-      // Filtramos as reservas para pegar apenas as que têm a data no campo requestDateTime igual à data atual
-      const reservasFiltradas = reservasArray.filter(reserva => {
-        const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+  //     // Filtramos as reservas para pegar apenas as que têm a data no campo requestDateTime igual à data atual
+  //     const reservasFiltradas = reservasArray.filter(reserva => {
+  //       const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
 
-        // Compara apenas a data, sem considerar a hora
-        const isSameDay = requestDateTime.isSame(today, 'day');
+  //       // Compara apenas a data, sem considerar a hora
+  //       const isSameDay = requestDateTime.isSame(today, 'day');
 
-        console.log(`Reserva: ${reserva.LastName}, RequestDateTime: ${requestDateTime.format()}`);
-        return isSameDay;
-      });
+  //       console.log(`Reserva: ${reserva.LastName}, RequestDateTime: ${requestDateTime.format()}`);
+  //       return isSameDay;
+  //     });
 
-      console.log("Reservas filtradas pela data atual:", reservasFiltradas);
+  //     console.log("Reservas filtradas pela data atual:", reservasFiltradas);
 
-      // Agora vamos agrupar as reservas por 'LastName' e 'Room' e pegar a mais recente de cada grupo
-      const reservasMaisRecentes = [];
+  //     // Agora vamos agrupar as reservas por 'LastName' e 'Room' e pegar a mais recente de cada grupo
+  //     const reservasMaisRecentes = [];
 
-      // Usando um Map para garantir que, para cada combinação LastName + Room, só a reserva mais recente seja adicionada
-      const seen = new Map();
+  //     // Usando um Map para garantir que, para cada combinação LastName + Room, só a reserva mais recente seja adicionada
+  //     const seen = new Map();
 
-      reservasFiltradas.forEach(reserva => {
-        const key = `${reserva.LastName}-${reserva.Room}`;
-        const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+  //     reservasFiltradas.forEach(reserva => {
+  //       const key = `${reserva.LastName}-${reserva.Room}`;
+  //       const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
 
-        if (!seen.has(key)) {
-          seen.set(key, reserva);
-        } else {
-          const existingReserva = seen.get(key);
-          const existingDate = dayjs(existingReserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+  //       if (!seen.has(key)) {
+  //         seen.set(key, reserva);
+  //       } else {
+  //         const existingReserva = seen.get(key);
+  //         const existingDate = dayjs(existingReserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
 
-          // Se a reserva atual for mais recente, substituímos a existente
-          if (requestDateTime.isAfter(existingDate)) {
-            seen.set(key, reserva);
-          }
-        }
-      });
+  //         // Se a reserva atual for mais recente, substituímos a existente
+  //         if (requestDateTime.isAfter(existingDate)) {
+  //           seen.set(key, reserva);
+  //         }
+  //       }
+  //     });
 
-      // Agora, obtemos todas as reservas mais recentes
-      reservasMaisRecentes.push(...seen.values());
+  //     // Agora, obtemos todas as reservas mais recentes
+  //     reservasMaisRecentes.push(...seen.values());
 
-      console.log("Reservas mais recentes para o dia de hoje:", reservasMaisRecentes);
-      setReservas(reservasMaisRecentes);
-    } catch (error) {
-      console.error("Erro ao buscar reservas:", error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     console.log("Reservas mais recentes para o dia de hoje:", reservasMaisRecentes);
+  //     setReservas(reservasMaisRecentes);
+  //   } catch (error) {
+  //     console.error("Erro ao buscar reservas:", error.message);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (postSuccessful) {
-      fetchReservas();
-    }
-  }, [postSuccessful]);
+  // useEffect(() => {
+  //   if (postSuccessful) {
+  //     fetchReservas();
+  //   }
+  // }, [postSuccessful]);
 
 
   useEffect(() => {
