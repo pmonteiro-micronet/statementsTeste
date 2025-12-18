@@ -352,32 +352,28 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   }, [propertyID]);
 
   useEffect(() => {
-    if (!propertyID) return;
+  if (!propertyID) return;
 
-    const fetchHousekeeping = async () => {
-      try {
-        const response = await axios.get(
-          "/api/reservations/housekeeping/gethousekeeping",
-          {
-            params: { propertyID }
-          }
-        );
+  const fetchHousekeeping = async () => {
+    try {
+      const response = await axios.post(
+        "/api/reservations/housekeeping/gethousekeeping",
+        { propertyID } // envio no body
+      );
 
-        if (response.data && response.data.length > 0) {
-          console.log("Housekeeping:", response.data);
-        } else {
-          console.warn("Nenhum dado encontrado para o propertyID:", propertyID);
-        }
-      } catch (error) {
-        console.error(
-          "Erro ao buscar housekeeping:",
-          error.response?.data || error.message
-        );
+      if (response.data && response.data.length > 0) {
+        console.log("Housekeeping:", response.data);
+      } else {
+        console.warn("Nenhum dado encontrado para o propertyID:", propertyID);
       }
-    };
+    } catch (error) {
+      console.error("Erro ao buscar housekeeping:", error.response?.data || error.message);
+    }
+  };
 
-    fetchHousekeeping();
-  }, [propertyID]);
+  fetchHousekeeping();
+}, [propertyID]);
+
 
   // UseMemo para preparar os dados filtrados de acordo com a paginação
   const items = React.useMemo(() => {
