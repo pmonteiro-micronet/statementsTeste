@@ -41,8 +41,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const tomorrowDate = tomorrow.toISOString().split("T")[0];
 
   // const [currentDate] = useState(today);
-  const [reservas, setReservas] = useState([]);
-  console.log(setReservas);
+  // const [reservas, setReservas] = useState([]);
+
   // const [postSuccessful, setPostSuccessful] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -392,10 +392,10 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
-    return reservas.slice(start, end); // Filtra as reservas com base na página atual e número de linhas por página
-  }, [page, rowsPerPage, reservas]); // A dependência inclui `reservas`, que é onde as reservas filtradas estão
+    return housekeeping.slice(start, end); // Filtra os housekeeping com base na página atual e número de linhas por página
+  }, [page, rowsPerPage, housekeeping]); // A dependência inclui `housekeeping`, que é onde os dados estão
 
-  const pages = Math.ceil(reservas.length / rowsPerPage); // Calcula o número total de páginas com base no total de reservas
+  const pages = Math.ceil(housekeeping.length / rowsPerPage); // Calcula o número total de páginas com base no total de housekeeping
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
@@ -500,7 +500,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
         <div className="mt-5 flex flex-col h-[calc(100vh-210px)]">
           {isLoading ? (
             (<LoadingBackdrop open={isLoading} />) // Exibe o carregamento enquanto os dados estão sendo carregados
-          ) : reservas.length > 0 ? (
+          ) : housekeeping.length > 0 ? (
             <div className="overflow-auto flex-grow">
               <table className="w-full text-left min-w-max border-collapse">
                 <thead className="sticky top-0 z-30">
