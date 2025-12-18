@@ -56,6 +56,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
   const [locale, setLocale] = useState("pt");
 
+  const [housekeeping, setHousekeeping] = useState([]);
+
   useEffect(() => {
     // Carregar o idioma do localStorage
     const storedLanguage = localStorage.getItem("language");
@@ -352,28 +354,36 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   }, [propertyID]);
 
   useEffect(() => {
-  if (!propertyID) return;
-
   const fetchHousekeeping = async () => {
     try {
+      setIsLoading(true);
+
       const response = await axios.post(
         "/api/reservations/housekeeping/gethousekeeping",
-        { propertyID } // envio no body
+        { propertyID }
       );
 
       if (response.data && response.data.length > 0) {
         console.log("Housekeeping:", response.data);
+        setHousekeeping(response.data); // 👈 guarda no estado
       } else {
+        setHousekeeping([]);
         console.warn("Nenhum dado encontrado para o propertyID:", propertyID);
       }
     } catch (error) {
-      console.error("Erro ao buscar housekeeping:", error.response?.data || error.message);
+      console.error(
+        "Erro ao buscar housekeeping:",
+        error.response?.data || error.message
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  fetchHousekeeping();
+  if (propertyID) {
+    fetchHousekeeping();
+  }
 }, [propertyID]);
-
 
   // UseMemo para preparar os dados filtrados de acordo com a paginação
   const items = React.useMemo(() => {
@@ -412,16 +422,16 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [sortOrder, setSortOrder] = useState('asc');
   const [sortField, setSortField] = useState('');
 
-  const sortedItems = [...reservas].sort((a, b) => {
-    if (sortField === 'guestName') {
-      const nameA = `${a.LastName}, ${a.FirstName}`.toLowerCase();
-      const nameB = `${b.LastName}, ${b.FirstName}`.toLowerCase();
+  // const sortedItems = [...reservas].sort((a, b) => {
+  //   if (sortField === 'guestName') {
+  //     const nameA = `${a.LastName}, ${a.FirstName}`.toLowerCase();
+  //     const nameB = `${b.LastName}, ${b.FirstName}`.toLowerCase();
 
-      if (sortOrder === 'asc') return nameA.localeCompare(nameB);
-      else return nameB.localeCompare(nameA);
-    }
-    return 0; // padrão se nenhum campo for selecionado
-  });
+  //     if (sortOrder === 'asc') return nameA.localeCompare(nameB);
+  //     else return nameB.localeCompare(nameA);
+  //   }
+  //   return 0; // padrão se nenhum campo for selecionado
+  // });
 
   const toggleSort = (field) => {
     if (sortField === field) {
@@ -524,21 +534,18 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedItems.map((reserva, index) => {
-                    // const isOpen = openDropdownIndex === index;
-
-                    return (
-                      <tr
-                        key={index}
-                        className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50"
-                      >
+                  {housekeeping.map((item, index) => (
+                          <tr
+      key={`${item.IDReserva}-${index}`}
+      className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor hover:bg-primary-50"
+    >
                         <td className="pl-1 pr-1 w-32 border-r border-[#e6e6e6] align-middle text-center">
                           <div className="flex items-center justify-center gap-2 w-full h-full">
 
                             {/* Botão de manutenção */}
                             <button
                               className="p-1 rounded flex items-center"
-                              onClick={() => handleOpenMaintenanceModal(reserva)}
+                              onClick={() => handleOpenMaintenanceModal(item)}
                             >
                               <HiOutlineWrenchScrewdriver size={20} color="gray" />
                             </button>
@@ -546,7 +553,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                             {/* Botão de traces */}
                             <button
                               className="p-1 rounded flex items-center"
-                              onClick={() => handleOpenTracesModal(reserva)}
+                              onClick={() => handleOpenTracesModal(item)}
                             >
                               <CiViewList size={20} color="gray" />
                             </button>
@@ -554,36 +561,35 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                             {/* Botão de info */}
                             <button
                               className="p-1 rounded flex items-center"
-                              onClick={() => handleOpenModal(reserva)}
+                              onClick={() => handleOpenModal(item)}
                             >
                               <IoInformationCircleOutline size={20} color="gray" />
                             </button>
                           </div>
                         </td>
                         {/* Other Cells */}
-                        <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.DateCI}</td>
-                        <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.DateCO}</td>
-                        <td className="text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.Room}</td>
+                        <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.ArrivalDate?.split("T")[0]}</td>
+                        <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.DepartureDate?.split("T")[0]}</td>
+                        <td className="text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.IDQuarto}</td>
                         <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">
-                          {`${reserva.LastName}, ${reserva.FirstName}`}
+                          {`${item.GuestName}`}
                         </td>
                         <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-32 truncate whitespace-nowrap overflow-hidden">
-                          {reserva.housekeeping === 1 && <MdOutlineDryCleaning size={30} />}
+                          {item.Lavandaria === "Sim" && <MdOutlineDryCleaning size={30} />}
                         </td>
-                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate whitespace-nowrap overflow-hidden">{reserva.roomStatus}</td>
-                        <td className="h-14 pr-2 border-r border-[#e6e6e6] text-right w-20 truncate whitespace-nowrap overflow-hidden">{reserva.ResNo}</td>
+                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate whitespace-nowrap overflow-hidden">{item.EstadoQuarto}</td>
+                        <td className="h-14 pr-2 border-r border-[#e6e6e6] text-right w-20 truncate whitespace-nowrap overflow-hidden">{item.IDReserva}</td>
                       </tr>
-                    );
-                  })}
+                    ))}
 
                   {/* Modals */}
                   <HousekeepingInfoForm
                     buttonName={t.frontOffice.housekeeping.info}
                     buttonColor="transparent"
-                    modalHeader={"Res. No.: " + selectedReserva?.ResNo}
+                    modalHeader={"Res. No.: " + selectedReserva?.IDReserva}
                     formTypeModal={11}
-                    roomNumber={selectedReserva?.Room}
-                    dateCI={selectedReserva?.DateCI}
+                    roomNumber={selectedReserva?.IDQuarto}
+                    dateCI={selectedReserva?.ArrivalDate}
                     booker={selectedReserva?.Booker}
                     salutation={selectedReserva?.Salutation}
                     lastName={selectedReserva?.LastName}
