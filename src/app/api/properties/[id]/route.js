@@ -29,7 +29,7 @@ export async function GET(request, context) {
 
 // Função PATCH para atualizar a propriedade
 export async function PATCH(request, context) {
-  const { id } = context.params;
+  const { id } = await context.params;
   const {
       propertyName,
       propertyTag,

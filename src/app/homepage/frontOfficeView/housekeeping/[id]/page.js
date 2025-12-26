@@ -5,8 +5,19 @@ import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
 
 import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
-import { IoInformationCircleOutline } from "react-icons/io5";
 import { CiViewList } from "react-icons/ci";
+import { MdCleanHands } from "react-icons/md";
+import {
+  CiCircleCheck,
+  CiWarning,
+  CiClock2,
+  CiPlay1,
+  CiSettings,
+  CiHome,
+} from "react-icons/ci";
+
+import { FaCircle } from "react-icons/fa";
+
 
 import { FaGear } from "react-icons/fa6";
 import { MdOutlineRefresh } from "react-icons/md";
@@ -28,6 +39,17 @@ import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../../public/locales/espanol/common.json";
 
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
+
+import { MdComputer } from "react-icons/md";
+import { CiLock } from "react-icons/ci";
+import { HiMiniArrowsUpDown } from "react-icons/hi2";
+
+import { GoArrowLeft, GoArrowRight } from "react-icons/go";
+
+import { IoMdExpand } from "react-icons/io";
+
+
+import { FaRegHourglass } from "react-icons/fa6";
 
 const translations = { en, pt, es };
 
@@ -76,143 +98,6 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
   const [propertyName, setPropertyName] = useState([]);
 
-  // const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-  // // Função para enviar os dados para a API
-  // const sendDataToAPI = async () => {
-  //   try {
-  //     setIsLoading(true); // Inicia o carregamento
-
-  //     const propertyResponse = await axios.get(`/api/properties/${propertyID}`);
-
-  //     if (propertyResponse.data && propertyResponse.data.response && propertyResponse.data.response.length > 0) {
-  //       const mpehotel = propertyResponse.data.response[0].mpehotel;
-  //       console.log('Mpehotel encontrado:', mpehotel);
-
-  //       // Faz as requisições com delay
-  //       await axios.get("/api/reservations/checkins/reservations_4_tat", {
-  //         params: { mpehotel, propertyID },
-  //       });
-
-  //       // Aguarda 1 segundo antes de fazer a próxima requisição
-  //       await sleep(1000);
-
-  //       await axios.get("/api/reservations/inHouses/reservations_4_tat", {
-  //         params: { mpehotel, propertyID },
-  //       });
-
-  //       // Aguarda mais 1 segundo antes de fazer a última requisição
-  //       await sleep(1000);
-
-  //       // await axios.get("/api/reservations/housekeeping/reservations_4_tat", {
-  //       //   params: { mpehotel, propertyID },
-  //       // });
-
-  //       // // Aguarda mais 1 segundo antes de fazer a última requisição
-  //       // await sleep(1000);
-
-  //       await axios.get("/api/reservations/info", {
-  //         params: { mpehotel, propertyID },
-  //       });
-
-  //       setPostSuccessful(true);
-
-  //       // Aguarda um curto tempo antes de buscar as reservas para garantir que os dados sejam atualizados no backend
-  //       setTimeout(fetchReservas, 1000);
-
-  //     } else {
-  //       console.error('Mpehotel não encontrado para o propertyID:', propertyID);
-  //       setPostSuccessful(false);
-  //     }
-  //   } catch (error) {
-  //     if (error.response && error.response.status === 500) {
-  //       console.log("Erro 500: Não conseguimos comunicar com o serviço PMS.");
-  //       setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
-  //     } else {
-  //       console.log("Erro inesperado:", error.response ? error.response.data : error.message);
-  //       setErrorMessage("We were unable to fulfill your order. Please contact support.");
-  //     }
-  //     setIsErrorModalOpen(true);
-  //     setPostSuccessful(false);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-
-  // // Chama a função sendDataToAPI ao carregar a página
-  // useEffect(() => {
-  //   sendDataToAPI();
-  // }, [propertyID]);
-
-  // const sendResToAPI = async (ResNo) => {
-  //   console.log("Enviando ResNumber para a API:", ResNo);
-  //   const windowValue = 0;
-
-  //   try {
-  //     // Faz a requisição para enviar os dados do statement
-  //     const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
-  //       params: {
-  //         ResNo,
-  //         window: windowValue,
-  //         propertyID,
-  //       },
-  //     });
-
-  //     console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
-  //     console.log("Resposta da API ao salvar statement:", saveResponse.data);
-
-  //     // Se a resposta de salvar o statement foi bem-sucedida, agora verificamos
-  //     // se o statement foi atualizado ou criado, e pegamos o requestID
-  //     if (saveResponse.data && saveResponse.data.data && saveResponse.data.data.requestID) {
-  //       const updatedRecord = saveResponse.data.data;
-  //       const updatedRequestID = updatedRecord.requestID;
-
-  //       // Redireciona para a página jsonView com o requestID do registro atualizado
-  //       console.log("Statement atualizado com requestID:", updatedRequestID);
-  //       router.push(`/homepage/jsonView?recordID=${updatedRequestID}&propertyID=${propertyID}`);
-  //     } else {
-  //       console.warn("Resposta da API não contém requestID.");
-  //     }
-
-  //   } catch (error) {
-  //     console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
-
-  //     if (error.response) {
-  //       if (error.response.status === 409) {
-  //         // O status 409 indica que já existe um registro com a mesma uniqueKey
-  //         console.warn("Registro já existente, buscando o requestID do registro existente.");
-
-  //         // Extraia o requestID do erro, caso a API o forneça
-  //         const existingRequestID = error.response.data?.existingRequestID;
-
-  //         if (existingRequestID) {
-  //           console.log("Registro existente encontrado com requestID:", existingRequestID);
-
-  //           // Redireciona para a página jsonView com o requestID do registro existente
-  //           router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
-  //         } else {
-  //           console.error("Não foi possível encontrar o requestID do registro existente.");
-  //         }
-  //       } else if (error.response.status === 500) {
-  //         // Trata o erro 500
-  //         setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
-  //         setIsErrorModalOpen(true);
-  //       } else {
-  //         // Outros erros
-  //         console.log("Erro inesperado:", error.response.data);
-  //         setErrorMessage("We were unable to fulfill your order. Please contact support.");
-  //         setIsErrorModalOpen(true);
-  //       }
-  //     } else {
-  //       // Erros que não possuem uma resposta da API (ex: problemas de rede)
-  //       console.log("Erro inesperado:", error.message);
-  //       setErrorMessage("We were unable to fulfill your order. Please contact support.");
-  //       setIsErrorModalOpen(true);
-  //     }
-  //   }
-  // };
-
   const [selectedReserva, setSelectedReserva] = useState(null);
 
   const handleOpenModal = (reserva) => {
@@ -224,10 +109,10 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     setIsModalMaintenanceOpen(true);
   };
 
-  const handleOpenTracesModal = (reserva) => {
-    setSelectedReserva(reserva); // Armazena os dados da reserva clicada
-    setIsModalTracesOpen(true);
-  };
+  // const handleOpenTracesModal = (reserva) => {
+  //   setSelectedReserva(reserva); // Armazena os dados da reserva clicada
+  //   setIsModalTracesOpen(true);
+  // };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -246,90 +131,6 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     setSelectedReserva(null); // Limpa os dados ao fechar a modal
     window.location.reload(); // Recarrega a página
   };
-
-  // // Função para pegar as reservas
-  // const fetchReservas = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await axios.get(`/api/reservations/housekeeping/${propertyID}`);
-  //     console.log("Response completo:", response);
-
-  //     // Parse das reservas
-  //     const reservasArray = response.data.response.flatMap(item => {
-  //       try {
-  //         return JSON.parse(item.responseBody);
-  //       } catch (err) {
-  //         console.error("Erro ao fazer parse de requestBody:", item.responseBody, err);
-  //         return [];
-  //       }
-  //     });
-
-  //     console.log("Reservas após parse (todas as linhas):", reservasArray);
-
-  //     if (reservasArray.length === 0) {
-  //       console.warn("Nenhuma reserva encontrada após parse.");
-  //       setIsLoading(false);
-  //       return; // Interrompe a execução se não houver reservas
-  //     }
-
-  //     // Obtemos a data atual no formato YYYY-MM-DD
-  //     const today = dayjs(currentDate, 'YYYY-MM-DD', true);
-  //     console.log("Data atual formatada:", today.format());
-
-  //     // Filtramos as reservas para pegar apenas as que têm a data no campo requestDateTime igual à data atual
-  //     const reservasFiltradas = reservasArray.filter(reserva => {
-  //       const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-
-  //       // Compara apenas a data, sem considerar a hora
-  //       const isSameDay = requestDateTime.isSame(today, 'day');
-
-  //       console.log(`Reserva: ${reserva.LastName}, RequestDateTime: ${requestDateTime.format()}`);
-  //       return isSameDay;
-  //     });
-
-  //     console.log("Reservas filtradas pela data atual:", reservasFiltradas);
-
-  //     // Agora vamos agrupar as reservas por 'LastName' e 'Room' e pegar a mais recente de cada grupo
-  //     const reservasMaisRecentes = [];
-
-  //     // Usando um Map para garantir que, para cada combinação LastName + Room, só a reserva mais recente seja adicionada
-  //     const seen = new Map();
-
-  //     reservasFiltradas.forEach(reserva => {
-  //       const key = `${reserva.LastName}-${reserva.Room}`;
-  //       const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-
-  //       if (!seen.has(key)) {
-  //         seen.set(key, reserva);
-  //       } else {
-  //         const existingReserva = seen.get(key);
-  //         const existingDate = dayjs(existingReserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-
-  //         // Se a reserva atual for mais recente, substituímos a existente
-  //         if (requestDateTime.isAfter(existingDate)) {
-  //           seen.set(key, reserva);
-  //         }
-  //       }
-  //     });
-
-  //     // Agora, obtemos todas as reservas mais recentes
-  //     reservasMaisRecentes.push(...seen.values());
-
-  //     console.log("Reservas mais recentes para o dia de hoje:", reservasMaisRecentes);
-  //     setReservas(reservasMaisRecentes);
-  //   } catch (error) {
-  //     console.error("Erro ao buscar reservas:", error.message);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (postSuccessful) {
-  //     fetchReservas();
-  //   }
-  // }, [postSuccessful]);
-
 
   useEffect(() => {
     const fetchHotelName = async () => {
@@ -356,36 +157,36 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   }, [propertyID]);
 
   useEffect(() => {
-  const fetchHousekeeping = async () => {
-    try {
-      setIsLoading(true);
+    const fetchHousekeeping = async () => {
+      try {
+        setIsLoading(true);
 
-      const response = await axios.post(
-        "/api/reservations/housekeeping/gethousekeeping",
-        { propertyID }
-      );
+        const response = await axios.post(
+          "/api/reservations/housekeeping/gethousekeeping",
+          { propertyID }
+        );
 
-      if (response.data && response.data.length > 0) {
-        console.log("Housekeeping:", response.data);
-        setHousekeeping(response.data); // 👈 guarda no estado
-      } else {
-        setHousekeeping([]);
-        console.warn("Nenhum dado encontrado para o propertyID:", propertyID);
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          console.log("Housekeeping:", response.data);
+          setHousekeeping(response.data); // 👈 guarda no estado
+        } else {
+          setHousekeeping([]);
+          console.warn("Nenhum dado encontrado ou dados inválidos para o propertyID:", propertyID);
+        }
+      } catch (error) {
+        console.error(
+          "Erro ao buscar housekeeping:",
+          error.response?.data || error.message
+        );
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error(
-        "Erro ao buscar housekeeping:",
-        error.response?.data || error.message
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
-  if (propertyID) {
-    fetchHousekeeping();
-  }
-}, [propertyID]);
+    if (propertyID) {
+      fetchHousekeeping();
+    }
+  }, [propertyID]);
 
   // UseMemo para preparar os dados filtrados de acordo com a paginação
   const items = React.useMemo(() => {
@@ -467,6 +268,23 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   //   setOpenDropdownIndex(newState ? index : null);
   // };
 
+  const estadoEstadiaIcon = {
+    0: <GoArrowRight size={18} title="Chegada" color="green" />,
+    1: <FaRegHourglass size={18} title="Permanência" />,
+    2: <GoArrowLeft size={18} title="Partida" color="red" />,
+    null: <IoMdExpand size={14} title="Vazio" />,
+  };
+
+  const estadoLimpezaConfig = {
+    1: { icon: <CiCircleCheck size={20} />, title: "Limpo" },
+    2: { icon: <FaCircle size={20} color="red"/>, title: "Sujo" },
+    3: { icon: <CiWarning size={20} />, title: "Fora de serviço" },
+    4: { icon: <CiHome size={20} />, title: "Pronto" },
+    5: { icon: <CiClock2 size={20} />, title: "Usado" },
+    6: { icon: <CiPlay1 size={20} />, title: "Limpeza em execução" },
+    10: { icon: <CiSettings size={20} />, title: "Arrumar quarto" },
+  };
+
   return (
     (<main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       {isLoading && <LoadingBackdrop open={isLoading} />}
@@ -531,77 +349,114 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                       </div>
                     </td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.title}</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.roomStatus}</td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.resNo}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-14">
+                      <div className="flex items-center justify-center h-full">
+                        <MdComputer size={20} title="HK Status" />
+                      </div>
+                    </td>
+
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-14">
+                      <div className="flex items-center justify-center h-full">
+                        <HiMiniArrowsUpDown size={20} title="Stay Status" />
+                      </div>
+                    </td>
+
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-14">
+                      <div className="flex items-center justify-center h-full">
+                        <MdCleanHands size={20} title="Room Status" />
+                      </div>
+                    </td>
                   </tr>
                 </thead>
                 <tbody>
-                  {housekeeping.map((item, index) => (
-                          <tr
-      key={`${item.IDReserva}-${index}`}
-      className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor hover:bg-primary-50"
-    >
-                        <td className="pl-1 pr-1 w-32 border-r border-[#e6e6e6] align-middle text-center">
-                          <div className="flex items-center justify-center gap-2 w-full h-full">
+                  {items.map((item, index) => (
+                    <tr
+                      key={`${item.IDReserva}-${index}`}
+                      className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor hover:bg-primary-50"
+                    >
+                      <td className="pl-1 pr-1 w-32 border-r border-[#e6e6e6] align-middle text-center">
+                        <div className="flex items-center justify-center gap-2 w-full h-full">
 
-                            {/* Botão de manutenção */}
-                            <button
-                              className="p-1 rounded flex items-center"
-                              onClick={() => handleOpenMaintenanceModal(item)}
-                            >
-                              <HiOutlineWrenchScrewdriver size={20} color="gray" />
-                            </button>
+                          {/* Botão de manutenção */}
+                          <button
+                            className="p-1 rounded flex items-center"
+                            onClick={() => handleOpenMaintenanceModal(item)}
+                          >
+                            <HiOutlineWrenchScrewdriver size={20} color="gray" />
+                          </button>
 
-                            {/* Botão de traces */}
-                            <button
-                              className="p-1 rounded flex items-center"
-                              onClick={() => handleOpenTracesModal(item)}
-                            >
-                              <CiViewList size={20} color="gray" />
-                            </button>
+                          {/* Botão de traces */}
+                          {/* <button
+                            className="p-1 rounded flex items-center"
+                            onClick={() => handleOpenTracesModal(item)}
+                          >
+                            <CiViewList size={20} color="gray" />
+                          </button> */}
 
-                            {/* Botão de info */}
-                            <button
-                              className="p-1 rounded flex items-center"
-                              onClick={() => handleOpenModal(item)}
-                            >
-                              <IoInformationCircleOutline size={20} color="gray" />
-                            </button>
-                          </div>
-                        </td>
-                        {/* Other Cells */}
-                        <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.ArrivalDate?.split("T")[0]}</td>
-                        <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.DepartureDate?.split("T")[0]}</td>
-                        <td className="text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.IDQuarto}</td>
-                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">
-                          {`${item.GuestName}`}
-                        </td>
-                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-32 truncate whitespace-nowrap overflow-hidden">
-                          {item.Lavandaria === "Sim" && <MdOutlineDryCleaning size={30} />}
-                        </td>
-                        <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] max-w-xs truncate whitespace-nowrap overflow-hidden">{item.EstadoQuarto}</td>
-                        <td className="h-14 pr-2 border-r border-[#e6e6e6] text-right w-20 truncate whitespace-nowrap overflow-hidden">{item.IDReserva}</td>
-                      </tr>
-                    ))}
+                          {/* Botão de info */}
+                          <button
+                            className="p-1 rounded flex items-center"
+                            onClick={() => handleOpenModal(item)}
+                          >
+                            <CiViewList size={20} color="gray" />
+                          </button>
+                        </div>
+                      </td>
+                      {/* Other Cells */}
+                      <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.ArrivalDate?.split("T")[0]}</td>
+                      <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.DepartureDate?.split("T")[0]}</td>
+                      <td className="text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.IDQuarto}</td>
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">
+                        {`${item.GuestName}`}
+                      </td>
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-32 truncate whitespace-nowrap overflow-hidden">
+                        {item.Lavandaria === "Sim" && <MdOutlineDryCleaning size={30} />}
+                      </td>
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-14">
+                        <div className="flex items-center justify-center h-full">
+                          {item.EstadoQuarto === 1 ? (
+                            <CiLock size={20} />
+                          ) : (
+                            <CiCircleCheck size={20} />
+                          )}
+                        </div>
+                      </td>
+
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-14">
+                        <div className="flex items-center justify-center h-full">
+                          {estadoEstadiaIcon[item.EstadoEstadia ?? null]}
+                        </div>
+                      </td>
+
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-14">
+                        <div className="flex items-center justify-center h-full">
+                          {estadoLimpezaConfig[item.EstadoLimpeza] && (
+                            <span title={estadoLimpezaConfig[item.EstadoLimpeza].title}>
+                              {estadoLimpezaConfig[item.EstadoLimpeza].icon}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
 
                   {/* Modals */}
                   <HousekeepingInfoForm
                     buttonName={t.frontOffice.housekeeping.info}
                     buttonColor="transparent"
-                    modalHeader={"Res. No.: " + selectedReserva?.IDReserva}
+                    modalHeader={"R. " + selectedReserva?.IDReserva}
                     formTypeModal={11}
-                    roomNumber={selectedReserva?.IDQuarto}
-                    dateCI={selectedReserva?.ArrivalDate}
-                    booker={selectedReserva?.Booker}
-                    salutation={selectedReserva?.Salutation}
-                    lastName={selectedReserva?.LastName}
-                    firstName={selectedReserva?.FirstName}
-                    roomType={selectedReserva?.RoomType}
-                    resStatus={selectedReserva?.resStatus}
-                    childs={selectedReserva?.Childs}
-                    adults={selectedReserva?.Adults}
-                    balance={selectedReserva?.balance}
-                    country={selectedReserva?.Country}
+                    hskStatus={selectedReserva?.EstadoQuarto}
+                    roomStatus={selectedReserva?.EstadoLimpeza}
+                    priority={selectedReserva?.Prioridade}
+                    roomType={selectedReserva?.Tipologia}
+                    stayStatus={selectedReserva?.EstadoEstadia}
+                    laundry={selectedReserva?.Lavandaria}
+                    guestName={selectedReserva?.GuestName}
+                    from={selectedReserva?.ArrivalDate}
+                    to={selectedReserva?.DepartureDate}
+                    propertyID={propertyID}
+                    resNo={selectedReserva?.IDReserva}
                     isBackdropVisible
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
