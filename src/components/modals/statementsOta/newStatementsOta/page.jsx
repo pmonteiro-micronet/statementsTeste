@@ -23,6 +23,7 @@ const NewReservationModal = ({ isOpen, onClose, propertyID }) => {
       const diff = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
       return diff > 0 ? diff : 0;
     } catch (e) {
+      console.error("Error calculating nights:", e);
       return 0;
     }
   };
