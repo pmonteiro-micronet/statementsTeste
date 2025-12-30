@@ -17,6 +17,110 @@ export async function GET() {
   }
 }
 
+export async function POST(req) {
+  try {
+    console.log("Iniciando processo de criação de nova propriedade");
+    const body = await req.json();
+    console.log("Request body recebido:", body);
+
+    const {
+      propertyName,
+      propertyTag,
+      propertyServer,
+      propertyPort,
+      propertyPortStay,
+      mpehotel,
+      pdfFilePath,
+      passeIni,
+      hotelName,
+      hotelTermsEN,
+      hotelTermsPT,
+      hotelTermsES,
+      hotelPhone,
+      hotelEmail,
+      hotelAddress,
+      hotelPostalCode,
+      hotelRNET,
+      hotelNIF,
+      hasStay,
+      replyEmail,
+      replyPassword,
+      sendingServer,
+      sendingPort,
+      emailSubject,
+      emailBody,
+      infoEmail,
+      hasRoomCloud,
+    } = body;
+
+    if (!propertyName || !propertyTag || !hotelName) {
+      return new NextResponse(
+        JSON.stringify({ error: "Some required fields are missing." }),
+        { status: 400 }
+      );
+    }
+
+    // ✅ Converter valores para boolean de forma segura
+    const stayValue = Boolean(hasStay);
+    const roomCloudValue = Boolean(hasRoomCloud);
+    
+    // Convert numeric fields
+    const portStayValue = propertyPortStay ? parseInt(propertyPortStay, 10) : null;
+    const mpehotelValue = mpehotel ? parseInt(mpehotel, 10) : 0;
+    const sendingPortValue = sendingPort ? parseInt(sendingPort, 10) : null;
+
+    console.log("Criando nova propriedade com hasStay:", stayValue, "hasRoomCloud:", roomCloudValue);
+
+    // Create new property
+    const newProperty = await prisma.properties.create({
+      data: {
+        propertyName,
+        propertyTag,
+        propertyServer,
+        propertyPort,
+        propertyPortStay: portStayValue,
+        mpehotel: mpehotelValue,
+        pdfFilePath,
+        passeIni,
+        hotelName,
+        hotelTermsEN,
+        hotelTermsPT,
+        hotelTermsES,
+        hotelPhone,
+        hotelEmail,
+        hotelAddress,
+        hotelPostalCode,
+        hotelRNET,
+        hotelNIF,
+        hasStay: stayValue,
+        replyEmail,
+        replyPassword,
+        sendingServer,
+        sendingPort: sendingPortValue,
+        emailSubject,
+        emailBody,
+        infoEmail,
+        hasRoomCloud: roomCloudValue
+      },
+    });
+
+    console.log("Property created with ID:", newProperty.propertyID);
+
+    return new NextResponse(
+      JSON.stringify({ propertyId: newProperty.propertyID, updatedProperties: newProperty }),
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Erro no processo:", error);
+    return new NextResponse(
+      JSON.stringify({ error: error.message || "Failed to create property." }),
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 export async function PUT(req) {
   try {
     console.log("Iniciando processo de atualização das propriedades");

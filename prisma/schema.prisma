@@ -39,6 +39,7 @@ model properties {
   privacyPolicyEN  String?           @default("") @db.VarChar(1000)
   privacyPolicyPT  String?           @default("") @db.VarChar(1000)
   hasRoomCloud     Boolean           @default(false)
+  sendStayByEmail  Boolean?          @default(false)
   usersProperties  usersProperties[]
 }
 
@@ -210,4 +211,12 @@ model roomCloudLogs {
   responseStatus String?   @db.VarChar(50)
   responseBody   String?   @db.Text
   createdAt      DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model chatbotsStay {
+  propertyID      Int     @id
+  active          Boolean
+  provider        String? @db.Text
+  hijiffyToken    String? @db.Text
+  hijiffyCampaign String? @db.Text
 }
