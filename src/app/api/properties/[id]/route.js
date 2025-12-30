@@ -27,7 +27,6 @@ export async function GET(request, context) {
   }
 }
 
-// Função PATCH para atualizar a propriedade
 export async function PATCH(request, context) {
   const { id } = context.params;
   const {
@@ -57,7 +56,8 @@ export async function PATCH(request, context) {
       emailSubject,
       emailBody,
       infoEmail,
-      hasRoomCloud
+      hasRoomCloud,
+      sendStayByEmail
   } = await request.json();
 
   try {
@@ -117,7 +117,8 @@ export async function PATCH(request, context) {
               emailSubject,
               emailBody,
               infoEmail,
-              hasRoomCloud: roomCloudValue
+              hasRoomCloud: roomCloudValue,
+              sendStayByEmail: sendStayByEmail === true
           },
       });
 
