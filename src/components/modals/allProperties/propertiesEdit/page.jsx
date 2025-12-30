@@ -28,6 +28,8 @@ const PropertiesEditForm = ({
     formTypeModal
 }) => {
     console.log("HOTEL TERMS BRO:", hotelTerms);
+    console.log("HOTEL:", hotel.propertyID);
+
     // Estados individuais para cada campo
     const [propertyName, setPropertyName] = useState(hotel.propertyName || "");
     const [propertyTag, setPropertyTag] = useState(hotel.propertyTag || "");

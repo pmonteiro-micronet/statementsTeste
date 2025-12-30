@@ -28,7 +28,7 @@ export async function GET(request, context) {
 }
 
 export async function PATCH(request, context) {
-  const { id } = context.params;
+  const { id } = await context.params;
   const {
       propertyName,
       propertyTag,
