@@ -41,6 +41,7 @@ const NewReservationModal = ({ isOpen, onClose, propertyID }) => {
   const [products, setProducts] = useState([]);
   const [roomTypeGroups, setRoomTypeGroups] = useState([]);
   const [selectedRoomType, setSelectedRoomType] = useState(null);
+  console.log("selectedRoomType", selectedRoomType);
   const [error, setError] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
 
