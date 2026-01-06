@@ -61,6 +61,7 @@ const CreateUserModal = ({
                 firstName,
                 secondName,
                 email,
+                selectedRole,
                 password,
                 pin,
                 expirationDate,
@@ -85,6 +86,22 @@ const CreateUserModal = ({
         }
     };
 
+    const [roles, setRoles] = useState([]);
+    const [selectedRole, setSelectedRole] = useState("");
+
+    useEffect(() => {
+        const rolesFetch = async () => {
+            try {
+                const response = await axios.get("/api/user/userRoles");
+
+                setRoles(response.data.response);
+            } catch (error) {
+                console.error("Erro ao ir buscar roles:", error);
+            }
+        };
+
+        rolesFetch();
+    }, []);
 
     const resetForm = () => {
         setFirstName("");
@@ -128,7 +145,7 @@ const CreateUserModal = ({
                                             color="transparent"
                                             variant="light"
                                             className="w-auto min-w-0 p-0 m-0 -pr-4"
-                                            onClick={() => onOpenChange(false)}
+                                            onPress={() => onOpenChange(false)}
                                         >
                                             <MdClose size={30} />
                                         </Button>
@@ -168,6 +185,27 @@ const CreateUserModal = ({
                                                 onChange={(e) => setEmail(e.target.value)}
                                                 className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
                                             />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-400">
+                                                {t.modals.createUser.role}
+                                            </label>
+
+                                            <select
+                                                value={selectedRole}
+                                                onChange={(e) => setSelectedRole(e.target.value)}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 bg-tableFooter text-gray-400 focus:outline-none"
+                                            >
+                                                <option value="" disabled>
+                                                    {t.modals.createUser.selectRole}
+                                                </option>
+
+                                                {roles.map((role) => (
+                                                    <option key={role.roleID} value={role.roleID}>
+                                                        {role.name}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-400">

@@ -39,6 +39,7 @@ model properties {
   privacyPolicyEN  String?           @default("") @db.VarChar(1000)
   privacyPolicyPT  String?           @default("") @db.VarChar(1000)
   hasRoomCloud     Boolean           @default(false)
+  sendStayByEmail  Boolean?          @default(false)
   usersProperties  usersProperties[]
 }
 
@@ -69,6 +70,7 @@ model users {
   internalUser     String?           @db.VarChar(100)
   internalPassword String?           @db.VarChar(255)
   usersProperties  usersProperties[]
+  user_roles       user_roles[] 
 }
 
 model usersProperties {
@@ -210,4 +212,27 @@ model roomCloudLogs {
   responseStatus String?   @db.VarChar(50)
   responseBody   String?   @db.Text
   createdAt      DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model chatbotsStay {
+  propertyID      Int     @id
+  active          Boolean
+  provider        String? @db.Text
+  hijiffyToken    String? @db.Text
+  hijiffyCampaign String? @db.Text
+}
+
+model roles {
+  roleID      Int     @id @default(autoincrement())
+  name        String  @db.VarChar(50)
+  description String? @default("") @db.VarChar(200)
+  user_roles       user_roles[] 
+}
+
+model user_roles {
+  ref    Int @id @default(autoincrement())
+  userID Int
+  roleID Int
+  user users @relation(fields: [userID], references: [userID])
+  role roles @relation(fields: [roleID], references: [roleID])
 }

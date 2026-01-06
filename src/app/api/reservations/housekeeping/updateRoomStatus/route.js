@@ -4,84 +4,96 @@ import prisma from "@/lib/db";
 
 export async function POST(request) {
     try {
-        // Receber payload do body
         const body = await request.json();
+        const { propertyId, internalRoom, roomStatus } = body;
 
-        const { propertyId, reservaId, roomStatus } = body;
-
-        // Validar parâmetros obrigatórios
-        if (!propertyId) {
-            return new NextResponse(
-                JSON.stringify({ error: "propertyId é obrigatório." }),
-                { status: 400, headers: { "Content-Type": "application/json; charset=utf-8" } }
-            );
-        }
-        if (!reservaId) {
-            return new NextResponse(
-                JSON.stringify({ error: "reservaId é obrigatório." }),
-                { status: 400, headers: { "Content-Type": "application/json; charset=utf-8" } }
-            );
-        }
-        if (roomStatus == null) {
-            return new NextResponse(
-                JSON.stringify({ error: "roomStatus é obrigatório." }),
-                { status: 400, headers: { "Content-Type": "application/json; charset=utf-8" } }
+        // Validações básicas
+        if (!propertyId || !internalRoom || roomStatus == null) {
+            return NextResponse.json(
+                { error: "Parâmetros obrigatórios em falta." },
+                { status: 400 }
             );
         }
 
-        const propertyIDInt = parseInt(propertyId, 10);
-        const reservaIDInt = parseInt(reservaId, 10);
-        const roomStatusInt = parseInt(roomStatus, 10);
+        const propertyIDInt = Number(propertyId);
+        const internalRoomInt = Number(internalRoom);
+        const roomStatusInt = Number(roomStatus);
 
-        if (isNaN(propertyIDInt) || isNaN(reservaIDInt) || isNaN(roomStatusInt)) {
-            return new NextResponse(
-                JSON.stringify({ error: "Valores inválidos." }),
-                { status: 400, headers: { "Content-Type": "application/json; charset=utf-8" } }
+        if (
+            Number.isNaN(propertyIDInt) ||
+            Number.isNaN(internalRoomInt) ||
+            Number.isNaN(roomStatusInt)
+        ) {
+            return NextResponse.json(
+                { error: "Valores inválidos." },
+                { status: 400 }
             );
         }
 
-        // Buscar host/porta no banco
+        // Buscar host e porta
         const property = await prisma.properties.findUnique({
             where: { propertyID: propertyIDInt },
-            select: { propertyServer: true, propertyPort: true, mpehotel: true }
+            select: { propertyServer: true, propertyPort: true }
         });
 
         if (!property) {
-            return new NextResponse(
-                JSON.stringify({ error: "Propriedade não encontrada." }),
-                { status: 404, headers: { "Content-Type": "application/json; charset=utf-8" } }
+            return NextResponse.json(
+                { error: "Propriedade não encontrada." },
+                { status: 404 }
             );
         }
 
-        const { propertyServer, propertyPort, mpehotel } = property;
+        const url = `http://${property.propertyServer}:${property.propertyPort}/updateroomstatus`;
 
-        // Montar URL da API externa (exemplo: atualizar room status)
-        const url = `http://${propertyServer}:${propertyPort}/updateroomstatus`;
-
-        const response = await axios.post(url, {
-            headers: {
-                Authorization: "q4vf9p8n4907895f7m8d24m75c2q947m2398c574q9586c490q756c98q4m705imtugcfecvrhym04capwz3e2ewqaefwegfiuoamv4ros2nuyp0sjc3iutow924bn5ry943utrjmi",
-                mpehotel: mpehotel,
-                resNo: reservaIDInt,
-                roomStatus: roomStatusInt,
-                "Content-Type": "application/json"
+        // Chamada à API externa
+        const response = await axios.post(
+            url,
+            {},
+            {
+                headers: {
+                    Authorization: "q4vf9p8n4907895f7m8d24m75c2q947m2398c574q9586c490q756c98q4m705imtugcfecvrhym04capwz3e2ewqaefwegfiuoamv4ros2nuyp0sjc3iutow924bn5ry943utrjmi",
+                    internalRoom: internalRoomInt,
+                    roomStatus: roomStatusInt,
+                    "Content-Type": "application/json"
+                },
+                timeout: 5000
             }
-        });
+        );
 
-        return new NextResponse(
-            JSON.stringify({ success: true, data: response.data }),
-            { status: 200, headers: { "Content-Type": "application/json; charset=utf-8" } }
+        // 🔹 TRATAR ReasonID
+        const reasonId = response.data?.ReasonID;
+
+        if (reasonId !== 1) {
+            return NextResponse.json(
+                {
+                    error: "API externa retornou erro",
+                    reasonId
+                },
+                { status: 400 }
+            );
+        }
+
+        // ✅ Sucesso
+        return NextResponse.json(
+            {
+                success: true,
+                reasonId
+            },
+            { status: 200 }
         );
 
     } catch (error) {
-        console.error("Erro ao atualizar Room Status:", error);
+        console.error(
+            "Erro ao atualizar Room Status:",
+            error.response?.data || error.message
+        );
 
-        return new NextResponse(
-            JSON.stringify({
+        return NextResponse.json(
+            {
                 error: "Erro inesperado",
-                details: error.message
-            }),
-            { status: 500, headers: { "Content-Type": "application/json; charset=utf-8" } }
+                details: error.response?.data || error.message
+            },
+            { status: 500 }
         );
     }
 }

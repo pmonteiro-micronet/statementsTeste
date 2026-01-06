@@ -177,8 +177,8 @@ export default function Sidebar({ children, setExpanded }) {
     setDropdownOpen(false); // Fechar o dropdown após selecionar
     window.location.reload(); // Recarregar a página para aplicar o idioma
   };
-  const user = session?.user || {};
-  const isAdmin = user?.permission === 1; // Verifica se o usuário é admin
+  
+  const isAdmin = session?.user?.role[0] === 1;
 
   return (
     <>

@@ -51,7 +51,6 @@ const ProfileModalForm = ({
     const user = session?.user || {};
     const { firstName, secondName, email, expirationDate } = user;
 
-    // const isAdmin = user?.permission === 1; // Verifica se o usuário é admin
     const [locale, setLocale] = useState("pt");
 
     const [selectedHotelTerms, setSelectedHotelTerms] = useState(null);

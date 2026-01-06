@@ -346,6 +346,8 @@
             "name": "Nombre",
             "surname": "Apellido",
             "email": "Correo electrónico",
+            "role": "Cargo",
+            "selectRole": "Seleccione un cargo",
             "password": "Contraseña",
             "pin": "PIN",
             "expirationDate": "Fecha de expiración",

@@ -4,17 +4,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
 
-import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
-import { CiViewList } from "react-icons/ci";
+// import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
+// import { CiViewList } from "react-icons/ci";
 import { MdCleanHands } from "react-icons/md";
 import {
   CiCircleCheck,
   CiWarning,
-  CiClock2,
-  CiPlay1,
-  CiSettings,
-  CiHome,
 } from "react-icons/ci";
+import { AiFillInfoCircle } from "react-icons/ai";
 
 import { FaCircle } from "react-icons/fa";
 
@@ -24,19 +21,19 @@ import { MdOutlineRefresh } from "react-icons/md";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
 
 import HousekeepingInfoForm from "@/components/modals/housekeeping/info/page";
-import HousekeepingMaintenanceForm from "@/components/modals/housekeeping/maintenance/page";
-import HousekeepingTracesForm from "@/components/modals/housekeeping/traces/page";
+// import HousekeepingMaintenanceForm from "@/components/modals/housekeeping/maintenance/page";
+// import HousekeepingTracesForm from "@/components/modals/housekeeping/traces/page";
 
-import "../../table.css";
+import "../../frontOfficeView/table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 import { MdOutlineDryCleaning } from "react-icons/md";
 
 import { useRouter } from "next/navigation";
 // import dayjs from 'dayjs';
 
-import en from "../../../../../../public/locales/english/common.json";
-import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
-import es from "../../../../../../public/locales/espanol/common.json";
+import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
 
 import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
 
@@ -70,8 +67,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModalMaintenanceOpen, setIsModalMaintenanceOpen] = useState(false);
-  const [isModalTracesOpen, setIsModalTracesOpen] = useState(false);
+  // const [isModalMaintenanceOpen, setIsModalMaintenanceOpen] = useState(false);
+  // const [isModalTracesOpen, setIsModalTracesOpen] = useState(false);
 
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -104,10 +101,10 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     setSelectedReserva(reserva); // Armazena os dados da reserva clicada
     setIsModalOpen(true);
   };
-  const handleOpenMaintenanceModal = (reserva) => {
-    setSelectedReserva(reserva); // Armazena os dados da reserva clicada
-    setIsModalMaintenanceOpen(true);
-  };
+  // const handleOpenMaintenanceModal = (reserva) => {
+  //   setSelectedReserva(reserva); // Armazena os dados da reserva clicada
+  //   setIsModalMaintenanceOpen(true);
+  // };
 
   // const handleOpenTracesModal = (reserva) => {
   //   setSelectedReserva(reserva); // Armazena os dados da reserva clicada
@@ -120,17 +117,17 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     window.location.reload(); // Recarrega a página
   };
 
-  const handleCloseMaintenanceModal = () => {
-    setIsModalMaintenanceOpen(false);
-    setSelectedReserva(null); // Limpa os dados ao fechar a modal
-    window.location.reload(); // Recarrega a página
-  };
+  // const handleCloseMaintenanceModal = () => {
+  //   setIsModalMaintenanceOpen(false);
+  //   setSelectedReserva(null); // Limpa os dados ao fechar a modal
+  //   window.location.reload(); // Recarrega a página
+  // };
 
-  const handleCloseTracesModal = () => {
-    setIsModalTracesOpen(false);
-    setSelectedReserva(null); // Limpa os dados ao fechar a modal
-    window.location.reload(); // Recarrega a página
-  };
+  // const handleCloseTracesModal = () => {
+  //   setIsModalTracesOpen(false);
+  //   setSelectedReserva(null); // Limpa os dados ao fechar a modal
+  //   window.location.reload(); // Recarrega a página
+  // };
 
   useEffect(() => {
     const fetchHotelName = async () => {
@@ -276,13 +273,13 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   };
 
   const estadoLimpezaConfig = {
-    1: { icon: <CiCircleCheck size={20} />, title: "Limpo" },
+    1: { icon: <FaCircle size={20} color="green"/>, title: "Limpo" },
     2: { icon: <FaCircle size={20} color="red"/>, title: "Sujo" },
     3: { icon: <CiWarning size={20} />, title: "Fora de serviço" },
-    4: { icon: <CiHome size={20} />, title: "Pronto" },
-    5: { icon: <CiClock2 size={20} />, title: "Usado" },
-    6: { icon: <CiPlay1 size={20} />, title: "Limpeza em execução" },
-    10: { icon: <CiSettings size={20} />, title: "Arrumar quarto" },
+    4: { icon: <FaCircle size={20} color="blue"/>, title: "Pronto" },
+    5: { icon: <FaCircle size={20} color="orange"/>, title: "Usado" },
+    6: { icon: <FaCircle size={20} color="yellow"/>, title: "Limpeza em execução" },
+    10: { icon: <FaCircle size={20} color="gray"/>, title: "Arrumar quarto" },
   };
 
   return (
@@ -378,27 +375,27 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                         <div className="flex items-center justify-center gap-2 w-full h-full">
 
                           {/* Botão de manutenção */}
-                          <button
+                          {/* <button
                             className="p-1 rounded flex items-center"
                             onClick={() => handleOpenMaintenanceModal(item)}
                           >
                             <HiOutlineWrenchScrewdriver size={20} color="gray" />
-                          </button>
+                          </button> */}
 
                           {/* Botão de traces */}
-                          {/* <button
+                           {/* <button
                             className="p-1 rounded flex items-center"
                             onClick={() => handleOpenTracesModal(item)}
                           >
                             <CiViewList size={20} color="gray" />
-                          </button> */}
+                          </button>  */}
 
                           {/* Botão de info */}
                           <button
                             className="p-1 rounded flex items-center"
                             onClick={() => handleOpenModal(item)}
                           >
-                            <CiViewList size={20} color="gray" />
+                            <AiFillInfoCircle size={20} color="gray" />
                           </button>
                         </div>
                       </td>
@@ -410,14 +407,14 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                         {`${item.GuestName}`}
                       </td>
                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-32 truncate whitespace-nowrap overflow-hidden">
-                        {item.Lavandaria === "Sim" && <MdOutlineDryCleaning size={30} />}
+                        {item.Lavandaria === "Sim" && <MdOutlineDryCleaning size={30} title="Changing sheets"/>}
                       </td>
                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-14">
                         <div className="flex items-center justify-center h-full">
                           {item.EstadoQuarto === 1 ? (
-                            <CiLock size={20} />
+                            <CiLock size={20} title="Occupied"/>
                           ) : (
-                            <CiCircleCheck size={20} />
+                            <CiCircleCheck size={20} title="Free"/>
                           )}
                         </div>
                       </td>
@@ -456,12 +453,12 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     from={selectedReserva?.ArrivalDate}
                     to={selectedReserva?.DepartureDate}
                     propertyID={propertyID}
-                    resNo={selectedReserva?.IDReserva}
+                    room={selectedReserva?.IDQuartoInterno}
                     isBackdropVisible
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                   />
-
+{/* 
                   <HousekeepingMaintenanceForm
                     buttonName={t.frontOffice.housekeeping.maintenance}
                     buttonColor="transparent"
@@ -483,9 +480,9 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     isBackdropVisible
                     isOpen={isModalMaintenanceOpen}
                     onClose={handleCloseMaintenanceModal}
-                  />
+                  /> */}
 
-                  <HousekeepingTracesForm
+                  {/* <HousekeepingTracesForm
                     buttonName={t.frontOffice.housekeeping.traces}
                     buttonColor="transparent"
                     modalHeader={t.modals.housekeeping.traces.title + " - Res. No.: " + selectedReserva?.ResNo}
@@ -505,7 +502,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     isBackdropVisible
                     isOpen={isModalTracesOpen}
                     onClose={handleCloseTracesModal}
-                  />
+                  /> */}
                 </tbody>
               </table>
             </div>
