@@ -56,7 +56,7 @@ const ProfileModalEditForm = ({
 
     const user = session?.user || {};
 
-    const isAdmin = user?.permission === 1; // Verifica se o usuário é admin
+    const isAdmin = session?.user?.role[0] === 1;
 
     const [locale, setLocale] = useState("pt");
     const [selectedHotelTerms, setSelectedHotelTerms] = useState(null);

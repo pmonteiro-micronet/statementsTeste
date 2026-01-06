@@ -44,7 +44,14 @@ const handler = NextAuth({
           select: { propertyID: true },
         });
 
+         // Buscar todos os propertyIDs associados ao usuário
+        const userRole = await prisma.user_roles.findMany({
+          where: { userID: user.userID },
+          select: { roleID: true },
+        });
+
         const propertyIDs = userProperties.map((p) => p.propertyID);
+        const role = userRole.map((r) => r.roleID);
 
         return {
           id: user.userID,
@@ -52,6 +59,7 @@ const handler = NextAuth({
           firstName: user.firstName,
           secondName: user.secondName,
           propertyIDs,
+          role,
           pin: user.pin,
           permission: user.permissions,
           expirationDate: user.expirationDate,
@@ -75,6 +83,7 @@ const handler = NextAuth({
         token.firstName = user.firstName;
         token.secondName = user.secondName;
         token.propertyIDs = user.propertyIDs;
+        token.role = user.role;
         token.pin = user.pin;
         token.permission = user.permission;
         token.expirationDate = user.expirationDate;
@@ -88,6 +97,7 @@ const handler = NextAuth({
       session.user.firstName = token.firstName;
       session.user.secondName = token.secondName;
       session.user.propertyIDs = token.propertyIDs;
+      session.user.role = token.role;
       session.user.pin = token.pin;
       session.user.permission = token.permission;
       session.user.expirationDate = token.expirationDate;

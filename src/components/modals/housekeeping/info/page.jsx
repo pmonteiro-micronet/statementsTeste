@@ -26,7 +26,7 @@ const HousekeepingInfoForm = ({
     from,
     to,
     propertyID,
-    resNo,
+    room,
     isOpen,
     onClose,
 }) => {
@@ -78,12 +78,12 @@ const HousekeepingInfoForm = ({
     const handleSave = async () => {
         try {
             const payload = {
-                reservaId: resNo,
+                internalRoom: room,
                 propertyId: propertyID,
                 roomStatus: editableRoomStatus
             };
 
-            const response = await fetch("/reservations/housekeeping/updateRoomStatus", {
+            const response = await fetch("/api/reservations/housekeeping/updateRoomStatus", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

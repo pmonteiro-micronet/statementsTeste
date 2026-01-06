@@ -70,6 +70,7 @@ model users {
   internalUser     String?           @db.VarChar(100)
   internalPassword String?           @db.VarChar(255)
   usersProperties  usersProperties[]
+  user_roles       user_roles[] 
 }
 
 model usersProperties {
@@ -219,4 +220,19 @@ model chatbotsStay {
   provider        String? @db.Text
   hijiffyToken    String? @db.Text
   hijiffyCampaign String? @db.Text
+}
+
+model roles {
+  roleID      Int     @id @default(autoincrement())
+  name        String  @db.VarChar(50)
+  description String? @default("") @db.VarChar(200)
+  user_roles       user_roles[] 
+}
+
+model user_roles {
+  ref    Int @id @default(autoincrement())
+  userID Int
+  roleID Int
+  user users @relation(fields: [userID], references: [userID])
+  role roles @relation(fields: [roleID], references: [roleID])
 }

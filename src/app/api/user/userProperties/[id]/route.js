@@ -32,7 +32,8 @@ export async function GET(request, { params }) {
 }
 
 // POST: Associa uma propriedade ao usuário
-export async function POST(req, { params }) {
+export async function POST(req, context) {
+  const { params } = context; // params vem do segundo argumento
   const userID = parseInt(params.id);
   const { propertyID, propertyTag } = await req.json();
 
