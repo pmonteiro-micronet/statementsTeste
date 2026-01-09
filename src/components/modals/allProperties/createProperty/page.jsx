@@ -54,6 +54,7 @@ const CreatePropertyModal = ({
     const [hotelNIF, setHotelNIF] = useState("");
 
     const [hasStay, setHasStay] = useState(false);
+    const [stayEmailEnabled, setStayEmailEnabled] = useState(false);
     const [replyEmail, setReplyEmail] = useState("");
     const [replyPassword, setReplyPassword] = useState("");
     const [sendingServer, setSendingServer] = useState("");
@@ -85,6 +86,12 @@ const CreatePropertyModal = ({
     const [roomCloudUsername, setRoomCloudUsername] = useState("");
     const [roomCloudPassword, setRoomCloudPassword] = useState("");
     const [roomCloudHotelID, setRoomCloudHotelID] = useState("");
+
+    // Chatbot settings
+    const [stayChatbotEnabled, setStayChatbotEnabled] = useState(false);
+    const [chatbotProvider, setChatbotProvider] = useState("");
+    const [hijiffyToken, setHijiffyToken] = useState("");
+    const [hijiffyCampaignID, setHijiffyCampaignID] = useState("");
 
     const [locale, setLocale] = useState("pt");
 
@@ -118,13 +125,13 @@ const CreatePropertyModal = ({
         console.log("RoomCLOUD:", roomCloudValue);
 
         try {
-            const propertyResponse = await axios.put(`/api/properties`, {
+            const propertyResponse = await axios.post(`/api/properties`, {
                 propertyName,
                 propertyTag,
                 propertyServer,
                 propertyPort,
-                propertyPortStay: parseInt(propertyPortStay, 10),
-                mpehotel: parseInt(mpehotel, 10),
+                propertyPortStay: propertyPortStay ? parseInt(propertyPortStay, 10) : null,
+                mpehotel: mpehotel ? parseInt(mpehotel, 10) : 0,
                 pdfFilePath,
                 passeIni,
                 hotelName,
@@ -138,10 +145,11 @@ const CreatePropertyModal = ({
                 hotelTermsPT,
                 hotelTermsES,
                 hasStay: stayValue,
+                sendStayByEmail: stayEmailEnabled,
                 replyEmail,
                 replyPassword,
                 sendingServer,
-                sendingPort: parseInt(sendingPort, 10),
+                sendingPort: sendingPort ? parseInt(sendingPort, 10) : null,
                 emailSubject,
                 emailBody,
                 infoEmail,
@@ -150,6 +158,25 @@ const CreatePropertyModal = ({
 
             if ([200, 201].includes(propertyResponse.status)) {
                 const propertyID = propertyResponse.data.updatedProperties.propertyID;
+                console.log("Property created with ID:", propertyID);
+
+                // Create chatbot entry if enabled
+                if (stayChatbotEnabled) {
+                    try {
+                        console.log("Creating chatbot for propertyID:", propertyID);
+                        const chatbotResp = await axios.post(`/api/properties/chatbotsStay`, {
+                            propertyID,
+                            active: true,
+                            provider: chatbotProvider || null,
+                            hijiffyToken: hijiffyToken || null,
+                            hijiffyCampaign: hijiffyCampaignID || null,
+                        });
+                        console.log("Chatbot creation response:", chatbotResp);
+                    } catch (chatErr) {
+                        console.error('Failed to create chatbot after property creation:', chatErr);
+                        setErrorMessage('Property created but chatbot creation failed.');
+                    }
+                }
 
                 // Só envia RoomCloud se ativado
                 if (roomCloudValue) {
@@ -229,6 +256,10 @@ const CreatePropertyModal = ({
         setEmailSubject("");
         setEmailBody("");
         setInfoEmail("");
+        setStayChatbotEnabled(false);
+        setChatbotProvider("");
+        setHijiffyToken("");
+        setHijiffyCampaignID("");
     };
 
     const handleImageChange = (event) => {
@@ -896,6 +927,12 @@ const CreatePropertyModal = ({
                                                 >
                                                     Email Settings
                                                 </div>
+                                                <div
+                                                    className={`px-3 py-1 rounded-md border  ${activeStayTab === "chatbot" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
+                                                    onClick={() => setActiveStayTab("chatbot")}
+                                                >
+                                                    Chatbot
+                                                </div>
                                             </div>
 
                                             {activeStayTab === "settings" && (
@@ -910,81 +947,118 @@ const CreatePropertyModal = ({
                                                         />
                                                         <label htmlFor="hasStay" className="text-sm">Tem stay?</label>
                                                     </div>
-                                                    <p className="bg-gray-200 p-1 mb-2">Send SMTP</p>
-                                                    <div className="flex flex-row gap-2 w-full">
-                                                        <div className="w-1/2 flex flex-col">
-                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.email}</p>
-                                                            <input
-                                                                type="text"
-                                                                value={replyEmail}
-                                                                onChange={(e) => setReplyEmail(e.target.value)}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                            />
-                                                        </div>
-                                                        <div className="w-1/2 flex flex-col">
-                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailPassword}</p>
-                                                            <input
-                                                                type="text"
-                                                                value={replyPassword}
-                                                                onChange={(e) => setReplyPassword(e.target.value)}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex flex-row gap-2 w-full">
-                                                        <div className="w-1/2 flex flex-col">
-                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.serverSMTP}</p>
-                                                            <input
-                                                                type="text"
-                                                                value={sendingServer}
-                                                                onChange={(e) => setSendingServer(e.target.value)}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                            />
-                                                        </div>
-                                                        <div className="w-1/2 flex flex-col">
-                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.portSMTP}</p>
-                                                            <input
-                                                                type="text"
-                                                                value={sendingPort}
-                                                                onChange={(e) => setSendingPort(e.target.value)}
-                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                            />
+
+                                                    <div className="flex items-center justify-between w-full">
+                                                        <div className="text-sm text-gray-700">Email</div>
+                                                        <div className="flex items-center gap-4">
+                                                            <label className="flex items-center gap-1 text-sm">
+                                                                <input
+                                                                    type="radio"
+                                                                    name={`stayEmail_create`}
+                                                                    checked={stayEmailEnabled === true}
+                                                                    onChange={() => setStayEmailEnabled(true)}
+                                                                    className="accent-primary"
+                                                                />
+                                                                <span className="text-sm">Yes</span>
+                                                            </label>
+                                                            <label className="flex items-center gap-1 text-sm">
+                                                                <input
+                                                                    type="radio"
+                                                                    name={`stayEmail_create`}
+                                                                    checked={stayEmailEnabled === false}
+                                                                    onChange={() => setStayEmailEnabled(false)}
+                                                                    className="accent-primary"
+                                                                />
+                                                                <span className="text-sm">No</span>
+                                                            </label>
                                                         </div>
                                                     </div>
-                                                    {/* <p className="bg-gray-200 p-1 mt-2 mb-2">Email</p>
-                                                    <div className="w-1/2 flex flex-col text-xs">
-                                                        <p>Email Subject</p>
-                                                        <input
-                                                            type="text"
-                                                            value={emailSubject}
-                                                            onChange={(e) => setEmailSubject(e.target.value)}
-                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                        />
-                                                    </div>
-                                                    <div className="w-full flex flex-col text-xs mt-2">
-                                                        <p>Email Body</p>
-                                                        <textarea
-                                                            value={emailBody}
-                                                            onChange={(e) => setEmailBody(e.target.value)}
-                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none h-20 resize-none"
-                                                        />
-                                                    </div> */}
-                                                    <p className="bg-gray-200 p-1 mt-2 mb-2">{t.modals.propertiesEdit.stay.receiptShipment}</p>
-                                                    <div className="flex flex-col w-full">
-                                                        <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.email}</p>
-                                                        <input
-                                                            type="text"
-                                                            value={infoEmail}
-                                                            onChange={(e) => setInfoEmail(e.target.value)}
-                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                        />
+
+                                                    <div className="flex items-center justify-between w-full mt-4">
+                                                        <div className="text-sm text-gray-700">Chatbot</div>
+                                                        <div className="flex items-center gap-4">
+                                                            <label className="flex items-center gap-1 text-sm">
+                                                                <input
+                                                                    type="radio"
+                                                                    name={`stayChatbot_create`}
+                                                                    checked={stayChatbotEnabled === true}
+                                                                    onChange={() => setStayChatbotEnabled(true)}
+                                                                    className="accent-primary"
+                                                                />
+                                                                <span className="text-sm">Yes</span>
+                                                            </label>
+                                                            <label className="flex items-center gap-1 text-sm">
+                                                                <input
+                                                                    type="radio"
+                                                                    name={`stayChatbot_create`}
+                                                                    checked={stayChatbotEnabled === false}
+                                                                    onChange={() => setStayChatbotEnabled(false)}
+                                                                    className="accent-primary"
+                                                                />
+                                                                <span className="text-sm">No</span>
+                                                            </label>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )}
 
                                             {activeStayTab === "email" && (
-                                                <div>
-                                                    <p className="bg-gray-200 p-1 -mt-4 mb-2">{t.modals.propertiesEdit.stay.email}</p>
+                                                <div className="overflow-auto max-h-[40vh]">
+                                                    <div>
+                                                        <p className="bg-gray-200 p-1 mb-2">{t.modals.propertiesEdit.stay.sendSMTP}</p>
+                                                        <div className="flex flex-row gap-2 w-full">
+                                                            <div className="w-1/2 flex flex-col">
+                                                                <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.email}</p>
+                                                                <input
+                                                                    type="text"
+                                                                    value={replyEmail}
+                                                                    onChange={(e) => setReplyEmail(e.target.value)}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            </div>
+                                                            <div className="w-1/2 flex flex-col">
+                                                                <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailPassword}</p>
+                                                                <input
+                                                                    type="text"
+                                                                    value={replyPassword}
+                                                                    onChange={(e) => setReplyPassword(e.target.value)}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-row gap-2 w-full">
+                                                            <div className="w-1/2 flex flex-col">
+                                                                <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.serverSMTP}</p>
+                                                                <input
+                                                                    type="text"
+                                                                    value={sendingServer}
+                                                                    onChange={(e) => setSendingServer(e.target.value)}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            </div>
+                                                            <div className="w-1/2 flex flex-col">
+                                                                <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.portSMTP}</p>
+                                                                <input
+                                                                    type="text"
+                                                                    value={sendingPort}
+                                                                    onChange={(e) => setSendingPort(e.target.value)}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <p className="bg-gray-200 p-1 mt-2 mb-2">{t.modals.propertiesEdit.stay.receiptShipment}</p>
+                                                        <div className="flex flex-col w-full">
+                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.email}</p>
+                                                            <input
+                                                                type="text"
+                                                                value={infoEmail}
+                                                                onChange={(e) => setInfoEmail(e.target.value)}
+                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <p className="bg-gray-200 p-1 my-2">{t.modals.propertiesEdit.stay.email}</p>
                                                     <div className="w-1/2 flex flex-col">
                                                         <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailSubject}</p>
                                                         <input
@@ -1138,6 +1212,47 @@ const CreatePropertyModal = ({
                                                                 ) : (
                                                                     <p>Nenhum template encontrado.</p>
                                                                 )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {activeStayTab === "chatbot" && (
+                                                <div className="flex flex-col gap-4">
+                                                    <div className="flex justify-center">
+                                                        <div className="w-1/2">
+                                                            <select
+                                                                value={chatbotProvider}
+                                                                onChange={(e) => setChatbotProvider(e.target.value)}
+                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 h-8 focus:outline-none"
+                                                            >
+                                                                <option value="">Select provider...</option>
+                                                                <option value="HiJiffy">HiJiffy</option>
+                                                                <option value="Nonius">Nonius</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    {chatbotProvider === 'HiJiffy' && (
+                                                        <div className="flex flex-col gap-3">
+                                                            <div className="flex flex-col">
+                                                                <label className="block text-sm font-medium text-gray-400">HiJiffy token</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={hijiffyToken}
+                                                                    onChange={(e) => setHijiffyToken(e.target.value)}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <label className="block text-sm font-medium text-gray-400">HiJiffy campaign id</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={hijiffyCampaignID}
+                                                                    onChange={(e) => setHijiffyCampaignID(e.target.value)}
+                                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                />
                                                             </div>
                                                         </div>
                                                     )}

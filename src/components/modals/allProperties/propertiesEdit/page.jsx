@@ -16,6 +16,7 @@ import pt from "../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../public/locales/espanol/common.json";
 
 import { MdKeyboardArrowLeft } from "react-icons/md";
+import { MdOutlineRefresh } from "react-icons/md";
 
 const translations = { en, pt, es };
 
@@ -51,6 +52,13 @@ const PropertiesEditForm = ({
     const [hotelNIF, setHotelNIF] = useState(hotel.hotelNIF || "");
     const [hasStay, setHasStay] = useState(hotel.hasStay || "");
     console.log(setHasStay);
+    // New toggles for Stay settings
+    const [stayEmailEnabled, setStayEmailEnabled] = useState(hotel.sendStayByEmail || false);
+    const [stayChatbotEnabled, setStayChatbotEnabled] = useState(hotel.stayChatbotEnabled || false);
+    // Chatbot provider and provider-specific fields
+    const [chatbotProvider, setChatbotProvider] = useState(hotel.chatbotProvider || "");
+    const [hijiffyToken, setHijiffyToken] = useState(hotel.hijiffyToken || "");
+    const [hijiffyCampaignID, setHijiffyCampaignID] = useState(hotel.hijiffyCampaignID || "");
     const [replyEmail, setReplyEmail] = useState(hotel.replyEmail || "");
     const [replyPassword, setReplyPassword] = useState(hotel.replyPassword || "");
     const [sendingServer, setSendingServer] = useState(hotel.sendingServer || "");
@@ -140,7 +148,27 @@ const PropertiesEditForm = ({
         if (storedLanguage) {
             setLocale(storedLanguage);
         }
-    }, []);
+
+        // Fetch chatbotsStay data
+        const fetchChatbotData = async () => {
+            try {
+                const response = await axios.get(`/api/properties/chatbotsStay/${hotel.propertyID}`);
+                if (response.status === 200 && response.data.response) {
+                    const chatbot = response.data.response;
+                    setStayChatbotEnabled(chatbot.active || false);
+                    setChatbotProvider(chatbot.provider || "");
+                    setHijiffyToken(chatbot.hijiffyToken || "");
+                    setHijiffyCampaignID(chatbot.hijiffyCampaign || "");
+                }
+            } catch (error) {
+                console.error("Error fetching chatbot data:", error);
+            }
+        };
+
+        if (hotel.propertyID) {
+            fetchChatbotData();
+        }
+    }, [hotel.propertyID]);
 
     // Carregar as traduções com base no idioma atual
     const t = translations[locale] || translations["pt"]; // fallback para "pt"
@@ -186,11 +214,13 @@ const PropertiesEditForm = ({
                 emailSubject,
                 emailBody,
                 infoEmail,
-                hasRoomCloud: roomCloudValue
+                hasRoomCloud: roomCloudValue,
+                sendStayByEmail: stayEmailEnabled
             });
 
             // Se a propriedade foi atualizada com sucesso, salva os termos
             if (response.status === 200) {
+                // Save RoomCloud data
                 const roomCloudResponse = await axios.post(`/api/properties/roomCloud`, {
                     propertyID: hotel.propertyID,
                     roomCloudUsername,
@@ -200,6 +230,19 @@ const PropertiesEditForm = ({
 
                 if (![200, 201].includes(roomCloudResponse.status)) {
                     throw new Error(`Failed to save RoomCloud data. Status: ${roomCloudResponse.status}`);
+                }
+
+                // Save Chatbot data
+                const chatbotResponse = await axios.post(`/api/properties/chatbotsStay`, {
+                    propertyID: hotel.propertyID,
+                    active: stayChatbotEnabled,
+                    provider: chatbotProvider,
+                    hijiffyToken,
+                    hijiffyCampaign: hijiffyCampaignID
+                });
+
+                if (![200, 201].includes(chatbotResponse.status)) {
+                    throw new Error(`Failed to save chatbot data. Status: ${chatbotResponse.status}`);
                 }
 
                 const hotelTermsResponse = await axios.post(`/api/properties/hotelTerms`, {
@@ -483,6 +526,11 @@ const PropertiesEditForm = ({
     const [associatedRoomCloudUserIDs, setAssociatedRoomCloudUserIDs] = useState(false);
     const [associatedStayUserIDs, setAssociatedStayUserIDs] = useState(false);
 
+    // Stay logs state
+    const [stayLogs, setStayLogs] = useState([]);
+    const [stayLogsLoading, setStayLogsLoading] = useState(false);
+    const [stayLogsError, setStayLogsError] = useState(null);
+
 
 
     const [roomCloudUserData, setRoomCloudUserData] = useState([]);
@@ -662,6 +710,41 @@ const PropertiesEditForm = ({
         }
     };
 
+    // Fetch stay logs from the property's stay endpoint
+    const fetchStayLogs = async () => {
+        setStayLogsError(null);
+        setStayLogsLoading(true);
+        try {
+            if (!propertyServer || !propertyPortStay) {
+                throw new Error('Missing property server or stay port');
+            }
+
+            // Use internal app-route proxy to avoid CORS issues
+            const proxyUrl = `/api/stay/getStayLogs?propertyServer=${encodeURIComponent(
+                propertyServer
+            )}&propertyPortStay=${encodeURIComponent(propertyPortStay)}`;
+
+            const response = await axios.get(proxyUrl, { timeout: 10000 });
+
+            // Accept both array and single-item response
+            const data = Array.isArray(response.data) ? response.data : response.data?.response || response.data;
+
+            if (Array.isArray(data)) setStayLogs(data);
+            else setStayLogs([]);
+        } catch (err) {
+            console.error('Error fetching stay logs:', err);
+            setStayLogsError(err.message || 'Failed to fetch stay logs');
+            setStayLogs([]);
+        } finally {
+            setStayLogsLoading(false);
+        }
+    };
+
+    // When user opens Logs tab, fetch logs
+    useEffect(() => {
+        if (activeStayTab === 'logs') fetchStayLogs();
+    }, [activeStayTab, propertyServer, propertyPortStay]);
+
     return (
         <>
             {formTypeModal === 11 && (
@@ -691,14 +774,14 @@ const PropertiesEditForm = ({
                                 {activeSection === null && (
                                     <div className="flex flex-row gap-4 justify-center mt-4">
                                         <div
-                                            className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 flex justify-center hover:bg-primary hover:text-white"
+                                            className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 h-24 flex justify-center items-center hover:bg-primary hover:text-white"
                                             onClick={() => setActiveSection("propertyDetails")}
                                         >
                                             {t.modals.propertiesEdit.propertyDetails}
                                         </div>
 
                                         <div
-                                            className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 flex justify-center hover:bg-primary hover:text-white"
+                                            className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 h-24 flex justify-center items-center hover:bg-primary hover:text-white"
                                             onClick={() => setActiveSection("hotelDetails")}
                                         >
                                             {t.modals.createProperty.hotelDetails}
@@ -706,7 +789,7 @@ const PropertiesEditForm = ({
 
                                         {hasStay && (
                                             <div
-                                                className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 flex justify-center hover:bg-primary hover:text-white"
+                                                className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 h-24 flex justify-center items-center hover:bg-primary hover:text-white"
                                                 onClick={() => setActiveSection("stay")}
                                             >
                                                 Stay
@@ -715,7 +798,7 @@ const PropertiesEditForm = ({
 
                                         {hasRoomCloud && (
                                             <div
-                                                className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 flex justify-center hover:bg-primary hover:text-white"
+                                                className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 h-24 flex justify-center items-center hover:bg-primary hover:text-white"
                                                 onClick={() => setActiveSection("ota")}
                                             >
                                                 OTA
@@ -1216,11 +1299,85 @@ const PropertiesEditForm = ({
                                             >
                                                 Email Settings
                                             </button>
+                                            <button
+                                                className={`px-3 py-1 rounded-md border  ${activeStayTab === "chatbot" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
+                                                onClick={() => setActiveStayTab("chatbot")}
+                                            >
+                                                Chatbot
+                                            </button>
+                                            <button
+                                                className={`px-3 py-1 rounded-md border  ${activeStayTab === "logs" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
+                                                onClick={() => setActiveStayTab("logs")}
+                                            >
+                                                Stay Logs
+                                            </button>
                                             </div>
                                             <FaUsers size={15} className="cursor-pointer" onClick={handleOpenStayUserModal} />
                                         </div>
                                         {activeStayTab === "settings" && (
-                                            <div>
+                                            <div className="flex flex-col gap-3">
+                                                <div className="flex items-center justify-between w-full">
+                                                    <div className="text-sm text-gray-700">Email</div>
+                                                    <div className="flex items-center gap-4">
+                                                        <label className="flex items-center gap-1 text-sm">
+                                                            <input
+                                                                type="radio"
+                                                                name={`stayEmail_${hotel.propertyID}`}
+                                                                checked={stayEmailEnabled === true}
+                                                                onChange={() => setStayEmailEnabled(true)}
+                                                                disabled={!isEditing}
+                                                                className="accent-primary"
+                                                            />
+                                                            <span className="text-sm">Yes</span>
+                                                        </label>
+                                                        <label className="flex items-center gap-1 text-sm">
+                                                            <input
+                                                                type="radio"
+                                                                name={`stayEmail_${hotel.propertyID}`}
+                                                                checked={stayEmailEnabled === false}
+                                                                onChange={() => setStayEmailEnabled(false)}
+                                                                disabled={!isEditing}
+                                                                className="accent-primary"
+                                                            />
+                                                            <span className="text-sm">No</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center justify-between w-full">
+                                                    <div className="text-sm text-gray-700">Chatbot</div>
+                                                    <div className="flex items-center gap-4">
+                                                        <label className="flex items-center gap-1 text-sm">
+                                                            <input
+                                                                type="radio"
+                                                                name={`stayChatbot_${hotel.propertyID}`}
+                                                                checked={stayChatbotEnabled === true}
+                                                                onChange={() => setStayChatbotEnabled(true)}
+                                                                disabled={!isEditing}
+                                                                className="accent-primary"
+                                                            />
+                                                            <span className="text-sm">Yes</span>
+                                                        </label>
+                                                        <label className="flex items-center gap-1 text-sm">
+                                                            <input
+                                                                type="radio"
+                                                                name={`stayChatbot_${hotel.propertyID}`}
+                                                                checked={stayChatbotEnabled === false}
+                                                                onChange={() => setStayChatbotEnabled(false)}
+                                                                disabled={!isEditing}
+                                                                className="accent-primary"
+                                                            />
+                                                            <span className="text-sm">No</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {activeStayTab === "email" && (
+                                            
+                                            <div className="overflow-auto max-h-[40vh]">
+                                                <div>
                                                 <p className="bg-gray-200 p-1 mb-2">{t.modals.propertiesEdit.stay.sendSMTP}</p>
                                                 <div className="flex flex-row gap-2 w-full">
                                                     <div className="w-1/2 flex flex-col">
@@ -1279,11 +1436,7 @@ const PropertiesEditForm = ({
 
                                                 </div>
                                             </div>
-                                        )}
-
-                                        {activeStayTab === "email" && (
-                                            <div>
-                                                <p className="bg-gray-200 p-1 -mt-4 mb-2">{t.modals.propertiesEdit.stay.email}</p>
+                                                <p className="bg-gray-200 p-1 my-2">{t.modals.propertiesEdit.stay.email}</p>
                                                 <div className="w-1/2 flex flex-col">
                                                     <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailSubject}</p>
                                                     <input
@@ -1443,7 +1596,106 @@ const PropertiesEditForm = ({
                                                     </div>
                                                 )}
                                             </div>
-                                        )}{/* Modal simples */}
+                                        )}
+
+                                        {activeStayTab === "logs" && (
+                                            <div className="mt-2">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h3 className="text-sm font-medium">Stay Logs</h3>
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            className={`p-2 bg-primary text-white rounded ${stayLogsLoading ? 'opacity-60' : ''}`}
+                                                            onClick={fetchStayLogs}
+                                                            aria-label="Refresh stay logs"
+                                                        >
+                                                            <MdOutlineRefresh size={18} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {stayLogsError && (
+                                                    <div className="text-sm text-red-600 mb-2">{stayLogsError}</div>
+                                                )}
+
+                                                <div className="overflow-auto max-h-[40vh] border rounded">
+                                                    <table className="min-w-full text-sm">
+                                                        <thead className="bg-primary text-white sticky top-0">
+                                                            <tr>
+                                                                <th className="px-2 py-1 text-left">Request Date</th>
+                                                                <th className="px-2 py-1 text-left">Res ID</th>
+                                                                <th className="px-2 py-1 text-left">Guest Email</th>
+                                                                <th className="px-2 py-1 text-left">Guest Phone</th>
+                                                                <th className="px-2 py-1 text-left">Control</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {stayLogs.length === 0 && !stayLogsLoading && (
+                                                                <tr><td colSpan={5} className="p-2 text-center text-gray-500">No logs found</td></tr>
+                                                            )}
+                                                            {stayLogs.map((log) => (
+                                                                <tr key={log.recordID} className="border-t">
+                                                                    <td className="px-2 py-1">{log.requestDate ? new Date(log.requestDate).toLocaleString() : ''}</td>
+                                                                    <td className="px-2 py-1">{log.protelReservationID || ''}</td>
+                                                                    <td className="px-2 py-1">{log.protelGuestEmail || ''}</td>
+                                                                    <td className="px-2 py-1">{log.protelGuestPhone || log.protelGuestMobilePhone || ''}</td>
+                                                                    <td className="px-2 py-1">{log.control || ''}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {/* Modal simples */}
+
+                                        {activeStayTab === "chatbot" && (
+                                            <div className="flex flex-col gap-4">
+                                                <div className="flex justify-center">
+                                                    <div className="w-1/2">
+                                                        <select
+                                                            value={chatbotProvider}
+                                                            onChange={(e) => setChatbotProvider(e.target.value)}
+                                                            disabled={!isEditing}
+                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 h-8 focus:outline-none"
+                                                        >
+                                                            <option value="">Select provider...</option>
+                                                            <option value="HiJiffy">HiJiffy</option>
+                                                            <option value="Nonius">Nonius</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                {chatbotProvider === "HiJiffy" && (
+                                                    <div className="flex flex-col gap-3">
+                                                        <div className="flex flex-col">
+                                                            <label className="block text-sm font-medium text-gray-400">HiJiffy token</label>
+                                                            <input
+                                                                type="text"
+                                                                value={hijiffyToken}
+                                                                onChange={(e) => setHijiffyToken(e.target.value)}
+                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                disabled={!isEditing}
+                                                            />
+                                                        </div>
+
+                                                        <div className="flex flex-col">
+                                                            <label className="block text-sm font-medium text-gray-400">Check-In Campaign ID</label>
+                                                            <input
+                                                                type="text"
+                                                                value={hijiffyCampaignID}
+                                                                onChange={(e) => setHijiffyCampaignID(e.target.value)}
+                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                disabled={!isEditing}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {chatbotProvider === "Nonius" && (
+                                                    <div className="text-sm text-gray-600 text-center">Nonius selected — no extra fields configured.</div>
+                                                )}
+                                            </div>
+                                        )}
                                         {isStayUserModalOpen && (
                                             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                                                 <div className="bg-white p-4 rounded w-96 h-96 flex flex-col">
