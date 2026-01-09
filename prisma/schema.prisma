@@ -69,8 +69,8 @@ model users {
   expirationDate   DateTime?         @default(dbgenerated("'2222-01-01'")) @db.Date
   internalUser     String?           @db.VarChar(100)
   internalPassword String?           @db.VarChar(255)
+  user_roles       user_roles[]
   usersProperties  usersProperties[]
-  user_roles       user_roles[] 
 }
 
 model usersProperties {
@@ -223,16 +223,24 @@ model chatbotsStay {
 }
 
 model roles {
-  roleID      Int     @id @default(autoincrement())
-  name        String  @db.VarChar(50)
-  description String? @default("") @db.VarChar(200)
-  user_roles       user_roles[] 
+  roleID      Int          @id @default(autoincrement())
+  name        String       @db.VarChar(50)
+  description String?      @default("") @db.VarChar(200)
+  user_roles  user_roles[]
 }
 
 model user_roles {
-  ref    Int @id @default(autoincrement())
+  ref    Int   @id @default(autoincrement())
   userID Int
   roleID Int
-  user users @relation(fields: [userID], references: [userID])
-  role roles @relation(fields: [roleID], references: [roleID])
+  role   roles @relation(fields: [roleID], references: [roleID])
+  user   users @relation(fields: [userID], references: [userID])
+
+  @@index([roleID], map: "user_roles_roleID_fkey")
+  @@index([userID], map: "user_roles_userID_fkey")
+}
+
+model maintenancePhoto {
+  ref   Int    @id @default(autoincrement())
+  image String @db.LongText
 }

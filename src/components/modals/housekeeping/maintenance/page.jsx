@@ -8,6 +8,10 @@ import { MdKeyboardArrowLeft } from "react-icons/md";
 import { CiImageOn } from "react-icons/ci";
 import { CiViewList } from "react-icons/ci";
 import { useSession } from "next-auth/react";
+import { MdOutlinePhotoLibrary } from "react-icons/md";
+import { FaCircle } from "react-icons/fa";
+import { CiWarning } from "react-icons/ci";
+import { IoMdClose } from "react-icons/io";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -22,6 +26,7 @@ const HousekeepingMaintenanceForm = ({
     propertyID,
     modalEdit,
     formTypeModal,
+    roomID,
     isOpen,
     onClose,
 }) => {
@@ -37,10 +42,13 @@ const HousekeepingMaintenanceForm = ({
     const [endDate, setEndDate] = useState(today);
     const [isEditing, setIsEditing] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
-    const [createdBy, setCreatedBy] = useState("");
+    const [currentUser, setCurrentUser] = useState("");
 
     const { data: session } = useSession();
+    const [maintenances, setMaintenances] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
+    console.log(isLoading);
     useEffect(() => {
         const storedLanguage = localStorage.getItem("language");
         if (storedLanguage) setLocale(storedLanguage);
@@ -48,63 +56,78 @@ const HousekeepingMaintenanceForm = ({
 
     useEffect(() => {
         if (session?.user) {
-            setCreatedBy(session.user.firstName);
+            setCurrentUser(session.user.firstName);
         }
     }, [session]);
 
 
     const t = translations[locale] || translations["pt"];
 
-    const info = [
-        {
-            nrm_reserva: "12345",
-            nrm_quarto: "204",
-            roomstatus: "clean",
-            status: "offen",
-            priority: 0,
-            tipologia: "Duplo Deluxe",
-            problema: "Ar-condicionado não funciona",
-            descproblema: "O ar-condicionado do quarto 204 não está funcionando corretamente.",
-            data: "2025-11-12"
-        },
-        {
-            nrm_reserva: "12345",
-            nrm_quarto: "204",
-            roomstatus: "clean",
-            status: "offen",
-            priority: 0,
-            tipologia: "Duplo Deluxe",
-            problema: "Ar-condicionado não funciona",
-            descproblema: "O ar-condicionado do quarto 204 não está funcionando corretamente.",
-            data: "2025-11-13"
-        },
-        {
-            nrm_reserva: "12345",
-            nrm_quarto: "204",
-            roomstatus: "dirty",
-            status: "offen",
-            priority: 1,
-            tipologia: "Duplo Deluxe",
-            problema: "Lâmpada queimada no banheiro",
-            descproblema: "A lâmpada do banheiro do quarto 204 está queimada e precisa ser substituída.",
-            data: "2025-11-13"
-        },
-        {
-            nrm_reserva: "12345",
-            nrm_quarto: "204",
-            roomstatus: "dirty",
-            status: "offen",
-            priority: 0,
-            tipologia: "Duplo Deluxe",
-            problema: "002 - Cofre não abre com o código",
-            descproblema: "O cofre do quarto 204 não está abrindo com o código fornecido pelo hóspede.",
-            data: "2025-11-13"
+    useEffect(() => {
+        const fetchMaintenances = async () => {
+            try {
+                setIsLoading(true);
+
+                const response = await axios.post(
+                    "/api/reservations/housekeeping/getMaintenances",
+                    { propertyID }
+                );
+
+                if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+                    console.log("Housekeeping:", response.data);
+                    setMaintenances(response.data);
+                } else {
+                    setMaintenances([]);
+                    console.warn("Nenhum dado encontrado ou dados inválidos para o propertyID:", propertyID);
+                }
+            } catch (error) {
+                console.error(
+                    "Erro ao buscar manutenções:",
+                    error.response?.data || error.message
+                );
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (propertyID) {
+            fetchMaintenances();
         }
-    ];
+    }, [propertyID]);
+
+    const estadoLimpezaConfig = {
+        1: { icon: <FaCircle size={20} color="green" />, title: "Limpo" },
+        2: { icon: <FaCircle size={20} color="red" />, title: "Sujo" },
+        3: { icon: <CiWarning size={20} />, title: "Fora de serviço" },
+        4: { icon: <FaCircle size={20} color="blue" />, title: "Pronto" },
+        5: { icon: <FaCircle size={20} color="orange" />, title: "Usado" },
+        6: { icon: <FaCircle size={20} color="yellow" />, title: "Limpeza em execução" },
+        10: { icon: <FaCircle size={20} color="gray" />, title: "Arrumar quarto" },
+    };
+
+    const mappedMaintenances = maintenances
+        .filter(item => item._del === 0) // 🔹 só os não deletados
+        .map((item) => ({
+            refnr: item.refnr?.toString() || "",
+            nrm_quarto: item.ziname || "",
+            IDQuartoInterno: item.IDQuartoInterno || "",
+            tipologia: item.kat || "",
+            problema: item.text || "",
+            descproblema: item.ztext || "",
+            localText: item.textlokal || "",
+            data: item.edate?.split("T")[0], // YYYY-MM-DD
+            priority: item.prio || 0,
+            status: item.status,
+            roomstatus: estadoLimpezaConfig[item.status]?.title || "",
+            image: item.dokument || null,
+            createdBy: item.euser || "",
+            createdAt: item.edate?.split("T")[0] || "",
+            updatedBy: item.suser && item.suser !== "n" ? item.suser : "",
+            updatedAt: item.sdate && item.sdate.split("T")[0] !== "1900-01-01" ? item.sdate.split("T")[0] : "",
+        }));
 
     const [roomsOptions, setRoomsOptions] = useState([]);
     const [reasonsOptions, setReasonsOptions] = useState([]);
-
 
     const fetchOptions = async (url, setOptions) => {
         if (!propertyID) return;
@@ -124,22 +147,28 @@ const HousekeepingMaintenanceForm = ({
         fetchOptions(`/api/reservations/housekeeping/getreasons?propertyID=${propertyID}`, setReasonsOptions);
     }, [propertyID]);
 
+    const [filterType, setFilterType] = useState("all"); // "all" | "own"
 
-    const filteredInfo = info.filter((item) => {
+    const filteredInfo = mappedMaintenances.filter((item) => {
         const search = searchTerm.toLowerCase();
-        const itemDate = item.data; // YYYY-MM-DD
+        const itemDate = item.data;
+
         const inDateRange =
             (!startDate || itemDate >= startDate) &&
             (!endDate || itemDate <= endDate);
 
         const matchesSearch =
-            item.nrm_reserva.toLowerCase().includes(search) ||
+            item.refnr.toLowerCase().includes(search) ||
             item.nrm_quarto.toLowerCase().includes(search) ||
             item.tipologia.toLowerCase().includes(search) ||
             item.problema.toLowerCase().includes(search);
 
-        return inDateRange && matchesSearch;
+        const matchesRoom =
+            filterType === "all" || item.nrm_quarto === roomID;
+
+        return inDateRange && matchesSearch && matchesRoom;
     });
+
 
     // const handleImageUpload = (e) => {
     //     const file = e.target.files[0];
@@ -175,45 +204,30 @@ const HousekeepingMaintenanceForm = ({
     const [description, setDescription] = useState("");
     const [localText, setLocalText] = useState("");
 
-    const [existingImageUrl, setExistingImageUrl] = useState(null);
-console.log(setExistingImageUrl);
-
     const handleSubmit = async () => {
         try {
-            let imageUrl = null;
+            let imageRef = null;
 
-            // ⚠️ Se existir imagem, fazemos upload para Cloudinary
+            // 🔹 Upload da imagem
             if (selectedImage) {
                 const formData = new FormData();
                 formData.append("file", selectedImage);
-                formData.append("propertyID", propertyID);
-                formData.append("room", selectedRoom);
-                formData.append("reasonID", selectedReasonID);
 
-                if (existingImageUrl) {
-                    formData.append("existingImage", existingImageUrl);
-                }
+                const uploadResponse = await axios.post(
+                    "/api/upload-maintenance-image",
+                    formData,
+                    { headers: { "Content-Type": "multipart/form-data" } }
+                );
 
-                const uploadResponse = await fetch("/api/upload-maintenance-image", {
-                    method: "POST",
-                    body: formData,
-                });
-
-                const uploadResult = await uploadResponse.json();
-
-                if (uploadResponse.ok) {
-                    imageUrl = uploadResult.imageUrl;
+                if (uploadResponse.data.ref) {
+                    imageRef = uploadResponse.data.ref;
                 } else {
-                    console.error("Erro ao enviar imagem:", uploadResult.error);
+                    console.error("Erro ao enviar imagem:", uploadResponse.data.error);
                 }
             }
 
-            // Gerar data e hora atuais
+            // 🔹 Criar manutenção
             const now = new Date();
-            const createdDate = now.toISOString().split("T")[0];      // YYYY-MM-DD
-            const createdTime = now.toTimeString().split(" ")[0];     // HH:mm:ss
-
-            // Payload da manutenção
             const payload = {
                 propertyID,
                 room: selectedRoom,
@@ -222,30 +236,180 @@ console.log(setExistingImageUrl);
                 isOOS,
                 description,
                 localText,
-                image: imageUrl,
-                createdDate,
-                createdTime,
-                createdBy,
+                image: imageRef,
+                createdDate: now.toISOString().split("T")[0],
+                createdTime: now.toTimeString().split(" ")[0],
+                createdBy: currentUser,
             };
 
-            // Enviar para a API
-            const response = await fetch(
+            await axios.post(
                 "/api/reservations/housekeeping/insertMaintenance",
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
-                }
+                payload
             );
 
-            const data = await response.json();
-            console.log("Resposta da API:", data);
+            // SE estiver OOS → atualizar status do quarto
+            if (isOOS) {
+                await updateRoomStatus({
+                    internalRoom: selectedRoom,
+                    propertyId: propertyID,
+                    roomStatus: 3,
+                });
+            }
+
+            console.log("Manutenção criada com sucesso");
+
+            // Fechar modal / resetar estado
+            onClose?.();
 
         } catch (error) {
             console.error("Erro ao submeter manutenção:", error);
+            alert("Erro ao criar manutenção.");
         }
     };
 
+    const handleOOS = async () => {
+        if (!selectedItem?.IDQuartoInterno) return;
+
+        try {
+            await updateRoomStatus({
+                internalRoom: selectedItem.IDQuartoInterno,
+                propertyId: propertyID,
+                roomStatus: 3,
+            });
+
+            console.log("Quarto marcado como OOS");
+        } catch {
+            alert("Erro ao colocar o quarto como OOS");
+        }
+    };
+
+    const updateRoomStatus = async ({ internalRoom, propertyId, roomStatus }) => {
+        try {
+            await axios.post("/api/reservations/housekeeping/updateRoomStatus", {
+                internalRoom,
+                propertyId,
+                roomStatus,
+            });
+
+            console.log("Room status atualizado com sucesso");
+        } catch (error) {
+            console.error("Erro ao atualizar status do quarto:", error);
+            throw error; // importante para quem chama saber que falhou
+        }
+    };
+
+    const [imagePreviewEdit, setImagePreviewEdit] = useState(null);
+
+
+    // Função para buscar Base64 pelo ref
+    const fetchImageByRef = async (ref) => {
+        try {
+            if (!ref) return;
+
+            const response = await axios.get(`/api/upload-maintenance-image?ref=${ref}`);
+            if (response.data?.image) {
+                setImagePreviewEdit(response.data.image);
+            } else {
+                setImagePreviewEdit(null); // não encontrou imagem
+            }
+        } catch (error) {
+            console.error("Erro ao buscar imagem:", error);
+            setImagePreviewEdit(null);
+        }
+    };
+
+    // Disparar quando selectedItem mudar
+    useEffect(() => {
+        if (selectedItem?.image) {
+            fetchImageByRef(selectedItem.image); // selectedItem.image = ref
+        } else {
+            setImagePreviewEdit(null);
+        }
+    }, [selectedItem]);
+
+
+    const [isEditMode, setIsEditMode] = useState(false);
+
+    const [editDescription, setEditDescription] = useState("");
+    const [editLocalText, setEditLocalText] = useState("");
+
+    useEffect(() => {
+        if (selectedItem) {
+            setEditDescription(selectedItem.descproblema || "");
+            setEditLocalText(selectedItem.localText || "");
+            setIsEditMode(false); // começa em modo leitura
+        }
+    }, [selectedItem]);
+
+    const handleSaveEdit = async (solve = false) => {
+        try {
+            const now = new Date();
+
+            const payload = {
+                propertyID,
+                refnr: selectedItem.refnr,
+                internalRoom: selectedItem.IDQuartoInterno,
+                description: editDescription,
+                localText: editLocalText,
+
+                // 🔹 Só entra quando Solve = true
+                ...(solve && {
+                    solved: 1,
+                    sdate: now.toISOString().split("T")[0],
+                    stime: now.toTimeString().split(" ")[0],
+                    suser: currentUser,
+                }),
+            };
+
+            await axios.post(
+                "/api/reservations/housekeeping/updateMaintenance",
+                payload
+            );
+
+            // 🔹 Atualizar UI local
+            setSelectedItem(prev => ({
+                ...prev,
+                descproblema: editDescription,
+                localText: editLocalText,
+                ...(solve && { solved: 1 }),
+            }));
+
+            setIsEditMode(false);
+
+        } catch (error) {
+            console.error("Erro ao salvar edição:", error);
+            alert("Erro ao salvar alterações");
+        }
+    };
+
+    const handleDeleteMaintenance = async () => {
+        try {
+            if (!selectedItem?.refnr || !selectedItem?.IDQuartoInterno) return;
+
+            if (!window.confirm("Deseja realmente apagar esta manutenção?")) return;
+
+            await axios.post("/api/reservations/housekeeping/deleteMaintenance", {
+                propertyID,
+                refnr: selectedItem.refnr,
+                internalRoom: selectedItem.IDQuartoInterno,
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            console.log("Manutenção apagada com sucesso");
+
+            // 🔹 Refresh na página inteira
+            window.location.reload();
+
+        } catch (error) {
+            console.error("Erro ao apagar manutenção:", error);
+            alert("Erro ao apagar manutenção");
+        }
+    };
+
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
     return (
         <>
@@ -294,7 +458,7 @@ console.log(setExistingImageUrl);
                                         >
                                             <MdKeyboardArrowLeft size={30} className="text-white" />
                                         </Button>
-                                        <h2 className="text-lg font-semibold">New WO</h2>
+                                        <h2 className="text-lg font-semibold">{t.modals.housekeeping.maintenance.newWo}</h2>
                                         <Button
                                             type="button"
                                             color="transparent"
@@ -302,7 +466,7 @@ console.log(setExistingImageUrl);
                                             className="text-white"
                                             onClick={handleSubmit}
                                         >
-                                            Create
+                                            {t.modals.housekeeping.maintenance.create}
                                         </Button>
                                     </div>
                                 ) : isEditing ? (
@@ -316,14 +480,21 @@ console.log(setExistingImageUrl);
                                         >
                                             <MdKeyboardArrowLeft size={30} className="text-white" />
                                         </Button>
-                                        <h2 className="text-lg font-semibold">WO {selectedItem.nrm_reserva}</h2>
+                                        <h2 className="text-lg font-semibold">{t.modals.housekeeping.maintenance.wo} {selectedItem.refnr}</h2>
                                         <Button
                                             type="button"
                                             color="transparent"
                                             variant="light"
                                             className="text-white"
+                                            onClick={() => {
+                                                if (isEditMode) {
+                                                    handleSaveEdit(); // 👈 salvar
+                                                } else {
+                                                    setIsEditMode(true); // 👈 ativar edição
+                                                }
+                                            }}
                                         >
-                                            Edit
+                                            {isEditMode ? "Save" : "Edit"}
                                         </Button>
                                     </div>
                                 ) : null}
@@ -366,35 +537,65 @@ console.log(setExistingImageUrl);
                                                         key={index}
                                                         className="border border-gray-200 rounded-2xl shadow-sm bg-white p-4 hover:shadow-md transition-shadow"
                                                     >
-                                                        <div className="flex flex-col gap-1 text-sm text-gray-700">
-                                                            <p>{item.nrm_reserva}</p>
+                                                        <div className="flex flex-col text-sm text-gray-700">
+                                                            <p>{item.refnr}</p>
                                                             <p>{item.nrm_quarto} ({item.tipologia})</p>
                                                             <p>{item.problema}</p>
                                                             <p>{item.data}</p>
+                                                            <p>{item.descproblema}</p>
                                                         </div>
-                                                        <div className="flex justify-end">
-                                                            <CiViewList
-                                                                size={20}
-                                                                className="cursor-pointer"
-                                                                onClick={() => handleEditClick(item)}
-                                                            />
+                                                        <div className="w-full h-px bg-gray-300 mt-1 mb-1"></div>
+
+                                                        <div className="flex justify-between">
+                                                            <div className="flex">
+                                                                <MdOutlinePhotoLibrary
+                                                                    size={20}
+                                                                    color="gray"
+                                                                    className="cursor-pointer"
+                                                                />
+                                                            </div>
+
+                                                            <div className="flex">
+                                                                <CiViewList
+                                                                    size={20}
+                                                                    className="cursor-pointer"
+                                                                    onClick={() => handleEditClick(item)}
+                                                                />
+                                                            </div>
                                                         </div>
+
                                                     </div>
                                                 ))
                                             ) : (
                                                 <p className="text-gray-500 text-center mt-4">
-                                                    Nenhum resultado encontrado.
+                                                    {t.modals.housekeeping.maintenance.noResults}
                                                 </p>
                                             )}
                                         </div>
 
                                         <div className="flex justify-between gap-3 mt-4">
-                                            <button className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200">
+                                            <button
+                                                type="button"
+                                                className={`px-4 py-2 rounded ${filterType === "own"
+                                                    ? "bg-gray-300"
+                                                    : "bg-gray-100 hover:bg-gray-200"
+                                                    }`}
+                                                onClick={() => setFilterType("own")}
+                                            >
                                                 {t.modals.housekeeping.maintenance.own}
                                             </button>
-                                            <button className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200">
+
+                                            <button
+                                                type="button"
+                                                className={`px-4 py-2 rounded ${filterType === "all"
+                                                    ? "bg-gray-300"
+                                                    : "bg-gray-100 hover:bg-gray-200"
+                                                    }`}
+                                                onClick={() => setFilterType("all")}
+                                            >
                                                 {t.modals.housekeeping.maintenance.all}
                                             </button>
+
                                             <button
                                                 type="button"
                                                 className="px-4 py-2 rounded bg-primary text-white hover:opacity-90"
@@ -406,49 +607,60 @@ console.log(setExistingImageUrl);
                                     </>
                                 ) : isAdding ? (
                                     // Formulário Adicionar
-                                    <div className="flex flex-col h-full justify-between gap-4">
-                                        <div className="flex flex-row justify-between gap-6 items-start">
-                                            <div className="flex flex-col text-gray-700 gap-2">
-                                                <p>Room</p>
-                                                <p>Reason</p>
-                                                <p>Set OOS</p>
+                                    <div className="flex flex-col max-h-[600px] overflow-y-auto gap-4 p-2">
+
+                                        {/* GRID TOPO */}
+                                        <div className="grid grid-cols-[35%_65%] w-full text-sm">
+                                            {/* Room */}
+                                            <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
+                                                {t.modals.housekeeping.maintenance.room}
                                             </div>
-                                            <div className="flex flex-col gap-2">
+                                            <div className="px-3 py-2 border-b border-gray-200 text-right">
                                                 <select
                                                     value={selectedRoom}
                                                     onChange={(e) => setSelectedRoom(e.target.value)}
-                                                    className="border border-gray-300 rounded px-2 py-1"
+                                                    className="border border-gray-300 rounded px-2 py-1 w-full"
                                                 >
-                                                    <option value="">Select a room</option>
+                                                    <option value="">{t.modals.housekeeping.maintenance.selectRoom}</option>
                                                     {roomsOptions.map((roomOption) => (
                                                         <option key={roomOption.value} value={roomOption.value}>
                                                             {roomOption.label}
                                                         </option>
                                                     ))}
                                                 </select>
+                                            </div>
 
+                                            {/* Reason */}
+                                            <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
+                                                {t.modals.housekeeping.maintenance.reason}
+                                            </div>
+                                            <div className="px-3 py-2 border-b border-gray-200 text-right">
                                                 <select
                                                     value={selectedReasonID}
                                                     onChange={(e) => {
-                                                        const value = parseInt(e.target.value, 10); // converte para número
+                                                        const value = parseInt(e.target.value, 10);
                                                         setSelectedReasonID(value);
-
                                                         const selected = reasonsOptions.find(r => r.value === value);
                                                         setSelectedReasonText(selected?.label || "");
                                                     }}
-                                                    className="border border-gray-300 rounded px-2 py-1"
+                                                    className="border border-gray-300 rounded px-2 py-1 w-full"
                                                 >
-                                                    <option value="">Select a reason</option>
+                                                    <option value="">{t.modals.housekeeping.maintenance.selectReason}</option>
                                                     {reasonsOptions.map((reasonOption) => (
                                                         <option key={reasonOption.value} value={reasonOption.value}>
                                                             {reasonOption.label}
                                                         </option>
                                                     ))}
                                                 </select>
+                                            </div>
 
+                                            {/* Set OOS */}
+                                            <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
+                                                {t.modals.housekeeping.maintenance.setOOS}
+                                            </div>
+                                            <div className="px-3 py-2 border-b border-gray-200 text-right">
                                                 <input
                                                     type="checkbox"
-                                                    id="oos"
                                                     className="accent-blue-500 w-4 h-4"
                                                     checked={isOOS}
                                                     onChange={(e) => setIsOOS(e.target.checked)}
@@ -456,127 +668,47 @@ console.log(setExistingImageUrl);
                                             </div>
                                         </div>
 
+                                        {/* Description */}
                                         <div>
-                                            <p>Description</p>
+                                            <p>{t.modals.housekeeping.maintenance.description}</p>
                                             <textarea
                                                 className="w-full h-16 resize-none rounded border border-gray-300 px-2 py-1"
                                                 value={description}
                                                 onChange={(e) => setDescription(e.target.value)}
-                                            ></textarea>
+                                            />
                                         </div>
 
+                                        {/* Local Text */}
                                         <div>
-                                            <p>Local Text</p>
+                                            <p>{t.modals.housekeeping.maintenance.localText}</p>
                                             <textarea
                                                 className="w-full h-16 resize-none rounded border border-gray-300 px-2 py-1"
                                                 value={localText}
                                                 onChange={(e) => setLocalText(e.target.value)}
-                                            ></textarea>
-                                        </div>
-
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            className="hidden"
-                                            id="imageUpload"
-                                            onChange={handleImageUpload}
-                                        />
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            capture="environment"
-                                            className="hidden"
-                                            id="cameraUpload"
-                                            onChange={handleImageUpload}
-                                        />
-
-                                        <div>
-                                            <p>Image</p>
-                                            <div className="w-full h-12 bg-gray-100 flex items-center justify-center rounded overflow-hidden">
-                                                {selectedImage ? (
-                                                    <img src={selectedImage} alt="Uploaded" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <CiImageOn size={30} color="gray" />
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex justify-between gap-3 mt-4">
-                                            <button
-                                                type="button"
-                                                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
-                                                onClick={() => document.getElementById('cameraUpload').click()}
-                                            >
-                                                Camera
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
-                                                onClick={() => document.getElementById('imageUpload').click()}
-                                            >
-                                                Upload Image
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
-                                                onClick={() => setSelectedImage(null)}
-                                            >
-                                                Del. Image
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : isEditing && selectedItem ? (
-                                    // Formulário Editar
-                                    <div className="flex flex-col h-full justify-between gap-4 overflow-y-auto max-h-[450px] pr-2">
-                                        <div className="flex flex-row justify-between gap-6 items-start">
-                                            <div className="flex flex-col text-gray-700 gap-2">
-                                                <p>Status</p>
-                                                <p>Priority</p>
-                                                <p>Room</p>
-                                                <p>R. Status</p>
-                                                <p>Reason</p>
-                                            </div>
-                                            <div className="flex flex-col gap-2">
-                                                <p>{selectedItem.status}</p>
-                                                <p>{selectedItem.priority}</p>
-                                                <p>{selectedItem.nrm_quarto}</p>
-                                                <p>{selectedItem.roomstatus}</p>
-                                                <p>{selectedItem.problema}</p>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <p>Description</p>
-                                            <textarea
-                                                className="w-full h-16 resize-none rounded border border-gray-300 px-2 py-1 bg-gray-100"
-                                                value={selectedItem.descproblema || ""}
-                                                readOnly
                                             />
                                         </div>
 
-                                        <div>
-                                            <p>Local Text</p>
-                                            <textarea className="w-full h-16 resize-none rounded border border-gray-300 px-2 py-1"></textarea>
-                                        </div>
+                                        {/* Hidden Inputs */}
+                                        <input
+                                            type="file"
+                                            id="imageUpload"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleImageUpload}
+                                        />
 
                                         <input
                                             type="file"
-                                            accept="image/*"
-                                            className="hidden"
-                                            id="imageUpload"
-                                            onChange={handleImageUpload}
-                                        />
-                                        <input
-                                            type="file"
+                                            id="cameraUpload"
                                             accept="image/*"
                                             capture="environment"
                                             className="hidden"
-                                            id="cameraUpload"
                                             onChange={handleImageUpload}
                                         />
 
+                                        {/* Image */}
                                         <div>
-                                            <p>Image</p>
+                                            <p>{t.modals.housekeeping.maintenance.image}</p>
                                             <div className="w-full h-12 bg-gray-100 flex items-center justify-center rounded overflow-hidden">
                                                 {imagePreview ? (
                                                     <img src={imagePreview} alt="Uploaded" className="w-full h-full object-cover" />
@@ -584,19 +716,171 @@ console.log(setExistingImageUrl);
                                                     <CiImageOn size={30} color="gray" />
                                                 )}
                                             </div>
+                                        </div>
 
+                                        {/* Botões */}
+                                        <div className="flex justify-between gap-3">
+                                            <button
+                                                type="button"
+                                                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
+                                                onClick={() => document.getElementById('cameraUpload').click()}
+                                            >
+                                                {t.modals.housekeeping.maintenance.camera}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
+                                                onClick={() => document.getElementById('imageUpload').click()}
+                                            >
+                                                {t.modals.housekeeping.maintenance.uploadImage}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
+                                                onClick={() => setSelectedImage(null)}
+                                            >
+                                                {t.modals.housekeeping.maintenance.delImage}
+                                            </button>
+                                        </div>
+
+                                    </div>
+
+                                ) : isEditing && selectedItem ? (
+                                    // Formulário Editar
+                                    <div className="flex flex-col h-full justify-between gap-4 overflow-y-auto max-h-[450px] pr-2">
+                                        <div className="grid grid-cols-[35%_65%] w-full text-sm">
+                                            {/* Linha 1 */}
+                                            <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
+                                                {t.modals.housekeeping.maintenance.status}
+                                            </div>
+                                            <div className="px-3 py-2 border-b border-gray-200 text-right">
+                                                {selectedItem.status}
+                                            </div>
+
+                                            {/* Linha 2 */}
+                                            <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
+                                                {t.modals.housekeeping.maintenance.priority}
+                                            </div>
+                                            <div className="px-3 py-2 border-b border-gray-200 text-right">
+                                                {selectedItem.priority}
+                                            </div>
+
+                                            {/* Linha 3 */}
+                                            <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
+                                                {t.modals.housekeeping.maintenance.room}
+                                            </div>
+                                            <div className="px-3 py-2 border-b border-gray-200 text-right">
+                                                {selectedItem.nrm_quarto}
+                                            </div>
+
+                                            {/* Linha 4 */}
+                                            <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
+                                                {t.modals.housekeeping.maintenance.roomStatus}
+                                            </div>
+                                            <div className="px-3 py-2 border-b border-gray-200 text-right">
+                                                {selectedItem.roomstatus}
+                                            </div>
+
+                                            {/* Linha 5 */}
+                                            <div className="bg-gray-100 text-gray-600 px-3 py-2">
+                                                {t.modals.housekeeping.maintenance.reason}
+                                            </div>
+                                            <div className="px-3 py-2 text-right">
+                                                {selectedItem.problema}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p>{t.modals.housekeeping.maintenance.description}</p>
+                                            <textarea
+                                                className={`w-full h-16 resize-none rounded border px-2 py-1 
+                                                    ${isEditMode ? "border-gray-300 bg-white" : "border-gray-300 bg-gray-100"}
+                                                `}
+                                                value={editDescription}
+                                                readOnly={!isEditMode}
+                                                onChange={(e) => setEditDescription(e.target.value)}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <p>{t.modals.housekeeping.maintenance.localText}</p>
+                                            <textarea
+                                                className={`w-full h-16 resize-none rounded border px-2 py-1 
+                                                ${isEditMode ? "border-gray-300 bg-white" : "border-gray-100 bg-gray-100"}
+                                            `}
+                                                value={editLocalText}
+                                                readOnly={!isEditMode}
+                                                onChange={(e) => setEditLocalText(e.target.value)}
+                                            />
+                                        </div>
+
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            id="imageUpload"
+                                            onChange={handleImageUpload}
+                                        />
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            capture="environment"
+                                            className="hidden"
+                                            id="cameraUpload"
+                                            onChange={handleImageUpload}
+                                        />
+
+                                        <div>
+                                            <p>{t.modals.housekeeping.maintenance.image}</p>
+                                            <div className="w-full h-12 bg-gray-100 flex items-center justify-center rounded overflow-hidden cursor-pointer">
+                                                {imagePreviewEdit ? (
+                                                    <img
+                                                        src={imagePreviewEdit}
+                                                        alt="Uploaded"
+                                                        className="w-full h-full object-cover"
+                                                        onClick={() => setIsImageModalOpen(true)} // abre o modal
+                                                    />
+                                                ) : (
+                                                    <CiImageOn size={30} color="gray" />
+                                                )}
+                                            </div>
+                                            {/* Modal da imagem */}
+                                            {isImageModalOpen && (
+                                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                                                    <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-md">
+                                                        {/* Header */}
+                                                        <div className="flex justify-between items-center px-4 py-2 h-12 bg-primary text-white rounded-t-lg">
+                                                            <h3 className="text-sm font-semibold">{t.modals.housekeeping.maintenance.image}</h3>
+                                                            <button
+                                                                className="text-white text-lg font-bold"
+                                                                onClick={() => setIsImageModalOpen(false)}
+                                                            >
+                                                                <IoMdClose size={20} />
+                                                            </button>
+                                                        </div>
+
+                                                        {/* Body */}
+                                                        <div className="p-4 flex items-center justify-center">
+                                                            <img
+                                                                src={imagePreviewEdit}
+                                                                alt="Expanded"
+                                                                className="max-w-full max-h-96 object-contain rounded"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
                                             <div className="flex flex-row justify-between gap-6 items-start mt-4">
                                                 <div className="flex flex-col text-gray-700 gap-2">
-                                                    <p>Created</p>
-                                                    <p>Created by</p>
-                                                    <p>Updated</p>
-                                                    <p>Updated by</p>
+                                                    <p>{t.modals.housekeeping.maintenance.created}</p>
+                                                    <p>{t.modals.housekeeping.maintenance.createdBy}</p>
+                                                    <p>{t.modals.housekeeping.maintenance.solved}</p>
+                                                    <p>{t.modals.housekeeping.maintenance.solvedBy}</p>
                                                 </div>
                                                 <div className="flex flex-col text-gray-700 gap-2">
-                                                    <p>2025-11-12</p>
-                                                    <p>Susana Martins</p>
-                                                    <p></p>
-                                                    <p></p>
+                                                    <p>{selectedItem.createdAt}</p>
+                                                    <p>{selectedItem.createdBy}</p>
+                                                    <p>{selectedItem.updatedAt}</p>
+                                                    <p>{selectedItem.updatedBy}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -604,20 +888,23 @@ console.log(setExistingImageUrl);
                                             <button
                                                 type="button"
                                                 className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
+                                                onClick={handleDeleteMaintenance}
                                             >
-                                                Delete
+                                                {t.modals.housekeeping.maintenance.delete}
                                             </button>
                                             <button
                                                 type="button"
+                                                onClick={handleOOS}
                                                 className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
                                             >
-                                                OOS
+                                                {t.modals.housekeeping.maintenance.oos}
                                             </button>
                                             <button
                                                 type="button"
+                                                onClick={() => handleSaveEdit(true)}
                                                 className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
                                             >
-                                                Solve
+                                                {t.modals.housekeeping.maintenance.solve}
                                             </button>
                                         </div>
                                     </div>
