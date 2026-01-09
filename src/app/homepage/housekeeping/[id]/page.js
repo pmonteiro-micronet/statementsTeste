@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
 
-// import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
+import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 // import { CiViewList } from "react-icons/ci";
 import { MdCleanHands } from "react-icons/md";
 import {
@@ -21,7 +21,7 @@ import { MdOutlineRefresh } from "react-icons/md";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
 
 import HousekeepingInfoForm from "@/components/modals/housekeeping/info/page";
-// import HousekeepingMaintenanceForm from "@/components/modals/housekeeping/maintenance/page";
+import HousekeepingMaintenanceForm from "@/components/modals/housekeeping/maintenance/page";
 // import HousekeepingTracesForm from "@/components/modals/housekeeping/traces/page";
 
 import "../../frontOfficeView/table.css";
@@ -67,7 +67,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [isModalMaintenanceOpen, setIsModalMaintenanceOpen] = useState(false);
+  const [isModalMaintenanceOpen, setIsModalMaintenanceOpen] = useState(false);
   // const [isModalTracesOpen, setIsModalTracesOpen] = useState(false);
 
 
@@ -101,10 +101,10 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     setSelectedReserva(reserva); // Armazena os dados da reserva clicada
     setIsModalOpen(true);
   };
-  // const handleOpenMaintenanceModal = (reserva) => {
-  //   setSelectedReserva(reserva); // Armazena os dados da reserva clicada
-  //   setIsModalMaintenanceOpen(true);
-  // };
+  const handleOpenMaintenanceModal = (reserva) => {
+    setSelectedReserva(reserva); // Armazena os dados da reserva clicada
+    setIsModalMaintenanceOpen(true);
+  };
 
   // const handleOpenTracesModal = (reserva) => {
   //   setSelectedReserva(reserva); // Armazena os dados da reserva clicada
@@ -117,11 +117,11 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     window.location.reload(); // Recarrega a página
   };
 
-  // const handleCloseMaintenanceModal = () => {
-  //   setIsModalMaintenanceOpen(false);
-  //   setSelectedReserva(null); // Limpa os dados ao fechar a modal
-  //   window.location.reload(); // Recarrega a página
-  // };
+  const handleCloseMaintenanceModal = () => {
+    setIsModalMaintenanceOpen(false);
+    setSelectedReserva(null); // Limpa os dados ao fechar a modal
+    window.location.reload(); // Recarrega a página
+  };
 
   // const handleCloseTracesModal = () => {
   //   setIsModalTracesOpen(false);
@@ -375,12 +375,12 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                         <div className="flex items-center justify-center gap-2 w-full h-full">
 
                           {/* Botão de manutenção */}
-                          {/* <button
+                          <button
                             className="p-1 rounded flex items-center"
                             onClick={() => handleOpenMaintenanceModal(item)}
                           >
                             <HiOutlineWrenchScrewdriver size={20} color="gray" />
-                          </button> */}
+                          </button>
 
                           {/* Botão de traces */}
                            {/* <button
@@ -458,14 +458,14 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                   />
-{/* 
+
                   <HousekeepingMaintenanceForm
                     buttonName={t.frontOffice.housekeeping.maintenance}
                     buttonColor="transparent"
-                    modalHeader={t.modals.housekeeping.maintenance.title + " - Res. No.: " + selectedReserva?.ResNo}
+                    modalHeader={t.modals.housekeeping.maintenance.title + " - Res. No.: " + selectedReserva?.IDReserva}
                     formTypeModal={11}
                     propertyID={propertyID}
-                    roomNumber={selectedReserva?.Room}
+                    roomID={selectedReserva?.IDQuarto}
                     dateCI={selectedReserva?.DateCI}
                     booker={selectedReserva?.Booker}
                     salutation={selectedReserva?.Salutation}
@@ -480,7 +480,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     isBackdropVisible
                     isOpen={isModalMaintenanceOpen}
                     onClose={handleCloseMaintenanceModal}
-                  /> */}
+                  /> 
 
                   {/* <HousekeepingTracesForm
                     buttonName={t.frontOffice.housekeeping.traces}
