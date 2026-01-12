@@ -241,6 +241,7 @@ model user_roles {
 }
 
 model maintenancePhoto {
-  ref   Int    @id @default(autoincrement())
-  image String @db.LongText
+  ref        Int    @id @default(autoincrement())
+  image      String @db.LongText
+  propertyID Int?
 }

@@ -97,6 +97,8 @@ export async function POST(request) {
   try {
     const data = await request.formData(); // ✅ pegar formData
     const file = data.get("file");
+    const propertyID = data.get("propertyID");
+
 
     if (!file) {
       return NextResponse.json({ error: "Arquivo obrigatório" }, { status: 400 });
@@ -106,10 +108,13 @@ export async function POST(request) {
     const arrayBuffer = await file.arrayBuffer();
     const base64 = Buffer.from(arrayBuffer).toString("base64");
     const dataUri = `data:${file.type};base64,${base64}`;
-
+    const propertyIDInt = parseInt(propertyID, 10);
     // salvar no Prisma
     const newPhoto = await prisma.maintenancePhoto.create({
-      data: { image: dataUri },
+      data: { 
+        image: dataUri,
+      propertyID: propertyIDInt
+    },
     });
 
     // retornar o ref gerado

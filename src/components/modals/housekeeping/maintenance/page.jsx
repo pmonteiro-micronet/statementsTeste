@@ -213,6 +213,7 @@ const HousekeepingMaintenanceForm = ({
             if (selectedImage) {
                 const formData = new FormData();
                 formData.append("file", selectedImage);
+                formData.append("propertyID", propertyID);
 
                 const uploadResponse = await axios.post(
                     "/api/upload-maintenance-image",
