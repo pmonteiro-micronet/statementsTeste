@@ -12,6 +12,7 @@ import { MdOutlinePhotoLibrary } from "react-icons/md";
 import { FaCircle } from "react-icons/fa";
 import { CiWarning } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
+import { AiOutlineExpand } from "react-icons/ai";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -830,14 +831,16 @@ const HousekeepingMaintenanceForm = ({
                                         />
 
                                         <div>
-                                            <p>{t.modals.housekeeping.maintenance.image}</p>
+                                            <div className="flex justify-between">
+                                                <p>{t.modals.housekeeping.maintenance.image}</p>
+                                                <p onClick={() => setIsImageModalOpen(true)}><AiOutlineExpand /></p>
+                                            </div>
                                             <div className="w-full h-12 bg-gray-100 flex items-center justify-center rounded overflow-hidden cursor-pointer">
                                                 {imagePreviewEdit ? (
                                                     <img
                                                         src={imagePreviewEdit}
                                                         alt="Uploaded"
                                                         className="w-full h-full object-cover"
-                                                        onClick={() => setIsImageModalOpen(true)} // abre o modal
                                                     />
                                                 ) : (
                                                     <CiImageOn size={30} color="gray" />
