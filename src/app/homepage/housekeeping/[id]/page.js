@@ -407,7 +407,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                         {`${item.GuestName}`}
                       </td>
                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-32 truncate whitespace-nowrap overflow-hidden">
-                        {item.Lavandaria === "Sim" && <MdOutlineDryCleaning size={30} title="Changing sheets"/>}
+                        {item.Lavandaria === 1 && <MdOutlineDryCleaning size={30} title="Changing sheets"/>}
                       </td>
                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-14">
                         <div className="flex items-center justify-center h-full">

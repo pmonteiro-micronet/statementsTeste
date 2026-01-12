@@ -209,7 +209,7 @@ const HousekeepingInfoForm = ({
                                             <p className="text-right">{roomType}</p>
                                             <p className="text-right">{estadoEstadiaIcon[stayStatus?? null]}</p>
                                             <p className="text-right">---</p>
-                                            <p className="text-right">{laundry}</p>
+                                            <p className="text-right">{laundry === 1 ? "Sim" : "Não"}</p>
                                             <p className="text-right">{guestName}</p>
                                             <p className="text-right">{from?.split("T")[0]}</p>
                                             <p className="text-right">{to?.split("T")[0]}</p>
