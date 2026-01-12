@@ -13,38 +13,70 @@ const handler = NextAuth({
         internal: { label: "Internal", type: "hidden" },
       },
       async authorize(credentials) {
+        console.log("🔐 AUTHORIZE");
+        console.log("credentials:", {
+          email: credentials?.email,
+          internal: credentials?.internal,
+        });
+
         let user;
         let isInternalUser = false;
 
         if (credentials.internal === "true") {
-          // Login via QR Code (usa internalUser e internalPassword)
+          console.log("➡️ Login INTERNAL");
+
           user = await prisma.users.findFirst({
             where: { internalUser: credentials.email },
           });
 
-          if (!user || !(await bcrypt.compare(credentials.password, user.internalPassword))) {
+          if (!user) {
+            console.log("❌ Internal user não encontrado");
             return null;
           }
 
+          const passwordOk = await bcrypt.compare(
+            credentials.password,
+            user.internalPassword
+          );
+
+          console.log("Password OK?", passwordOk);
+
+          if (!passwordOk) return null;
+
           isInternalUser = true;
         } else {
-          // Login normal (usa email e password)
+          console.log("➡️ Login NORMAL");
+
           user = await prisma.users.findUnique({
             where: { email: credentials.email },
           });
 
-          if (!user || !(await bcrypt.compare(credentials.password, user.password))) {
+          if (!user) {
+            console.log("❌ User não encontrado");
             return null;
           }
+
+          const passwordOk = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+
+          console.log("Password OK?", passwordOk);
+
+          if (!passwordOk) return null;
         }
 
-        // Buscar todos os propertyIDs associados ao usuário
+        console.log("✅ User autenticado:", {
+          id: user.userID,
+          email: user.email,
+          isInternalUser,
+        });
+
         const userProperties = await prisma.usersProperties.findMany({
           where: { userID: user.userID },
           select: { propertyID: true },
         });
 
-         // Buscar todos os propertyIDs associados ao usuário
         const userRole = await prisma.user_roles.findMany({
           where: { userID: user.userID },
           select: { roleID: true },
@@ -63,7 +95,7 @@ const handler = NextAuth({
           pin: user.pin,
           permission: user.permissions,
           expirationDate: user.expirationDate,
-          isInternalUser, // <- Adicionado aqui
+          isInternalUser,
         };
       },
     }),
@@ -77,6 +109,10 @@ const handler = NextAuth({
   },
   callbacks: {
     async jwt({ token, user }) {
+      console.log("🪙 JWT CALLBACK");
+      console.log("Token ANTES:", token);
+      console.log("User:", user);
+
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -87,11 +123,18 @@ const handler = NextAuth({
         token.pin = user.pin;
         token.permission = user.permission;
         token.expirationDate = user.expirationDate;
-        token.isInternalUser = user.isInternalUser ?? false; // <- Aqui
+        token.isInternalUser = user.isInternalUser ?? false;
       }
+
+      console.log("Token DEPOIS:", token);
+
       return token;
     },
     async session({ session, token }) {
+      console.log("🧠 SESSION CALLBACK");
+      console.log("Token:", token);
+      console.log("Session ANTES:", session);
+
       session.user.id = token.id;
       session.user.email = token.email;
       session.user.firstName = token.firstName;
@@ -101,7 +144,10 @@ const handler = NextAuth({
       session.user.pin = token.pin;
       session.user.permission = token.permission;
       session.user.expirationDate = token.expirationDate;
-      session.user.isInternalUser = token.isInternalUser ?? false; // <- Aqui
+      session.user.isInternalUser = token.isInternalUser ?? false;
+
+      console.log("Session DEPOIS:", session);
+
       return session;
     },
   },
