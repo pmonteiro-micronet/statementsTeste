@@ -141,9 +141,9 @@ export default function SidebarWrapper({ children }) {
   
 useEffect(() => {
   if (selectedHotelID && session?.user) {
-    const isAdmin = session?.user?.role[0] === 1;
-    const isHousekeeping = session?.user?.role[0] === 2;
-    const isUser = session?.user?.role[0] === 3;
+    const isAdmin = session?.user?.role?.includes(1) ?? false;
+    const isHousekeeping = session?.user?.role?.includes(2) ?? false;
+    const isUser = session?.user?.role?.includes(3) ?? false;
 
     const menu = {};
 
