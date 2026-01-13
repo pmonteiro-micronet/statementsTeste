@@ -95,7 +95,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const data = await request.formData(); // ✅ pegar formData
+    const data = await request.formData(); // pegar formData
     const file = data.get("file");
     const propertyID = data.get("propertyID");
 

@@ -178,7 +178,7 @@ export default function Sidebar({ children, setExpanded }) {
     window.location.reload(); // Recarregar a página para aplicar o idioma
   };
   
-  const isAdmin = session?.user?.role[0] === 1;
+  const isAdmin = session?.user?.role?.includes(1) ?? false;
 
   return (
     <>
