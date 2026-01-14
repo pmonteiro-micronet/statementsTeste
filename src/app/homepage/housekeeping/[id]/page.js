@@ -28,7 +28,6 @@ import "../../frontOfficeView/table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 import { MdOutlineDryCleaning } from "react-icons/md";
 
-import { useRouter } from "next/navigation";
 // import dayjs from 'dayjs';
 
 import en from "../../../../../public/locales/english/common.json";
@@ -57,7 +56,6 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const today = new Date().toISOString().split("T")[0];
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowDate = tomorrow.toISOString().split("T")[0];
 
   // const [currentDate] = useState(today);
   // const [reservas, setReservas] = useState([]);
@@ -89,9 +87,6 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
   // Carregar as traduções com base no idioma atual
   const t = translations[locale] || translations["pt"]; // fallback para "pt"
-
-  const router = useRouter();
-
 
   const [propertyName, setPropertyName] = useState([]);
 
@@ -201,21 +196,21 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   };
 
   // Função chamada quando o botão de refresh é clicado
-  // const handleRefreshClick = () => {
-  //   sendDataToAPI([today, tomorrowDate]); // Envia os dados ao clicar no botão
-  // };
-
-  const handleRefreshClick = async () => {
-    try {
-      setIsLoading(true); // Ativa o loading
-      await sendDataToAPI([today, tomorrowDate]); // Faz a requisição de dados
-      router.refresh(); // Recarrega a página sem alterar a URL
-    } catch (error) {
-      console.error("Erro ao tentar fazer refresh:", error);
-    } finally {
-      setIsLoading(false); // Garante que o loading seja desativado
-    }
+  const handleRefreshClick = () => {
+    window.location.reload();
   };
+
+  // const handleRefreshClick = async () => {
+  //   try {
+  //     setIsLoading(true); // Ativa o loading
+  //     await sendDataToAPI([today, tomorrowDate]); // Faz a requisição de dados
+  //     router.refresh(); // Recarrega a página sem alterar a URL
+  //   } catch (error) {
+  //     console.error("Erro ao tentar fazer refresh:", error);
+  //   } finally {
+  //     setIsLoading(false); // Garante que o loading seja desativado
+  //   }
+  // };
 
   // const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
 
@@ -273,13 +268,13 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   };
 
   const estadoLimpezaConfig = {
-    1: { icon: <FaCircle size={20} color="green"/>, title: "Limpo" },
-    2: { icon: <FaCircle size={20} color="red"/>, title: "Sujo" },
+    1: { icon: <FaCircle size={20} color="green" />, title: "Limpo" },
+    2: { icon: <FaCircle size={20} color="red" />, title: "Sujo" },
     3: { icon: <CiWarning size={20} />, title: "Fora de serviço" },
-    4: { icon: <FaCircle size={20} color="blue"/>, title: "Pronto" },
-    5: { icon: <FaCircle size={20} color="orange"/>, title: "Usado" },
-    6: { icon: <FaCircle size={20} color="yellow"/>, title: "Limpeza em execução" },
-    10: { icon: <FaCircle size={20} color="gray"/>, title: "Arrumar quarto" },
+    4: { icon: <FaCircle size={20} color="blue" />, title: "Pronto" },
+    5: { icon: <FaCircle size={20} color="orange" />, title: "Usado" },
+    6: { icon: <FaCircle size={20} color="yellow" />, title: "Limpeza em execução" },
+    10: { icon: <FaCircle size={20} color="gray" />, title: "Arrumar quarto" },
   };
 
   return (
@@ -383,7 +378,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                           </button>
 
                           {/* Botão de traces */}
-                           {/* <button
+                          {/* <button
                             className="p-1 rounded flex items-center"
                             onClick={() => handleOpenTracesModal(item)}
                           >
@@ -407,14 +402,14 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                         {`${item.GuestName}`}
                       </td>
                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-32 truncate whitespace-nowrap overflow-hidden">
-                        {item.Lavandaria === 1 && <MdOutlineDryCleaning size={30} title="Changing sheets"/>}
+                        {item.Lavandaria === 1 && <MdOutlineDryCleaning size={30} title="Changing sheets" />}
                       </td>
                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-14">
                         <div className="flex items-center justify-center h-full">
                           {item.EstadoQuarto === 1 ? (
-                            <CiLock size={20} title="Occupied"/>
+                            <CiLock size={20} title="Occupied" />
                           ) : (
-                            <CiCircleCheck size={20} title="Free"/>
+                            <CiCircleCheck size={20} title="Free" />
                           )}
                         </div>
                       </td>
@@ -480,7 +475,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     isBackdropVisible
                     isOpen={isModalMaintenanceOpen}
                     onClose={handleCloseMaintenanceModal}
-                  /> 
+                  />
 
                   {/* <HousekeepingTracesForm
                     buttonName={t.frontOffice.housekeeping.traces}
