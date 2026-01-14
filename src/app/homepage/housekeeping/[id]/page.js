@@ -14,6 +14,7 @@ import {
 import { AiFillInfoCircle } from "react-icons/ai";
 
 import { FaCircle } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa6";
 
 
 import { FaGear } from "react-icons/fa6";
@@ -22,6 +23,8 @@ import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
 
 import HousekeepingInfoForm from "@/components/modals/housekeeping/info/page";
 import HousekeepingMaintenanceForm from "@/components/modals/housekeeping/maintenance/page";
+import HousekeepingInsertMaintenanceForm from "@/components/modals/housekeeping/insertMaintenance/page";
+
 // import HousekeepingTracesForm from "@/components/modals/housekeeping/traces/page";
 
 import "../../frontOfficeView/table.css";
@@ -66,6 +69,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalMaintenanceOpen, setIsModalMaintenanceOpen] = useState(false);
+  const [isModalInsertMaintenanceOpen, setIsModalInsertMaintenanceOpen] = useState(false);
+
   // const [isModalTracesOpen, setIsModalTracesOpen] = useState(false);
 
 
@@ -118,6 +123,10 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     window.location.reload(); // Recarrega a página
   };
 
+  const handleCloseInsertMaintenanceModal = () => {
+    setIsModalInsertMaintenanceOpen(false);
+    window.location.reload(); // Recarrega a página
+  };
   // const handleCloseTracesModal = () => {
   //   setIsModalTracesOpen(false);
   //   setSelectedReserva(null); // Limpa os dados ao fechar a modal
@@ -292,13 +301,29 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
               </button>
             </div>
 
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <button
                 onClick={handleRefreshClick}
                 className="text-white bg-primary rounded-lg cursor-pointer p-2"
               >
                 <MdOutlineRefresh size={20} />
               </button>
+              <button
+                onClick={() => setIsModalInsertMaintenanceOpen(true)}
+                className="text-white bg-primary rounded-lg cursor-pointer p-2"
+              >
+                <FaPlus size={20}/>
+              </button>
+              <HousekeepingInsertMaintenanceForm
+                buttonName={t.frontOffice.housekeeping.maintenance}
+                buttonColor="transparent"
+                modalHeader={t.modals.housekeeping.maintenance.title + " - Res. No.: " + selectedReserva?.IDReserva}
+                formTypeModal={11}
+                propertyID={propertyID}
+                isBackdropVisible
+                isOpen={isModalInsertMaintenanceOpen}
+                onClose={handleCloseInsertMaintenanceModal}
+              />
             </div>
           </div>
         </div>
