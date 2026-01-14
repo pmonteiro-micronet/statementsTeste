@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import axios from "axios";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
@@ -13,10 +14,13 @@ import { FaCircle } from "react-icons/fa";
 import { CiWarning } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
 import { AiOutlineExpand } from "react-icons/ai";
+import { FaFilter } from "react-icons/fa";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../public/locales/espanol/common.json";
+
+import ErrorRegistrationForm from "@/components/modals/arrivals/reservationForm/error/page";
 
 const translations = { en, pt, es };
 
@@ -49,6 +53,9 @@ const HousekeepingMaintenanceForm = ({
     const [maintenances, setMaintenances] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
     console.log(isLoading);
     useEffect(() => {
         const storedLanguage = localStorage.getItem("language");
@@ -63,6 +70,7 @@ const HousekeepingMaintenanceForm = ({
 
 
     const t = translations[locale] || translations["pt"];
+    console.log("RoomID:", roomID);
 
     useEffect(() => {
         const fetchMaintenances = async () => {
@@ -121,6 +129,7 @@ const HousekeepingMaintenanceForm = ({
             status: item.status,
             roomstatus: estadoLimpezaConfig[item.status]?.title || "",
             image: item.dokument || null,
+            solved: item.solved || 0,
             createdBy: item.euser || "",
             createdAt: item.edate?.split("T")[0] || "",
             updatedBy: item.suser && item.suser !== "n" ? item.suser : "",
@@ -149,26 +158,35 @@ const HousekeepingMaintenanceForm = ({
     }, [propertyID]);
 
     const [filterType, setFilterType] = useState("all"); // "all" | "own"
-
+    const [solvedFilter, setSolvedFilter] = useState("unsolved");
     const filteredInfo = mappedMaintenances.filter((item) => {
         const search = searchTerm.toLowerCase();
         const itemDate = item.data;
 
+        // Filtro por data
         const inDateRange =
             (!startDate || itemDate >= startDate) &&
             (!endDate || itemDate <= endDate);
 
+        // Filtro por texto
         const matchesSearch =
             item.refnr.toLowerCase().includes(search) ||
             item.nrm_quarto.toLowerCase().includes(search) ||
             item.tipologia.toLowerCase().includes(search) ||
             item.problema.toLowerCase().includes(search);
 
+        // Filtro por quarto
         const matchesRoom =
             filterType === "all" || item.nrm_quarto === roomID;
 
-        return inDateRange && matchesSearch && matchesRoom;
+        // ✅ Filtro por resolvido / não resolvido
+        const matchesSolved =
+            (solvedFilter === "solved" && item.solved === 1) ||
+            (solvedFilter === "unsolved" && item.solved === 0);
+
+        return inDateRange && matchesSearch && matchesRoom && matchesSolved;
     });
+
 
 
     // const handleImageUpload = (e) => {
@@ -259,13 +277,15 @@ const HousekeepingMaintenanceForm = ({
             }
 
             console.log("Manutenção criada com sucesso");
-
+            setErrorMessage('Manutenção criada com sucesso');
+            setIsErrorModalOpen(true);
             // Fechar modal / resetar estado
             onClose?.();
 
         } catch (error) {
             console.error("Erro ao submeter manutenção:", error);
-            alert("Erro ao criar manutenção.");
+            setErrorMessage('Erro ao criar manutenção.');
+            setIsErrorModalOpen(true);
         }
     };
 
@@ -279,9 +299,11 @@ const HousekeepingMaintenanceForm = ({
                 roomStatus: 3,
             });
 
-            console.log("Quarto marcado como OOS");
+            setErrorMessage('Quarto marcado como OOS com sucesso.');
+            setIsErrorModalOpen(true);
         } catch {
-            alert("Erro ao colocar o quarto como OOS");
+            setErrorMessage('Erro ao colocar o quarto como OOS.');
+            setIsErrorModalOpen(true);
         }
     };
 
@@ -295,7 +317,8 @@ const HousekeepingMaintenanceForm = ({
 
             console.log("Room status atualizado com sucesso");
         } catch (error) {
-            console.error("Erro ao atualizar status do quarto:", error);
+            setErrorMessage("Erro ao atualizar status do quarto:", error);
+            setIsErrorModalOpen(true);
             throw error; // importante para quem chama saber que falhou
         }
     };
@@ -354,7 +377,7 @@ const HousekeepingMaintenanceForm = ({
                 description: editDescription,
                 localText: editLocalText,
 
-                // 🔹 Só entra quando Solve = true
+                // Só entra quando solve = true
                 ...(solve && {
                     solved: 1,
                     sdate: now.toISOString().split("T")[0],
@@ -363,12 +386,22 @@ const HousekeepingMaintenanceForm = ({
                 }),
             };
 
+            // Salva a manutenção
             await axios.post(
                 "/api/reservations/housekeeping/updateMaintenance",
                 payload
             );
 
-            // 🔹 Atualizar UI local
+            // Atualiza status do quarto quando solve = true
+            if (solve) {
+                await updateRoomStatus({
+                    internalRoom: selectedItem.IDQuartoInterno,
+                    propertyId: propertyID,
+                    roomStatus: 2,
+                });
+            }
+
+            // Atualizar UI local
             setSelectedItem(prev => ({
                 ...prev,
                 descproblema: editDescription,
@@ -377,12 +410,15 @@ const HousekeepingMaintenanceForm = ({
             }));
 
             setIsEditMode(false);
-
+            setErrorMessage('Manutenção editada com sucesso.');
+            setIsErrorModalOpen(true);
         } catch (error) {
             console.error("Erro ao salvar edição:", error);
-            alert("Erro ao salvar alterações");
+            setErrorMessage('Erro ao guardar as alterações');
+            setIsErrorModalOpen(true);
         }
     };
+
 
     const handleDeleteMaintenance = async () => {
         try {
@@ -390,31 +426,58 @@ const HousekeepingMaintenanceForm = ({
 
             if (!window.confirm("Deseja realmente apagar esta manutenção?")) return;
 
-            await axios.post("/api/reservations/housekeeping/deleteMaintenance", {
-                propertyID,
-                refnr: selectedItem.refnr,
-                internalRoom: selectedItem.IDQuartoInterno,
-            }, {
-                headers: {
-                    "Content-Type": "application/json",
+            // Apaga a manutenção
+            await axios.post(
+                "/api/reservations/housekeeping/deleteMaintenance",
+                {
+                    propertyID,
+                    refnr: selectedItem.refnr,
+                    internalRoom: selectedItem.IDQuartoInterno,
                 },
-            });
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
 
-            console.log("Manutenção apagada com sucesso");
+            setErrorMessage('Manutenção apagada com sucesso');
+            setIsErrorModalOpen(true);
+            // Atualiza o status do quarto para 2
+            await updateRoomStatus({
+                internalRoom: selectedItem.IDQuartoInterno,
+                propertyId: propertyID,
+                roomStatus: 2, // ✅ aqui o status é 2
+            });
 
             // 🔹 Refresh na página inteira
             window.location.reload();
 
         } catch (error) {
-            console.error("Erro ao apagar manutenção:", error);
-            alert("Erro ao apagar manutenção");
+            setErrorMessage("Erro ao apagar manutenção:", error);
+            setIsErrorModalOpen(true);
         }
     };
 
+
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+
+    useEffect(() => {
+        if (!roomID || roomsOptions.length === 0) return;
+
+        const roomFound = roomsOptions.find(
+            (option) => String(option.label) === String(roomID)
+        );
+
+        if (roomFound) {
+            setSelectedRoom(String(roomFound.value));
+        }
+    }, [roomID, roomsOptions]);
+
 
     return (
         <>
+            {isOpen && typeof window !== 'undefined' && createPortal(<div className="fixed inset-0 bg-black bg-opacity-50 z-40" />, document.body)}
             {formTypeModal === 11 && (
                 <Modal
                     isOpen={isOpen}
@@ -424,7 +487,7 @@ const HousekeepingMaintenanceForm = ({
                     isKeyboardDismissDisabled={true}
                     className="z-50"
                     size="lg"
-                    backdrop="dim"
+                    backdrop="transparent"
                 >
                     <ModalContent>
                         <form>
@@ -502,7 +565,7 @@ const HousekeepingMaintenanceForm = ({
                                 ) : null}
                             </ModalHeader>
 
-                            <ModalBody className="flex flex-col p-5 bg-background min-h-[400px] max-h-[500px] overflow-hidden">
+                            <ModalBody className="flex flex-col p-5 bg-background h-full overflow-hidden">
                                 {!isAdding && !isEditing ? (
                                     // Lista de itens
                                     <>
@@ -531,8 +594,27 @@ const HousekeepingMaintenanceForm = ({
                                             />
                                             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                                         </div>
+                                        <div className="flex gap-2 mt-4 items-center">
+                                            <FaFilter size={18} color="gray" />
+                                            <button
+                                                className={`px-2 rounded text-sm h-8 ${solvedFilter === "unsolved" ? "bg-primary text-white" : "bg-gray-100 hover:bg-primary-50"
+                                                    }`}
+                                                onClick={() => setSolvedFilter("unsolved")}
+                                                type="button"
+                                            >
+                                                Por resolver
+                                            </button>
 
-                                        <div className="mt-4 flex flex-col gap-3 overflow-y-auto max-h-[300px] pr-2 rounded">
+                                            <button
+                                                className={`px-2 rounded text-sm h-8 ${solvedFilter === "solved" ? "bg-primary text-white" : "bg-gray-100 hover:bg-primary-50"
+                                                    }`}
+                                                onClick={() => setSolvedFilter("solved")}
+                                                type="button"
+                                            >
+                                                Resolvidos
+                                            </button>
+                                        </div>
+                                        <div className="flex-grow overflow-y-auto mt-4 flex flex-col gap-3 pr-2 rounded max-h-[300px]">
                                             {filteredInfo.length > 0 ? (
                                                 filteredInfo.map((item, index) => (
                                                     <div
@@ -575,7 +657,7 @@ const HousekeepingMaintenanceForm = ({
                                             )}
                                         </div>
 
-                                        <div className="flex justify-between gap-3 mt-4">
+                                        <div className="flex justify-between gap-3 mt-4 flex-shrink-0">
                                             <button
                                                 type="button"
                                                 className={`px-4 py-2 rounded ${filterType === "own"
@@ -849,7 +931,7 @@ const HousekeepingMaintenanceForm = ({
                                             </div>
                                             {/* Modal da imagem */}
                                             {isImageModalOpen && (
-                                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                                                <div className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-50">
                                                     <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-md">
                                                         {/* Header */}
                                                         <div className="flex justify-between items-center px-4 py-2 h-12 bg-primary text-white rounded-t-lg">
@@ -910,6 +992,14 @@ const HousekeepingMaintenanceForm = ({
                                             >
                                                 {t.modals.housekeeping.maintenance.solve}
                                             </button>
+                                            {/** Modal de erro */}
+                                            {isErrorModalOpen && errorMessage && (
+                                                <ErrorRegistrationForm
+                                                    modalHeader={t.frontOffice.registrationForm.attention}
+                                                    errorMessage={errorMessage}
+                                                    onClose={() => setIsErrorModalOpen(false)}
+                                                />
+                                            )}
                                         </div>
                                     </div>
                                 ) : null}
