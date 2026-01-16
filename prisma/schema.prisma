@@ -40,6 +40,7 @@ model properties {
   privacyPolicyPT  String?           @default("") @db.VarChar(1000)
   hasRoomCloud     Boolean           @default(false)
   sendStayByEmail  Boolean?          @default(false)
+  hasLockSys       Boolean           @default(false)
   usersProperties  usersProperties[]
 }
 
@@ -244,4 +245,11 @@ model maintenancePhoto {
   ref        Int    @id @default(autoincrement())
   image      String @db.LongText
   propertyID Int?
+}
+
+model lockSysTemplates {
+  templateID   Int     @id @default(autoincrement())
+  emailSubject String? @default("") @db.VarChar(500)
+  emailBody    String? @default("") @db.VarChar(8000)
+  language     String? @default("") @db.VarChar(3)
 }

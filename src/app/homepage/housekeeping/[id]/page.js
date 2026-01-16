@@ -168,8 +168,23 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
         );
 
         if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-          console.log("Housekeeping:", response.data);
-          setHousekeeping(response.data); // 👈 guarda no estado
+          console.log("Housekeeping raw:", response.data);
+
+          // 🔹 Filtra para manter apenas a última linha de cada quarto + hóspede + data
+          const filteredHousekeeping = Object.values(
+            response.data.reduce((acc, item) => {
+              // Chave única por quarto interno + hóspede + arrivalDate
+              const key = `${item.IDQuartoInterno}_${item.GuestName}_${item.ArrivalDate}`;
+
+              // Substitui sempre, garantindo que a última linha do backend fique
+              acc[key] = item;
+
+              return acc;
+            }, {})
+          );
+
+          console.log("Housekeeping filtered:", filteredHousekeeping);
+          setHousekeeping(filteredHousekeeping); // 👈 só os únicos
         } else {
           setHousekeeping([]);
           console.warn("Nenhum dado encontrado ou dados inválidos para o propertyID:", propertyID);
@@ -312,7 +327,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                 onClick={() => setIsModalInsertMaintenanceOpen(true)}
                 className="text-white bg-primary rounded-lg cursor-pointer p-2"
               >
-                <FaPlus size={20}/>
+                <FaPlus size={20} />
               </button>
               <HousekeepingInsertMaintenanceForm
                 buttonName={t.frontOffice.housekeeping.maintenance}
