@@ -65,6 +65,9 @@ const PropertiesEditForm = ({
     const [sendingPort, setSendingPort] = useState(hotel.sendingPort || "");
     const [emailSubject, setEmailSubject] = useState(hotel.emailSubject || "");
     const [emailBody, setEmailBody] = useState(hotel.emailBody || "");
+
+    const [showLockTemplatesModal, setShowLockTemplatesModal] = useState(false);
+
     const [infoEmail, setInfoEmail] = useState(hotel.infoEmail || "");
 
     const [loading, setLoading] = useState(false);
@@ -73,6 +76,7 @@ const PropertiesEditForm = ({
 
     const [activeContent, setActiveContent] = useState("terms");
     const [activeKey, setActiveKey] = useState("EN");
+
 
 
     const [privacyPolicyEN, setPrivacyPolicyEN] = useState(hotelTerms[0]?.privacyPolicyEN || "");
@@ -136,6 +140,9 @@ const PropertiesEditForm = ({
     // }, [propertyID]);
 
     const [hasRoomCloud, setHasRoomCloud] = useState(hotel.hasRoomCloud || false);
+    const [hasLockSys, setHasLockSys] = useState(hotel.hasLockSys || false);
+    console.log(setHasLockSys);
+
     const [roomCloudUsername, setRoomCloudUsername] = useState(roomCloud[0]?.username || "");
     const [roomCloudPassword, setRoomCloudPassword] = useState(roomCloud[0]?.password || "");
     const [roomCloudHotelID, setRoomCloudHotelID] = useState(roomCloud[0]?.hotelID || "");
@@ -172,6 +179,70 @@ const PropertiesEditForm = ({
 
     // Carregar as traduções com base no idioma atual
     const t = translations[locale] || translations["pt"]; // fallback para "pt"
+
+    const [activeEmailLang, setActiveEmailLang] = useState("PT"); // "PT" | "EN"
+    const [emailTitlePT, setEmailTitlePT] = useState("");
+    const [emailBodyPT, setEmailBodyPT] = useState("");
+    const [emailTitleEN, setEmailTitleEN] = useState("");
+    const [emailBodyEN, setEmailBodyEN] = useState("");
+    const [showLockVariablesbar, setShowLockVariablesbar] = useState(false);
+
+    const getCurrentSubject = () => {
+        return activeEmailLang === "PT" ? emailTitlePT : emailTitleEN;
+    };
+
+    const getCurrentBody = () => {
+        return activeEmailLang === "PT" ? emailBodyPT : emailBodyEN;
+    };
+
+    const setCurrentSubject = (value) => {
+        if (activeEmailLang === "PT") {
+            setEmailTitlePT(value);
+        } else {
+            setEmailTitleEN(value);
+        }
+    };
+
+    const setCurrentBody = (value) => {
+        if (activeEmailLang === "PT") {
+            setEmailBodyPT(value);
+        } else {
+            setEmailBodyEN(value);
+        }
+    };
+
+    useEffect(() => {
+        const fetchLockEmail = async () => {
+            try {
+                if (!hotel.propertyID) {
+                    console.log("Não há propertyID associado");
+                    return;
+                }
+
+                const response = await axios.get(
+                    `/api/lock/getLocks?propertyID=${hotel.propertyID}`
+                );
+
+                console.log("Resposta da API:", response.data);
+
+                // A resposta é um array
+                if (response.data && response.data.length > 0) {
+                    const data = response.data[0];
+
+                    setEmailTitlePT(data.emailTitlePT);
+                    setEmailBodyPT(data.emailBodyPT);
+                    setEmailTitleEN(data.emailTitleEN);
+                    setEmailBodyEN(data.emailBodyEN);
+                }
+
+            } catch (error) {
+                console.error("Erro ao buscar emails de fechaduras:", error);
+            }
+        };
+
+        fetchLockEmail();
+    }, [hotel.propertyID]);
+
 
     const handleSave = async () => {
         if (!propertyName || !propertyTag || !propertyServer) {
@@ -220,6 +291,18 @@ const PropertiesEditForm = ({
 
             // Se a propriedade foi atualizada com sucesso, salva os termos
             if (response.status === 200) {
+
+                const lockEmailResponse = await axios.post("/api/lock/updateEmail", {
+                    propertyID: hotel.propertyID,
+                    emailTitlePT,
+                    emailBodyPT,
+                    emailTitleEN,
+                    emailBodyEN
+                });
+
+                if (![200, 201].includes(lockEmailResponse.status)) {
+                    throw new Error(`Failed to save lock emails. Status: ${lockEmailResponse.status}`);
+                }
                 // Save RoomCloud data
                 const roomCloudResponse = await axios.post(`/api/properties/roomCloud`, {
                     propertyID: hotel.propertyID,
@@ -277,7 +360,7 @@ const PropertiesEditForm = ({
     const [selectedImage, setSelectedImage] = useState(null);
     const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/dp6iart4f/image/upload/hotels/";
     const [imageUrl, setImageUrl] = useState(
-    `${CLOUDINARY_BASE_URL}${hotel.propertyID}.png`
+        `${CLOUDINARY_BASE_URL}${hotel.propertyID}.png`
     );
 
     const handleImageChange = (event) => {
@@ -391,6 +474,28 @@ const PropertiesEditForm = ({
         }
     };
 
+        const LockCopyToClipboard = (text) => {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                setCopiedVar(text);
+                setTimeout(() => setCopiedVar(null), 2000);
+            });
+        } else {
+            // fallback antigo para navegadores mais antigos
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                console.log(`Copiado: ${text}`);
+            } catch {
+                console.log('Erro ao copiar para área de transferência');
+            }
+            document.body.removeChild(textarea);
+        }
+    };
+
     const guestDetails = [
         { key: '{{protelGuestFirstName}}', desc: t.modals.propertiesEdit.stay.guestDetails.Name },
         { key: '{{protelGuestLastName}}', desc: t.modals.propertiesEdit.stay.guestDetails.Surname },
@@ -414,6 +519,13 @@ const PropertiesEditForm = ({
         { key: '{{hotel_phone}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelPhone },
     ];
 
+        const reservationLockDetails = [
+        { key: '{{code}}', desc: "Code" },
+        { key: '{{guestName}}', desc: "Nome" },
+        { key: '{{roomID}}', desc: "Quarto" },
+        { key: '{{validFrom}}', desc: "Valido de"},
+        { key: '{{validUntil}}', desc: "Valido até" },
+    ];
     const [selectedBold, setSelectedBold] = React.useState(false);
 
     // const checkIfSelectedBold = () => {
@@ -490,6 +602,8 @@ const PropertiesEditForm = ({
     };
 
     const [templates, setTemplates] = useState([]);
+    const [lockTemplates, setLockTemplates] = useState([]);
+
 
     // Função que busca os templates da API
     const fetchTemplates = async () => {
@@ -506,6 +620,20 @@ const PropertiesEditForm = ({
         }
     };
 
+    const fetchLockTemplates = async () => {
+        try {
+            const response = await axios.get('/api/lock/templates'); // ajusta a URL da API conforme seu backend
+            if (response.data && response.data.response) {
+                setLockTemplates(response.data.response);
+            } else {
+                setLockTemplates([]);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar templates:', error);
+            setLockTemplates([]);
+        }
+    };
+
     // Quando o modal abrir, faz a requisição
     useEffect(() => {
         if (showTemplatesModal) {
@@ -513,11 +641,51 @@ const PropertiesEditForm = ({
         }
     }, [showTemplatesModal]);
 
+    useEffect(() => {
+        if (showLockTemplatesModal) {
+            fetchLockTemplates();
+        }
+    }, [showLockTemplatesModal]);
+
     const handleSelectTemplate = (template) => {
         setEmailSubject(template.emailSubject);
         setEmailBody(template.emailBody);
         setShowTemplatesModal(false); // fecha modal após seleção
     };
+
+    const handleSelectLockTemplate = (template) => {
+        const isPT = template.language === "PT";
+
+        // atualiza o idioma do template selecionado
+        if (isPT) {
+            setEmailTitlePT(template.emailSubject);
+            setEmailBodyPT(template.emailBody);
+        } else {
+            setEmailTitleEN(template.emailSubject);
+            setEmailBodyEN(template.emailBody);
+        }
+
+        // procura o template do outro idioma
+        const otherLangTemplate = lockTemplates.find(
+            (t) => t.language !== template.language
+        );
+
+        if (otherLangTemplate) {
+            if (isPT) {
+                setEmailTitleEN(otherLangTemplate.emailSubject);
+                setEmailBodyEN(otherLangTemplate.emailBody);
+            } else {
+                setEmailTitlePT(otherLangTemplate.emailSubject);
+                setEmailBodyPT(otherLangTemplate.emailBody);
+            }
+        }
+
+        // opcional: mantém a aba ativa no idioma do template selecionado
+        setActiveEmailLang(template.language);
+
+        setShowLockTemplatesModal(false);
+    };
+
 
     const [activeSection, setActiveSection] = useState(null); // null = menu principal
     const [activeStayTab, setActiveStayTab] = useState("settings");
@@ -802,6 +970,15 @@ const PropertiesEditForm = ({
                                                 onClick={() => setActiveSection("ota")}
                                             >
                                                 OTA
+                                            </div>
+                                        )}
+
+                                        {hasLockSys && (
+                                            <div
+                                                className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 h-24 flex justify-center items-center hover:bg-primary hover:text-white"
+                                                onClick={() => setActiveSection("lock")}
+                                            >
+                                                Lock
                                             </div>
                                         )}
                                     </div>
@@ -1287,30 +1464,30 @@ const PropertiesEditForm = ({
                                         </button>
                                         <div className="flex justify-between items-center mb-4 text-sm gap-2 -mt-4">
                                             <div className="flex flex-row gap-2">
-                                            <button
-                                                className={`px-3 py-1 rounded-md border ${activeStayTab === "settings" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
-                                                onClick={() => setActiveStayTab("settings")}
-                                            >
-                                                Settings
-                                            </button>
-                                            <button
-                                                className={`px-3 py-1 rounded-md border  ${activeStayTab === "email" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
-                                                onClick={() => setActiveStayTab("email")}
-                                            >
-                                                Email Settings
-                                            </button>
-                                            <button
-                                                className={`px-3 py-1 rounded-md border  ${activeStayTab === "chatbot" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
-                                                onClick={() => setActiveStayTab("chatbot")}
-                                            >
-                                                Chatbot
-                                            </button>
-                                            <button
-                                                className={`px-3 py-1 rounded-md border  ${activeStayTab === "logs" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
-                                                onClick={() => setActiveStayTab("logs")}
-                                            >
-                                                Stay Logs
-                                            </button>
+                                                <button
+                                                    className={`px-3 py-1 rounded-md border ${activeStayTab === "settings" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
+                                                    onClick={() => setActiveStayTab("settings")}
+                                                >
+                                                    Settings
+                                                </button>
+                                                <button
+                                                    className={`px-3 py-1 rounded-md border  ${activeStayTab === "email" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
+                                                    onClick={() => setActiveStayTab("email")}
+                                                >
+                                                    Email Settings
+                                                </button>
+                                                <button
+                                                    className={`px-3 py-1 rounded-md border  ${activeStayTab === "chatbot" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
+                                                    onClick={() => setActiveStayTab("chatbot")}
+                                                >
+                                                    Chatbot
+                                                </button>
+                                                <button
+                                                    className={`px-3 py-1 rounded-md border  ${activeStayTab === "logs" ? "bg-gray-200 font-medium" : "bg-white text-gray-500"}`}
+                                                    onClick={() => setActiveStayTab("logs")}
+                                                >
+                                                    Stay Logs
+                                                </button>
                                             </div>
                                             <FaUsers size={15} className="cursor-pointer" onClick={handleOpenStayUserModal} />
                                         </div>
@@ -1375,67 +1552,67 @@ const PropertiesEditForm = ({
                                         )}
 
                                         {activeStayTab === "email" && (
-                                            
+
                                             <div className="overflow-auto max-h-[40vh]">
                                                 <div>
-                                                <p className="bg-gray-200 p-1 mb-2">{t.modals.propertiesEdit.stay.sendSMTP}</p>
-                                                <div className="flex flex-row gap-2 w-full">
-                                                    <div className="w-1/2 flex flex-col">
+                                                    <p className="bg-gray-200 p-1 mb-2">{t.modals.propertiesEdit.stay.sendSMTP}</p>
+                                                    <div className="flex flex-row gap-2 w-full">
+                                                        <div className="w-1/2 flex flex-col">
+                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.email}</p>
+                                                            <input
+                                                                type="text"
+                                                                value={replyEmail}
+                                                                onChange={(e) => setReplyEmail(e.target.value)}
+                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                            />
+                                                        </div>
+                                                        <div className="w-1/2 flex flex-col">
+                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailPassword}</p>
+                                                            <input
+                                                                type="text"
+                                                                value={replyPassword}
+                                                                onChange={(e) => setReplyPassword(e.target.value)}
+                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-row gap-2 w-full">
+                                                        <div className="w-1/2 flex flex-col">
+                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.serverSMTP}</p>
+                                                            <input
+                                                                type="text"
+                                                                value={sendingServer}
+                                                                onChange={(e) => setSendingServer(e.target.value)}
+                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                            />
+                                                        </div>
+                                                        <div className="w-1/2 flex flex-col">
+                                                            <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.portSMTP}</p>
+                                                            <input
+                                                                type="text"
+                                                                value={sendingPort}
+                                                                onChange={(e) => setSendingPort(e.target.value)}
+                                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                                disabled={!isEditing} // Desabilita o campo quando não está em edição
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <p className="bg-gray-200 p-1 mt-2 mb-2">{t.modals.propertiesEdit.stay.receiptShipment}</p>
+                                                    <div className="flex flex-col w-full">
                                                         <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.email}</p>
                                                         <input
                                                             type="text"
-                                                            value={replyEmail}
-                                                            onChange={(e) => setReplyEmail(e.target.value)}
+                                                            value={infoEmail}
+                                                            onChange={(e) => setInfoEmail(e.target.value)}
                                                             className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
                                                             disabled={!isEditing} // Desabilita o campo quando não está em edição
                                                         />
-                                                    </div>
-                                                    <div className="w-1/2 flex flex-col">
-                                                        <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailPassword}</p>
-                                                        <input
-                                                            type="text"
-                                                            value={replyPassword}
-                                                            onChange={(e) => setReplyPassword(e.target.value)}
-                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-row gap-2 w-full">
-                                                    <div className="w-1/2 flex flex-col">
-                                                        <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.serverSMTP}</p>
-                                                        <input
-                                                            type="text"
-                                                            value={sendingServer}
-                                                            onChange={(e) => setSendingServer(e.target.value)}
-                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                        />
-                                                    </div>
-                                                    <div className="w-1/2 flex flex-col">
-                                                        <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.portSMTP}</p>
-                                                        <input
-                                                            type="text"
-                                                            value={sendingPort}
-                                                            onChange={(e) => setSendingPort(e.target.value)}
-                                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                            disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <p className="bg-gray-200 p-1 mt-2 mb-2">{t.modals.propertiesEdit.stay.receiptShipment}</p>
-                                                <div className="flex flex-col w-full">
-                                                    <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.email}</p>
-                                                    <input
-                                                        type="text"
-                                                        value={infoEmail}
-                                                        onChange={(e) => setInfoEmail(e.target.value)}
-                                                        className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                                                        disabled={!isEditing} // Desabilita o campo quando não está em edição
-                                                    />
 
+                                                    </div>
                                                 </div>
-                                            </div>
                                                 <p className="bg-gray-200 p-1 my-2">{t.modals.propertiesEdit.stay.email}</p>
                                                 <div className="w-1/2 flex flex-col">
                                                     <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailSubject}</p>
@@ -1466,7 +1643,7 @@ const PropertiesEditForm = ({
                                                             <p className="block text-sm font-medium text-gray-400">{t.modals.propertiesEdit.stay.emailBody}</p>
                                                         </div>
                                                         <div className="flex flex-row gap-2 items-center hover:text-blue-600">
-                                                            <div onClick={() => setShowTemplatesModal(true)} className="bg-[#FC9D25] p-1 rounded-lg"><ImInsertTemplate  color="white" size={15} /></div>
+                                                            <div onClick={() => setShowTemplatesModal(true)} className="bg-[#FC9D25] p-1 rounded-lg"><ImInsertTemplate color="white" size={15} /></div>
                                                             <div
                                                                 className="bg-[#FC9D25] p-1 rounded-lg"
                                                                 onClick={() => setShowVariablesbar(!showVariablesbar)}
@@ -1853,6 +2030,150 @@ const PropertiesEditForm = ({
                                         </div>
                                     </div>
                                 )}
+
+                                {activeSection === "lock" && (
+                                    <div className="mb-2">
+                                         {/* Botão voltar */}
+                                        <button onClick={goBack} className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+                                            <MdKeyboardArrowLeft size={18} />
+                                        </button>
+                                        <p className="bg-gray-200 p-1 my-2">
+                                            {t.modals.propertiesEdit.stay.email}
+                                        </p>
+                                        <div className="flex flex-row justify-center bg-gray-100 w-32 h-8 rounded-xl items-center mb-4">
+                                            {["EN", "PT"].map((lang) => (
+                                                <div
+                                                    key={lang}
+                                                    onClick={() => setActiveEmailLang(lang)}
+                                                    className={`cursor-pointer p-1 ${activeEmailLang === lang
+                                                        ? "bg-white text-black rounded-lg m-1 text-sm border border-gray-200"
+                                                        : "text-gray-500 m-1 text-sm"
+                                                        }`}
+                                                >
+                                                    {lang}
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="w-1/2 flex flex-col">
+                                            <p className="block text-sm font-medium text-gray-400">
+                                                {t.modals.propertiesEdit.stay.emailSubject}
+                                            </p>
+                                            <input
+                                                ref={subjectInputRef}
+                                                type="text"
+                                                value={getCurrentSubject()}  // vai retornar emailTitlePT ou emailTitleEN conforme activeEmailLang
+                                                onChange={(e) => setCurrentSubject(e.target.value)}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                disabled={!isEditing}
+                                            />
+                                        </div>
+
+                                        <div className="w-full flex flex-col text-xs mt-2 -mb-8">
+                                            <div className="flex flex-row justify-between items-center mb-1 cursor-pointer">
+                                                <p className="block text-sm font-medium text-gray-400">
+                                                    {t.modals.propertiesEdit.stay.emailBody}
+                                                </p>
+
+                                                <div className="flex flex-row gap-2 items-center hover:text-blue-600">
+                                                    <div
+                                                        onClick={() => setShowLockTemplatesModal(true)}
+                                                        className="bg-[#FC9D25] p-1 rounded-lg"
+                                                    >
+                                                        <ImInsertTemplate color="white" size={15} />
+                                                    </div>
+                                                    <div
+                                                        className="bg-[#FC9D25] p-1 rounded-lg"
+                                                        onClick={() => setShowLockVariablesbar(!showLockVariablesbar)}
+                                                    >
+                                                        <FaGripLines color="white" size={15} />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <textarea
+                                                ref={textareaRef}
+                                                value={getCurrentBody()}      // vai retornar emailBodyPT ou emailBodyEN
+                                                onChange={(e) => setCurrentBody(e.target.value)}
+                                                onDoubleClick={handleDoubleClickSubject}
+                                                className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none resize-none"
+                                                disabled={!isEditing}
+                                            />
+                                        </div>
+
+                                        {showLockVariablesbar && (
+                                            <div className="fixed top-0 right-0 h-full w-72 bg-white shadow-lg p-4 z-50 flex flex-col">
+                                                <div className="flex justify-between items-center mb-4 flex-shrink-0">
+                                                    <h2 className="text-sm font-bold">{t.modals.propertiesEdit.stay.displayedElements}</h2>
+                                                    <button onClick={() => setShowLockVariablesbar(false)} className="text-gray-500 text-lg">&times;</button>
+                                                </div>
+
+                                                <div className="flex-shrink-0 font-bold flex justify-between border-b pb-1 mb-2 text-xs">
+                                                    <span>{t.modals.propertiesEdit.stay.variable}</span>
+                                                    <span>{t.modals.propertiesEdit.stay.description}</span>
+                                                </div>
+
+                                                <div className="flex-grow overflow-y-auto text-xs space-y-6">
+                                                    {/* Detalhes do hóspede */}
+                                                    <div>
+                                                        <h3 className="font-semibold mb-2">Detalhes da Reserva</h3>
+                                                        <ul className="space-y-2">
+                                                            {reservationLockDetails.map(({ key, desc }) => (
+                                                                <li key={key} className="flex justify-between">
+                                                                    <span
+                                                                        className="flex items-center cursor-pointer hover:text-[#FC9D25] space-x-1"
+                                                                        onClick={() => LockCopyToClipboard(key)}
+                                                                        onMouseEnter={() => setHoveredVar(key)}
+                                                                        onMouseLeave={() => setHoveredVar(null)}
+                                                                        title="Clique para copiar"
+                                                                    >
+                                                                        <span>{key}</span>
+                                                                        {hoveredVar === key && <IoCopy size={16} />}
+                                                                    </span>
+                                                                    <span>{desc}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {showLockTemplatesModal && (
+                                            <div className="fixed top-0 right-0 h-full w-72 bg-white shadow-lg p-4 z-50 flex flex-col overflow-auto">
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <h2 className="text-sm font-bold">Templates</h2>
+                                                    <button
+                                                        onClick={() => setShowLockTemplatesModal(false)}
+                                                        className="text-gray-500 text-lg"
+                                                    >
+                                                        &times;
+                                                    </button>
+                                                </div>
+                                                <div className="text-xs flex flex-col gap-2">
+                                                    {lockTemplates.length > 0 ? (
+                                                        lockTemplates.map((template) => (
+                                                            <div
+                                                                key={template.templateID}
+                                                                onClick={() => handleSelectLockTemplate(template)}
+                                                                className="cursor-pointer p-2 border rounded hover:bg-gray-100"
+                                                            >
+                                                                <strong>Template #{template.templateID}</strong>
+                                                                <p className="text-gray-600 truncate">
+                                                                    {template.emailSubject}
+                                                                </p>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <p>Nenhum template encontrado.</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+
                                 {/* Exibição de erro */}
                                 {error && <p className="text-red-500 text-sm">{error}</p>}
 
@@ -1870,6 +2191,7 @@ const PropertiesEditForm = ({
                                         </Button>
                                     )}
                                 </div>
+
                             </ModalBody>
                         </ModalContent>
                     </Modal>

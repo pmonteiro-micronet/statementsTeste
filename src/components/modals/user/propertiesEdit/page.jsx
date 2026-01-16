@@ -8,6 +8,7 @@ import axios from "axios";
 import { FaGripLines } from "react-icons/fa";
 import { IoCopy } from "react-icons/io5";
 import { MdKeyboardArrowLeft } from "react-icons/md";
+import { ImInsertTemplate } from "react-icons/im";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -80,7 +81,124 @@ const PropertiesEditForm = ({ hotel, hotelTerms, roomCloud, onClose }) => {
     const [roomCloudUser, setRoomCloudUser] = useState(false);
     const [stayUser, setStayUser] = useState(false);
 
+    const [hasLockSys, setHasLockSys] = useState(hotel.hasLockSys || false);
+    console.log(setHasLockSys);
+    const [activeEmailLang, setActiveEmailLang] = useState("PT"); // "PT" | "EN"
+    const [emailTitlePT, setEmailTitlePT] = useState("");
+    const [emailBodyPT, setEmailBodyPT] = useState("");
+    const [emailTitleEN, setEmailTitleEN] = useState("");
+    const [emailBodyEN, setEmailBodyEN] = useState("");
+    const [lockTemplates, setLockTemplates] = useState([]);
+    const [showLockTemplatesModal, setShowLockTemplatesModal] = useState(false);
 
+    const getCurrentSubject = () => {
+        return activeEmailLang === "PT" ? emailTitlePT : emailTitleEN;
+    };
+
+    const getCurrentBody = () => {
+        return activeEmailLang === "PT" ? emailBodyPT : emailBodyEN;
+    };
+
+    const setCurrentSubject = (value) => {
+        if (activeEmailLang === "PT") {
+            setEmailTitlePT(value);
+        } else {
+            setEmailTitleEN(value);
+        }
+    };
+
+    const setCurrentBody = (value) => {
+        if (activeEmailLang === "PT") {
+            setEmailBodyPT(value);
+        } else {
+            setEmailBodyEN(value);
+        }
+    };
+
+    useEffect(() => {
+        const fetchLockEmail = async () => {
+            try {
+                if (!hotel.propertyID) {
+                    console.log("Não há propertyID associado");
+                    return;
+                }
+
+                const response = await axios.get(
+                    `/api/lock/getLocks?propertyID=${hotel.propertyID}`
+                );
+
+                console.log("Resposta da API:", response.data);
+
+                // A resposta é um array
+                if (response.data && response.data.length > 0) {
+                    const data = response.data[0];
+
+                    setEmailTitlePT(data.emailTitlePT);
+                    setEmailBodyPT(data.emailBodyPT);
+                    setEmailTitleEN(data.emailTitleEN);
+                    setEmailBodyEN(data.emailBodyEN);
+                }
+
+            } catch (error) {
+                console.error("Erro ao buscar emails de fechaduras:", error);
+            }
+        };
+
+        fetchLockEmail();
+    }, [hotel.propertyID]);
+
+    const fetchLockTemplates = async () => {
+        try {
+            const response = await axios.get('/api/lock/templates'); // ajusta a URL da API conforme seu backend
+            if (response.data && response.data.response) {
+                setLockTemplates(response.data.response);
+            } else {
+                setLockTemplates([]);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar templates:', error);
+            setLockTemplates([]);
+        }
+    };
+
+    useEffect(() => {
+        if (showLockTemplatesModal) {
+            fetchLockTemplates();
+        }
+    }, [showLockTemplatesModal]);
+
+    const handleSelectLockTemplate = (template) => {
+        const isPT = template.language === "PT";
+
+        // atualiza o idioma do template selecionado
+        if (isPT) {
+            setEmailTitlePT(template.emailSubject);
+            setEmailBodyPT(template.emailBody);
+        } else {
+            setEmailTitleEN(template.emailSubject);
+            setEmailBodyEN(template.emailBody);
+        }
+
+        // procura o template do outro idioma
+        const otherLangTemplate = lockTemplates.find(
+            (t) => t.language !== template.language
+        );
+
+        if (otherLangTemplate) {
+            if (isPT) {
+                setEmailTitleEN(otherLangTemplate.emailSubject);
+                setEmailBodyEN(otherLangTemplate.emailBody);
+            } else {
+                setEmailTitlePT(otherLangTemplate.emailSubject);
+                setEmailBodyPT(otherLangTemplate.emailBody);
+            }
+        }
+
+        // opcional: mantém a aba ativa no idioma do template selecionado
+        setActiveEmailLang(template.language);
+
+        setShowLockTemplatesModal(false);
+    };
 
     useEffect(() => {
         const checkRoomCloudAssociation = async () => {
@@ -205,6 +323,19 @@ const PropertiesEditForm = ({ hotel, hotelTerms, roomCloud, onClose }) => {
 
             // Se a propriedade foi atualizada com sucesso, salva os termos
             if (response.status === 200) {
+
+                const lockEmailResponse = await axios.post("/api/lock/updateEmail", {
+                    propertyID: hotel.propertyID,
+                    emailTitlePT,
+                    emailBodyPT,
+                    emailTitleEN,
+                    emailBodyEN
+                });
+
+                if (![200, 201].includes(lockEmailResponse.status)) {
+                    throw new Error(`Failed to save lock emails. Status: ${lockEmailResponse.status}`);
+                }
+
                 const roomCloudResponse = await axios.post(`/api/properties/roomCloud`, {
                     propertyID: hotel.propertyID,
                     roomCloudUsername,
@@ -531,6 +662,15 @@ const PropertiesEditForm = ({ hotel, hotelTerms, roomCloud, onClose }) => {
                                     onClick={() => setActiveSection("ota")}
                                 >
                                     OTA
+                                </div>
+                            )}
+
+                            {hasLockSys && (
+                                <div
+                                    className="cursor-pointer border border-gray-300 text-gray-600 p-2 rounded w-40 h-24 flex justify-center items-center hover:bg-primary hover:text-white"
+                                    onClick={() => setActiveSection("lock")}
+                                >
+                                    Lock
                                 </div>
                             )}
                         </div>
@@ -1280,6 +1420,101 @@ const PropertiesEditForm = ({ hotel, hotelTerms, roomCloud, onClose }) => {
                             </div>
                         </div>
                     )}
+
+{activeSection === "lock" && (
+                                    <div className="mb-2">
+                                        <button onClick={goBack} className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+                                                                                    <MdKeyboardArrowLeft size={18} />
+                                                                                </button>
+                                        <p className="bg-gray-200 p-1 my-2">
+                                            {t.modals.propertiesEdit.stay.email}
+                                        </p>
+                                        <div className="flex flex-row justify-center bg-gray-100 w-32 h-8 rounded-xl items-center mb-4">
+                                            {["EN", "PT"].map((lang) => (
+                                                <div
+                                                    key={lang}
+                                                    onClick={() => setActiveEmailLang(lang)}
+                                                    className={`cursor-pointer p-1 ${activeEmailLang === lang
+                                                        ? "bg-white text-black rounded-lg m-1 text-sm border border-gray-200"
+                                                        : "text-gray-500 m-1 text-sm"
+                                                        }`}
+                                                >
+                                                    {lang}
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="w-1/2 flex flex-col">
+                                            <p className="block text-sm font-medium text-gray-400">
+                                                {t.modals.propertiesEdit.stay.emailSubject}
+                                            </p>
+                                            <input
+                                                ref={subjectInputRef}
+                                                type="text"
+                                                value={getCurrentSubject()}  // vai retornar emailTitlePT ou emailTitleEN conforme activeEmailLang
+                                                onChange={(e) => setCurrentSubject(e.target.value)}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                                                disabled={!isEditing}
+                                            />
+                                        </div>
+
+                                        <div className="w-full flex flex-col text-xs mt-2 -mb-8">
+                                            <div className="flex flex-row justify-between items-center mb-1 cursor-pointer">
+                                                <p className="block text-sm font-medium text-gray-400">
+                                                    {t.modals.propertiesEdit.stay.emailBody}
+                                                </p>
+
+                                                <div className="flex flex-row gap-2 items-center hover:text-blue-600">
+                                                    <div
+                                                        onClick={() => setShowLockTemplatesModal(true)}
+                                                        className="bg-[#FC9D25] p-1 rounded-lg"
+                                                    >
+                                                        <ImInsertTemplate color="white" size={15} />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <textarea
+                                                ref={textareaRef}
+                                                value={getCurrentBody()}      // vai retornar emailBodyPT ou emailBodyEN
+                                                onChange={(e) => setCurrentBody(e.target.value)}
+                                                className="w-full h-72 border border-gray-300 rounded-md px-2 py-1 focus:outline-none resize-none"
+                                                disabled={!isEditing}
+                                            />
+                                        </div>
+                                        {showLockTemplatesModal && (
+                                            <div className="fixed top-0 right-0 h-full w-72 bg-white shadow-lg p-4 z-50 flex flex-col overflow-auto">
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <h2 className="text-sm font-bold">Templates</h2>
+                                                    <button
+                                                        onClick={() => setShowLockTemplatesModal(false)}
+                                                        className="text-gray-500 text-lg"
+                                                    >
+                                                        &times;
+                                                    </button>
+                                                </div>
+                                                <div className="text-xs flex flex-col gap-2">
+                                                    {lockTemplates.length > 0 ? (
+                                                        lockTemplates.map((template) => (
+                                                            <div
+                                                                key={template.templateID}
+                                                                onClick={() => handleSelectLockTemplate(template)}
+                                                                className="cursor-pointer p-2 border rounded hover:bg-gray-100"
+                                                            >
+                                                                <strong>Template #{template.templateID}</strong>
+                                                                <p className="text-gray-600 truncate">
+                                                                    {template.emailSubject}
+                                                                </p>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <p>Nenhum template encontrado.</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
 
                     {/* Exibição de erro */}
                     {error && <p className="text-red-500 text-sm">{error}</p>}
