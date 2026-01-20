@@ -182,8 +182,22 @@ const HousekeepingInsertMaintenanceForm = ({
                     <ModalContent>
                         <form>
                             <ModalHeader className="flex flex-row justify-between items-center bg-primary text-white p-2">
-                                    <div className="flex flex-row items-center justify-between w-full">
-                                        <h2 className="text-lg font-semibold">{t.modals.housekeeping.maintenance.newWo}</h2>
+                                <div className="flex flex-row items-center justify-between w-full">
+                                    <h2 className="text-lg font-semibold">
+                                        {t.modals.housekeeping.maintenance.newWo}
+                                    </h2>
+
+                                    <div className="flex flex-row items-center gap-2">
+                                        <button
+                                            type="button"
+                                            color="transparent"
+                                            variant="light"
+                                            className="text-white text-sm font-light"
+                                            onClick={onClose}
+                                        >
+                                             {t.modals.propertiesEdit.cancel}
+                                        </button>
+
                                         <Button
                                             type="button"
                                             color="transparent"
@@ -194,146 +208,147 @@ const HousekeepingInsertMaintenanceForm = ({
                                             {t.modals.housekeeping.maintenance.create}
                                         </Button>
                                     </div>
+                                </div>
                             </ModalHeader>
 
                             <ModalBody className="flex flex-col p-5 bg-background h-full overflow-hidden">
-                                    <div className="flex flex-col max-h-[600px] overflow-y-auto gap-4 p-2">
+                                <div className="flex flex-col max-h-[600px] overflow-y-auto gap-4 p-2">
 
-                                        {/* GRID TOPO */}
-                                        <div className="grid grid-cols-[35%_65%] w-full text-sm">
-                                            {/* Room */}
-                                            <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
-                                                {t.modals.housekeeping.maintenance.room}
-                                            </div>
-                                            <div className="px-3 py-2 border-b border-gray-200 text-right">
-                                                <select
-                                                    value={selectedRoom}
-                                                    onChange={(e) => setSelectedRoom(e.target.value)}
-                                                    className="border border-gray-300 rounded px-2 py-1 w-full"
-                                                >
-                                                    <option value="">{t.modals.housekeeping.maintenance.selectRoom}</option>
-                                                    {roomsOptions.map((roomOption) => (
-                                                        <option key={roomOption.value} value={roomOption.value}>
-                                                            {roomOption.label}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-
-                                            {/* Reason */}
-                                            <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
-                                                {t.modals.housekeeping.maintenance.reason}
-                                            </div>
-                                            <div className="px-3 py-2 border-b border-gray-200 text-right">
-                                                <select
-                                                    value={selectedReasonID}
-                                                    onChange={(e) => {
-                                                        const value = parseInt(e.target.value, 10);
-                                                        setSelectedReasonID(value);
-                                                        const selected = reasonsOptions.find(r => r.value === value);
-                                                        setSelectedReasonText(selected?.label || "");
-                                                    }}
-                                                    className="border border-gray-300 rounded px-2 py-1 w-full"
-                                                >
-                                                    <option value="">{t.modals.housekeeping.maintenance.selectReason}</option>
-                                                    {reasonsOptions.map((reasonOption) => (
-                                                        <option key={reasonOption.value} value={reasonOption.value}>
-                                                            {reasonOption.label}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-
-                                            {/* Set OOS */}
-                                            <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
-                                                {t.modals.housekeeping.maintenance.setOOS}
-                                            </div>
-                                            <div className="px-3 py-2 border-b border-gray-200 text-right">
-                                                <input
-                                                    type="checkbox"
-                                                    className="accent-blue-500 w-4 h-4"
-                                                    checked={isOOS}
-                                                    onChange={(e) => setIsOOS(e.target.checked)}
-                                                />
-                                            </div>
+                                    {/* GRID TOPO */}
+                                    <div className="grid grid-cols-[35%_65%] w-full text-sm">
+                                        {/* Room */}
+                                        <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
+                                            {t.modals.housekeeping.maintenance.room}
+                                        </div>
+                                        <div className="px-3 py-2 border-b border-gray-200 text-right">
+                                            <select
+                                                value={selectedRoom}
+                                                onChange={(e) => setSelectedRoom(e.target.value)}
+                                                className="border border-gray-300 rounded px-2 py-1 w-full"
+                                            >
+                                                <option value="">{t.modals.housekeeping.maintenance.selectRoom}</option>
+                                                {roomsOptions.map((roomOption) => (
+                                                    <option key={roomOption.value} value={roomOption.value}>
+                                                        {roomOption.label}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
 
-                                        {/* Description */}
-                                        <div>
-                                            <p>{t.modals.housekeeping.maintenance.description}</p>
-                                            <textarea
-                                                className="w-full h-16 resize-none rounded border border-gray-300 px-2 py-1"
-                                                value={description}
-                                                onChange={(e) => setDescription(e.target.value)}
+                                        {/* Reason */}
+                                        <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
+                                            {t.modals.housekeeping.maintenance.reason}
+                                        </div>
+                                        <div className="px-3 py-2 border-b border-gray-200 text-right">
+                                            <select
+                                                value={selectedReasonID}
+                                                onChange={(e) => {
+                                                    const value = parseInt(e.target.value, 10);
+                                                    setSelectedReasonID(value);
+                                                    const selected = reasonsOptions.find(r => r.value === value);
+                                                    setSelectedReasonText(selected?.label || "");
+                                                }}
+                                                className="border border-gray-300 rounded px-2 py-1 w-full"
+                                            >
+                                                <option value="">{t.modals.housekeeping.maintenance.selectReason}</option>
+                                                {reasonsOptions.map((reasonOption) => (
+                                                    <option key={reasonOption.value} value={reasonOption.value}>
+                                                        {reasonOption.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {/* Set OOS */}
+                                        <div className="bg-gray-100 text-gray-600 px-3 py-2 border-b border-gray-200">
+                                            {t.modals.housekeeping.maintenance.setOOS}
+                                        </div>
+                                        <div className="px-3 py-2 border-b border-gray-200 text-right">
+                                            <input
+                                                type="checkbox"
+                                                className="accent-blue-500 w-4 h-4"
+                                                checked={isOOS}
+                                                onChange={(e) => setIsOOS(e.target.checked)}
                                             />
                                         </div>
-
-                                        {/* Local Text */}
-                                        <div>
-                                            <p>{t.modals.housekeeping.maintenance.localText}</p>
-                                            <textarea
-                                                className="w-full h-16 resize-none rounded border border-gray-300 px-2 py-1"
-                                                value={localText}
-                                                onChange={(e) => setLocalText(e.target.value)}
-                                            />
-                                        </div>
-
-                                        {/* Hidden Inputs */}
-                                        <input
-                                            type="file"
-                                            id="imageUpload"
-                                            accept="image/*"
-                                            className="hidden"
-                                            onChange={handleImageUpload}
-                                        />
-
-                                        <input
-                                            type="file"
-                                            id="cameraUpload"
-                                            accept="image/*"
-                                            capture="environment"
-                                            className="hidden"
-                                            onChange={handleImageUpload}
-                                        />
-
-                                        {/* Image */}
-                                        <div>
-                                            <p>{t.modals.housekeeping.maintenance.image}</p>
-                                            <div className="w-full h-12 bg-gray-100 flex items-center justify-center rounded overflow-hidden">
-                                                {imagePreview ? (
-                                                    <img src={imagePreview} alt="Uploaded" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <CiImageOn size={30} color="gray" />
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Botões */}
-                                        <div className="flex justify-between gap-3">
-                                            <button
-                                                type="button"
-                                                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
-                                                onClick={() => document.getElementById('cameraUpload').click()}
-                                            >
-                                                {t.modals.housekeeping.maintenance.camera}
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
-                                                onClick={() => document.getElementById('imageUpload').click()}
-                                            >
-                                                {t.modals.housekeeping.maintenance.uploadImage}
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
-                                                onClick={() => setSelectedImage(null)}
-                                            >
-                                                {t.modals.housekeeping.maintenance.delImage}
-                                            </button>
-                                        </div>
-
                                     </div>
+
+                                    {/* Description */}
+                                    <div>
+                                        <p>{t.modals.housekeeping.maintenance.description}</p>
+                                        <textarea
+                                            className="w-full h-16 resize-none rounded border border-gray-300 px-2 py-1"
+                                            value={description}
+                                            onChange={(e) => setDescription(e.target.value)}
+                                        />
+                                    </div>
+
+                                    {/* Local Text */}
+                                    <div>
+                                        <p>{t.modals.housekeeping.maintenance.localText}</p>
+                                        <textarea
+                                            className="w-full h-16 resize-none rounded border border-gray-300 px-2 py-1"
+                                            value={localText}
+                                            onChange={(e) => setLocalText(e.target.value)}
+                                        />
+                                    </div>
+
+                                    {/* Hidden Inputs */}
+                                    <input
+                                        type="file"
+                                        id="imageUpload"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleImageUpload}
+                                    />
+
+                                    <input
+                                        type="file"
+                                        id="cameraUpload"
+                                        accept="image/*"
+                                        capture="environment"
+                                        className="hidden"
+                                        onChange={handleImageUpload}
+                                    />
+
+                                    {/* Image */}
+                                    <div>
+                                        <p>{t.modals.housekeeping.maintenance.image}</p>
+                                        <div className="w-full h-12 bg-gray-100 flex items-center justify-center rounded overflow-hidden">
+                                            {imagePreview ? (
+                                                <img src={imagePreview} alt="Uploaded" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <CiImageOn size={30} color="gray" />
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Botões */}
+                                    <div className="flex justify-between gap-3">
+                                        <button
+                                            type="button"
+                                            className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
+                                            onClick={() => document.getElementById('cameraUpload').click()}
+                                        >
+                                            {t.modals.housekeeping.maintenance.camera}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
+                                            onClick={() => document.getElementById('imageUpload').click()}
+                                        >
+                                            {t.modals.housekeeping.maintenance.uploadImage}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
+                                            onClick={() => setSelectedImage(null)}
+                                        >
+                                            {t.modals.housekeeping.maintenance.delImage}
+                                        </button>
+                                    </div>
+
+                                </div>
                             </ModalBody>
                         </form>
                     </ModalContent>
