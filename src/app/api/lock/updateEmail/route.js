@@ -9,7 +9,7 @@ export async function POST(request) {
 
         console.log("Received data:", body);
         // Validações básicas
-        if (!propertyID || !emailTitlePT || !emailBodyPT || !emailTitleEN || !emailBodyEN) {
+        if (!propertyID) {
             return NextResponse.json(
                 { error: "Parâmetros obrigatórios em falta." },
                 { status: 400 }
