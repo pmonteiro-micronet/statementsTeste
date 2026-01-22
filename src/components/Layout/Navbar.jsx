@@ -151,7 +151,7 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
       {/* Logo */}
       <div className="flex !flex-row !items-center gap-2">
         <img
-          src="/icon/extensionsLogoWeb.png"
+          src="/icon/extensionsLogo.png"
           alt="extensions"
           width={20}
           height={20}
@@ -170,7 +170,7 @@ export default function NavBar({ listItems, hotels = [], selectedHotelID, setSel
           <div className="flex justify-between items-center mb-4 -mt-3">
             <div className="flex !flex-row !items-center gap-2">
               <img
-                src="/icon/extensionsLogoWeb.png"
+                src="/icon/extensionsLogo.png"
                 alt="extensions"
                 width={20}
                 height={20}
