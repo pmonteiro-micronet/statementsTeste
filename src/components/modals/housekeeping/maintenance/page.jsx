@@ -426,7 +426,7 @@ const HousekeepingMaintenanceForm = ({
 
             if (!window.confirm("Deseja realmente apagar esta manutenção?")) return;
 
-            // Apaga a manutenção
+            // 🔹 Apaga a manutenção
             await axios.post(
                 "/api/reservations/housekeeping/deleteMaintenance",
                 {
@@ -441,24 +441,51 @@ const HousekeepingMaintenanceForm = ({
                 }
             );
 
-            setErrorMessage('Manutenção apagada com sucesso');
+            // 🔹 Monta o payload para updateMaintenance
+            const now = new Date();
+
+            const payload = {
+                propertyID,
+                refnr: selectedItem.refnr,
+                internalRoom: selectedItem.IDQuartoInterno,
+                description: editDescription,
+                localText: editLocalText,
+                solved: 1,
+                sdate: now.toISOString().split("T")[0],
+                stime: now.toTimeString().split(" ")[0],
+                suser: currentUser,
+            };
+
+            // 🔹 Atualiza a manutenção (marcando como resolvida)
+            await axios.post(
+                "/api/reservations/housekeeping/updateMaintenance",
+                payload,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setErrorMessage("Manutenção apagada com sucesso");
             setIsErrorModalOpen(true);
-            // Atualiza o status do quarto para 2
+
+            // 🔹 Atualiza o status do quarto para 2
             await updateRoomStatus({
                 internalRoom: selectedItem.IDQuartoInterno,
                 propertyId: propertyID,
-                roomStatus: 2, // ✅ aqui o status é 2
+                roomStatus: 2,
             });
 
-            // 🔹 Refresh na página inteira
+            // 🔹 Refresh na página
             window.location.reload();
 
         } catch (error) {
-            setErrorMessage("Erro ao apagar manutenção:", error);
+            console.error(error);
+            setErrorMessage("Erro ao apagar manutenção");
             setIsErrorModalOpen(true);
         }
     };
-
 
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
