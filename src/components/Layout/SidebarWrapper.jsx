@@ -21,7 +21,7 @@ import { LuMapPinHouse } from "react-icons/lu";
 import { RxEnter, RxExit } from "react-icons/rx";
 import { FaRegAddressCard } from "react-icons/fa";
 import { GiArchiveRegister } from "react-icons/gi";
-import { MdOutlineDryCleaning } from "react-icons/md";
+import { PiBroom } from "react-icons/pi";
 
 export default function SidebarWrapper({ children }) {
   const { data: session } = useSession();
@@ -200,13 +200,13 @@ useEffect(() => {
       };
 
       menu.Housekeeping = {
-        icon: <MdOutlineDryCleaning size={18} />,
+        icon: <PiBroom size={20} />,
         items: [
           {
             ref: `/homepage/housekeeping/${selectedHotelID}`,
-            label: `${t.navbar.text.housekeeping}`,
+            label: `${t.navbar.text.management}`,
             onClick: () => handleRedirect("housekeeping"),
-            icon: <MdOutlineDryCleaning />,
+            icon: <PiBroom size={18} />,
           },
         ],
       };
@@ -262,13 +262,13 @@ useEffect(() => {
     // Housekeeping vê apenas Housekeeping
     else if (isHousekeeping) {
       menu.Housekeeping = {
-        icon: <MdOutlineDryCleaning size={18} />,
+        icon: <PiBroom size={20} />,
         items: [
           {
             ref: `/homepage/housekeeping/${selectedHotelID}`,
-            label: `${t.navbar.text.housekeeping}`,
+            label: `${t.navbar.text.management}`,
             onClick: () => handleRedirect("housekeeping"),
-            icon: <MdOutlineDryCleaning />,
+            icon: <PiBroom size={18} />,
           },
         ],
       };
