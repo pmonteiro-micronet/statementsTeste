@@ -204,7 +204,7 @@ useEffect(() => {
         items: [
           {
             ref: `/homepage/housekeeping/${selectedHotelID}`,
-            label: `${t.navbar.text.housekeeping}`,
+            label: `${t.navbar.text.management}`,
             onClick: () => handleRedirect("housekeeping"),
             icon: <PiBroom size={18} />,
           },
@@ -266,7 +266,7 @@ useEffect(() => {
         items: [
           {
             ref: `/homepage/housekeeping/${selectedHotelID}`,
-            label: `Management`,
+            label: `${t.navbar.text.management}`,
             onClick: () => handleRedirect("housekeeping"),
             icon: <PiBroom size={18} />,
           },
