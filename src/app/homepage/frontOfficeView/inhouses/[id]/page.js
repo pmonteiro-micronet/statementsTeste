@@ -498,8 +498,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     const isOpen = openDropdownIndex === index;
                     // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                     return (
-                      // <tr key={index} onClick={() => setOpenDropdownIndex(index)} className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50"></tr>
-                      <tr key={index} className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">
+                      <tr key={index} onClick={() => setOpenDropdownIndex(index)} className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">
+                      {/* <tr key={index} className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50"> */}
                         <td className="pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center">
                           <div className="flex items-center justify-center w-full h-full">
                             <Dropdown isOpen={isOpen} onOpenChange={(open) => setOpenDropdownIndex(open ? index : null)}>

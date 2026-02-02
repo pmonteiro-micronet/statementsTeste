@@ -2,11 +2,17 @@
 import React, { useState, useEffect } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 
+import { FaCircle } from "react-icons/fa";
+import { CiCircleCheck, CiWarning } from "react-icons/ci";
+import { CiLock } from "react-icons/ci";
+
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../public/locales/espanol/common.json";
 
-import { GoArrowLeft } from "react-icons/go";
+import { GoArrowLeft, GoArrowRight } from "react-icons/go";
+import { IoMdExpand } from "react-icons/io";
+import { FaRegHourglass } from "react-icons/fa6";
 
 const translations = { en, pt, es };
 
@@ -29,6 +35,8 @@ const HousekeepingInfoForm = ({
     room,
     isOpen,
     onClose,
+    onAddMaintenance,
+    selectedReserva,
 }) => {
     const [locale, setLocale] = useState("pt");
     const [editableRoomStatus, setEditableRoomStatus] = useState(roomStatus);
@@ -53,10 +61,21 @@ const HousekeepingInfoForm = ({
     console.log("T LOCALE:", t);
     const [isEditing, setIsEditing] = useState(false);
 
+    // const hskStatusLegend = {
+    //     1: "Ocupado",
+    //     2: "Livre"
+    // }
+
     const hskStatusLegend = {
-        1: "Ocupado",
-        2: "Livre"
-    }
+        1: {
+            label: "Occupied",
+            icon: <CiLock size={20} />,
+        },
+        2: {
+            label: "Free",
+            icon: <CiCircleCheck size={20} />,
+        },
+    };
 
     const roomStatusOptions = {
         1: "Limpo",
@@ -68,11 +87,11 @@ const HousekeepingInfoForm = ({
         10: "Arrumar Quarto",
     };
 
-    const estadoEstadiaIcon = {
-        0: "Chegada",
-        1: "Permanência",
-        2: "Partida",
-        null: "Vazio",
+    const estadoEstadiaConfig = {
+        0: { label: "Chegada", icon: <GoArrowRight size={18} className="text-green-500" /> },
+        1: { label: "Permanência", icon: <FaRegHourglass size={18} /> },
+        2: { label: "Partida", icon: <GoArrowLeft size={18} className="text-red-500" />, },
+        null: { label: "Vazio", icon: <IoMdExpand size={14} /> },
     };
 
     const handleSave = async () => {
@@ -106,6 +125,16 @@ const HousekeepingInfoForm = ({
             console.error(error);
             alert("Não foi possível atualizar o Room Status.");
         }
+    };
+
+    const estadoLimpezaConfig = {
+        1: { icon: <FaCircle size={20} color="green" />, title: "Limpo" },
+        2: { icon: <FaCircle size={20} color="red" />, title: "Sujo" },
+        3: { icon: <CiWarning size={20} />, title: "Fora de serviço" },
+        4: { icon: <FaCircle size={20} color="blue" />, title: "Pronto" },
+        5: { icon: <FaCircle size={20} color="orange" />, title: "Usado" },
+        6: { icon: <FaCircle size={20} color="yellow" />, title: "Limpeza em execução" },
+        10: { icon: <FaCircle size={20} color="gray" />, title: "Arrumar quarto" },
     };
 
     return (
@@ -171,7 +200,10 @@ const HousekeepingInfoForm = ({
 
                                         {/* coluna2 */}
                                         <div className="flex flex-col gap-1 w-1/2 pl-2 items-end p-2">
-                                            <p className="text-right">{hskStatusLegend[hskStatus]}</p>
+                                            <p className="text-right flex items-center justify-end gap-2">
+                                                <span>{hskStatusLegend[hskStatus]?.label}</span>
+                                                {hskStatusLegend[hskStatus]?.icon}
+                                            </p>
                                             {isEditing ? (
                                                 <select
                                                     value={editableRoomStatus}
@@ -185,7 +217,15 @@ const HousekeepingInfoForm = ({
                                                     ))}
                                                 </select>
                                             ) : (
-                                                <p className="text-right">{roomStatusOptions[roomStatus]}</p>
+                                                <p className="text-right flex items-center justify-end gap-2">
+                                                    <span>{roomStatusOptions[roomStatus]}</span>
+
+                                                    {estadoLimpezaConfig[roomStatus] && (
+                                                        <>
+                                                            {estadoLimpezaConfig[roomStatus].icon}
+                                                        </>
+                                                    )}
+                                                </p>
                                             )}
                                             <p className="text-right">0</p>
                                             <p className="text-right">{priority}</p>
@@ -207,7 +247,12 @@ const HousekeepingInfoForm = ({
                                         {/* coluna2 */}
                                         <div className="flex flex-col gap-1 w-1/2 pl-2 items-end p-2">
                                             <p className="text-right">{roomType}</p>
-                                            <p className="text-right">{estadoEstadiaIcon[stayStatus?? null]}</p>
+                                            <p className="text-right flex items-center justify-end gap-2">
+                                                <span>
+                                                    {estadoEstadiaConfig[stayStatus ?? null]?.label}
+                                                </span>
+                                                {estadoEstadiaConfig[stayStatus ?? null]?.icon}
+                                            </p>
                                             <p className="text-right">---</p>
                                             <p className="text-right">{laundry === 1 ? "Sim" : "Não"}</p>
                                             <p className="text-right">{guestName}</p>
@@ -215,6 +260,16 @@ const HousekeepingInfoForm = ({
                                             <p className="text-right">{to?.split("T")[0]}</p>
                                         </div>
                                     </div>
+                                    <button
+                                        type="button"
+                                        className="px-4 py-2 bg-primary text-white rounded-lg"
+                                        onClick={() => {
+                                            onClose();
+                                            onAddMaintenance(selectedReserva);
+                                        }}
+                                        >
+                                            Add Maintenance
+                                    </button>
                                 </ModalBody>
                             </form>
                         )}

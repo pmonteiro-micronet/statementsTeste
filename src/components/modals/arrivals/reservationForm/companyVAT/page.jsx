@@ -61,7 +61,7 @@ const MultiModalManager = ({ openModal, setOpenModal, propertyID, onSave, profil
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showConfirmNewCompanyModal, setShowConfirmNewCompanyModal] = useState(false);
-    console.log(showConfirmNewCompanyModal,setIsSubmitting);
+    console.log(showConfirmNewCompanyModal, setIsSubmitting);
 
     // Simple email and VAT validators (small, safe implementations)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -73,35 +73,35 @@ const MultiModalManager = ({ openModal, setOpenModal, propertyID, onSave, profil
     };
 
     useEffect(() => {
-  if (activeModal !== "edit") return;
+        if (activeModal !== "edit") return;
 
-  if (selectedCompany) {
-    setCompanyFormData({
-        companyID: selectedCompany.CompanyID || "",
-      companyName: selectedCompany.name1 || "",
-      vatNo: selectedCompany.vatno || "",
-      emailAddress: selectedCompany.email || "",
-      country: selectedCompany.landkz || "",
-      countryName: selectedCompany.land || "",
-      streetAddress: selectedCompany.strasse || "",
-      zipCode: selectedCompany.plz || "",
-      city: selectedCompany.city || "",
-      state: selectedCompany.region || "",
-    });
-  } else if (companyData) {
-    setCompanyFormData({
-      companyName: companyData.companyName || "",
-      vatNo: companyData.vatNo || "",
-      emailAddress: companyData.emailAddress || "",
-      country: companyData.country || "",
-      countryName: companyData.countryName || "",
-      streetAddress: companyData.streetAddress || "",
-      zipCode: companyData.zipCode || "",
-      city: companyData.city || "",
-      state: companyData.state || "",
-    });
-  }
-}, [activeModal, selectedCompany, companyData]);
+        if (selectedCompany) {
+            setCompanyFormData({
+                companyID: selectedCompany.CompanyID || "",
+                companyName: selectedCompany.name1 || "",
+                vatNo: selectedCompany.vatno || "",
+                emailAddress: selectedCompany.email || "",
+                country: selectedCompany.landkz || "",
+                countryName: selectedCompany.land || "",
+                streetAddress: selectedCompany.strasse || "",
+                zipCode: selectedCompany.plz || "",
+                city: selectedCompany.city || "",
+                state: selectedCompany.region || "",
+            });
+        } else if (companyData) {
+            setCompanyFormData({
+                companyName: companyData.companyName || "",
+                vatNo: companyData.vatNo || "",
+                emailAddress: companyData.emailAddress || "",
+                country: companyData.country || "",
+                countryName: companyData.countryName || "",
+                streetAddress: companyData.streetAddress || "",
+                zipCode: companyData.zipCode || "",
+                city: companyData.city || "",
+                state: companyData.state || "",
+            });
+        }
+    }, [activeModal, selectedCompany, companyData]);
 
 
     useEffect(() => {
@@ -121,8 +121,12 @@ const MultiModalManager = ({ openModal, setOpenModal, propertyID, onSave, profil
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // When editing an existing company, update companyFormData.
-        // Otherwise (search/insert) update insertFormData so search/insert inputs work.
+        // Validação específica para NIF
+        if (name === "vatNo") {
+            // só números, até 9 dígitos
+            if (!/^\d{0,9}$/.test(value)) return;
+        }
+
         if (activeModal === "edit") {
             setCompanyFormData(prev => ({ ...prev, [name]: value }));
         } else {
@@ -179,20 +183,37 @@ const MultiModalManager = ({ openModal, setOpenModal, propertyID, onSave, profil
     };
 
     const handleBlur = () => {
-        // Use the appropriate source depending on modal state
-    const vat = (activeModal === "edit" ? companyFormData.vatNo : insertFormData.vatNo)?.trim();
-    const countryVal = activeModal === "edit" ? companyFormData.country : insertFormData.country;
+  const vat = (activeModal === "edit"
+    ? companyFormData.vatNo
+    : insertFormData.vatNo
+  )?.trim();
 
-        if (Number(countryVal) === 27 && vat) {
-            if (!validatePortugueseVAT(vat)) {
-                setVatError(t.modals.errors.invalidVAT);
-            } else {
-                setVatError("");
-            }
-        } else {
-            setVatError("");
-        }
-    };
+  const countryVal = activeModal === "edit"
+    ? companyFormData.country
+    : insertFormData.country;
+
+  // Só valida NIF português
+  if (Number(countryVal) === 27 && vat) {
+
+    // 1️⃣ formato: exatamente 9 dígitos
+    if (!/^\d{9}$/.test(vat)) {
+      setVatError(t.modals.errors.vatMustHave9Digits);
+      return;
+    }
+
+    // 2️⃣ dígito de controlo
+    if (!validatePortugueseVAT(vat)) {
+      setVatError(t.modals.errors.invalidVAT);
+      return;
+    }
+
+    // 3️⃣ válido
+    setVatError("");
+  } else {
+    setVatError("");
+  }
+};
+
 
     // 🔹 Buscar lista de países da API
     useEffect(() => {
@@ -281,9 +302,9 @@ const MultiModalManager = ({ openModal, setOpenModal, propertyID, onSave, profil
             })
         );
 
-    // Enviar dados novos para o pai
-    onSave(payload);
-    closeAll();
+        // Enviar dados novos para o pai
+        onSave(payload);
+        closeAll();
     };
 
     if (loading) return <LoadingBackdrop open={true} />;
@@ -293,150 +314,150 @@ const MultiModalManager = ({ openModal, setOpenModal, propertyID, onSave, profil
             {/* ---------- Modal de Insert ---------- */}
             <Modal isOpen={activeModal === "insert"}
                 onOpenChange={closeAll} className="z-50" size="5xl" hideCloseButton={true}>
-            <ModalContent>
-                {() => (
-                    <>
+                <ModalContent>
+                    {() => (
+                        <>
                             <ModalHeader className="flex flex-row justify-between items-center gap-1 bg-primary text-white h-12">
-                            {t.modals.companyInfo.insert}
-                            <Button color="transparent" variant="light" onClick={closeAll} className="w-auto min-w-0 p-0 m-0">
-                                <MdClose size={30} />
-                            </Button>
-                        </ModalHeader>
-                        <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
-                            <div className="flex flex-col">
-                                <div className="flex flex-row gap-2 mb-0.5 items-center">
-                                    <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">
-                                            {t.modals.companyInfo.vatNO} *
-                                        </label>
+                                {t.modals.companyInfo.insert}
+                                <Button color="transparent" variant="light" onClick={closeAll} className="w-auto min-w-0 p-0 m-0">
+                                    <MdClose size={30} />
+                                </Button>
+                            </ModalHeader>
+                            <ModalBody className="flex flex-col mx-5 my-5 space-y-4 text-textPrimaryColor max-h-[70vh] overflow-y-auto">
+                                <div className="flex flex-col">
+                                    <div className="flex flex-row gap-2 mb-0.5 items-center">
+                                        <div className="w-1/3">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">
+                                                {t.modals.companyInfo.vatNO} *
+                                            </label>
 
-                                        <div className="flex flex-row gap-2 items-center">
+                                            <div className="flex flex-row gap-2 items-center">
+                                                <input
+                                                    type="text"
+                                                    name="vatNo"
+                                                    value={insertFormData.vatNo}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                                />
+                                            </div>
+                                            {vatError && <p className="text-red-500 text-xs mt-1">{vatError}</p>}
+                                        </div>
+                                        <div className="w-2/3">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.companyName} *</label>
                                             <input
+                                                ref={inputRef}
                                                 type="text"
-                                                name="vatNo"
-                                                value={insertFormData.vatNo}
+                                                name="companyName"
+                                                value={insertFormData.companyName}
                                                 onChange={handleChange}
-                                                onBlur={handleBlur}
                                                 className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
                                             />
                                         </div>
-                                        {vatError && <p className="text-red-500 text-xs mt-1">{vatError}</p>}
                                     </div>
-                                    <div className="w-2/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.companyName} *</label>
-                                        <input
-                                            ref={inputRef}
-                                            type="text"
-                                            name="companyName"
-                                            value={insertFormData.companyName}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
+
+                                    <div className="flex flex-row gap-2 mb-0.5 items-center">
+                                        <div className="w-1/3">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.streetAddress}</label>
+                                            <input
+                                                type="text"
+                                                name="streetAddress"
+                                                value={insertFormData.streetAddress}
+                                                onChange={handleChange}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            />
+                                        </div>
+
+                                        <div className="w-1/3">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.zipCode}</label>
+                                            <input
+                                                type="text"
+                                                name="zipCode"
+                                                value={insertFormData.zipCode}
+                                                onChange={handleChange}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            />
+                                        </div>
+                                        <div className="w-1/3">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.city}</label>
+                                            <input
+                                                type="text"
+                                                name="city"
+                                                value={insertFormData.city}
+                                                onChange={handleChange}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-row gap-2 mb-0.5 items-center">
+
+                                        <div className="w-1/3">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.state}</label>
+                                            <input
+                                                type="text"
+                                                name="state"
+                                                value={insertFormData.state}
+                                                onChange={handleChange}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            />
+                                        </div>
+                                        <div className="w-1/3">
+                                            <label className="block text-sm font-medium">{t.modals.companyInfo.country} *</label>
+                                            <Select
+                                                options={countryOptions}
+                                                // value={countryOptions.find(option => option.label === formData.country)}
+                                                value={
+                                                    countryOptions.find(
+                                                        option => option.value === insertFormData.country
+                                                    ) || null
+                                                }
+                                                onChange={handleCountryChange}
+                                                isSearchable
+                                                // styles={customStyles}
+                                                classNames={{
+                                                    control: (state) =>
+                                                        `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''
+                                                        }`,
+                                                    menu: () => '!bg-background !text-textPrimaryColor',
+                                                    option: (state) =>
+                                                        `!cursor-pointer ${state.isSelected
+                                                            ? '!bg-primary !text-white'
+                                                            : state.isFocused
+                                                                ? '!bg-primary-100 !text-black'
+                                                                : '!bg-background !text-textPrimaryColor'
+                                                        }`,
+                                                    singleValue: () => '!text-textPrimaryColor',
+                                                    placeholder: () => '!text-gray-400',
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-row">
+                                        <div className="w-full">
+                                            <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.email}</label>
+                                            <input
+                                                type="text"
+                                                name="emailAddress"
+                                                value={insertFormData.emailAddress}
+                                                onChange={handleChange}
+                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="flex flex-row gap-2 mb-0.5 items-center">
-                                    <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.streetAddress}</label>
-                                        <input
-                                            type="text"
-                                            name="streetAddress"
-                                            value={insertFormData.streetAddress}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
-                                    </div>
-
-                                    <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.zipCode}</label>
-                                        <input
-                                            type="text"
-                                            name="zipCode"
-                                            value={insertFormData.zipCode}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
-                                    </div>
-                                    <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.city}</label>
-                                        <input
-                                            type="text"
-                                            name="city"
-                                            value={insertFormData.city}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
-                                    </div>
+                                {errorMessage && <p className="text-red-500 text-xs -mt-4">{errorMessage}</p>}
+                                <div className="flex justify-end space-x-2 -mt-4">
+                                    <Button color="error" onClick={closeAll} disabled={isSubmitting}>{t.modals.companyInfo.cancel}</Button>
+                                    <Button color="primary" onClick={handleSave} disabled={isSubmitting}>{isSubmitting ? t.modals.companyInfo.saving || 'Saving...' : t.modals.companyInfo.save}</Button>
                                 </div>
-
-                                <div className="flex flex-row gap-2 mb-0.5 items-center">
-
-                                    <div className="w-1/3">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.state}</label>
-                                        <input
-                                            type="text"
-                                            name="state"
-                                            value={insertFormData.state}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
-                                    </div>
-                                    <div className="w-1/3">
-                                        <label className="block text-sm font-medium">{t.modals.companyInfo.country} *</label>
-                                        <Select
-                                            options={countryOptions}
-                                            // value={countryOptions.find(option => option.label === formData.country)}
-                                            value={
-                                                countryOptions.find(
-                                                    option => option.value === insertFormData.country
-                                                ) || null
-                                            }
-                                            onChange={handleCountryChange}
-                                            isSearchable
-                                            // styles={customStyles}
-                                            classNames={{
-                                                control: (state) =>
-                                                    `!bg-background !text-textPrimaryColor !border !border-gray-300 !rounded-md ${state.isFocused ? '!border-blue-500' : ''
-                                                    }`,
-                                                menu: () => '!bg-background !text-textPrimaryColor',
-                                                option: (state) =>
-                                                    `!cursor-pointer ${state.isSelected
-                                                        ? '!bg-primary !text-white'
-                                                        : state.isFocused
-                                                            ? '!bg-primary-100 !text-black'
-                                                            : '!bg-background !text-textPrimaryColor'
-                                                    }`,
-                                                singleValue: () => '!text-textPrimaryColor',
-                                                placeholder: () => '!text-gray-400',
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-row">
-                                    <div className="w-full">
-                                        <label className="block text-sm font-medium text-textPrimaryColor">{t.modals.companyInfo.email}</label>
-                                        <input
-                                            type="text"
-                                            name="emailAddress"
-                                            value={insertFormData.emailAddress}
-                                            onChange={handleChange}
-                                            className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {errorMessage && <p className="text-red-500 text-xs -mt-4">{errorMessage}</p>}
-                            <div className="flex justify-end space-x-2 -mt-4">
-                                <Button color="error" onClick={closeAll} disabled={isSubmitting}>{t.modals.companyInfo.cancel}</Button>
-                                <Button color="primary" onClick={handleSave} disabled={isSubmitting}>{isSubmitting ? t.modals.companyInfo.saving || 'Saving...' : t.modals.companyInfo.save}</Button>
-                            </div>
-                        </ModalBody>
-                    </>
-                )}
-            </ModalContent>
-        </Modal>
+                            </ModalBody>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
 
             {/* ---------- Modal de Edição ---------- */}
             <Modal
@@ -638,9 +659,21 @@ const MultiModalManager = ({ openModal, setOpenModal, propertyID, onSave, profil
                                                 name="vatNo"
                                                 value={insertFormData.vatNo}
                                                 onChange={handleChange}
-                                                onKeyDown={handleKeyDown}
-                                                className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline focus:outline-black focus:ring-2 focus:ring-black"
+                                                onBlur={handleBlur}
+                                                inputMode="numeric"
+                                                maxLength={9}
+                                                className={`w-full rounded-md px-2 py-1 
+      border ${vatError ? "border-red-500" : "border-gray-300"}
+      focus:outline focus:outline-black focus:ring-2
+      ${vatError ? "focus:ring-red-500" : "focus:ring-black"}
+    `}
                                             />
+
+                                            {vatError && (
+                                                <p className="mt-1 text-xs text-red-500">
+                                                    {vatError}
+                                                </p>
+                                            )}
                                         </div>
 
                                         <div className="w-2/3">

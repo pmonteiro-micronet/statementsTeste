@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
+import {  DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "@heroui/react";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 // import { CiViewList } from "react-icons/ci";
@@ -29,7 +31,7 @@ import HousekeepingInsertMaintenanceForm from "@/components/modals/housekeeping/
 
 import "../../frontOfficeView/table.css";
 import LoadingBackdrop from "@/components/Loader/page";
-import { MdOutlineDryCleaning } from "react-icons/md";
+import { PiCoatHanger } from "react-icons/pi";
 
 // import dayjs from 'dayjs';
 
@@ -81,6 +83,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [locale, setLocale] = useState("pt");
 
   const [housekeeping, setHousekeeping] = useState([]);
+
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
 
   useEffect(() => {
     // Carregar o idioma do localStorage
@@ -404,36 +408,64 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                   {items.map((item, index) => (
                     <tr
                       key={`${item.IDReserva}-${index}`}
-                      className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor hover:bg-primary-50"
+                      className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor hover:bg-primary-50 cursor-pointer"
+                      onClick={() => handleOpenModal(item)}
                     >
-                      <td className="pl-1 pr-1 w-32 border-r border-[#e6e6e6] align-middle text-center">
-                        <div className="flex items-center justify-center gap-2 w-full h-full">
+                     <td className="pl-1 pr-1 w-10 border-r border-[#e6e6e6] align-middle text-center">
+  <div className="flex items-center justify-center w-full h-full" onClick={(e) => e.stopPropagation()}>
+    <Dropdown
+      isOpen={openDropdownIndex === index}
+      onOpenChange={(open) => setOpenDropdownIndex(open ? index : null)}
+    >
+      <DropdownTrigger>
+        <button
+          className="p-1 rounded flex items-center"
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpenDropdownIndex(index);
+          }}
+        >
+          <BsThreeDotsVertical size={20} className="text-gray-600" />
+        </button>
+      </DropdownTrigger>
 
-                          {/* Botão de manutenção */}
-                          <button
-                            className="p-1 rounded flex items-center"
-                            onClick={() => handleOpenMaintenanceModal(item)}
-                          >
-                            <HiOutlineWrenchScrewdriver size={20} color="gray" />
-                          </button>
+      <DropdownMenu
+        aria-label="Room Actions"
+        closeOnSelect={true}
+        className="text-gray-700"
+      >
+        {/* Manutenção */}
+        <DropdownItem
+          key="maintenance"
+          onClick={() => {
+            handleOpenMaintenanceModal(item);
+          }}
+        >
+          <div className="flex flex-row gap-2 items-center">
+            <HiOutlineWrenchScrewdriver size={16} />
+            <span>Manutenção</span>
+          </div>
+        </DropdownItem>
 
-                          {/* Botão de traces */}
-                          {/* <button
-                            className="p-1 rounded flex items-center"
-                            onClick={() => handleOpenTracesModal(item)}
-                          >
-                            <CiViewList size={20} color="gray" />
-                          </button>  */}
+        {/* Info */}
+        <DropdownItem
+          key="info"
+          onClick={() => {
+            handleOpenModal(item);
+          }}
+        >
+          <div className="flex flex-row gap-2 items-center">
+            <AiFillInfoCircle size={16} />
+            <span>Info</span>
+          </div>
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+  </div>
+</td>
 
-                          {/* Botão de info */}
-                          <button
-                            className="p-1 rounded flex items-center"
-                            onClick={() => handleOpenModal(item)}
-                          >
-                            <AiFillInfoCircle size={20} color="gray" />
-                          </button>
-                        </div>
-                      </td>
+
+                      
                       {/* Other Cells */}
                       <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.ArrivalDate?.split("T")[0]}</td>
                       <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.DepartureDate?.split("T")[0]}</td>
@@ -442,7 +474,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                         {`${item.GuestName}`}
                       </td>
                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-32 truncate whitespace-nowrap overflow-hidden">
-                        {item.Lavandaria === 1 && <MdOutlineDryCleaning size={30} title="Changing sheets" />}
+                        {item.Lavandaria === 1 && <PiCoatHanger size={18} title="Changing sheets" />}
                       </td>
                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-14">
                         <div className="flex items-center justify-center h-full">
@@ -492,6 +524,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     isBackdropVisible
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
+                    onAddMaintenance={handleOpenMaintenanceModal}
+                    selectedReserva={selectedReserva}
                   />
 
                   <HousekeepingMaintenanceForm
