@@ -384,7 +384,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                         )}
                       </div>
                     </td>
-                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase">{t.frontOffice.housekeeping.title}</td>
+                    <td className="pl-2 pr-2 border-r border-[#e6e6e6] uppercase w-14">HSK</td>
                     <td className="pl-2 pr-2 border-r border-[#e6e6e6] w-14">
                       <div className="flex items-center justify-center h-full">
                         <MdComputer size={20} title="HK Status" />
@@ -473,8 +473,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">
                         {`${item.GuestName}`}
                       </td>
-                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-32 truncate whitespace-nowrap overflow-hidden">
-                        {item.Lavandaria === 1 && <PiCoatHanger size={18} title="Changing sheets" />}
+                      <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-14 truncate whitespace-nowrap overflow-hidden">
+                        {item.Lavandaria === 1 && <PiCoatHanger size={20} title="Changing sheets" />}
                       </td>
                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-14">
                         <div className="flex items-center justify-center h-full">
