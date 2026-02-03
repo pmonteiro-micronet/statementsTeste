@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationTable from "@/components/table/paginationTable/page";
-import {  DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "@heroui/react";
+import { DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, } from "@heroui/react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 
 import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
@@ -119,6 +119,11 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     setIsModalOpen(false);
     setSelectedReserva(null); // Limpa os dados ao fechar a modal
     window.location.reload(); // Recarrega a página
+  };
+
+  const handleCloseModalWithoutReload = () => {
+    setIsModalOpen(false);
+    setSelectedReserva(null);
   };
 
   const handleCloseMaintenanceModal = () => {
@@ -411,61 +416,58 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                       className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor hover:bg-primary-50 cursor-pointer"
                       onClick={() => handleOpenModal(item)}
                     >
-                     <td className="pl-1 pr-1 w-10 border-r border-[#e6e6e6] align-middle text-center">
-  <div className="flex items-center justify-center w-full h-full" onClick={(e) => e.stopPropagation()}>
-    <Dropdown
-      isOpen={openDropdownIndex === index}
-      onOpenChange={(open) => setOpenDropdownIndex(open ? index : null)}
-    >
-      <DropdownTrigger>
-        <button
-          className="p-1 rounded flex items-center"
-          onClick={(e) => {
-            e.stopPropagation();
-            setOpenDropdownIndex(index);
-          }}
-        >
-          <BsThreeDotsVertical size={20} className="text-gray-600" />
-        </button>
-      </DropdownTrigger>
+                      <td className="pl-1 pr-1 w-10 border-r border-[#e6e6e6] align-middle text-center">
+                        <div className="flex items-center justify-center w-full h-full" onClick={(e) => e.stopPropagation()}>
+                          <Dropdown
+                            isOpen={openDropdownIndex === index}
+                            onOpenChange={(open) => setOpenDropdownIndex(open ? index : null)}
+                          >
+                            <DropdownTrigger>
+                              <button
+                                className="p-1 rounded flex items-center"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenDropdownIndex(index);
+                                }}
+                              >
+                                <BsThreeDotsVertical size={20} className="text-gray-600" />
+                              </button>
+                            </DropdownTrigger>
 
-      <DropdownMenu
-        aria-label="Room Actions"
-        closeOnSelect={true}
-        className="text-gray-700"
-      >
-        {/* Manutenção */}
-        <DropdownItem
-          key="maintenance"
-          onClick={() => {
-            handleOpenMaintenanceModal(item);
-          }}
-        >
-          <div className="flex flex-row gap-2 items-center">
-            <HiOutlineWrenchScrewdriver size={16} />
-            <span>Manutenção</span>
-          </div>
-        </DropdownItem>
+                            <DropdownMenu
+                              aria-label="Room Actions"
+                              closeOnSelect={true}
+                              className="text-gray-700"
+                            >
+                              {/* Manutenção */}
+                              <DropdownItem
+                                key="maintenance"
+                                onClick={() => {
+                                  handleOpenMaintenanceModal(item);
+                                }}
+                              >
+                                <div className="flex flex-row gap-2 items-center">
+                                  <HiOutlineWrenchScrewdriver size={16} />
+                                  <span>Manutenção</span>
+                                </div>
+                              </DropdownItem>
 
-        {/* Info */}
-        <DropdownItem
-          key="info"
-          onClick={() => {
-            handleOpenModal(item);
-          }}
-        >
-          <div className="flex flex-row gap-2 items-center">
-            <AiFillInfoCircle size={16} />
-            <span>Info</span>
-          </div>
-        </DropdownItem>
-      </DropdownMenu>
-    </Dropdown>
-  </div>
-</td>
-
-
-                      
+                              {/* Info */}
+                              <DropdownItem
+                                key="info"
+                                onClick={() => {
+                                  handleOpenModal(item);
+                                }}
+                              >
+                                <div className="flex flex-row gap-2 items-center">
+                                  <AiFillInfoCircle size={16} />
+                                  <span>Info</span>
+                                </div>
+                              </DropdownItem>
+                            </DropdownMenu>
+                          </Dropdown>
+                        </div>
+                      </td>
                       {/* Other Cells */}
                       <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.ArrivalDate?.split("T")[0]}</td>
                       <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{item.DepartureDate?.split("T")[0]}</td>
@@ -474,7 +476,9 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                         {`${item.GuestName}`}
                       </td>
                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-14 truncate whitespace-nowrap overflow-hidden">
-                        {item.Lavandaria === 1 && <PiCoatHanger size={20} title="Changing sheets" />}
+                        <div className="flex items-center justify-center h-full">
+                          {item.Lavandaria === 1 && <PiCoatHanger size={20} title="Changing sheets" />}
+                        </div>
                       </td>
                       <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] w-14">
                         <div className="flex items-center justify-center h-full">
@@ -524,6 +528,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     isBackdropVisible
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
+                    onCloseWithoutReload={handleCloseModalWithoutReload}
                     onAddMaintenance={handleOpenMaintenanceModal}
                     selectedReserva={selectedReserva}
                   />
