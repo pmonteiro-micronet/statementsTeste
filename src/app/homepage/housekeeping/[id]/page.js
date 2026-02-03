@@ -190,7 +190,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
               return acc;
             }, {})
-          );
+          ).filter(item => !(item.EstadoEstadia === 2 && item.EstadoLimpeza === 1)); // Filtrar reservas em checkout com quarto limpo
 
           console.log("Housekeeping filtered:", filteredHousekeeping);
           setHousekeeping(filteredHousekeeping); // 👈 só os únicos
