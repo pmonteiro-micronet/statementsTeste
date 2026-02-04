@@ -17,6 +17,7 @@ import { AiFillInfoCircle } from "react-icons/ai";
 
 import { FaCircle } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
 import { FaGear } from "react-icons/fa6";
@@ -85,6 +86,8 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   const [housekeeping, setHousekeeping] = useState([]);
 
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+
+  const [showCompletedReservations, setShowCompletedReservations] = useState(false);
 
   useEffect(() => {
     // Carregar o idioma do localStorage
@@ -190,7 +193,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
               return acc;
             }, {})
-          ).filter(item => !(item.EstadoEstadia === 2 && item.EstadoLimpeza === 1)); // Filtrar reservas em checkout com quarto limpo
+          );
 
           console.log("Housekeeping filtered:", filteredHousekeeping);
           setHousekeeping(filteredHousekeeping); // 👈 só os únicos
@@ -214,14 +217,18 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
   }, [propertyID]);
 
   // UseMemo para preparar os dados filtrados de acordo com a paginação
+  const filteredHousekeeping = React.useMemo(() => {
+    return showCompletedReservations ? housekeeping : housekeeping.filter(item => !(item.EstadoEstadia === 2 && item.EstadoLimpeza === 1));
+  }, [housekeeping, showCompletedReservations]);
+
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
-    return housekeeping.slice(start, end); // Filtra os housekeeping com base na página atual e número de linhas por página
-  }, [page, rowsPerPage, housekeeping]); // A dependência inclui `housekeeping`, que é onde os dados estão
+    return filteredHousekeeping.slice(start, end); // Filtra os housekeeping com base na página atual e número de linhas por página
+  }, [page, rowsPerPage, filteredHousekeeping]); // A dependência inclui `filteredHousekeeping`
 
-  const pages = Math.ceil(housekeeping.length / rowsPerPage); // Calcula o número total de páginas com base no total de housekeeping
+  const pages = Math.ceil(filteredHousekeeping.length / rowsPerPage); // Calcula o número total de páginas com base no total de housekeeping filtrado
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
@@ -333,6 +340,13 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                 <MdOutlineRefresh size={20} />
               </button>
               <button
+                onClick={() => setShowCompletedReservations(!showCompletedReservations)}
+                className="text-white bg-primary rounded-lg cursor-pointer p-2"
+                title={showCompletedReservations ? "Ocultar Completadas" : "Mostrar Completadas"}
+              >
+                {showCompletedReservations ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+              </button>
+              <button
                 onClick={() => setIsModalInsertMaintenanceOpen(true)}
                 className="text-white bg-primary rounded-lg cursor-pointer p-2"
               >
@@ -359,7 +373,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
         <div className="mt-5 flex flex-col h-[calc(100vh-210px)]">
           {isLoading ? (
             (<LoadingBackdrop open={isLoading} />) // Exibe o carregamento enquanto os dados estão sendo carregados
-          ) : housekeeping.length > 0 ? (
+          ) : filteredHousekeeping.length > 0 ? (
             <div className="overflow-auto flex-grow">
               <table className="w-full text-left min-w-max border-collapse">
                 <thead className="sticky top-0 z-30">
