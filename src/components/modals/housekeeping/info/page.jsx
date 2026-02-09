@@ -72,7 +72,7 @@ const HousekeepingInfoForm = ({
             label: "Occupied",
             icon: <CiLock size={20} />,
         },
-        2: {
+        0: {
             label: "Free",
             icon: <CiCircleCheck size={20} />,
         },
