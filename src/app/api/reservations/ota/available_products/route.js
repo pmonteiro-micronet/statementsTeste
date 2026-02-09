@@ -33,7 +33,7 @@ export async function POST(request) {
     const auth = Buffer.from(`${creds.username}:${creds.password}`).toString("base64");
 
     // Send POST request to RoomCloud
-    const url = `https://apitest.roomcloud.net/hotw/download/Cloudtools.jsp?hotelId=${creds.hotelID}`;
+    const url = `https://xml.tecnes.com/hotw/download/Cloudtools.jsp?hotelId=${creds.hotelID}`;
     const response = await axios.post(url, xml, {
       headers: {
         "Content-Type": "application/xml",
