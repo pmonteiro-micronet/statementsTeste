@@ -34,6 +34,7 @@ import { FaRegStar } from "react-icons/fa";
 import { FaStar } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { FaPhone } from "react-icons/fa";
+import { IoReader } from "react-icons/io5";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -129,6 +130,31 @@ export default function Page() {
             };
         }
     }, [session, status]);
+
+
+    // const lerCartaoCidadao = async () => {
+    //     try {
+    //         const response = await axios.post("/api/CCRead", {
+    //             propertyID: propertyID
+    //         });
+
+    //         console.log("Dados do Cartão de Cidadão:", response.data);
+    //     } catch (err) {
+    //         console.error("Erro ao ler CC:", err.response?.data || err.message);
+    //     }
+    // };
+
+    const lerCartaoCidadao = async () => { 
+        try 
+        { 
+            const response = await axios.get("http://localhost:5000/read_cc"); 
+            console.log("Dados do Cartão de Cidadão:", response); 
+        } 
+    catch (err) { console.error("Erro ao contactar o serviço do CC:", err); } };
+
+    useEffect(() => {
+        lerCartaoCidadao();
+    }, []);
 
 
     const handleLanguageChange = (lang) => {
@@ -1394,8 +1420,12 @@ export default function Page() {
                 <>
                     <div className="pt-2 px-4 flex justify-between flag-position items-center">
                         <div className='text-textPrimaryColor'>{hotelName}</div>
-                        <div className='text-textPrimaryColor'>
+                        <div className='text-textPrimaryColor flex flex-row gap-2 items-center'>
                             <p>{t.frontOffice.registrationForm.title}</p>
+                        <IoReader 
+                        onClick={lerCartaoCidadao}
+                        />
+
                         </div>
                         <div className="flex flex-row gap-8 items-center language-row">
                             <div
@@ -1442,6 +1472,7 @@ export default function Page() {
                                     className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
                                 />
                             </div>
+                            
                             {dropdownOpen && (
                                 <div className="absolute mt-2 bg-white border rounded shadow-lg">
                                     <div
