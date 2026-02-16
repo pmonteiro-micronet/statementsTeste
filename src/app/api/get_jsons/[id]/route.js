@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
-export async function GET(request, context) {
-  const { id } = context.params;
+export async function GET(request, { params }) {
+  const { id } = await params;
+
   const requestId = parseInt(id, 10);
 
   if (isNaN(requestId)) {
