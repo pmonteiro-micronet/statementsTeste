@@ -3,22 +3,67 @@ import prisma from "@/lib/db";
 
 export async function GET(request, context) {
   const { id } = context.params;
+  const requestId = parseInt(id, 10);
+
+  if (isNaN(requestId)) {
+    return new NextResponse(JSON.stringify({ error: "Invalid requestID" }), { status: 400 });
+  }
 
   try {
-    const response = await prisma.requestRecords.findMany({
-      where: {
-        requestID: parseInt(id),
-      },
-    });
+    // 1) Tenta buscar no table `requestRecords` (comportamento original)
+    let record = await prisma.requestRecords.findUnique({ where: { requestID: requestId } });
 
-    // Verifique se a resposta está vazia
-    if (response.length === 0) {
-      return new NextResponse(JSON.stringify({ error: "Not found" }), {
-        status: 404,
-      });
+    // 2) Se não existir, procura nas outras tabelas onde `requestBody` também pode estar
+    const fallbackTables = [
+      { model: prisma.requestRecordsInHouses, name: 'requestRecordsInHouses' },
+      { model: prisma.requestRecordsArrivals, name: 'requestRecordsArrivals' },
+      { model: prisma.requestRecordsDepartures, name: 'requestRecordsDepartures' },
+      { model: prisma.requestRecordsReservationsOta, name: 'requestRecordsReservationsOta' },
+      { model: prisma.requestRecordsHousekeeping, name: 'requestRecordsHousekeeping' },
+      { model: prisma.registrationRecords, name: 'registrationRecords' },
+    ];
+
+    if (!record) {
+      for (const tbl of fallbackTables) {
+        try {
+          const found = await tbl.model.findUnique({ where: { requestID: requestId } });
+          if (found) {
+            // normaliza o registro para o mesmo formato usado por `requestRecords`
+            record = { ...found };
+            record._sourceTable = tbl.name; // para debug
+            break;
+          }
+        } catch (e) {
+          // alguns modelos podem não ter o método findUnique por nomes diferentes - ignore o erro e continue
+          console.debug(`search ${tbl.name} failed:`, e?.message || e);
+        }
+      }
     }
 
-    return new NextResponse(JSON.stringify({ response }), { status: 200 });
+    if (!record) {
+      return new NextResponse(JSON.stringify({ error: "Not found" }), { status: 404 });
+    }
+
+    // Normalizar `requestBody` e `responseBody` para string (algumas tabelas usam JSON native)
+    const normalized = { ...record };
+    if (typeof normalized.requestBody === 'object') {
+      try {
+        normalized.requestBody = JSON.stringify(normalized.requestBody);
+      } catch (e) {
+        console.warn('Failed to stringify requestBody:', e);
+        normalized.requestBody = String(normalized.requestBody);
+      }
+    }
+    if (typeof normalized.responseBody === 'object') {
+      try {
+        normalized.responseBody = JSON.stringify(normalized.responseBody);
+      } catch (e) {
+        normalized.responseBody = String(normalized.responseBody);
+      }
+    }
+
+    // garante estrutura consistente (array de um item) para compatibilidade com o front-end
+    return new NextResponse(JSON.stringify({ response: [normalized] }), { status: 200 });
   } catch (error) {
     console.error("Erro ao buscar dados:", error);
     return new NextResponse(JSON.stringify({ error: error.message }), {
