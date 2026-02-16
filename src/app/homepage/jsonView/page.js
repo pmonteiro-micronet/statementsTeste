@@ -106,7 +106,25 @@ const JsonViewPage = () => {
         setError(null);
         try {
           const response = await axios.get(`/api/get_jsons/${recordID}`);
-          setReservationData(response.data.response[0]);
+
+          console.log("FULL RESPONSE:", response.data);
+          // normaliza o registro retornado (aceita requestBody ou responseBody)
+          const rec = response.data?.response?.[0] ?? null;
+          if (!rec) {
+            setError('Registro não encontrado');
+            setLoading(false);
+            return;
+          }
+
+          // fallback: se requestBody estiver ausente, usa responseBody
+          if (!rec.requestBody && rec.responseBody) rec.requestBody = rec.responseBody;
+
+          // garante que requestBody seja string (algumas tabelas armazenam como JSON nativo)
+          if (typeof rec.requestBody === 'object') {
+            try { rec.requestBody = JSON.stringify(rec.requestBody); } catch (e) { rec.requestBody = String(rec.requestBody); }
+          }
+
+          setReservationData(rec);
         } catch (error) {
           setError("Erro ao carregar os dados: ", error);
         } finally {
@@ -146,46 +164,60 @@ const JsonViewPage = () => {
 
   useEffect(() => {
     const loadVatNo = async () => {
-      if (!reservationData || !reservationData.requestBody) {
-        console.log("Erro: requestBody não encontrado");
+      if (!reservationData) {
+        console.log("Erro: reservationData não encontrado");
         return;
       }
 
-      try {
-        const parsedData = JSON.parse(reservationData.requestBody);
-
-        // Log para ver o que foi recebido
-        console.log("DADOS RECEBIDOS (parsedData):", parsedData);
-
-        let vatNumber = "";
-        let reservationNumber = "";
-        let profileID = null;
-        let companyID = ""; // Variável para armazenar o CompanyID
-
-        parsedData.forEach((data) => {
-          // Acessa GuestInfo e pega o ProfileID e VatNo
-          if (data.GuestInfo && data.GuestInfo.length > 0) {
-            vatNumber = data.GuestInfo[0].VatNo || "";
-            profileID = data.GuestInfo[0].ProfileID || null;
-          }
-
-          // Acessa Reservation e pega o ReservationNumber e CompanyID
-          if (data.Reservation && data.Reservation.length > 0) {
-            reservationNumber = data.Reservation[0].ReservationNumber || "";
-            companyID = data.Reservation[0].CompanyID || ""; // Acessa CompanyID (companyVatNO)
-          }
-        });
-
-        // Atualiza os estados com os valores obtidos
-        setInitialVatNo(vatNumber);
-        setVatNo(vatNumber);
-        setResNo(reservationNumber);
-        setProfileID(profileID);
-        setCompanyID(companyID); // Atualiza o estado do CompanyID
-
-      } catch (error) {
-        console.error("Erro ao processar o pedido:", error);
+      // aceita requestBody como string ou como object; fallback para responseBody
+      const raw = reservationData.requestBody ?? reservationData.responseBody;
+      if (!raw) {
+        console.log("Erro: requestBody não encontrado (recordID:", reservationData.requestID || 'N/A', ")");
+        return;
       }
+
+      let parsedData;
+      try {
+        if (typeof raw === 'string') {
+          parsedData = JSON.parse(raw);
+        } else if (typeof raw === 'object') {
+          parsedData = raw;
+        } else {
+          console.error('requestBody tem tipo inesperado:', typeof raw);
+          return;
+        }
+      } catch (err) {
+        console.error('Erro ao parsear requestBody:', err);
+        return;
+      }
+
+      console.log("DADOS RECEBIDOS (parsedData):", parsedData);
+
+      // garante que seja um array
+      if (!Array.isArray(parsedData)) parsedData = [parsedData];
+
+      let vatNumber = "";
+      let reservationNumber = "";
+      let profileID = null;
+      let companyID = "";
+
+      parsedData.forEach((data) => {
+        if (data.GuestInfo && data.GuestInfo.length > 0) {
+          vatNumber = data.GuestInfo[0].VatNo || "";
+          profileID = data.GuestInfo[0].ProfileID || null;
+        }
+
+        if (data.Reservation && data.Reservation.length > 0) {
+          reservationNumber = data.Reservation[0].ReservationNumber || "";
+          companyID = data.Reservation[0].CompanyID || "";
+        }
+      });
+
+      setInitialVatNo(vatNumber);
+      setVatNo(vatNumber);
+      setResNo(reservationNumber);
+      setProfileID(profileID);
+      setCompanyID(companyID);
     };
 
     loadVatNo();
@@ -262,13 +294,13 @@ const sendResToAPI = async (ResNo) => {
 
   // Função handleEditClick para o restante da lógica
   const handleEditClick = async () => {
-    if (!reservationData || !reservationData.requestBody) {
+    if (!reservationData || !(reservationData.requestBody || reservationData.responseBody)) {
       console.log("Erro: requestBody não encontrado");
       return;
     }
 
     try {
-      const parsedData = JSON.parse(reservationData.requestBody);
+      const parsedData = JSON.parse(reservationData.requestBody ?? reservationData.responseBody);
       const reservations = parsedData[0]?.Reservation;
       const guestInfo = parsedData[0]?.GuestInfo;
 
@@ -322,11 +354,11 @@ const sendResToAPI = async (ResNo) => {
             <div className="flex flex-row justify-between w-[80%] mb-10 infoContainer">
               {/* Detalhes da Reserva */}
               <div className="text-left">
-                {reservationData && reservationData.requestBody ? (
+                {reservationData && (reservationData.requestBody || reservationData.responseBody) ? (
                   Array.isArray(
-                    JSON.parse(reservationData.requestBody)[0]?.Reservation
+                    JSON.parse(reservationData.requestBody ?? reservationData.responseBody)[0]?.Reservation
                   ) ? (
-                    JSON.parse(reservationData.requestBody)[0].Reservation.map(
+                    JSON.parse(reservationData.requestBody ?? reservationData.responseBody)[0].Reservation.map(
                       (reservation, index) => (
                         <div key={index} className="text-textPrimaryColor">
                           <p className="font-bold text-3xl text-primary roomInfo">
@@ -470,11 +502,11 @@ const sendResToAPI = async (ResNo) => {
 
                 {/* Informações do hóspede */}
                 <div className="mt-4">
-                  {reservationData && reservationData.requestBody ? (
+                  {reservationData && (reservationData.requestBody || reservationData.responseBody) ? (
                     (() => {
                       let parsedData = [];
                       try {
-                        parsedData = JSON.parse(reservationData.requestBody);
+                        parsedData = JSON.parse(reservationData.requestBody ?? reservationData.responseBody);
                       } catch (error) {
                         console.error("Erro ao fazer o parse do JSON:", error);
                         return <p>{t.errors.loading}</p>;
@@ -580,11 +612,11 @@ const sendResToAPI = async (ResNo) => {
                 </tr>
               </thead>
               <tbody>
-                {reservationData && reservationData.requestBody ? (
+                {reservationData && (reservationData.requestBody || reservationData.responseBody) ? (
                   Array.isArray(
-                    JSON.parse(reservationData.requestBody)[0]?.Items
+                    JSON.parse(reservationData.requestBody ?? reservationData.responseBody)[0]?.Items
                   ) ? (
-                    JSON.parse(reservationData.requestBody)[0].Items.map((item, index) => (
+                    JSON.parse(reservationData.requestBody ?? reservationData.responseBody)[0].Items.map((item, index) => (
                       <tr
                         key={item.ID}
                         className={index % 2 === 0 ? "bg-white" : "bg-primary-100"}
@@ -627,9 +659,9 @@ const sendResToAPI = async (ResNo) => {
             </table>
 
             <div className="flex justify-end w-[80%] mx-auto">
-              {reservationData && reservationData.requestBody ? (
+              {reservationData && (reservationData.requestBody || reservationData.responseBody) ? (
                 (() => {
-                  const parsedData = JSON.parse(reservationData.requestBody);
+                  const parsedData = JSON.parse(reservationData.requestBody ?? reservationData.responseBody);
                   const documentTotals = parsedData[0]?.DocumentTotals;
 
                   if (Array.isArray(documentTotals) && documentTotals.length > 0) {
@@ -672,9 +704,9 @@ const sendResToAPI = async (ResNo) => {
                 </tr>
               </thead>
               <tbody>
-                {reservationData && reservationData.requestBody ? (
+                {reservationData && (reservationData.requestBody || reservationData.responseBody) ? (
                   (() => {
-                    const parsedData = JSON.parse(reservationData.requestBody);
+                    const parsedData = JSON.parse(reservationData.requestBody ?? reservationData.responseBody);
                     const taxes = parsedData[0]?.Taxes;
 
                     if (Array.isArray(taxes) && taxes.length > 0) {
@@ -714,10 +746,10 @@ const sendResToAPI = async (ResNo) => {
             </div>
             <div className="flex justify-between items-center mx-auto w-[65%] footerContainer">
               <div className="">
-                {reservationData && reservationData.requestBody ? (
+                {reservationData && (reservationData.requestBody || reservationData.responseBody) ? (
                   (() => {
                     // Faz o parse do requestBody uma única vez para evitar parse múltiplo
-                    const parsedRequestBody = JSON.parse(reservationData.requestBody);
+                    const parsedRequestBody = JSON.parse(reservationData.requestBody ?? reservationData.responseBody);
 
                     // Verifica se parsedRequestBody é um array e se o primeiro item tem o array de HotelInfo
                     return Array.isArray(parsedRequestBody) &&
