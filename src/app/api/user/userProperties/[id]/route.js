@@ -32,24 +32,30 @@ export async function GET(request, { params }) {
 }
 
 // POST: Associa uma propriedade ao usuário
-export async function POST(req, context) {
-  const { params } = context; // params vem do segundo argumento
-  const userID = parseInt(params.id);
+export async function POST(req, { params }) {
+  const { id } = await params;  
+  const userID = parseInt(id);
   const { propertyID, propertyTag } = await req.json();
 
   if (!userID || !propertyID || !propertyTag) {
-      return new NextResponse(JSON.stringify({ error: "User ID, property ID, and propertyTag are required" }), { status: 400 });
+    return NextResponse.json(
+      { error: "User ID, property ID, and propertyTag are required" },
+      { status: 400 }
+    );
   }
 
   try {
-      const association = await prisma.usersProperties.create({
-          data: { userID, propertyID, propertyTag },
-      });
+    const association = await prisma.usersProperties.create({
+      data: { userID, propertyID, propertyTag },
+    });
 
-      return new NextResponse(JSON.stringify({ association }), { status: 201 });
+    return NextResponse.json({ association }, { status: 201 });
   } catch (error) {
-      console.error("Erro ao associar propriedade:", error);
-      return new NextResponse(JSON.stringify({ error: "Failed to associate property" }), { status: 500 });
+    console.error("Erro ao associar propriedade:", error);
+    return NextResponse.json(
+      { error: "Failed to associate property" },
+      { status: 500 }
+    );
   }
 }
 

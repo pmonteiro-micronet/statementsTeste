@@ -34,7 +34,7 @@ import { FaRegStar } from "react-icons/fa";
 import { FaStar } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { FaPhone } from "react-icons/fa";
-import { IoReader } from "react-icons/io5";
+// import { IoReader } from "react-icons/io5";
 
 import en from "../../../../../public/locales/english/common.json";
 import pt from "../../../../../public/locales/portuguesPortugal/common.json";
@@ -87,12 +87,23 @@ export default function Page() {
     const router = useRouter();
 
     // const [localCompanyData, setLocalCompanyData] = useState(null);
-    const [addressData, setAddressData] = useState({});
-    const [personalIDData, setPersonalIDData] = useState({});
+    const [addressData, setAddressData] = useState(null);
+    const [personalIDData, setPersonalIDData] = useState(null);
 
     const [newCompany, setNewCompany] = useState(null);
     const [showRatingModal, setShowRatingModal] = useState(false);
 
+    useEffect(() => {
+        if (address) {
+            setAddressData(prev => prev || address); // mantém alterações se já existirem
+        }
+    }, [address]);
+
+    useEffect(() => {
+        if (personalID) {
+            setPersonalIDData(prev => prev || personalID); // mantém alterações se já existirem
+        }
+    }, [personalID]);
 
     // useEffect(() => {
     //     const companies = JSON.parse(localStorage.getItem("company") || "{}");
@@ -132,29 +143,17 @@ export default function Page() {
     }, [session, status]);
 
 
-    // const lerCartaoCidadao = async () => {
-    //     try {
-    //         const response = await axios.post("/api/CCRead", {
-    //             propertyID: propertyID
-    //         });
+    // const lerCartaoCidadao = async () => { 
+    //     try 
+    //     { 
+    //         const response = await axios.get("http://localhost:5000/read_cc"); 
+    //         console.log("Dados do Cartão de Cidadão:", response); 
+    //     } 
+    // catch (err) { console.error("Erro ao contactar o serviço do CC:", err); } };
 
-    //         console.log("Dados do Cartão de Cidadão:", response.data);
-    //     } catch (err) {
-    //         console.error("Erro ao ler CC:", err.response?.data || err.message);
-    //     }
-    // };
-
-    const lerCartaoCidadao = async () => { 
-        try 
-        { 
-            const response = await axios.get("http://localhost:5000/read_cc"); 
-            console.log("Dados do Cartão de Cidadão:", response); 
-        } 
-    catch (err) { console.error("Erro ao contactar o serviço do CC:", err); } };
-
-    useEffect(() => {
-        lerCartaoCidadao();
-    }, []);
+    // useEffect(() => {
+    //     lerCartaoCidadao();
+    // }, []);
 
 
     const handleLanguageChange = (lang) => {
@@ -947,15 +946,15 @@ export default function Page() {
                 );
 
                 console.log('Resposta da API:', response.data);
-                // Atualiza o campo 'seen' no backend
-                try {
-                    await axios.post('/api/reservations/checkins/registrationForm/updateSeen', {
-                        requestID: requestID
-                    });
-                    console.log("Campo 'seen' atualizado com sucesso.");
-                } catch (err) {
-                    console.error("Erro ao atualizar campo 'seen':", err);
-                }
+                // // Atualiza o campo 'seen' no backend
+                // try {
+                //     await axios.post('/api/reservations/checkins/registrationForm/updateSeen', {
+                //         requestID: requestID
+                //     });
+                //     console.log("Campo 'seen' atualizado com sucesso.");
+                // } catch (err) {
+                //     console.error("Erro ao atualizar campo 'seen':", err);
+                // }
 
                 setSuccessMessage("Registration sent successfully");
                 setIsSuccessModalOpen(true);
@@ -1286,6 +1285,33 @@ export default function Page() {
 
     const [countryOptions, setCountryOptions] = useState([]);
     const [docTypeOptions, setDocTypeOptions] = useState([]);
+
+useEffect(() => {
+    if (!personalIDData || countryOptions.length === 0) return;
+
+    const updatedCountryOfBirthID = personalIDData.CountryOfBirthID
+        || countryOptions.find(c => c.label === personalIDData.CountryOfBirth)?.value;
+
+    const updatedNationalityID = personalIDData.NationalityID
+        || countryOptions.find(c => c.label === (personalIDData.NationalityLabel || personalIDData.Nationality))?.value;
+
+    const updatedNationalityLabel = personalIDData.NationalityLabel || personalIDData.Nationality;
+
+    // Só atualiza se algum valor realmente mudou
+    if (
+        updatedCountryOfBirthID !== personalIDData.CountryOfBirthID ||
+        updatedNationalityID !== personalIDData.NationalityID ||
+        updatedNationalityLabel !== personalIDData.NationalityLabel
+    ) {
+        setPersonalIDData(prev => ({
+            ...prev,
+            CountryOfBirthID: updatedCountryOfBirthID,
+            NationalityID: updatedNationalityID,
+            NationalityLabel: updatedNationalityLabel
+        }));
+    }
+}, [personalIDData, countryOptions]);
+
     // const [countryIDSelected, setCountryIDSelected] = useState(() => ({
     //     CountryID: ""
     // }));
@@ -1422,10 +1448,6 @@ export default function Page() {
                         <div className='text-textPrimaryColor'>{hotelName}</div>
                         <div className='text-textPrimaryColor flex flex-row gap-2 items-center'>
                             <p>{t.frontOffice.registrationForm.title}</p>
-                        <IoReader 
-                        onClick={lerCartaoCidadao}
-                        />
-
                         </div>
                         <div className="flex flex-row gap-8 items-center language-row">
                             <div
@@ -1472,7 +1494,7 @@ export default function Page() {
                                     className="w-8 h-8 object-cover rounded-full" // Tornar a bandeira circular
                                 />
                             </div>
-                            
+
                             {dropdownOpen && (
                                 <div className="absolute mt-2 bg-white border rounded shadow-lg">
                                     <div
@@ -1752,13 +1774,12 @@ export default function Page() {
 
                                             {isAddressModalOpen && (
                                                 <AddressForm
-
                                                     onClose={() => setisAddressModalOpen(false)}
                                                     onSave={(newAddressData) => {
                                                         console.log("Dados recebidos do AddressForm:", newAddressData);
                                                         setAddressData(newAddressData); // guarda no state addressData
                                                     }}
-                                                    address={address}
+                                                    address={addressData} // sempre atual
                                                     profileID={profileID}
                                                     propertyID={propertyID}
                                                     t={t}
@@ -1776,7 +1797,7 @@ export default function Page() {
                                                     </div>
                                                 }
                                                 ariaLabel="Country:"
-                                                value={addressData?.Country ?? address.Country ?? ""}
+                                                value={addressData?.Country ?? ""}
                                                 style={inputStyleFull}
                                                 disabled
                                             />
@@ -1787,7 +1808,7 @@ export default function Page() {
                                                 name="Street Address"
                                                 label={t.frontOffice.registrationForm.streetAddress}
                                                 ariaLabel="Street Address:"
-                                                value={addressData?.Street ?? address.Street ?? ""}
+                                                value={addressData?.Street ?? ""}
                                                 style={inputStyleFull}
                                                 disabled
                                             />
@@ -1798,7 +1819,7 @@ export default function Page() {
                                                 name="ZIP / Postal Code"
                                                 label={t.frontOffice.registrationForm.zipPostalCode}
                                                 ariaLabel="ZIP / Postal Code:"
-                                                value={addressData?.PostalCode ?? address.PostalCode ?? ""}
+                                                value={addressData?.PostalCode ?? ""}
                                                 style={inputStyleFull}
                                                 disabled
                                             />
@@ -1809,7 +1830,7 @@ export default function Page() {
                                                 name="City"
                                                 label={t.frontOffice.registrationForm.city}
                                                 ariaLabel="City:"
-                                                value={addressData?.City ?? address.City ?? ""}
+                                                value={addressData?.City ?? ""}
                                                 style={inputStyleFull}
                                                 disabled
                                             />
@@ -1846,7 +1867,7 @@ export default function Page() {
                                                         console.log("Dados recebidos do modal PersonalID:", newPersonalIDData);
                                                         setPersonalIDData(newPersonalIDData); // armazena no state local
                                                     }}
-                                                    personalID={personalID}
+                                                    personalID={personalIDData}
                                                     profileID={profileID}
                                                     propertyID={propertyID}
                                                     t={t}
@@ -1873,9 +1894,7 @@ export default function Page() {
                                                         ? ""
                                                         : personalIDData?.DateOfBirth && personalIDData.DateOfBirth.split('T')[0] !== '1900-01-01'
                                                             ? formatDate(personalIDData.DateOfBirth)
-                                                            : personalID.DateOfBirth && personalID.DateOfBirth.split('T')[0] !== '1900-01-01'
-                                                                ? personalID.DateOfBirth.split('T')[0]
-                                                                : ""
+                                                            : ""
                                                 }
                                                 style={inputStyleFullWithLine}
                                                 disabled
@@ -1892,7 +1911,7 @@ export default function Page() {
                                                     </div>
                                                 }
                                                 ariaLabel={"Country of Birth:"}
-                                                value={personalIDData?.CountryOfBirth ?? personalID.CountryOfBirth}
+                                                value={personalIDData?.CountryOfBirth}
                                                 style={`${inputStyleFullWithLine}`}
                                                 disabled
                                             />
@@ -1908,7 +1927,8 @@ export default function Page() {
                                             name={"Nationality"}
                                             label={t.frontOffice.registrationForm.nationality}
                                             ariaLabel={"Nationality:"}
-                                            value={personalIDData?.NationalityLabel ?? personalID.Nationality}
+                                            value={countryOptions.find(c => c.value === personalIDData?.NationalityID)?.label
+                                                ?? personalIDData?.NationalityLabel ?? ""}
                                             style={`${inputStyleFullWithLine}`}
                                             disabled
                                         />
@@ -1929,7 +1949,7 @@ export default function Page() {
                                                     </div>
                                                 }
                                                 ariaLabel={"ID Doc:"}
-                                                value={personalIDData?.IDDoc ?? personalID.IDDoc}
+                                                value={personalIDData?.IDDoc}
                                                 style={`${inputStyleFullWithLine}`}
                                                 disabled
                                             />
@@ -1944,7 +1964,7 @@ export default function Page() {
                                                     </div>
                                                 }
                                                 ariaLabel={"ID Doc Nr.:"}
-                                                value={personalIDData?.NrDoc ?? personalID.NrDoc}
+                                                value={personalIDData?.NrDoc}
                                                 style={`${inputStyleFullWithLine}`}
                                                 disabled
                                             />
@@ -1963,9 +1983,7 @@ export default function Page() {
                                                 value={
                                                     personalIDData?.ExpDate
                                                         ? formatDate(personalIDData.ExpDate)
-                                                        : personalID?.ExpDate //&& personalID.ExpDate.split('T')[0] !== '2050-12-31'
-                                                            ? personalID.ExpDate.split('T')[0]
-                                                            : ""
+                                                        : ""
                                                 }
                                                 style={inputStyleFullWithLine}
                                                 disabled
@@ -1976,7 +1994,7 @@ export default function Page() {
                                                 name={"Country issue"}
                                                 label={t.frontOffice.registrationForm.issue}
                                                 ariaLabel={"Country issue:"}
-                                                value={personalIDData?.Issue ?? personalID.Issue}
+                                                value={personalIDData?.Issue}
                                                 style={inputStyleFullWithLine}
                                                 disabled
                                             />

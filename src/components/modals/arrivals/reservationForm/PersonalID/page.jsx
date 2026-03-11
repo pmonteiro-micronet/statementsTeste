@@ -378,7 +378,7 @@ const PersonalIDForm = ({ onClose, onSave, personalID, propertyID, t }) => {
                                             options={countryOptions}
                                             value={
                                                 countryOptions.find(
-                                                    option => option.label === formData.NationalityLabel
+                                                    option => option.value === formData.NationalityID
                                                 ) || null
                                             }
                                             onChange={(selectedOption) => {
