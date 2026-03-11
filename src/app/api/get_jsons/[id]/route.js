@@ -50,7 +50,7 @@ export async function GET(request, { params }) {
     if (typeof normalized.requestBody === 'object') {
       try {
         normalized.requestBody = JSON.stringify(normalized.requestBody);
-      } catch (e) {
+      } catch {
         console.warn('Failed to stringify requestBody:', e);
         normalized.requestBody = String(normalized.requestBody);
       }
@@ -58,7 +58,7 @@ export async function GET(request, { params }) {
     if (typeof normalized.responseBody === 'object') {
       try {
         normalized.responseBody = JSON.stringify(normalized.responseBody);
-      } catch (e) {
+      } catch {
         normalized.responseBody = String(normalized.responseBody);
       }
     }

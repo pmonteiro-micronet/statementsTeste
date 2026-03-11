@@ -1,16 +1,11 @@
 "use client"
-import React, { useState, useEffect } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, Button, Input } from "@nextui-org/react";
 //imports de icons
 import { TfiSave } from "react-icons/tfi";
 import { LiaExpandSolid } from "react-icons/lia";
 import { MdClose } from "react-icons/md";
-import { FiEdit3 } from "react-icons/fi";
-import { BsArrowRight } from "react-icons/bs";
 import { FiSearch } from "react-icons/fi";
 import { IoIosArrowDown } from "react-icons/io";
-import axios from 'axios';
-
 
 import { expansion } from "@/components/functionsForm/expansion/page";
 
@@ -27,9 +22,13 @@ import reservationInsert, { reservationEdit } from "@/components/functionsForm/C
 import PriceFilterReservation from "@/components/functionsForm/CRUD/frontOffice/reservation/priceFilters/page";
 
 import SearchModal from "@/components/modal/frontOffice/reservations/searchModal/page";
-import { useTranslations } from 'next-intl';
+import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
 
-const reservationsForm = ({
+const translations = { en, pt, es };
+
+const ReservationsForm = ({
     idReservation,
     idGuest,
     buttonName,
@@ -41,28 +40,30 @@ const reservationsForm = ({
     modalEdit,
     formTypeModal,
     buttonColor,
-    criado,
-    editado,
-    editor,
-
-    showModal,
-    startDate,
-    endDate,
 }) => {
 
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    // const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-    const { toggleExpand, setIsExpanded, isExpanded } = expansion();
+    const { toggleExpand, isExpanded } = expansion();
 
     //variaveis de estilo para inputs
     const inputStyle = "w-full border-b-2 border-gray-300 px-1 h-8 outline-none my-2 text-sm"
-    const sharedLineInputStyle = "w-1/2 border-b-2 border-gray-300 px-1 h-10 outline-none my-2"
 
-    const { handleInputReservation, handleSubmitReservation, setReservation, reservation, handleClientSelect, handleLanguageSelect, handleTipologySelect, handleRoomSelect, GuestNumberNrm, NightNrm } = reservationInsert();
+    const { handleInputReservation, handleSubmitReservation, reservation, handleClientSelect, handleLanguageSelect, handleTipologySelect, handleRoomSelect, GuestNumberNrm, NightNrm } = reservationInsert();
     const { handleUpdateReservation, setValuesReserve, valuesReserve, setValuesGuest, valuesGuest } = reservationEdit(idReservation, idGuest);
-    const { handleRateCode, prices, setPrices, mp } = PriceFilterReservation(GuestNumberNrm, NightNrm);
+    const { handleRateCode, prices} = PriceFilterReservation(GuestNumberNrm, NightNrm);
 
-    const t = useTranslations('Index');
+     useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+            setActiveFlag(storedLanguage === "en" ? "usa-uk" : storedLanguage === "pt" ? "pt" : "es");
+        }
+    }, []);
+
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
     return (
         <>
@@ -691,4 +692,4 @@ const reservationsForm = ({
     );
 };
 
-export default reservationsForm;
+export default ReservationsForm;

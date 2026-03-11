@@ -39,7 +39,7 @@ export default function SearchModal({ buttonName, buttonIcon, buttonColor, input
             </Button>
             <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop='transparent' size='sm' placement='center' hideCloseButton='true'>
                 <ModalContent>
-                    {(onClose) => (
+                    {() => (
                         <>
                             <div className='bg-white'>
                                 <div className='bg-lightBlue mx-2 my-1 rounded-xl'>

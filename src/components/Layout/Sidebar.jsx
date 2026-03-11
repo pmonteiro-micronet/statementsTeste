@@ -239,27 +239,29 @@ export default function Sidebar({ children, setExpanded }) {
               <FaUser style={{ color: "#FC9D25" }} />
             </div>
 
-            {/* Informações do usuário */}
-            <div
-              className={`flex justify-between text-textPrimaryColor items-center overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"
-                }`}
-            >
-              <div className="leading-4">
-                <h4 className="font-semibold">
-                  {session
-                    ? `${session.user.firstName} ${session.user.secondName}`
-                    : `${t.navbar.errors.unknownUser}`}
-                </h4>
-                <span className="text-xs text-textLabelColor">
-                  {session ? session.user.email : `${t.navbar.errors.unknownEmail}`}
-                </span>
-              </div>
+<div
+  className={`flex justify-between items-center overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}`}
+>
+  {/* Texto do usuário */}
+  <div className="leading-4 truncate flex-1">
+    <h4 className="font-semibold truncate">
+      {session
+        ? `${session.user.firstName} ${session.user.secondName}`
+        : `${t.navbar.errors.unknownUser}`}
+    </h4>
+    <span className="text-xs text-textLabelColor truncate">
+      {session ? session.user.email : `${t.navbar.errors.unknownEmail}`}
+    </span>
+  </div>
 
-              {/* Botão de seta para abrir dropdown */}
-              <button onClick={toggleDropdown} className="ml-2 text-gray-600">
-                {isDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
-              </button>
-            </div>
+  {/* Botão de dropdown */}
+  <button
+    onClick={toggleDropdown}
+    className="ml-2 text-gray-600 flex-shrink-0"
+  >
+    {isDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
+  </button>
+</div>
 
             {/* Dropdown */}
             {isDropdownOpen && (
