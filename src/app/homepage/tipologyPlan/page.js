@@ -18,10 +18,10 @@ import TravelGroupForm from "@/components/modals/frontOffice/clientForm/travelAg
 import GroupForm from "@/components/modals/frontOffice/clientForm/groups/page";
 import OthersForm from "@/components/modals/frontOffice/clientForm/others/page";
 // import { BiSolidPencil } from "react-icons/bi";
-import { FiPlus, FiX } from 'react-icons/fi';
+// import { FiPlus, FiX } from 'react-icons/fi';
 import { FaCalendarAlt, FaRegTrashAlt, FaRegUserCircle, FaBed } from 'react-icons/fa';
 import { FaPlus } from "react-icons/fa6";
-import Modal from '@/components/modals/tipologyPlan/confirmationBoxs/page';
+// import Modal from '@/components/modals/tipologyPlan/confirmationBoxs/page';
 
 import en from "../../../../public/locales/english/common.json";
 import pt from "../../../../public/locales/portuguesPortugal/common.json";
@@ -31,8 +31,8 @@ const translations = { en, pt, es };
 
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 
-import { Popover, PopoverTrigger, PopoverContent, Button, Input } from "@nextui-org/react";
-import { getMonth } from 'date-fns';
+import { Popover, PopoverTrigger, PopoverContent, Button } from "@nextui-org/react";
+// import { getMonth } from 'date-fns';
 
 
 // Configurando plugins
@@ -50,12 +50,11 @@ export default function CalendarPage() {
   const [roomCounts, setRoomCounts] = useState({});
   const [reservation, setReservation] = useState([]);
   const [selectionInfo, setSelectionInfo] = useState({ roomTypeID: null, dates: [] }); //seleção de uma linha
-  const [selectionRows, setSelectionRows] = useState({ roomTypeID: null, dates: [] }); //seleção de uma linha
+  // const [selectionRows, setSelectionRows] = useState({ roomTypeID: null, dates: [] }); //seleção de uma linha
   const [availability, setAvailability] = useState({});
   const [updatedAvailability, setUpdatedAvailability] = useState({});
-
-  const [dragStart, setDragStart] = useState(null);
-  const [dragEnd, setDragEnd] = useState(null);
+  // const [dragStart, setDragStart] = useState(null);
+  // const [dragEnd, setDragEnd] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const [startDate, setStartDate] = useState(null);
@@ -93,8 +92,8 @@ export default function CalendarPage() {
 
   const [selectedRoomType, setSelectedRoomType] = useState('');
   const [guestName, setGuestName] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [dataFetched, setDataFetched] = useState(false);
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [dataFetched, setDataFetched] = useState(false);
   const [query, setQuery] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isGuestNameValid, setIsGuestNameValid] = useState(false);
@@ -104,7 +103,8 @@ export default function CalendarPage() {
   const [groupReservation, setRoomRevervation] = useState({}); // Estado para armazenar o número de quartos associados a cada tipo de quarto
 
   const [nights, setNights] = useState([]);
-
+console.log(updatedAvailability, selectedRow, endDate2);
+console.log(query, setQuery, setGuestName, setSelectedRoomType, selectedColumn, overbookings, years, nights, setRoomRevervation, setSearchTerm, setIsGuestNameValid, setSelectedGuestId, setSelectedGuestId);
   const [locale, setLocale] = useState("pt");
   useEffect(() => {
     // Carregar o idioma do localStorage
@@ -116,7 +116,7 @@ export default function CalendarPage() {
 
   // Carregar as traduções com base no idioma atual
   const t = translations[locale] || translations["pt"]; // fallback para "pt"
-
+console.log("t", t);
   const handleToggleModal = () => {
     setShowModal(!showModal);
   };
@@ -298,9 +298,9 @@ export default function CalendarPage() {
     setWeeks(newWeeks);
 
     // Calcula o índice da semana que contém o dia atual
-    const startOfMonth = currentToday.startOf('month');
-    const daysSinceStartOfMonth = currentToday.diff(startOfMonth, 'day');
-    const currentWeekIndex = Math.floor(daysSinceStartOfMonth / 7);
+    // const startOfMonth = currentToday.startOf('month');
+    // const daysSinceStartOfMonth = currentToday.diff(startOfMonth, 'day');
+    // const currentWeekIndex = Math.floor(daysSinceStartOfMonth / 7);
 
     // Encontre a semana que contém o dia de hoje
     const weekIndex = newWeeks.findIndex(week =>
@@ -312,14 +312,14 @@ export default function CalendarPage() {
   };
 
   // Função para lidar com a atualização do número de quartos associados a um determinado tipo de quarto
-  const handleRoomCountUpdate = (katnr, count) => {
-    setRoomRevervation(prevCounts => ({
-      ...prevCounts,
-      [katnr]: count
-    }));
+  // const handleRoomCountUpdate = (katnr, count) => {
+  //   setRoomRevervation(prevCounts => ({
+  //     ...prevCounts,
+  //     [katnr]: count
+  //   }));
 
-    console.log(`Número de quartos atualizado para a tipologia ${katnr}: ${count}`);
-  };
+  //   console.log(`Número de quartos atualizado para a tipologia ${katnr}: ${count}`);
+  // };
 
   //calcula o nrm de noites
   const calculateNights = (start, end) => {
@@ -415,19 +415,19 @@ export default function CalendarPage() {
     }
   }, [isDragging, startDate, endDate, tipology]);
 
-  const setCurrentWeekToCurrentDate = () => {
-    const currentToday = dayjs();  // Pega a data atual
-    const newWeeks = generateDate(currentToday.month(), currentToday.year());  // Regenera as semanas para o mês atual
-    setWeeks(newWeeks);
-    setToday(currentToday);
+  // const setCurrentWeekToCurrentDate = () => {
+  //   const currentToday = dayjs();  // Pega a data atual
+  //   const newWeeks = generateDate(currentToday.month(), currentToday.year());  // Regenera as semanas para o mês atual
+  //   setWeeks(newWeeks);
+  //   setToday(currentToday);
 
-    // Calcula o índice da semana atual dentro do mês
-    const startOfMonth = currentToday.startOf('month');
-    const daysSinceStartOfMonth = currentToday.diff(startOfMonth, 'day');
-    const newCurrentWeekIndex = Math.floor(daysSinceStartOfMonth / 7);
+  //   // Calcula o índice da semana atual dentro do mês
+  //   const startOfMonth = currentToday.startOf('month');
+  //   const daysSinceStartOfMonth = currentToday.diff(startOfMonth, 'day');
+  //   const newCurrentWeekIndex = Math.floor(daysSinceStartOfMonth / 7);
 
-    setCurrentWeekIndex(newCurrentWeekIndex);  // Atualiza o índice da semana
-  };
+  //   setCurrentWeekIndex(newCurrentWeekIndex);  // Atualiza o índice da semana
+  // };
 
 
   // Função para lidar com o pressionamento da tecla Ctrl
@@ -474,11 +474,11 @@ export default function CalendarPage() {
     setSelectedDates(updatedDates);
   };
 
-  const handleInputChange = (event) => {
-    setGuestName(event.target.value);
-    setSearchTerm(event.target.value);
-    setIsGuestNameValid(query.some(item => `${item.firstName} ${item.secondName}` === event.target.value));
-  };
+  // const handleInputChange = (event) => {
+  //   setGuestName(event.target.value);
+  //   setSearchTerm(event.target.value);
+  //   setIsGuestNameValid(query.some(item => `${item.firstName} ${item.secondName}` === event.target.value));
+  // };
 
   //RESOLVER ISTO DEPOIS
   // useEffect(() => {
@@ -506,21 +506,21 @@ export default function CalendarPage() {
   //   getData();
   // }, [dataFetched]);
 
-  const handleNameSelect = (selectedName, id) => {
-    setGuestName(selectedName);
-    setSelectedGuestId(id);
-    setSearchTerm('');
-    setIsGuestNameValid(filteredResults.some(item => `${item.firstName} ${item.secondName}` === selectedName));
-  };
+  // const handleNameSelect = (selectedName, id) => {
+  //   setGuestName(selectedName);
+  //   setSelectedGuestId(id);
+  //   setSearchTerm('');
+  //   setIsGuestNameValid(filteredResults.some(item => `${item.firstName} ${item.secondName}` === selectedName));
+  // };
 
-  useEffect(() => {
-    console.log("Selected Guest ID:", selectedGuestId);
-  }, [selectedGuestId]);
+  // useEffect(() => {
+  //   console.log("Selected Guest ID:", selectedGuestId);
+  // }, [selectedGuestId]);
 
-  const filteredResults = query.filter(item => {
-    const fullName = `${item.firstName} ${item.secondName}`.toLowerCase();
-    return fullName.includes(searchTerm.toLowerCase());
-  });
+  // const filteredResults = query.filter(item => {
+  //   const fullName = `${item.firstName} ${item.secondName}`.toLowerCase();
+  //   return fullName.includes(searchTerm.toLowerCase());
+  // });
 
   /*const formatDateToDisplay = (dateString) => {
     const date = new Date(dateString);
@@ -540,9 +540,9 @@ export default function CalendarPage() {
     updateDateRange(index, field, formattedDate);
   };*/
 
-  const showAlert = (message) => {
-    alert(message);
-  };
+  // const showAlert = (message) => {
+  //   alert(message);
+  // };
 
   const handleYearChange = (action) => {
     let newYear;
@@ -634,7 +634,7 @@ export default function CalendarPage() {
               {/**AUTOCOMPLETE FEITO POR MUAH - pesquisa através de API */}
               {searchTerm && (
                 <ul>
-                  {filteredResults.map((item, index) => (
+                  {filteredResults.map((item) => (
                     <li key={item.id} onClick={() => handleNameSelect(item.firstName + ' ' + item.secondName, item.id)}>
                       {item.firstName} {item.secondName}
                     </li>
@@ -1102,9 +1102,9 @@ export default function CalendarPage() {
               <span>{"Occupancy"}</span>
             </td>
             {weeks[currentWeekIndex].map((day, index) => {
-              const totalAvailableRooms = roomTypeState.reduce((acc, roomType) => {
-                return acc + (availability[roomType.katnr]?.[day.date.format('YYYY-MM-DD')] || 0);
-              }, 0);
+              // const totalAvailableRooms = roomTypeState.reduce((acc, roomType) => {
+              //   return acc + (availability[roomType.katnr]?.[day.date.format('YYYY-MM-DD')] || 0);
+              // }, 0);
               const totalOccupiedRooms = roomTypeState.reduce((acc, roomType) => {
                 const availableRooms = availability[roomType.katnr]?.[day.date.format('YYYY-MM-DD')] || 0;
                 const occupiedRooms = (roomCounts[roomType.katnr] || 0) - availableRooms;

@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/db";
 import bcrypt from "bcryptjs";
 
-export const { handlers } = NextAuth({
+const handler = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -13,9 +13,7 @@ export const { handlers } = NextAuth({
         internal: { label: "Internal", type: "hidden" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+        if (!credentials?.email || !credentials?.password) return null;
 
         let user;
         let isInternalUser = false;
@@ -121,4 +119,4 @@ export const { handlers } = NextAuth({
   },
 });
 
-export const { GET, POST } = handlers;
+export { handler as GET, handler as POST };

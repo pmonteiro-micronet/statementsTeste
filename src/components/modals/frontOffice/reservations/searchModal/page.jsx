@@ -1,22 +1,34 @@
-import React, { useState } from 'react'
+'use client';
+import  { useEffect } from 'react'
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import { IoIosArrowUp } from "react-icons/io";
 
 import ClientFormAutocomplete from "@/components/functionsForm/autocomplete/clientForm/page";
 import InputFieldControlled from '@/components/functionsForm/inputs/typeText/page';
 
-import { useTranslations } from 'next-intl';
+import en from "../../../../../public/locales/english/common.json";
+import pt from "../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../public/locales/espanol/common.json";
 
-export default function searchModal({
+const translations = { en, pt, es };
+
+export default function SearchModal({
     buttonName,
     buttonIcon,
     buttonColor,
     handleClientSelect,
-    handleSubmitReservation,
-    reservation,
 }) {
 
-    const t = useTranslations('Index');
+ useEffect(() => {
+        // Carregar o idioma do localStorage
+        const storedLanguage = localStorage.getItem("language");
+        if (storedLanguage) {
+            setLocale(storedLanguage);
+            setActiveFlag(storedLanguage === "en" ? "usa-uk" : storedLanguage === "pt" ? "pt" : "es");
+        }
+    }, []);
+
+    // Carregar as traduções com base no idioma atual
+    const t = translations[locale] || translations["pt"]; // fallback para "pt"
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 

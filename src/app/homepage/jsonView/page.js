@@ -121,16 +121,22 @@ const JsonViewPage = () => {
           if (!rec.requestBody && rec.responseBody) rec.requestBody = rec.responseBody;
 
           // garante que requestBody seja string (algumas tabelas armazenam como JSON nativo)
-          if (typeof rec.requestBody === 'object') {
-            try { rec.requestBody = JSON.stringify(rec.requestBody); } catch (e) { rec.requestBody = String(rec.requestBody); }
-          }
+if (typeof rec.requestBody === 'object') {
+  try {
+    rec.requestBody = JSON.stringify(rec.requestBody);
+  } catch {
+    rec.requestBody = String(rec.requestBody);
+  }
+}
 
-          setReservationData(rec);
-        } catch (error) {
-          setError("Erro ao carregar os dados: ", error);
-        } finally {
-          setLoading(false);
-        }
+setReservationData(rec);
+} catch (error) {
+  // Mostra a mensagem de erro de forma correta
+  console.error(error);
+  setError(`Erro ao carregar os dados: ${error.message}`);
+} finally {
+  setLoading(false);
+}
       };
       fetchReservation();
     }
