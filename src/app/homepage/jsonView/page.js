@@ -105,8 +105,9 @@ const JsonViewPage = () => {
         setLoading(true);
         setError(null);
         try {
+          console.log("URL CRLH", `/api/get_jsons/${recordID}`);
           const response = await axios.get(`/api/get_jsons/${recordID}`);
-
+          
           console.log("FULL RESPONSE:", response.data);
           // normaliza o registro retornado (aceita requestBody ou responseBody)
           const rec = response.data?.response?.[0] ?? null;
@@ -258,7 +259,6 @@ const sendResToAPI = async (ResNo) => {
 
   const handleOkClick = async () => {
     const vatNoToSend = vatNo !== initialVatNo ? vatNo : undefined;
-    console.log("cheguei aqui", vatNoToSend);
 
     try {
       if (vatNoToSend) {

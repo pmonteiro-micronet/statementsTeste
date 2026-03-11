@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/db";
 import bcrypt from "bcryptjs";
 
-const handler = NextAuth({
+export const { handlers } = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -13,64 +13,42 @@ const handler = NextAuth({
         internal: { label: "Internal", type: "hidden" },
       },
       async authorize(credentials) {
-        console.log("🔐 AUTHORIZE");
-        console.log("credentials:", {
-          email: credentials?.email,
-          internal: credentials?.internal,
-        });
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
 
         let user;
         let isInternalUser = false;
 
         if (credentials.internal === "true") {
-          console.log("➡️ Login INTERNAL");
-
           user = await prisma.users.findFirst({
             where: { internalUser: credentials.email },
           });
 
-          if (!user) {
-            console.log("❌ Internal user não encontrado");
-            return null;
-          }
+          if (!user) return null;
 
           const passwordOk = await bcrypt.compare(
             credentials.password,
             user.internalPassword
           );
 
-          console.log("Password OK?", passwordOk);
-
           if (!passwordOk) return null;
 
           isInternalUser = true;
         } else {
-          console.log("➡️ Login NORMAL");
-
           user = await prisma.users.findUnique({
             where: { email: credentials.email },
           });
 
-          if (!user) {
-            console.log("❌ User não encontrado");
-            return null;
-          }
+          if (!user) return null;
 
           const passwordOk = await bcrypt.compare(
             credentials.password,
             user.password
           );
 
-          console.log("Password OK?", passwordOk);
-
           if (!passwordOk) return null;
         }
-
-        console.log("✅ User autenticado:", {
-          id: user.userID,
-          email: user.email,
-          isInternalUser,
-        });
 
         const userProperties = await prisma.usersProperties.findMany({
           where: { userID: user.userID },
@@ -82,16 +60,13 @@ const handler = NextAuth({
           select: { roleID: true },
         });
 
-        const propertyIDs = userProperties.map((p) => p.propertyID);
-        const role = userRole.map((r) => r.roleID);
-
         return {
           id: user.userID,
           email: user.email,
           firstName: user.firstName,
           secondName: user.secondName,
-          propertyIDs,
-          role,
+          propertyIDs: userProperties.map((p) => p.propertyID),
+          role: userRole.map((r) => r.roleID),
           pin: user.pin,
           permission: user.permissions,
           expirationDate: user.expirationDate,
@@ -100,19 +75,19 @@ const handler = NextAuth({
       },
     }),
   ],
+
   pages: {
     signIn: "/auth",
   },
+
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
   },
+
+  secret: process.env.NEXTAUTH_SECRET,
+
   callbacks: {
     async jwt({ token, user }) {
-      console.log("🪙 JWT CALLBACK");
-      console.log("Token ANTES:", token);
-      console.log("User:", user);
-
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -126,15 +101,10 @@ const handler = NextAuth({
         token.isInternalUser = user.isInternalUser ?? false;
       }
 
-      console.log("Token DEPOIS:", token);
-
       return token;
     },
-    async session({ session, token }) {
-      console.log("🧠 SESSION CALLBACK");
-      console.log("Token:", token);
-      console.log("Session ANTES:", session);
 
+    async session({ session, token }) {
       session.user.id = token.id;
       session.user.email = token.email;
       session.user.firstName = token.firstName;
@@ -146,11 +116,9 @@ const handler = NextAuth({
       session.user.expirationDate = token.expirationDate;
       session.user.isInternalUser = token.isInternalUser ?? false;
 
-      console.log("Session DEPOIS:", session);
-
       return session;
     },
   },
 });
 
-export { handler as GET, handler as POST };
+export const { GET, POST } = handlers;

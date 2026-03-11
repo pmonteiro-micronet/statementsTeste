@@ -50,6 +50,7 @@ export async function GET(request) {
         });
 
         const rooms = response.data;
+        console.log(rooms);
 
         // Opcional: Filtrar ou transformar os dados se necessário
         const formattedRooms = rooms.map((room) => ({

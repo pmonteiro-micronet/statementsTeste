@@ -196,6 +196,12 @@ useEffect(() => {
             onClick: () => handleRedirect("departures"),
             icon: <RxExit />,
           },
+          {
+            ref: `/homepage/room_calendar/${selectedHotelID}`,
+            label: `Room Calendar`,
+            onClick: () => handleRedirect("room_calendar"),
+            icon: <RxExit />,
+          },
         ],
       };
 

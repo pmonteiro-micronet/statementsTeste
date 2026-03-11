@@ -75,39 +75,41 @@ export async function GET(request, { params }) {
 
 export async function PATCH(request, context) {
   try {
-    const { id } = context.params;
+    // No App Router, params é async
+    const { params } = context;
+    const { id } = await params; // 👈 use await aqui
+    if (!id) {
+      return new NextResponse(JSON.stringify({ error: "Missing ID" }), { status: 400 });
+    }
 
-    console.log("Received id:", id); // Log para verificar o id recebido
+    const requestId = parseInt(id, 10);
+    if (isNaN(requestId)) {
+      return new NextResponse(JSON.stringify({ error: "Invalid requestID" }), { status: 400 });
+    }
+
+    console.log("Received id:", requestId);
 
     // Passo 1: Verificar quantos registros com seen = true já existem
     const seenRecords = await prisma.requestRecords.findMany({
-      where: {
-        seen: true,
-      },
-      orderBy: {
-        seenAt: 'asc', // Ordena os registros pelo campo seenAt em ordem crescente
-      },
+      where: { seen: true },
+      orderBy: { seenAt: "asc" },
     });
 
-    console.log("Found seen records:", seenRecords); // Log para verificar os registros encontrados
+    console.log("Found seen records:", seenRecords);
 
-    // Passo 2: Se já existirem 6 registros com seen = true, excluir o registro com o menor seenAt
+    // Passo 2: Se já existirem 6 registros, remove o mais antigo
     if (seenRecords.length >= 6) {
-      const oldestRecord = seenRecords[0]; // O menor valor de seenAt está no índice 0 após a ordenação
-      console.log("Oldest record to delete (based on seenAt):", oldestRecord); // Log para verificar o registro a ser excluído
+      const oldestRecord = seenRecords[0];
+      console.log("Deleting oldest record:", oldestRecord.requestID);
 
       await prisma.requestRecords.delete({
-        where: {
-          requestID: oldestRecord.requestID, // Usando requestID para excluir o registro
-        },
+        where: { requestID: oldestRecord.requestID },
       });
     }
 
-    // Passo 3: Verificar se o registro com requestID existe
+    // Passo 3: Verifica se o registro existe
     const record = await prisma.requestRecords.findUnique({
-      where: {
-        requestID: parseInt(id), // Verifica se o ID fornecido existe no banco de dados
-      },
+      where: { requestID: requestId },
     });
 
     if (!record) {
@@ -115,23 +117,17 @@ export async function PATCH(request, context) {
       return new NextResponse(JSON.stringify({ error: "Record not found" }), { status: 404 });
     }
 
-    // Passo 4: Atualizar o campo `seen` para true e `seenAt` para a data atual
-    const response = await prisma.requestRecords.update({
-      where: {
-        requestID: parseInt(id),
-      },
-      data: {
-        seen: true,
-        seenAt: new Date(), // Define o campo seenAt com a data e hora atual
-      },
+    // Passo 4: Atualiza para seen = true
+    const updatedRecord = await prisma.requestRecords.update({
+      where: { requestID: requestId },
+      data: { seen: true, seenAt: new Date() },
     });
 
-    console.log("Updated record:", response); // Log para verificar o registro atualizado
-    return new NextResponse(JSON.stringify({ response }), { status: 200 });
+    console.log("Updated record:", updatedRecord);
+
+    return new NextResponse(JSON.stringify({ response: updatedRecord }), { status: 200 });
   } catch (error) {
     console.error("Erro ao atualizar dados:", error);
-    return new NextResponse(JSON.stringify({ error: error.message }), {
-      status: 500,
-    });
+    return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }
