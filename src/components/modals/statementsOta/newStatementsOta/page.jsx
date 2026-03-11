@@ -4,7 +4,7 @@ import axios from "axios";
 import { Modal, ModalContent, ModalHeader, ModalBody, Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import { FaShoppingCart } from "react-icons/fa";
-import CheckoutForm from "./CheckoutForm";
+//import CheckoutForm from "./CheckoutForm";
 
 const COUNTRIES = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
@@ -315,6 +315,7 @@ const NewReservationModal = ({ isOpen, onClose, propertyID }) => {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [roomTypeGroups, setRoomTypeGroups] = useState([]);
+  console.log("roomTypeGroups", roomTypeGroups);
   const [roomTypeAvailabilityByDay, setRoomTypeAvailabilityByDay] = useState({});
   const [allDays, setAllDays] = useState([]);
   const [cartItems, setCartItems] = useState([]);
@@ -539,12 +540,15 @@ const NewReservationModal = ({ isOpen, onClose, propertyID }) => {
     setCartQuantities((s) => ({ ...s, [key]: q }));
   };
 
+  console.log(setQty);
+
   const originalAvailabilityForMainType = (mainType) => {
     try {
       const byDay = roomTypeAvailabilityByDay[mainType] || {};
       const vals = allDays.map((d) => Number(byDay[d] || 0));
       return vals.length ? Math.min(...vals) : 0;
     } catch (e) {
+      console.log(e);
       return 0;
     }
   };
@@ -561,6 +565,7 @@ const NewReservationModal = ({ isOpen, onClose, propertyID }) => {
       }, 0);
       return Math.max(0, original - booked);
     } catch (e) {
+      console.log(e);
       return 0;
     }
   };
@@ -825,7 +830,9 @@ const NewReservationModal = ({ isOpen, onClose, propertyID }) => {
                                     };
 
                                     const available = getAvailableStock(p, p.key);
+                                    console.log("available", available);
                                     const qtyState = cartQuantities[p.key] || 1;
+                                    console.log("qtyState", qtyState);
 
                                     rows.push(
                                       <tr key={`p-${persons}-${mainType}-${idx}`} onClick={() => addToCart(p)} className="cursor-pointer hover:bg-gray-50">
