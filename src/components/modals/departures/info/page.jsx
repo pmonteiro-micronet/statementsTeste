@@ -47,6 +47,9 @@ const DepartureInfoForm = ({
 
     return (
         <>
+        {isOpen && (
+    <div className="fixed inset-0 bg-black/20 z-40" />
+  )}
             {formTypeModal === 11 && (
                 <Modal
                     isOpen={isOpen}

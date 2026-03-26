@@ -319,7 +319,7 @@ const ProfileModalEditForm = ({
                                                 </Button>
                                             </div>
                                         </ModalHeader>
-                                        <ModalBody className="flex flex-col space-y-8 bg-background">
+                                        <ModalBody className="flex flex-col space-y-8 bg-background max-h-[70vh] overflow-y-auto">
                                             {/* Abas feitas com divs */}
                                             <div className="flex justify-center">
                                                 <div className="flex flex-row justify-center bg-gray-100 w-40 h-10 rounded-xl">

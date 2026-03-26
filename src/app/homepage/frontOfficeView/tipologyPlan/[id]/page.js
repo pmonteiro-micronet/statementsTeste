@@ -11,7 +11,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 
 //imports de componentes
 import ReservationsForm from '@/components/modals/frontOffice/reservations/multiReservations/page';
-import InputFieldControlled from '@/components/functionsForm/inputs/typeText/page';
+// import InputFieldControlled from '@/components/functionsForm/inputs/typeText/page';
 import IndividualForm from "@/components/modals/frontOffice/clientForm/individuals/page";
 import CompanyForm from "@/components/modals/frontOffice/clientForm/companies/page";
 import TravelGroupForm from "@/components/modals/frontOffice/clientForm/travelAgency/page";
@@ -19,17 +19,18 @@ import GroupForm from "@/components/modals/frontOffice/clientForm/groups/page";
 import OthersForm from "@/components/modals/frontOffice/clientForm/others/page";
 // import { BiSolidPencil } from "react-icons/bi";
 // import { FiPlus, FiX } from 'react-icons/fi';
-import { FaCalendarAlt, FaRegTrashAlt, FaRegUserCircle, FaBed } from 'react-icons/fa';
-import { FaPlus } from "react-icons/fa6";
+import { FaCalendarAlt, FaRegTrashAlt, FaBed } from 'react-icons/fa';
+// import { FaPlus } from "react-icons/fa6";
 // import Modal from '@/components/modals/tipologyPlan/confirmationBoxs/page';
 
-import en from "../../../../public/locales/english/common.json";
-import pt from "../../../../public/locales/portuguesPortugal/common.json";
-import es from "../../../../public/locales/espanol/common.json";
+import en from "../../../../../../public/locales/english/common.json";
+import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
+import es from "../../../../../../public/locales/espanol/common.json";
 const translations = { en, pt, es };
 // import { MdOutlineZoomOut } from "react-icons/md";
 
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import { FaUser } from "react-icons/fa";
 
 import { Popover, PopoverTrigger, PopoverContent, Button } from "@nextui-org/react";
 // import { getMonth } from 'date-fns';
@@ -40,7 +41,10 @@ dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isBetween);
 
-export default function CalendarPage() {
+export default function CalendarPage({ params }) {
+  const resolvedParams = React.use(params); // Resolve the promise
+  const { id } = resolvedParams;
+  const propertyID = id;
   const [today, setToday] = useState(dayjs());
   const [weeks, setWeeks] = useState(generateDate(today.month(), today.year()));
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
@@ -103,9 +107,17 @@ export default function CalendarPage() {
   const [groupReservation, setRoomRevervation] = useState({}); // Estado para armazenar o número de quartos associados a cada tipo de quarto
 
   const [nights, setNights] = useState([]);
-console.log(updatedAvailability, selectedRow, endDate2);
-console.log(query, setQuery, setGuestName, setSelectedRoomType, selectedColumn, overbookings, years, nights, setRoomRevervation, setSearchTerm, setIsGuestNameValid, setSelectedGuestId, setSelectedGuestId);
+  console.log(updatedAvailability, selectedRow, endDate2);
+  console.log(query, setQuery, setGuestName, setSelectedRoomType, selectedColumn, overbookings, years, nights, setRoomRevervation, setSearchTerm, setIsGuestNameValid, setSelectedGuestId, setSelectedGuestId);
   const [locale, setLocale] = useState("pt");
+
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [roomTypeGroups, setRoomTypeGroups] = useState([]);
+  const [allDays, setAllDays] = useState([]);
+  const [selectedTipology, setSelectedTipology] = useState(null);
+  console.log(roomTypeGroups, error, searchTerm, setShowButton, showButton, selectedTipology);
   useEffect(() => {
     // Carregar o idioma do localStorage
     const storedLanguage = localStorage.getItem("language");
@@ -116,8 +128,12 @@ console.log(query, setQuery, setGuestName, setSelectedRoomType, selectedColumn, 
 
   // Carregar as traduções com base no idioma atual
   const t = translations[locale] || translations["pt"]; // fallback para "pt"
-console.log("t", t);
+  console.log("t", t);
   const handleToggleModal = () => {
+    if (showModal) {
+      // está a fechar → limpa seleção
+      clearSelection();
+    }
     setShowModal(!showModal);
   };
 
@@ -127,14 +143,14 @@ console.log("t", t);
 
         // buscar tipologias
         const resTipologies = await axios.get(`/api/room_calendar/roomType`, {
-          params: { propertyID: 2 }
+          params: { propertyID }
         });
 
         const tipologies = resTipologies.data;
 
         // buscar quartos
         const resRooms = await axios.get(`/api/room_calendar/rooms`, {
-          params: { propertyID: 2 }
+          params: { propertyID }
         });
 
         const rooms = resRooms.data;
@@ -171,7 +187,7 @@ console.log("t", t);
         // reservas
         const resBookings = await axios.get('/api/room_calendar/getreservationprotel', {
           params: {
-            propertyID: 2,
+            propertyID,
             startDate: '2026-03-01',
             endDate: '2026-03-31'
           }
@@ -330,6 +346,10 @@ console.log("t", t);
     return diffDays > 0 ? diffDays : 0;
   };
 
+  const formatDate = (date) => {
+    return dayjs(date).format("YYYY-MM-DD");
+  };
+
   const handleMouseDown = (date, roomTypeID, rowIndex, columnIndex) => {
     const formattedDate = date.format('YYYY-MM-DD');
     setSelectionInfo({ roomTypeID, dates: [formattedDate] });
@@ -375,9 +395,13 @@ console.log("t", t);
       console.log("selecionado:", [...selectedCells]);
 
       const formattedDate = date.format('YYYY-MM-DD');
-      const selectedTipology = roomTypeState.find(t => t.roomTypeID === selectionInfo.roomTypeID);
-      const tipologyName = selectedTipology ? selectedTipology.name : '';
-      const tipologyID = selectedTipology ? selectedTipology.roomTypeID : '';
+      const selectedTipology = roomTypeState.find(
+        t => t.katnr === selectionInfo.roomTypeID
+      );
+      const tipologyName = selectedTipology ? selectedTipology.tipologyName : '';
+      const tipologyID = selectedTipology ? selectedTipology.katnr : '';
+      setSelectedTipology(tipologyName);
+      console.log("tipologia selecionada:", tipologyName, tipologyID);
       // Extrair o segundo número (valor) do objeto groupReservation
       const groupNumber = Object.values(groupReservation)[0] || '';
 
@@ -399,6 +423,7 @@ console.log("t", t);
         setEndDate(date.format('YYYY-MM-DD'));
         // Usar o estado anterior para garantir que endDate tenha o valor atualizado
         setSelectedDates((prevDates) => [...prevDates, { start: startDate, end: formattedDate, tipologyName, tipologyID, groupNumber, numberNights }]);
+        triggerSearchFromSelection(startDate, formattedDate, tipologyName);
       }
 
       // Limpar seleção após o uso
@@ -604,46 +629,213 @@ console.log("t", t);
   //   window.location.href = '/homepage/frontOffice/tipology_Plan/zoom_out';
   // }
 
+  const clearSelection = () => {
+    setFinalSelectedCells([]);
+    setCellsSelection([]);
+    setSelectionInfo({
+      roomTypeID: null,
+      dates: [],
+    });
+    setSelectedDates([]);
+  };
+
+ const triggerSearchFromSelection = async (start, end, tipology) => {
+    const nights = calculateNights(start, end);
+
+    const newForm = {
+      checkin: start,
+      checkout: end,
+      nights,
+      adults: 1, // ou outro valor default
+    };
+
+    await handleSearch(newForm, tipology);
+  };
+
+ const handleSearch = async (customForm, tipologyParam) => {
+    const activeForm = customForm || form;
+
+    setError(null);
+    setLoading(true);
+    setProducts([]);
+    setRoomTypeGroups([]);
+    setSelectedRoomType(null);
+
+    try {
+      // Criar lista de dias entre checkin (inclusive) e checkout (exclusive)
+      const days = [];
+      const start = new Date(activeForm.checkin);
+
+      const nights =
+        Number(activeForm.nights) ||
+        calculateNights(activeForm.checkin, activeForm.checkout) ||
+        1;
+
+      for (let i = 0; i < nights; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        days.push(formatDate(d));
+      }
+
+      setAllDays(days);
+
+      const maxAdults = Number(activeForm.adults) || 1;
+      const requests = [];
+
+      for (const day of days) {
+        const nextDay = formatDate(new Date(new Date(day).getTime() + 24 * 60 * 60 * 1000));
+        for (let persons = 1; persons <= maxAdults; persons++) {
+          requests.push(
+            axios
+              .post("/api/reservations/ota/available_products", {
+                propertyID,
+                checkin: day,
+                checkout: nextDay,
+                adults: persons,
+              })
+              .then((r) => ({ day, persons, res: r }))
+          );
+        }
+      }
+
+      const results = await Promise.all(requests);
+
+      // Array final de produtos
+      const productsArray = [];
+
+      results.forEach(({ day, persons, res }) => {
+        const data = res.data.products ? res.data : res.data.data || {};
+        const dayProducts = data.products || [];
+        const rooms = data.rooms || [];
+
+        // Map para contar disponibilidade por roomId
+        const roomIdToCount = {};
+        rooms.forEach((r) => {
+          const roomId = r.roomId?.value ?? r.roomId;
+          const count = r.count?.value ?? r.count ?? 0;
+          roomIdToCount[roomId] = count;
+        });
+
+        dayProducts.forEach((p) => {
+          const roomId = p.roomId?.value ?? p.roomId;
+          const rateId = p.rateId?.value ?? p.rateId;
+          const roomName = p.roomName ?? "Unknown";
+          const roomType = p.roomType ?? "Unknown";
+          const currency = p.currency?.value ?? "EUR";
+          const baseRate = Number(p.baseRate?.amountAfterTax ?? p.baseRate ?? 0);
+
+          // Preço específico por dia se existir
+          let dailyAmount = baseRate;
+          if (p.baseDailyAmounts?.baseDailyAmount) {
+            const arr = Array.isArray(p.baseDailyAmounts.baseDailyAmount)
+              ? p.baseDailyAmounts.baseDailyAmount
+              : [p.baseDailyAmounts.baseDailyAmount];
+
+            const found = arr.find((d) => (d.day?.value ?? d.day) === day);
+            if (found) {
+              dailyAmount = Number(found.amountAfterTax ?? dailyAmount);
+            }
+          }
+
+          productsArray.push({
+            roomId,
+            rateId,
+            roomName,
+            roomType,
+            rateDescription: p.rateDescription,
+            currency,
+            baseRate: dailyAmount,
+            persons,
+            available: roomIdToCount[roomId] ?? 0,
+            raw: p,
+            day,
+          });
+        });
+      });
+
+      console.log("ARRAY FINAL DE PRODUTOS:", productsArray);
+      const normalize = (str) =>
+  str
+    ?.toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+const filteredProducts = productsArray.filter((p) => {
+  if (!tipologyParam) return true;
+
+  const roomName = normalize(p.roomName);
+  const roomType = normalize(p.roomType);
+  const tipology = normalize(tipologyParam);
+
+  return roomName.includes(tipology) || roomType.includes(tipology);
+});
+
+console.log("TIPOLOGIA:", selectedTipology);
+console.log("ANTES:", productsArray.length);
+console.log("DEPOIS:", filteredProducts.length);
+
+setProducts(filteredProducts);
+    } catch (err) {
+      console.error(err);
+      setError("Erro ao procurar disponibilidade");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className='w-full'>
       {showModal && (
-        <>
-          <div className='fixed top-0 right-0 bg-lightBlue h-screen w-[22%] z-10'>
-            <div className='mt-20 px-4 text-black bg-white border border-gray-300 rounded-lg mx-2'>
-              <div className='flex flex-row items-center justify-between flex-wrap'>
-                <FaRegUserCircle size={20} className={guestName.trim() === '' ? 'text-red-500' : 'text-black'} />
-                <InputFieldControlled
-                  type={"text"}
-                  id={"guestName"}
-                  name={"guestName"}
-                  label={"Guest Name"}
-                  ariaLabel={"Guest Name"}
-                  style={"h-10 bg-transparent outline-none flex-grow "}
-                  value={guestName}
-                  onChange={handleInputChange}
-                />
-                <div className="flex-shrink-0">
-                  <FaPlus
-                    size={15}
-                    color='blue'
-                    className='cursor-pointer'
-                    onClick={() => setShowButton(!showButton)}
-                  />
-                </div>
-              </div>
-              {/**AUTOCOMPLETE FEITO POR MUAH - pesquisa através de API */}
-              {searchTerm && (
-                <ul>
-                  {filteredResults.map((item) => (
-                    <li key={item.id} onClick={() => handleNameSelect(item.firstName + ' ' + item.secondName, item.id)}>
-                      {item.firstName} {item.secondName}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            {/* FILTROS PARA TIPOS DE GUEST FORMS */}
-            {showButton && (
+  <div className='fixed top-0 right-0 bg-lightBlue h-screen w-[30%] z-10 flex flex-col'>
+
+    {/* HEADER / GUEST */}
+    {/* <div className='px-4 mt-4 text-black bg-white border border-gray-300 rounded-lg mx-2'> */}
+      {/* <div className='flex flex-row items-center justify-between flex-wrap'>
+        <FaRegUserCircle
+          size={20}
+          className={guestName.trim() === '' ? 'text-red-500' : 'text-black'}
+        />
+
+        <InputFieldControlled
+          type="text"
+          id="guestName"
+          name="guestName"
+          label="Guest Name"
+          ariaLabel="Guest Name"
+          style="h-10 bg-transparent outline-none flex-grow"
+          value={guestName}
+          onChange={handleInputChange}
+        />
+
+        <div className="flex-shrink-0">
+          <FaPlus
+            size={15}
+            color='blue'
+            className='cursor-pointer'
+            onClick={() => setShowButton(!showButton)}
+          />
+        </div>
+      </div> */}
+
+      {/* AUTOCOMPLETE */}
+      {/* {searchTerm && (
+        <ul>
+          {filteredResults.map((item) => (
+            <li
+              key={item.id}
+              onClick={() =>
+                handleNameSelect(item.firstName + ' ' + item.secondName, item.id)
+              }
+            >
+              {item.firstName} {item.secondName}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div> */}
+
+    {/* GUEST TYPES */}
+    {showButton && (
               <div className="flex flex-col justify-center items-center mt-2 gap-2 px-4">
                 <p className='text-xs text-gray-500'>{"Guest Details"}</p>
                 <div className='flex flex-row gap-2'>
@@ -682,133 +874,252 @@ console.log("t", t);
                 </div>
               </div>
             )}
-            <div className='mt-20' style={{ maxHeight: 'calc(100% - 8rem)', overflowY: 'auto' }}>
-              <p className='text-xs text-gray-500 px-4'>{"Reservation Details"}</p>
-              {selectedDates.map((dateRange, index) => (
-                <div className={`bg-white border border-gray-300 text-sm px-4 py-1 rounded-lg mt-4 mx-2 ${index === selectedDates.length - 1 ? 'mb-10' : ''}`} key={index}>
-                  <div className='flex flex-row items-center justify-between border-b-3 border-gray py-2'>
-                    <div className='flex flex-row items-center gap-4'>
-                      <FaBed className='' size={25} color='gray' />
-                      <p className='text-ml'>{dateRange.tipologyName}</p>
+
+    {/* 🔥 SCROLL PRINCIPAL */}
+    <div className="flex-1 overflow-y-auto mt-4 px-2 min-h-0 pb-28">
+
+      {/* RESERVATION DETAILS */}
+      <p className='text-xs text-gray-500 px-2'>Reservation Details</p>
+
+      {selectedDates.map((dateRange, index) => (
+        <div
+          key={index}
+          className='bg-white border border-gray-300 text-sm px-4 py-2 rounded-lg mt-4'
+        >
+          <div className='flex justify-between items-center py-2'>
+            <div className='flex items-center gap-4'>
+              <FaBed size={25} color='gray' />
+              <p>{dateRange.tipologyName}</p>
+            </div>
+
+            <FaRegTrashAlt
+              className="cursor-pointer"
+              size={15}
+              color='gray'
+              onClick={() => removeEvent(index)}
+            />
+          </div>
+
+          <div className='flex justify-around py-1'>
+            <div className="flex flex-col gap-1">
+              <label>In:</label>
+              <input
+                type="date"
+                value={dateRange.start}
+                onChange={(e) =>
+                  updateDateRange(index, 'start', e.target.value)
+                }
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label>Out:</label>
+              <input
+                type="date"
+                value={dateRange.end}
+                onChange={(e) =>
+                  updateDateRange(index, 'end', e.target.value)
+                }
+              />
+            </div>
+
+            <div className='flex items-center'>
+              <p>N: {calculateNights(dateRange.start, dateRange.end)}</p>
+            </div>
+
+            <div className='flex flex-row items-center gap-2'>
+              <FaUser size={15}/>
+              <p>1</p>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {/* AVAILABLE ROOMS HEADER */}
+      <div className="sticky top-0 bg-lightBlue z-10 mt-6 py-2">
+        <p className="text-xs text-gray-500">Available Rooms</p>
+      </div>
+
+      {/* LISTA DE PRODUTOS */}
+      {loading && (
+        <p className="text-sm text-gray-400">Loading...</p>
+      )}
+
+      {!loading && products.length === 0 && (
+        <p className="text-sm text-gray-400">No rooms available</p>
+      )}
+{!loading && products.length > 0 && (
+  <div className="w-full my-4">
+    <div className="overflow-x-auto">
+      <table className="min-w-full border text-sm">
+        <thead>
+          <tr className="bg-gray-200 sticky top-0 z-10">
+            <th className="border px-2 py-2">Room Name</th>
+            <th className="border px-2 py-2">Available</th>
+            {allDays.map((day) => (
+              <th key={day} className="border px-2 py-2">{day}</th>
+            ))}
+            <th className="border px-2 py-2">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {(() => {
+            // Agrupa apenas por roomName
+            const grouped = products.reduce((acc, product) => {
+              const key = product.roomName;
+              if (!acc[key]) acc[key] = [];
+              acc[key].push(product);
+              return acc;
+            }, {});
+
+            return Object.entries(grouped).map(([roomName, group], index) => {
+              // Cria mapa de preços por dia (pega o último produto para cada dia)
+              const dailyMap = {};
+              let available = 0;
+
+              group.forEach((p) => {
+                dailyMap[p.day] = Number(p.baseRate); // preço daquele dia
+                available = Math.max(available, Number(p.available)); // pega maior disponível
+              });
+
+              // Moeda (assume a mesma para todos os produtos do mesmo quarto)
+              const currency = group[0].currency || "EUR";
+              const formatAmount = (amt) => {
+                if (!Number.isFinite(amt)) return "-";
+                return amt.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }) + ` ${currency}`;
+              };
+
+              // Total
+              const total = Object.values(dailyMap).reduce((s, v) => s + (v || 0), 0);
+
+              return (
+                <tr key={roomName + index} className="hover:bg-gray-50">
+                  <td className="border px-2 py-2">{roomName}</td>
+                  <td className="border px-2 py-2 text-center">{available}</td>
+                  {allDays.map((day) => (
+                    <td key={`${roomName}-${day}`} className="border px-2 py-2 text-center">
+                      {dailyMap[day] !== undefined ? formatAmount(dailyMap[day]) : "-"}
+                    </td>
+                  ))}
+                  <td className="border px-2 py-2 text-center font-semibold">{formatAmount(total)}</td>
+                </tr>
+              );
+            });
+          })()}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+      {/* espaço extra para não cortar o último item */}
+      <div className="h-10" />
+    </div>
+
+    {/* 🔥 FOOTER FIXO */}
+    <div className='absolute bottom-0 w-full flex justify-center gap-10 p-4 bg-lightBlue border-t'>
+
+      <ReservationsForm
+        formTypeModal={0}
+        buttonName="Reserve"
+        editIcon={<FaCalendarAlt size={25} color="white" />}
+        buttonColor="primary"
+        modalHeader="Enter a reservation"
+        startDate={startDate}
+        endDate={endDate}
+        tipology={tipology}
+        selectedDates={selectedDates}
+        selectedRoomType={selectedRoomType}
+        disabled={!isGuestNameValid}
+        guestName={guestName}
+        guestId={selectedGuestId}
+      />
+
+      <button
+        className="text-sm"
+        onClick={handleToggleModal}
+      >
+        Cancel
+      </button>
+    </div>
+
+  </div>
+)}
+
+     <div className={`transition-all duration-300 ${showModal ? 'w-[65%]' : 'w-full'}`}>
+
+  {/* HEADER */}
+  <div className={`bg-primary ${showModal ? 'py-4' : 'py-2'}`}>
+    <div className='flex justify-between items-center'>
+      <p className='text-ml text-white px-4'><b>{"Typology plan"}</b></p>
+      <div className='flex items-center gap-5'>
+
+        {!showModal && (
+          <Popover placement="bottom" showArrow offset={10}>
+            <PopoverTrigger>
+              <Button color="transparent">
+                <FaCalendarAlt color='white' size={15} className='cursor-pointer' />
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-[250px]">
+              {(titleProps) => (
+                <div className="px-1 py-2 w-full">
+                  <p className="text-small font-bold text-foreground" {...titleProps}>
+                    {"Filter"}
+                  </p>
+
+                  <div className="mt-2 flex flex-col justify-around">
+                    <div className="flex items-center justify-between">
+                      <span className='text-center font-bold'>{selectedYear}</span>
+
+                      <div className='flex flex-row gap-4'>
+                        <button onClick={() => handleYearChange('decrement')} className='p-2'>
+                          <IoIosArrowUp size={10} />
+                        </button>
+                        <button onClick={() => handleYearChange('increment')} className='p-2'>
+                          <IoIosArrowDown size={10} />
+                        </button>
+                      </div>
                     </div>
-                    <div>
-                      <FaRegTrashAlt className="cursor-pointer" size={15} color={'gray'} onClick={() => removeEvent(index)} />
-                    </div>
-                  </div>
-                  <div className='flex flex-row justify-around py-1'>
-                    <div className="flex flex-col gap-2">
-                      <label>{"In:"}</label>
-                      <input
-                        className='outline-none'
-                        type="date"
-                        value={dateRange.start}
-                        onChange={(e) => updateDateRange(index, 'start', e.target.value)}
-                      />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <label>{"Out:"}</label>
-                      <input
-                        className='outline-none'
-                        type="date"
-                        value={dateRange.end}
-                        onChange={(e) => updateDateRange(index, 'end', e.target.value)}
-                      />
-                    </div>
-                    <div className='flex flex-row justify-between items-center py-1'>
-                      <p className='text-sm px-3 text-center'>N: {calculateNights(dateRange.start, dateRange.end)}</p>
+
+                    <div className="mt-4 grid grid-cols-4 gap-2">
+                      {months.map((month, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleMonthChange(index)}
+                          className="p-2 text-center rounded-full w-12 h-12 hover:bg-primary"
+                        >
+                          {month}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-            <div className='absolute bottom-0 w-full flex justify-center gap-40 p-4 bg-lightBlue'>
-              <ReservationsForm
-                formTypeModal={0}
-                buttonName={"Reserve"}
-                //buttonIcon={<FiPlus size={15} />}
-                editIcon={<FaCalendarAlt size={25} color="white" />}
-                buttonColor={"primary"}
-                modalHeader={"Enter a reservation"}
-                startDate={`${startDate}`}
-                endDate={`${endDate}`}
-                tipology={`${tipology}`}
-                selectedDates={selectedDates}
-                selectedRoomType={selectedRoomType}
-                disabled={!isGuestNameValid}
-                guestName={guestName}
-                guestId={selectedGuestId}
-              />
-              <button
-                className="text-sm"
-                onClick={handleToggleModal}>{"Cancel"}</button>
-            </div>
-          </div>
-        </>
-      )}
+              )}
+            </PopoverContent>
+          </Popover>
+        )}
 
-      <div className={`bg-primary ${showModal ? 'py-4' : 'py-2'}`}>
-        <div className='flex justify-between items-center'>
-          <p className='text-ml text-white px-4'><b>{"typology plan"}</b></p>
-          <div className='flex items-center gap-5'>
-            {/* <MdOutlineZoomOut size={20} color='white' className='cursor-pointer' onClick={handleZoomOutClick} /> */}
-            {!showModal && (
-              <Popover placement="bottom" showArrow offset={10}>
-                <PopoverTrigger>
-                  <Button color="transparent" className="">
-                    <FaCalendarAlt
-                      color='white'
-                      size={15}
-                      className='cursor-pointer'
-                    />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[250px]">
-                  {(titleProps) => (
-                    <div className="px-1 py-2 w-full">
-                      <p className="text-small font-bold text-foreground" {...titleProps}>
-                        {"Filter"}
-                      </p>
-                      <div className="mt-2 flex flex-col justify-around">
-                        <div className="flex items-center justify-between">
-                          <span className='text-center font-bold'>{selectedYear}</span>
-                          <div className='flex flex-row gap-4'>
-                            <button onClick={() => handleYearChange('decrement')} className='p-2'>
-                              <IoIosArrowUp size={10} />
-                            </button>
-                            <button onClick={() => handleYearChange('increment')} className='p-2'>
-                              <IoIosArrowDown size={10} />
-                            </button>
-                          </div>
-                        </div>
-                        {/**EXIBIÇÃO DOS MESES EM 3 COLUNAS E 4 LINHAS */}
-                        <div className="mt-4 grid grid-cols-4 gap-2">
-                          {months.map((month, index) => (
-                            <button
-                              key={index}
-                              onClick={() => handleMonthChange(index)}
-                              className={`p-2 text-center rounded-full w-12 h-12 hover:bg-primary`}
-                            >
-                              {month}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </PopoverContent>
-              </Popover>
-            )}
-            <GrFormPrevious className='w-5 h-5 cursor-pointer text-white' onClick={goToPreviousWeek} />
-            <p className='cursor-pointer text-white' onClick={goToCurrentWeek}>{"Today"}</p>
-            <GrFormNext className='w-5 h-5 cursor-pointer text-white' onClick={goToNextWeek} />
-          </div>
-        </div>
+        <GrFormPrevious className='w-5 h-5 cursor-pointer text-white' onClick={goToPreviousWeek} />
+        <p className='cursor-pointer text-white' onClick={goToCurrentWeek}>Today</p>
+        <GrFormNext className='w-5 h-5 cursor-pointer text-white' onClick={goToNextWeek} />
       </div>
-      <table className='w-[100%] bg-tableCol'>
+    </div>
+  </div>
+
+
+       <div className="overflow-x-auto">
+    <table className='w-full bg-tableCol'>
         <thead>
           <tr>
             {/*CABEÇALHO DA TABELA C/ FORMATAÇÃO DE DATA */}
-            <th className='w-[15%] bg-tableCol text-left px-4'>{"Typologies"}</th>
+            <th className='w-[15%] bg-tableCol text-left px-4'>
+              {`${weeks[currentWeekIndex][0].date.format("DDMMM").toUpperCase()} - 
+${weeks[currentWeekIndex][weeks[currentWeekIndex].length - 1].date.format("DDMMM").toUpperCase()}`}
+            </th>
             {weeks[currentWeekIndex].map((day, index) => (
               <td key={index} className={`w-[5%] h-14 border-tableCol border-l-3 border-r-3 border-b-2 ${day.date.day() === 0 || day.date.day() === 6 ? "bg-tableColWeekend" : "bg-lightBlueCol"} select-none 
               ${day.date.isSame(today, 'day') ? "bg-primary bg-opacity-30" : ""} select-none`}>
@@ -1135,5 +1446,8 @@ console.log("t", t);
         </tbody>
       </table>
     </div>
+    </div>
+    </div>
+
   );
 }

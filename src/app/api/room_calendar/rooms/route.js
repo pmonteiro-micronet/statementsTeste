@@ -27,7 +27,7 @@ export async function GET(request) {
         // Buscar dados do servidor no banco de dados
         const property = await prisma.properties.findUnique({
             where: { propertyID: propertyIDInt },
-            select: { propertyServer: true, propertyPort: true }
+            select: { propertyServer: true, propertyPort: true, mpehotel: true }
         });
 
         if (!property) {
@@ -38,8 +38,8 @@ export async function GET(request) {
         }
 
         // Construir a URL da API externa
-        const { propertyServer, propertyPort } = property;
-        const url = `http://${propertyServer}:${propertyPort}/getrooms`;
+        const { propertyServer, propertyPort, mpehotel } = property;
+        const url = `http://${propertyServer}:${propertyPort}/getrooms?mpehotel=${mpehotel}`;
 
         // Fazer a requisição para buscar os tipos de documentos
         const response = await axios.get(url, {

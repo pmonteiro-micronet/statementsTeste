@@ -46,6 +46,10 @@ const InHousesInfoForm = ({
 
     return (
         <>
+           {isOpen && (
+    <div className="fixed inset-0 bg-black/20 z-40" />
+  )}
+
             {formTypeModal === 11 && (
                 <Modal
                     isOpen={isOpen}
@@ -79,7 +83,7 @@ const InHousesInfoForm = ({
                                     </div>
                                 </ModalHeader>
 
-                                <ModalBody className="flex flex-col mx-5 my-2 bg-background min-h-[400px]">
+                                <ModalBody className="flex flex-col px-5 py-2 bg-background min-h-[400px]">
                                     <Tabs aria-label="Options" className="flex flex-col flex-grow">
                                         <Tab key="reservation" title={t.frontOffice.infoModal.departure.reservation.title}>
                                             {/* Garantindo altura mínima para evitar encolhimento */}

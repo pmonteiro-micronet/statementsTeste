@@ -6,8 +6,9 @@ import NavBar from "./Navbar";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 import { IoDocumentOutline } from "react-icons/io5";
-import { FaRegCalendarAlt } from "react-icons/fa";
+import { FaRegCalendarAlt, FaBed } from "react-icons/fa";
 import { RiHotelLine } from "react-icons/ri";
+
 import en from "../../../public/locales/english/common.json";
 import pt from "../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../public/locales/espanol/common.json";
@@ -197,10 +198,10 @@ useEffect(() => {
             icon: <RxExit />,
           },
           {
-            ref: `/homepage/room_calendar/${selectedHotelID}`,
-            label: `Room Calendar`,
-            onClick: () => handleRedirect("room_calendar"),
-            icon: <RxExit />,
+            ref: `/homepage/frontOfficeView/tipologyPlan/${selectedHotelID}`,
+            label: `Tipology Plan`,
+            onClick: () => handleRedirect("tipologyPlan"),
+            icon: <FaBed />,
           },
         ],
       };
