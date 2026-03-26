@@ -39,7 +39,7 @@ export async function GET(request) {
 
         // Construir a URL da API externa
         const { propertyServer, propertyPort } = property;
-        const url = `http://${propertyServer}:${propertyPort}/getrooms`;
+        const url = `http://${propertyServer}:${propertyPort}/getroomshsk`;
 
         // Fazer a requisição para buscar os tipos de documentos
         const response = await axios.get(url, {
