@@ -27,8 +27,6 @@ const PropertiesEditForm = ({
     onClose,
     formTypeModal
 }) => {
-    console.log("HOTEL TERMS BRO:", hotelTerms);
-    console.log("HOTEL:", hotel.propertyID);
 
     // Estados individuais para cada campo
     const [propertyName, setPropertyName] = useState(hotel.propertyName || "");
@@ -90,54 +88,9 @@ const PropertiesEditForm = ({
     const [showVariablesbar, setShowVariablesbar] = useState(false);
     const [hoveredVar, setHoveredVar] = useState(null);
 
-    // const [activeTab, setActiveTab] = useState("propertyDetails");
     const [showTemplatesModal, setShowTemplatesModal] = useState(false);
 
     const [smallTab, setSmallTab] = useState("details"); // ou "reviews" como valor inicial
-
-    // const router = useRouter();
-    // Função para buscar os dados de uma propriedade pelo ID
-    // const fetchPropertyData = async (propertyID) => {
-    //     try {
-    //         setLoading(true);
-    //         const response = await axios.get(`/api/properties/${propertyID}`);
-    //         if (response.status === 200) {
-
-    //             const data = response.data;
-    //             setHotel(data);
-    //             console.log(response.data);
-    //             // Atualizar estados individuais com os dados retornados
-    //             setPropertyName(data.propertyName || "");
-    //             setPropertyTag(data.propertyTag || "");
-    //             setPropertyServer(data.propertyServer || "");
-    //             setPropertyPort(data.propertyPort || "");
-    //             setmpehotel(data.mpehotel || "");
-    //             setPdfFilePath(data.pdfFilePath || "");
-    //             setPasseIni(data.passeIni || "");
-
-    //             setHotelName(data.hotelName || "");
-    //             setHotelMiniTerms(data.hotelMiniTerms || "");
-    //             setHotelPhone(data.hotelPhone || "");
-    //             setHotelEmail(data.hotelEmail || "");
-    //             setHotelAddress(data.hotelAddress || "");
-    //             setHotelPostalCode(data.hotelPostalCode || "");
-    //             setHotelRNET(data.hotelRNET || "");
-    //             setHotelNIF(data.hotelNIF || "");
-    //         }
-    //     } catch (error) {
-    //         console.error("Error fetching property data:", error);
-    //         setError("Failed to fetch property data. Please try again.");
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
-    // // useEffect para buscar os dados quando o componente for montado
-    // useEffect(() => {
-    //     if (propertyID) {
-    //         fetchPropertyData(propertyID);
-    //     }
-    // }, [propertyID]);
 
     const [hasRoomCloud, setHasRoomCloud] = useState(hotel.hasRoomCloud || false);
     const [hasLockSys, setHasLockSys] = useState(hotel.hasLockSys || false);
@@ -148,7 +101,19 @@ const PropertiesEditForm = ({
     const [roomCloudHotelID, setRoomCloudHotelID] = useState(roomCloud[0]?.hotelID || "");
 
     const [locale, setLocale] = useState("pt");
+    const [typologies, setTypologies] = useState([
+        {
+            title: "Typology 1",
+            source: "roomcloud+protel",
+            rooms: [
+                { roomName: "", roomcloudId: "" }
+            ],
+        },
+    ]);
 
+    const [openAccordion, setOpenAccordion] = useState(null);
+    const [globalSource, setGlobalSource] = useState("roomcloud+protel");
+    console.log(typologies, setTypologies, openAccordion, setOpenAccordion);
     useEffect(() => {
         // Carregar o idioma do localStorage
         const storedLanguage = localStorage.getItem("language");
@@ -186,6 +151,7 @@ const PropertiesEditForm = ({
     const [emailTitleEN, setEmailTitleEN] = useState("");
     const [emailBodyEN, setEmailBodyEN] = useState("");
     const [showLockVariablesbar, setShowLockVariablesbar] = useState(false);
+    const goToRoomCloudSection = () => setActiveSection("roomcloudRules");
 
     const getCurrentSubject = () => {
         return activeEmailLang === "PT" ? emailTitlePT : emailTitleEN;
@@ -243,118 +209,274 @@ const PropertiesEditForm = ({
         fetchLockEmail();
     }, [hotel.propertyID]);
 
+const handleSave = async () => {
+  if (!propertyName || !propertyTag || !propertyServer) {
+    setError("Please fill in all fields.");
+    return;
+  }
 
-    const handleSave = async () => {
-        if (!propertyName || !propertyTag || !propertyServer) {
-            setError("Please fill in all fields.");
-            return;
+  const roomCloudValue = !!hasRoomCloud;
+  const hasStayValue = !!hasStay;
+
+  try {
+    setLoading(true);
+
+    // 1. Atualizar propriedade
+    const response = await axios.patch(
+      `/api/properties/${hotel.propertyID}`,
+      {
+        propertyName,
+        propertyTag,
+        propertyServer,
+        propertyPort,
+        propertyPortStay,
+        mpehotel,
+        hotelName,
+        hotelTermsEN,
+        hotelTermsPT,
+        hotelTermsES,
+        hotelPhone,
+        hotelEmail,
+        hotelAddress,
+        hotelPostalCode,
+        hotelRNET,
+        hotelNIF,
+        passeIni,
+        pdfFilePath,
+        hasStay: hasStayValue,
+        replyEmail,
+        replyPassword,
+        sendingServer,
+        sendingPort,
+        emailSubject,
+        emailBody,
+        infoEmail,
+        hasRoomCloud: roomCloudValue,
+        sendStayByEmail: stayEmailEnabled,
+      }
+    );
+
+    if (response.status !== 200) {
+      throw new Error("Failed to update property");
+    }
+
+    // 2. LOCK EMAILS (SÓ SE HOUVER ALTERAÇÕES)
+    const hasEmailChanges =
+      [emailTitlePT, emailBodyPT, emailTitleEN, emailBodyEN]
+        .some((v) => v && v.trim() !== "");
+
+    if (hasEmailChanges) {
+      const lockEmailResponse = await axios.post("/api/lock/updateEmail", {
+        propertyID: hotel.propertyID,
+        emailTitlePT,
+        emailBodyPT,
+        emailTitleEN,
+        emailBodyEN,
+      });
+
+      if (![200, 201].includes(lockEmailResponse.status)) {
+        throw new Error("Failed to save lock emails");
+      }
+    }
+
+    // 3. RoomCloud credentials
+    const roomCloudResponse = await axios.post(
+      `/api/properties/roomCloud`,
+      {
+        propertyID: hotel.propertyID,
+        roomCloudUsername,
+        roomCloudPassword,
+        roomCloudHotelID,
+      }
+    );
+
+    if (![200, 201].includes(roomCloudResponse.status)) {
+      throw new Error("Failed to save RoomCloud data");
+    }
+
+    // 4. Chatbot
+    const chatbotResponse = await axios.post(
+      `/api/properties/chatbotsStay`,
+      {
+        propertyID: hotel.propertyID,
+        active: stayChatbotEnabled,
+        provider: chatbotProvider,
+        hijiffyToken,
+        hijiffyCampaign: hijiffyCampaignID,
+      }
+    );
+
+    if (![200, 201].includes(chatbotResponse.status)) {
+      throw new Error("Failed to save chatbot data");
+    }
+
+    // 5. Hotel terms
+    const hotelTermsResponse = await axios.post(
+      `/api/properties/hotelTerms`,
+      {
+        propertyID: hotel.propertyID,
+        termsAndCondEN: hotelTermsEN,
+        termsAndCondPT: hotelTermsPT,
+        termsAndCondES: hotelTermsES,
+        privacyPolicyEN,
+        privacyPolicyPT,
+        privacyPolicyES,
+        miniTermsEN,
+        miniTermsPT,
+        miniTermsES,
+      }
+    );
+
+    if (![200, 201].includes(hotelTermsResponse.status)) {
+      setError("Failed to save hotel terms.");
+      return;
+    }
+
+    // 6. 🔥 ROOMS (AGORA COM ROOMCOUNT + LIMPEZA)
+    const cleanedRooms = rooms
+      .filter((r) => r.roomName && r.roomcloudId) // evita vazios
+      .map((r) => ({
+        roomName: r.roomName,
+        roomcloudId: r.roomcloudId,
+        roomcount: r.roomcount ?? 0, // 🔥 importante
+      }));
+
+    if (cleanedRooms.length > 0) {
+      const roomsResponse = await axios.post(
+        `/api/properties/roomCloudProtelType`,
+        {
+          propertyID: hotel.propertyID,
+          rooms: cleanedRooms,
         }
+      );
 
-        const roomCloudValue = !!hasRoomCloud;
-        const hasStayValue = !!hasStay;
+      if (![200, 201].includes(roomsResponse.status)) {
+        throw new Error("Failed to save rooms");
+      }
+    }
+
+    // sucesso opcional
+    // setIsEditing(false);
+    // onClose();
+
+  } catch (error) {
+    console.error("Error updating property:", error);
+    setError("Failed to update data. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+    // const handleSave = async () => {
+    //     if (!propertyName || !propertyTag || !propertyServer) {
+    //         setError("Please fill in all fields.");
+    //         return;
+    //     }
+
+    //     const roomCloudValue = !!hasRoomCloud;
+    //     const hasStayValue = !!hasStay;
 
 
-        try {
-            setLoading(true);
+    //     try {
+    //         setLoading(true);
 
-            // Atualizar a propriedade
-            const response = await axios.patch(`/api/properties/${hotel.propertyID}`, {
-                propertyName,
-                propertyTag,
-                propertyServer,
-                propertyPort,
-                propertyPortStay,
-                mpehotel,
-                hotelName,
-                hotelTermsEN,
-                hotelTermsPT,
-                hotelTermsES,
-                hotelPhone,
-                hotelEmail,
-                hotelAddress,
-                hotelPostalCode,
-                hotelRNET,
-                hotelNIF,
-                passeIni,
-                pdfFilePath,
-                hasStay: hasStayValue,
-                replyEmail,
-                replyPassword,
-                sendingServer,
-                sendingPort,
-                emailSubject,
-                emailBody,
-                infoEmail,
-                hasRoomCloud: roomCloudValue,
-                sendStayByEmail: stayEmailEnabled
-            });
+    //         // Atualizar a propriedade
+    //         const response = await axios.patch(`/api/properties/${hotel.propertyID}`, {
+    //             propertyName,
+    //             propertyTag,
+    //             propertyServer,
+    //             propertyPort,
+    //             propertyPortStay,
+    //             mpehotel,
+    //             hotelName,
+    //             hotelTermsEN,
+    //             hotelTermsPT,
+    //             hotelTermsES,
+    //             hotelPhone,
+    //             hotelEmail,
+    //             hotelAddress,
+    //             hotelPostalCode,
+    //             hotelRNET,
+    //             hotelNIF,
+    //             passeIni,
+    //             pdfFilePath,
+    //             hasStay: hasStayValue,
+    //             replyEmail,
+    //             replyPassword,
+    //             sendingServer,
+    //             sendingPort,
+    //             emailSubject,
+    //             emailBody,
+    //             infoEmail,
+    //             hasRoomCloud: roomCloudValue,
+    //             sendStayByEmail: stayEmailEnabled
+    //         });
 
-            // Se a propriedade foi atualizada com sucesso, salva os termos
-            if (response.status === 200) {
+    //         // Se a propriedade foi atualizada com sucesso, salva os termos
+    //         if (response.status === 200) {
 
-                const lockEmailResponse = await axios.post("/api/lock/updateEmail", {
-                    propertyID: hotel.propertyID,
-                    emailTitlePT,
-                    emailBodyPT,
-                    emailTitleEN,
-                    emailBodyEN
-                });
+    //             const lockEmailResponse = await axios.post("/api/lock/updateEmail", {
+    //                 propertyID: hotel.propertyID,
+    //                 emailTitlePT,
+    //                 emailBodyPT,
+    //                 emailTitleEN,
+    //                 emailBodyEN
+    //             });
 
-                if (![200, 201].includes(lockEmailResponse.status)) {
-                    throw new Error(`Failed to save lock emails. Status: ${lockEmailResponse.status}`);
-                }
-                // Save RoomCloud data
-                const roomCloudResponse = await axios.post(`/api/properties/roomCloud`, {
-                    propertyID: hotel.propertyID,
-                    roomCloudUsername,
-                    roomCloudPassword,
-                    roomCloudHotelID
-                });
+    //             if (![200, 201].includes(lockEmailResponse.status)) {
+    //                 throw new Error(`Failed to save lock emails. Status: ${lockEmailResponse.status}`);
+    //             }
+    //             // Save RoomCloud data
+    //             const roomCloudResponse = await axios.post(`/api/properties/roomCloud`, {
+    //                 propertyID: hotel.propertyID,
+    //                 roomCloudUsername,
+    //                 roomCloudPassword,
+    //                 roomCloudHotelID
+    //             });
 
-                if (![200, 201].includes(roomCloudResponse.status)) {
-                    throw new Error(`Failed to save RoomCloud data. Status: ${roomCloudResponse.status}`);
-                }
+    //             if (![200, 201].includes(roomCloudResponse.status)) {
+    //                 throw new Error(`Failed to save RoomCloud data. Status: ${roomCloudResponse.status}`);
+    //             }
 
-                // Save Chatbot data
-                const chatbotResponse = await axios.post(`/api/properties/chatbotsStay`, {
-                    propertyID: hotel.propertyID,
-                    active: stayChatbotEnabled,
-                    provider: chatbotProvider,
-                    hijiffyToken,
-                    hijiffyCampaign: hijiffyCampaignID
-                });
+    //             // Save Chatbot data
+    //             const chatbotResponse = await axios.post(`/api/properties/chatbotsStay`, {
+    //                 propertyID: hotel.propertyID,
+    //                 active: stayChatbotEnabled,
+    //                 provider: chatbotProvider,
+    //                 hijiffyToken,
+    //                 hijiffyCampaign: hijiffyCampaignID
+    //             });
 
-                if (![200, 201].includes(chatbotResponse.status)) {
-                    throw new Error(`Failed to save chatbot data. Status: ${chatbotResponse.status}`);
-                }
+    //             if (![200, 201].includes(chatbotResponse.status)) {
+    //                 throw new Error(`Failed to save chatbot data. Status: ${chatbotResponse.status}`);
+    //             }
 
-                const hotelTermsResponse = await axios.post(`/api/properties/hotelTerms`, {
-                    propertyID: hotel.propertyID,
-                    termsAndCondEN: hotelTermsEN,
-                    termsAndCondPT: hotelTermsPT,
-                    termsAndCondES: hotelTermsES,
-                    privacyPolicyEN,
-                    privacyPolicyPT,
-                    privacyPolicyES,
-                    miniTermsEN,
-                    miniTermsPT,
-                    miniTermsES,
-                });
+    //             const hotelTermsResponse = await axios.post(`/api/properties/hotelTerms`, {
+    //                 propertyID: hotel.propertyID,
+    //                 termsAndCondEN: hotelTermsEN,
+    //                 termsAndCondPT: hotelTermsPT,
+    //                 termsAndCondES: hotelTermsES,
+    //                 privacyPolicyEN,
+    //                 privacyPolicyPT,
+    //                 privacyPolicyES,
+    //                 miniTermsEN,
+    //                 miniTermsPT,
+    //                 miniTermsES,
+    //             });
 
-                if (hotelTermsResponse.status === 200 || hotelTermsResponse.status === 201) {
-                    // setIsEditing(false);
-                    //onClose(); // Fecha o modal
-                } else {
-                    setError("Failed to save hotel terms.");
-                }
-            }
-        } catch (error) {
-            console.error("Error updating property or hotel terms:", error);
-            setError("Failed to update data. Please try again.");
-        } finally {
-            setLoading(false);
-        }
-    };
+    //             if (hotelTermsResponse.status === 200 || hotelTermsResponse.status === 201) {
+    //                 // setIsEditing(false);
+    //                 //onClose(); // Fecha o modal
+    //             } else {
+    //                 setError("Failed to save hotel terms.");
+    //             }
+    //         }
+    //     } catch (error) {
+    //         console.error("Error updating property or hotel terms:", error);
+    //         setError("Failed to update data. Please try again.");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
 
     const [selectedImage, setSelectedImage] = useState(null);
@@ -474,7 +596,7 @@ const PropertiesEditForm = ({
         }
     };
 
-        const LockCopyToClipboard = (text) => {
+    const LockCopyToClipboard = (text) => {
         if (navigator.clipboard) {
             navigator.clipboard.writeText(text).then(() => {
                 setCopiedVar(text);
@@ -519,26 +641,14 @@ const PropertiesEditForm = ({
         { key: '{{hotel_phone}}', desc: t.modals.propertiesEdit.stay.hotelDetails.hotelPhone },
     ];
 
-        const reservationLockDetails = [
+    const reservationLockDetails = [
         { key: '{{code}}', desc: "Code" },
         { key: '{{guestName}}', desc: "Nome" },
         { key: '{{roomID}}', desc: "Quarto" },
-        { key: '{{validFrom}}', desc: "Valido de"},
+        { key: '{{validFrom}}', desc: "Valido de" },
         { key: '{{validUntil}}', desc: "Valido até" },
     ];
     const [selectedBold, setSelectedBold] = React.useState(false);
-
-    // const checkIfSelectedBold = () => {
-    //     const textarea = textareaRef.current;
-    //     if (!textarea || !isEditing) return false;
-
-    //     const start = textarea.selectionStart;
-    //     const end = textarea.selectionEnd;
-    //     const selectedText = emailBody.slice(start, end);
-
-    //     // Verifica se a seleção está exatamente entre dois pares de **
-    //     return selectedText.startsWith("**") && selectedText.endsWith("**");
-    // };
 
     const handleBoldClick = () => {
         const textarea = textareaRef.current;
@@ -913,6 +1023,83 @@ const PropertiesEditForm = ({
         if (activeStayTab === 'logs') fetchStayLogs();
     }, [activeStayTab, propertyServer, propertyPortStay]);
 
+const [rooms, setRooms] = useState([]);
+
+useEffect(() => {
+  const fetchRooms = async () => {
+    const res = await fetch(
+      `/api/properties/roomCloudProtelType?propertyID=${hotel.propertyID}`
+    );
+
+    const data = await res.json();
+
+    setRooms(
+      (data.rooms || []).map((r) => ({
+        ...r,
+        roomcount: r.roomcount ?? 0, // 🔥 garantir valor
+        uid: r.id ? `db-${r.id}` : crypto.randomUUID(),
+      }))
+    );
+  };
+
+  if (hotel?.propertyID) fetchRooms();
+}, [hotel.propertyID]);
+
+const handleRoomChange = (index, field, value) => {
+  const updated = [...rooms];
+
+  updated[index] = {
+    ...updated[index],
+    [field]:
+      field === "roomcount" ? Number(value) : value, 
+  };
+
+  setRooms(updated);
+};
+
+const addRoom = () => {
+  setRooms((prev) => [
+    ...prev,
+    {
+      uid: crypto.randomUUID(),
+      roomName: "",
+      roomcloudId: "",
+      roomcount: "", 
+      isNew: true,
+    },
+  ]);
+};
+
+const removeRoom = (index) => {
+  setRooms((prev) => prev.filter((_, i) => i !== index));
+};
+
+const handleSaveRooms = async () => {
+  try {
+    const payload = {
+      propertyID: hotel.propertyID,
+      rooms: rooms.map((r) => ({
+        roomName: r.roomName,
+        roomcloudId: r.roomcloudId,
+      })),
+    };
+
+    const res = await fetch("/api/properties/roomCloudProtelType", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) throw new Error("Erro ao salvar quartos");
+
+    alert("Quartos sincronizados com sucesso!");
+  } catch (error) {
+    console.error(error);
+    alert("Erro ao salvar quartos");
+  }
+};
+console.log(handleSaveRooms);
+
     return (
         <>
             {formTypeModal === 11 && (
@@ -1105,6 +1292,9 @@ const PropertiesEditForm = ({
                                                 <label htmlFor="hasRoomCloud" className="text-sm text-gray-600">
                                                     Tem RoomCloud?
                                                 </label>
+                                                <p className="text-sm text-blue-500 cursor-pointer" onClick={goToRoomCloudSection}>
+                                                    RoomCloud Rules
+                                                </p>
                                             </div>
                                         </div>
 
@@ -1147,6 +1337,117 @@ const PropertiesEditForm = ({
                                     </div>
                                 )}
 
+{activeSection === "roomcloudRules" && (
+  <div className="flex flex-col gap-4 p-4">
+
+    {/* Voltar */}
+    <button
+      onClick={() => setActiveSection("propertyDetails")}
+      className="flex items-center gap-2 mb-4 text-sm text-gray-500"
+    >
+      <MdKeyboardArrowLeft size={18} />
+      Voltar
+    </button>
+
+    <h2 className="text-lg font-bold mb-2">
+      Quartos existentes
+    </h2>
+
+    {/* Select */}
+    <div className="mb-4">
+      <label className="text-sm font-medium text-gray-600">
+        Fonte de dados
+      </label>
+
+      <select
+        value={globalSource}
+        onChange={(e) => setGlobalSource(e.target.value)}
+        className="border border-gray-300 rounded-md px-2 py-1 w-full"
+      >
+        <option value="roomcloud+protel">RoomCloud + Protel</option>
+        <option value="protel">Protel</option>
+        <option value="roomcloud">RoomCloud</option>
+      </select>
+    </div>
+
+    {/* LISTA (SÓ SE ROOMCLOUD) */}
+    {(globalSource === "roomcloud" ||
+      globalSource === "roomcloud+protel") && (
+
+      <div className="border border-gray-300 rounded-md p-4 bg-white">
+
+        {/* HEADER */}
+        <div className="grid grid-cols-3 gap-2 mb-2 text-xs text-gray-500 px-1">
+          <span>Nome</span>
+          <span>RoomCloud ID</span>
+          <span>Qtd</span>
+        </div>
+
+        {/* SCROLL AREA */}
+        <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1">
+
+          {rooms.map((room, index) => (
+            <div
+              key={room.uid}
+              className="flex gap-2 items-center"
+            >
+
+              {/* Nome */}
+              <input
+                className="border px-2 py-1 w-1/3"
+                placeholder="Nome"
+                value={room.roomName || ""}
+                onChange={(e) =>
+                  handleRoomChange(index, "roomName", e.target.value)
+                }
+              />
+
+              {/* RoomCloud ID */}
+              <input
+              type="text"
+                className="border px-2 py-1 w-1/3"
+                placeholder="ID"
+                value={room.roomcloudId || ""}
+                onChange={(e) =>
+                  handleRoomChange(index, "roomcloudId", e.target.value)
+                }
+              />
+
+              {/* Room Count 🔥 */}
+              <input
+                type="text"
+                className="border px-2 py-1 w-1/4"
+                placeholder="Qtd"
+                value={room.roomcount ?? 0}
+                onChange={(e) =>
+                  handleRoomChange(index, "roomcount", e.target.value)
+                }
+              />
+
+              {/* Delete */}
+              <button
+                onClick={() => removeRoom(index)}
+                className="text-red-500"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+
+        </div>
+
+        {/* Add */}
+        <button
+          onClick={addRoom}
+          className="text-sm text-blue-500 mt-3"
+        >
+          + Add Room
+        </button>
+
+      </div>
+    )}
+  </div>
+)}
                                 {activeSection === "hotelDetails" && (
                                     <div className="flex flex-col gap-2 p-4">
                                         {/* Botão voltar */}
@@ -2033,7 +2334,7 @@ const PropertiesEditForm = ({
 
                                 {activeSection === "lock" && (
                                     <div className="mb-2">
-                                         {/* Botão voltar */}
+                                        {/* Botão voltar */}
                                         <button onClick={goBack} className="flex items-center gap-2 mb-4 text-sm text-gray-500">
                                             <MdKeyboardArrowLeft size={18} />
                                         </button>

@@ -86,52 +86,62 @@ const InHousesInfoForm = ({
                                 <ModalBody className="flex flex-col px-5 py-2 bg-background min-h-[400px]">
                                     <Tabs aria-label="Options" className="flex flex-col flex-grow">
                                         <Tab key="reservation" title={t.frontOffice.infoModal.departure.reservation.title}>
-                                            {/* Garantindo altura mínima para evitar encolhimento */}
-                                            <div className="min-h-[300px] flex flex-col gap-5">
-                                                <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.room}</strong></p>
-                                                    <p>{roomNumber}</p>
-                                                </div>
-                                                <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.roomType}</strong></p>
-                                                    <p>{roomType}</p>
-                                                </div>
-                                                <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.status}</strong></p>
-                                                    <p>{resStatus}</p>
-                                                </div>
-                                                <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>{t.frontOffice.infoModal.arrival.reservation.arrival}</strong></p>
-                                                    <p>{dateCI}</p>
-                                                </div>
-                                                <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.adults}</strong></p>
-                                                    <p>{adults}</p>
-                                                </div>
-                                                <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.childs}</strong></p>
-                                                    <p>{childs}</p>
-                                                </div>
-                                                <div className="flex justify-between text-textPrimaryColor">
-                                                    <p><strong>{t.frontOffice.infoModal.departure.reservation.balance}</strong></p>
-                                                    <p>{balance}</p>
+                                            <div className="space-y-4">
+                                                <div className="bg-cardColor py-4 px-4 rounded-lg">
+                                                    <p className="text-[#f7ba83] mb-4 text-lg font-semibold">{t.frontOffice.infoModal.departure.reservation.title}</p>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-gray-500 text-xs mb-1 font-medium">{t.frontOffice.infoModal.departure.reservation.room}</span>
+                                                            <span className="text-textPrimaryColor text-base font-medium">{roomNumber || '-'}</span>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-gray-500 text-xs mb-1 font-medium">{t.frontOffice.infoModal.departure.reservation.roomType}</span>
+                                                            <span className="text-textPrimaryColor text-base font-medium">{roomType || '-'}</span>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-gray-500 text-xs mb-1 font-medium">{t.frontOffice.infoModal.departure.reservation.status}</span>
+                                                            <span className="text-textPrimaryColor text-base font-medium">{resStatus || '-'}</span>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-gray-500 text-xs mb-1 font-medium">{t.frontOffice.infoModal.arrival.reservation.arrival}</span>
+                                                            <span className="text-textPrimaryColor text-base font-medium">{dateCI || '-'}</span>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-gray-500 text-xs mb-1 font-medium">{t.frontOffice.infoModal.departure.reservation.adults}</span>
+                                                            <span className="text-textPrimaryColor text-base font-medium">{adults || '-'}</span>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-gray-500 text-xs mb-1 font-medium">{t.frontOffice.infoModal.departure.reservation.childs}</span>
+                                                            <span className="text-textPrimaryColor text-base font-medium">{childs || '-'}</span>
+                                                        </div>
+                                                        <div className="flex flex-col sm:col-span-2">
+                                                            <span className="text-gray-500 text-xs mb-1 font-medium">{t.frontOffice.infoModal.departure.reservation.balance}</span>
+                                                            <span className="text-textPrimaryColor text-base font-semibold">{balance || '-'}</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </Tab>
                                         <Tab key="profiles" title={t.frontOffice.infoModal.departure.profile.title}>
-                                            <div className="min-h-[300px] flex flex-col gap-4">
-                                                <p className="text-gray-400">{t.frontOffice.infoModal.departure.profile.travelAgency}</p>
-                                                <p className="text-textPrimaryColor">{booker}</p>
-
-                                                <p className="text-gray-400">{t.frontOffice.infoModal.departure.profile.country}</p>
-                                                <p className="text-textPrimaryColor">{country}</p>
-
-                                                <p className="text-gray-400">{t.frontOffice.infoModal.departure.profile.guests}</p>
-                                                <p className="text-textPrimaryColor">
-                                                    {salutation} {lastName && firstName
-                                                        ? `${lastName}, ${firstName}`
-                                                        : lastName || firstName}
-                                                </p>
+                                            <div className="bg-cardColor py-4 px-4 rounded-lg space-y-4">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-gray-500 text-xs mb-1 font-medium">{t.frontOffice.infoModal.departure.profile.travelAgency}</span>
+                                                        <span className="text-textPrimaryColor text-base font-medium">{booker || '-'}</span>
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-gray-500 text-xs mb-1 font-medium">{t.frontOffice.infoModal.departure.profile.country}</span>
+                                                        <span className="text-textPrimaryColor text-base font-medium">{country || '-'}</span>
+                                                    </div>
+                                                    <div className="flex flex-col sm:col-span-2">
+                                                        <span className="text-gray-500 text-xs mb-1 font-medium">{t.frontOffice.infoModal.departure.profile.guests}</span>
+                                                        <span className="text-textPrimaryColor text-base font-medium">
+                                                            {salutation} {lastName && firstName
+                                                                ? `${lastName}, ${firstName}`
+                                                                : lastName || firstName || '-'}
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </Tab>
                                     </Tabs>

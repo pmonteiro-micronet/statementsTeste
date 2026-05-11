@@ -12,7 +12,7 @@ import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
 import { IoMdInformationCircle } from "react-icons/io";
 import { CgFormatIndentIncrease } from "react-icons/cg";
 
-import InHousesInfoForm from "@/components/modals/inhouses/info/page";
+// import InHousesInfoForm from "@/components/modals/inhouses/info/page";
 import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 
@@ -127,87 +127,87 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     sendDataToAPI();
   }, [propertyID]);
 
- const sendResToAPI = async (ResNo) => {
-  console.log("Enviando ResNumber para a API:", ResNo);
-  const windowValue = 0;
+  const sendResToAPI = async (ResNo) => {
+    console.log("Enviando ResNumber para a API:", ResNo);
+    const windowValue = 0;
 
-  try {
-    const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
-      params: { ResNo, window: windowValue, propertyID },
-    });
+    try {
+      const saveResponse = await axios.get("/api/reservations/info/specificReservation", {
+        params: { ResNo, window: windowValue, propertyID },
+      });
 
-    console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
-    console.log("Resposta da API ao salvar statement:", saveResponse.data);
+      console.log(`Dados enviados com sucesso para a reserva ${ResNo} com window: ${windowValue}`);
+      console.log("Resposta da API ao salvar statement:", saveResponse.data);
 
-    // 🔹 Pegando o body corretamente, que pode ser objeto ou string
-    let updatedRecord = saveResponse.data?.data?.responseBody || saveResponse.data?.data;
+      // 🔹 Pegando o body corretamente, que pode ser objeto ou string
+      let updatedRecord = saveResponse.data?.data?.responseBody || saveResponse.data?.data;
 
-    // 🔹 Se for string, parseia para objeto
-    if (typeof updatedRecord === "string") {
-      try {
-        updatedRecord = JSON.parse(updatedRecord);
-      } catch (err) {
-        console.error("Erro ao fazer parse do JSON da API:", err);
-        setErrorMessage("Erro ao processar os dados da reserva.");
+      // 🔹 Se for string, parseia para objeto
+      if (typeof updatedRecord === "string") {
+        try {
+          updatedRecord = JSON.parse(updatedRecord);
+        } catch (err) {
+          console.error("Erro ao fazer parse do JSON da API:", err);
+          setErrorMessage("Erro ao processar os dados da reserva.");
+          setIsErrorModalOpen(true);
+          return;
+        }
+      }
+
+      console.log("UPDATEDRECORD:", updatedRecord);
+
+      // 🔎 Agora guestInfo deve existir dentro da chave "0"
+      const guestInfo = Array.isArray(updatedRecord["0"]?.GuestInfo)
+        ? updatedRecord["0"].GuestInfo
+        : [];
+
+      console.log("GUESTINFO:", guestInfo);
+
+      if (guestInfo.length === 0) {
+        console.warn("GuestInfo vazio → não há movimentos para mostrar.");
+        setErrorMessage(t.frontOffice.inHouses.errors.windowA);
         setIsErrorModalOpen(true);
         return;
       }
-    }
 
-    console.log("UPDATEDRECORD:", updatedRecord);
-
-    // 🔎 Agora guestInfo deve existir dentro da chave "0"
-    const guestInfo = Array.isArray(updatedRecord["0"]?.GuestInfo)
-      ? updatedRecord["0"].GuestInfo
-      : [];
-
-    console.log("GUESTINFO:", guestInfo);
-
-    if (guestInfo.length === 0) {
-      console.warn("GuestInfo vazio → não há movimentos para mostrar.");
-      setErrorMessage(t.frontOffice.inHouses.errors.windowA);
-      setIsErrorModalOpen(true);
-      return;
-    }
-
-    // Continua fluxo normal: pega requestID fora do array
-    const requestID = updatedRecord?.requestID;
-    if (requestID) {
-      console.log("Statement atualizado com requestID:", requestID);
-      router.push(`/homepage/jsonView?recordID=${requestID}&propertyID=${propertyID}`);
-    } else {
-      console.warn("Resposta da API não contém requestID.");
-    }
-
-  } catch (error) {
-    console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
-
-    if (error.response) {
-      if (error.response.status === 409) {
-        console.warn("Registro já existente, buscando o requestID do registro existente.");
-        const existingRequestID = error.response.data?.existingRequestID;
-
-        if (existingRequestID) {
-          console.log("Registro existente encontrado com requestID:", existingRequestID);
-          router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
-        } else {
-          console.error("Não foi possível encontrar o requestID do registro existente.");
-        }
-      } else if (error.response.status === 500) {
-        setErrorMessage(t.frontOffice.inHouses.errors.noCommunication);
-        setIsErrorModalOpen(true);
+      // Continua fluxo normal: pega requestID fora do array
+      const requestID = updatedRecord?.requestID;
+      if (requestID) {
+        console.log("Statement atualizado com requestID:", requestID);
+        router.push(`/homepage/jsonView?recordID=${requestID}&propertyID=${propertyID}`);
       } else {
-        console.log("Erro inesperado:", error.response.data);
+        console.warn("Resposta da API não contém requestID.");
+      }
+
+    } catch (error) {
+      console.error("Erro ao enviar os dados ou buscar o recordID:", error.response ? error.response.data : error.message);
+
+      if (error.response) {
+        if (error.response.status === 409) {
+          console.warn("Registro já existente, buscando o requestID do registro existente.");
+          const existingRequestID = error.response.data?.existingRequestID;
+
+          if (existingRequestID) {
+            console.log("Registro existente encontrado com requestID:", existingRequestID);
+            router.push(`/homepage/jsonView?recordID=${existingRequestID}&propertyID=${propertyID}`);
+          } else {
+            console.error("Não foi possível encontrar o requestID do registro existente.");
+          }
+        } else if (error.response.status === 500) {
+          setErrorMessage(t.frontOffice.inHouses.errors.noCommunication);
+          setIsErrorModalOpen(true);
+        } else {
+          console.log("Erro inesperado:", error.response.data);
+          setErrorMessage(t.frontOffice.inHouses.errors.support);
+          setIsErrorModalOpen(true);
+        }
+      } else {
+        console.log("Erro inesperado:", error.message);
         setErrorMessage(t.frontOffice.inHouses.errors.support);
         setIsErrorModalOpen(true);
       }
-    } else {
-      console.log("Erro inesperado:", error.message);
-      setErrorMessage(t.frontOffice.inHouses.errors.support);
-      setIsErrorModalOpen(true);
     }
-  }
-};
+  };
 
   const [selectedReserva, setSelectedReserva] = useState(null);
 
@@ -221,82 +221,82 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     setSelectedReserva(null); // Limpa os dados ao fechar a modal
     window.location.reload(); // Recarrega a página
   };
-
+console.log(selectedReserva, setSelectedReserva, handleOpenModal, handleCloseModal);
   // Função para pegar as reservas
   const fetchReservas = async () => {
-  setIsLoading(true);
-  try {
-    const response = await axios.get(`/api/reservations/inHouses/${propertyID}`);
-    console.log("Response completo:", response);
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`/api/reservations/inHouses/${propertyID}`);
+      console.log("Response completo:", response);
 
-    // Parse das reservas adicionando requestID e propertyID
-    const reservasArray = response.data.response.flatMap(item => {
-      try {
-        const parsed = JSON.parse(item.responseBody);
+      // Parse das reservas adicionando requestID e propertyID
+      const reservasArray = response.data.response.flatMap(item => {
+        try {
+          const parsed = JSON.parse(item.responseBody);
 
-        // Se parsed for array, adiciona os IDs a cada reserva
-        return Array.isArray(parsed)
-          ? parsed.map(reserva => ({
+          // Se parsed for array, adiciona os IDs a cada reserva
+          return Array.isArray(parsed)
+            ? parsed.map(reserva => ({
               ...reserva,
               requestID: item.requestID,
               propertyID: item.propertyID,
             }))
-          : [];
-      } catch (err) {
-        console.error("Erro ao fazer parse de requestBody:", item.responseBody, err);
-        return [];
-      }
-    });
-
-    console.log("Reservas após parse (todas as linhas):", reservasArray);
-
-    if (reservasArray.length === 0) {
-      console.warn("Nenhuma reserva encontrada após parse.");
-      setIsLoading(false);
-      return;
-    }
-
-    const today = dayjs(currentDate, 'YYYY-MM-DD', true);
-    console.log("Data atual formatada:", today.format());
-
-    const reservasFiltradas = reservasArray.filter(reserva => {
-      const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-      const isSameDay = requestDateTime.isSame(today, 'day');
-      console.log(`Reserva: ${reserva.LastName}, RequestDateTime: ${requestDateTime.format()}`);
-      return isSameDay;
-    });
-
-    console.log("Reservas filtradas pela data atual:", reservasFiltradas);
-
-    // Agrupar por LastName + Room e pegar a mais recente
-    const seen = new Map();
-
-    reservasFiltradas.forEach(reserva => {
-      const key = `${reserva.LastName}-${reserva.Room}`;
-      const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-
-      if (!seen.has(key)) {
-        seen.set(key, reserva);
-      } else {
-        const existingReserva = seen.get(key);
-        const existingDate = dayjs(existingReserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
-
-        if (requestDateTime.isAfter(existingDate)) {
-          seen.set(key, reserva);
+            : [];
+        } catch (err) {
+          console.error("Erro ao fazer parse de requestBody:", item.responseBody, err);
+          return [];
         }
+      });
+
+      console.log("Reservas após parse (todas as linhas):", reservasArray);
+
+      if (reservasArray.length === 0) {
+        console.warn("Nenhuma reserva encontrada após parse.");
+        setIsLoading(false);
+        return;
       }
-    });
 
-    const reservasMaisRecentes = Array.from(seen.values());
-    console.log("Reservas mais recentes para o dia de hoje:", reservasMaisRecentes);
+      const today = dayjs(currentDate, 'YYYY-MM-DD', true);
+      console.log("Data atual formatada:", today.format());
 
-    setReservas(reservasMaisRecentes);
-  } catch (error) {
-    console.error("Erro ao buscar reservas:", error.message);
-  } finally {
-    setIsLoading(false);
-  }
-};
+      const reservasFiltradas = reservasArray.filter(reserva => {
+        const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+        const isSameDay = requestDateTime.isSame(today, 'day');
+        console.log(`Reserva: ${reserva.LastName}, RequestDateTime: ${requestDateTime.format()}`);
+        return isSameDay;
+      });
+
+      console.log("Reservas filtradas pela data atual:", reservasFiltradas);
+
+      // Agrupar por LastName + Room e pegar a mais recente
+      const seen = new Map();
+
+      reservasFiltradas.forEach(reserva => {
+        const key = `${reserva.LastName}-${reserva.Room}`;
+        const requestDateTime = dayjs(reserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+
+        if (!seen.has(key)) {
+          seen.set(key, reserva);
+        } else {
+          const existingReserva = seen.get(key);
+          const existingDate = dayjs(existingReserva.requestDateTime, 'YYYY-MM-DD HH:mm:ss');
+
+          if (requestDateTime.isAfter(existingDate)) {
+            seen.set(key, reserva);
+          }
+        }
+      });
+
+      const reservasMaisRecentes = Array.from(seen.values());
+      console.log("Reservas mais recentes para o dia de hoje:", reservasMaisRecentes);
+
+      setReservas(reservasMaisRecentes);
+    } catch (error) {
+      console.error("Erro ao buscar reservas:", error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
 
   useEffect(() => {
@@ -388,33 +388,33 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
     }
   };
 
-    const fetchPropertyDetails = async (propertyID) => {
-      try {
-        const response = await axios.get(`/api/properties?propertyID=${propertyID}`);
-  
-        if (response.data && response.data.response) {
-          console.log("RESPOSTA DE PROPERTY DETAILS:", response);
-  
-          // Busca o objeto no array cujo propertyID seja igual ao que você passou
-          const property = response.data.response.find(
-            (prop) => prop.propertyID === Number(propertyID)
-          );
-  
-          if (property) {
-            return property;
-          }
-  
-          throw new Error("Nenhuma propriedade encontrada com esse ID.");
-        }
-  
-        throw new Error("Nenhuma propriedade encontrada.");
-      } catch (error) {
-        console.error("Erro ao buscar detalhes da propriedade:", error);
-        return null;
-      }
-    };
+  const fetchPropertyDetails = async (propertyID) => {
+    try {
+      const response = await axios.get(`/api/properties?propertyID=${propertyID}`);
 
-    const verifyProperty = async (propertyDetails) => {
+      if (response.data && response.data.response) {
+        console.log("RESPOSTA DE PROPERTY DETAILS:", response);
+
+        // Busca o objeto no array cujo propertyID seja igual ao que você passou
+        const property = response.data.response.find(
+          (prop) => prop.propertyID === Number(propertyID)
+        );
+
+        if (property) {
+          return property;
+        }
+
+        throw new Error("Nenhuma propriedade encontrada com esse ID.");
+      }
+
+      throw new Error("Nenhuma propriedade encontrada.");
+    } catch (error) {
+      console.error("Erro ao buscar detalhes da propriedade:", error);
+      return null;
+    }
+  };
+
+  const verifyProperty = async (propertyDetails) => {
     const { propertyServer, propertyPort } = propertyDetails;
 
     for (let attempts = 0; attempts < 3; attempts++) {
@@ -428,7 +428,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
 
     return false;
   };
-  
+
   return (
     (<main className="flex flex-col flex-grow h-full overflow-hidden p-0 m-0 bg-background">
       {isLoading && <LoadingBackdrop open={isLoading} />}
@@ -499,10 +499,10 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                     // Aqui, reserva já deve ser um objeto com as propriedades que você precisa
                     return (
                       <tr key={index} onClick={() => setOpenDropdownIndex(index)} className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50">
-                      {/* <tr key={index} className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50"> */}
+                        {/* <tr key={index} className="min-h-14 h-14 border-b border-[#e8e6e6] text-textPrimaryColor text-left hover:bg-primary-50"> */}
                         <td className="pl-1 pr-1 w-8 border-r border-[#e6e6e6] align-middle text-center">
                           <div className="flex items-center justify-center w-full h-full">
-                            <Dropdown  isOpen={isOpen && !isModalOpen} onOpenChange={(open) => setOpenDropdownIndex(open ? index : null)}>
+                            <Dropdown isOpen={isOpen && !isModalOpen} onOpenChange={(open) => setOpenDropdownIndex(open ? index : null)}>
                               <DropdownTrigger>
                                 <Button
                                   variant="light"
@@ -521,9 +521,28 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                                 isOpen={true}
                                 className="relative z-10 text-textPrimaryColor"
                               >
-                                <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
+                                <DropdownItem
+                                  key="edit"
+                                  onClick={() => {
+                                    const queryParams = new URLSearchParams({
+                                      room: reserva?.Room || '',
+                                      dateCI: reserva?.DateCI || '',
+                                      booker: reserva?.Booker || '',
+                                      salutation: reserva?.Salutation || '',
+                                      lastName: reserva?.LastName || '',
+                                      firstName: reserva?.FirstName || '',
+                                      roomType: reserva?.RoomType || '',
+                                      resStatus: reserva?.resStatus || '',
+                                      childs: reserva?.Childs || '',
+                                      adults: reserva?.Adults || '',
+                                      balance: reserva?.balance || '',
+                                      country: reserva?.Country || ''
+                                    }).toString();
+                                    router.push(`/homepage/frontOfficeView/info?${queryParams}`);
+                                  }}
+                                >
                                   <div className="flex flex-row gap-2">
-                                    <IoMdInformationCircle size={15}/> {t.frontOffice.inHouses.info}
+                                    <IoMdInformationCircle size={15} /> {t.frontOffice.inHouses.info}
                                   </div>
                                 </DropdownItem>
                                 <DropdownItem
@@ -537,49 +556,49 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                                   }}
                                 >
                                   <div className="flex flex-row gap-2">
-                                  <CgFormatIndentIncrease size={15}/> {t.frontOffice.inHouses.statement}
+                                    <CgFormatIndentIncrease size={15} /> {t.frontOffice.inHouses.statement}
                                   </div>
                                 </DropdownItem>
-                                 <DropdownItem
-                                key="rf"
-                                onClick={async () => {
-                                  // Busca os detalhes da propriedade
-                                  const propertyDetails = await fetchPropertyDetails(propertyID);
-                                  console.log("PROPERTY ID:", propertyID);
-                                  console.log("Detalhes da propriedade:", propertyDetails);
+                                <DropdownItem
+                                  key="rf"
+                                  onClick={async () => {
+                                    // Busca os detalhes da propriedade
+                                    const propertyDetails = await fetchPropertyDetails(propertyID);
+                                    console.log("PROPERTY ID:", propertyID);
+                                    console.log("Detalhes da propriedade:", propertyDetails);
 
-                                  if (!propertyDetails) {
-                                    console.error("Não foi possível encontrar os detalhes da propriedade.");
-                                    return;
-                                  }
+                                    if (!propertyDetails) {
+                                      console.error("Não foi possível encontrar os detalhes da propriedade.");
+                                      return;
+                                    }
 
-                                  // Verifica se a propriedade está acessível
-                                  const isVerified = await verifyProperty(propertyDetails);
+                                    // Verifica se a propriedade está acessível
+                                    const isVerified = await verifyProperty(propertyDetails);
 
-                                  if (isVerified) {
-                                    // Redireciona caso seja verificado com sucesso
-                                    const url = `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.ProfileID}`;
+                                    if (isVerified) {
+                                      // Redireciona caso seja verificado com sucesso
+                                      const url = `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.ProfileID}`;
 
-                                    console.log("👉 URL de redirecionamento:", url);
-                                    router.push(
-                                      `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.ProfileID}`
-                                    );
-                                  } else {
-                                    // Exibe mensagem de erro no modal
-                                    setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
-                                    setIsErrorModalOpen(true);
-                                  }
-                                }}
-                              >
-                                <div className="flex flex-row gap-2">
-                                  <CgFormatIndentIncrease size={16} /> {t.frontOffice.arrivals.registrationForm}
-                                </div>
-                              </DropdownItem>
+                                      console.log("👉 URL de redirecionamento:", url);
+                                      router.push(
+                                        `/homepage/frontOfficeView/registrationForm?propertyID=${reserva.propertyID}&requestID=${reserva.requestID}&resNo=${reserva.ResNo}&profileID=${reserva.ProfileID}`
+                                      );
+                                    } else {
+                                      // Exibe mensagem de erro no modal
+                                      setErrorMessage("We were unable to communicate with the PMS service. Please contact support.");
+                                      setIsErrorModalOpen(true);
+                                    }
+                                  }}
+                                >
+                                  <div className="flex flex-row gap-2">
+                                    <CgFormatIndentIncrease size={16} /> {t.frontOffice.arrivals.registrationForm}
+                                  </div>
+                                </DropdownItem>
                               </DropdownMenu>
                             </Dropdown>
                           </div>
 
-                          <InHousesInfoForm
+                          {/* <InHousesInfoForm
                             buttonName={t.frontOffice.inHouses.info}
                             buttonColor={"transparent"}
                             modalHeader={"Res. No.: " + selectedReserva?.ResNo}
@@ -599,7 +618,7 @@ export default function InHouses({ params }) {  // Renomeado para InHouses
                             isBackdropVisible={true}
                             isOpen={isModalOpen}
                             onClose={handleCloseModal}
-                          />
+                          /> */}
 
                         </td>
                         <td className="h-14 text-right pr-2 w-28 truncate whitespace-nowrap overflow-hidden">{reserva.DateCI}</td>

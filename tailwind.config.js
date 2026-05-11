@@ -26,6 +26,8 @@ module.exports = {
         colors: {
           primaryBackground: "#FFFFFF",
           background: "#FAFAFA",
+          lightWhite: "#f1f2f4",
+          grayHeader: "#d2d6de",
           foreground: "#001517",
           textPrimaryColor: "#000000",
           buttonModalPrimaryColor: "#000000",

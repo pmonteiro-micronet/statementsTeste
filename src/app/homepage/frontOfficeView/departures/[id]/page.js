@@ -12,7 +12,7 @@ import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
 import { IoMdInformationCircle } from "react-icons/io";
 import { CgFormatIndentIncrease } from "react-icons/cg";
 
-import DepartureInfoForm from "@/components/modals/departures/info/page";
+// import DepartureInfoForm from "@/components/modals/departures/info/page";
 import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 
@@ -58,7 +58,7 @@ export default function Page({ params }) {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+console.log(isModalOpen);
   const router = useRouter();
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -226,7 +226,7 @@ export default function Page({ params }) {
     setSelectedReserva(null); // Limpa os dados ao fechar a modal
     window.location.reload(); // Recarrega a página
   };
-
+console.log(selectedReserva, setSelectedReserva, handleOpenModal, handleCloseModal);
   // Função para pegar as reservas
   useEffect(() => {
     const fetchReservas = async () => {
@@ -460,11 +460,30 @@ export default function Page({ params }) {
                               isOpen={true}
                               className="relative z-10 text-textPrimaryColor"
                             >
-                              <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
-                                <div className="flex flex-row gap-2">
-                                  <IoMdInformationCircle size={15} /> {t.frontOffice.departures.info}
-                                </div>
-                              </DropdownItem>
+                               <DropdownItem
+                                  key="edit"
+                                  onClick={() => {
+                                    const queryParams = new URLSearchParams({
+                                      room: reserva?.Room || '',
+                                      dateCO: reserva?.DateCO || '',
+                                      booker: reserva?.Booker || '',
+                                      salutation: reserva?.Salutation || '',
+                                      lastName: reserva?.LastName || '',
+                                      firstName: reserva?.FirstName || '',
+                                      roomType: reserva?.RoomType || '',
+                                      resStatus: reserva?.resStatus || '',
+                                      childs: reserva?.Childs || '',
+                                      adults: reserva?.Adults || '',
+                                      balance: reserva?.balance || '',
+                                      country: reserva?.Country || ''
+                                    }).toString();
+                                    router.push(`/homepage/frontOfficeView/info?${queryParams}`);
+                                  }}
+                                >
+                                  <div className="flex flex-row gap-2">
+                                    <IoMdInformationCircle size={15} /> {t.frontOffice.inHouses.info}
+                                  </div>
+                                </DropdownItem>
                               <DropdownItem
                                 key="show"
                                 onClick={() => {
@@ -481,7 +500,7 @@ export default function Page({ params }) {
                               </DropdownItem>
                             </DropdownMenu>
                           </Dropdown>
-                          <DepartureInfoForm
+                          {/* <DepartureInfoForm
                             buttonName={"Info"}
                             buttonColor={"transparent"}
                             modalHeader={`${t.frontOffice.infoModal.departure.title} ${selectedReserva?.ResNo}`}
@@ -501,7 +520,7 @@ export default function Page({ params }) {
                             isBackdropVisible={true}
                             isOpen={isModalOpen}
                             onClose={handleCloseModal}
-                          />
+                          /> */}
                         </td>
                         <td className="h-14 pr-2 border-r border-[#e6e6e6] text-right truncate whitespace-nowrap overflow-hidden">{reserva.Room}</td>
                         <td className="h-14 pl-2 pr-2 border-r border-[#e6e6e6] truncate whitespace-nowrap overflow-hidden">

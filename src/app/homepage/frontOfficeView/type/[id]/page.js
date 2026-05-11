@@ -23,7 +23,6 @@ import { FaCalendarAlt, FaRegTrashAlt, FaBed, FaShoppingCart } from 'react-icons
 // import { FaPlus } from "react-icons/fa6";
 // import Modal from '@/components/modals/tipologyPlan/confirmationBoxs/page';
 import { IoChevronBack } from "react-icons/io5";
-import { IoSearch } from "react-icons/io5";
 
 import en from "../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
@@ -131,7 +130,7 @@ export default function CalendarPage({ params }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isGuestNameValid, setIsGuestNameValid] = useState(false);
   const [selectedGuestId, setSelectedGuestId] = useState('');
-console.log(selectedGuestId, setSelectedGuestId, isGuestNameValid, setIsGuestNameValid, searchTerm, setSearchTerm, query, setQuery, guestName, setGuestName, selectedRoomType, setSelectedRoomType, selectedColumn, setSelectedColumn, overbookings, setOverbookings, years, setYears);
+console.log(selectedRoomType, setSelectedRoomType, guestName, setGuestName, query, setQuery, searchTerm, setSearchTerm, isGuestNameValid, setIsGuestNameValid, selectedGuestId, setSelectedGuestId);
   const [isSelecting, setIsSelecting] = useState(false);
   const [groupReservation, setRoomRevervation] = useState({}); // Estado para armazenar o número de quartos associados a cada tipo de quarto
 
@@ -143,20 +142,18 @@ console.log(selectedGuestId, setSelectedGuestId, isGuestNameValid, setIsGuestNam
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
   const [roomTypeGroups, setRoomTypeGroups] = useState([]);
   const [allDays, setAllDays] = useState([]);
   const [selectedTipology, setSelectedTipology] = useState(null);
   const [rateFilter, setRateFilter] = useState("website");
   const [step, setStep] = useState(1);
   const [selectedRoom, setSelectedRoom] = useState(null);
-console.log(selectedRoom, setSelectedRoom, step, setStep, rateFilter, setRateFilter, allDays, setAllDays, roomTypeGroups, setRoomTypeGroups, allProducts, setAllProducts, products, setProducts, error, loading);
+
   const [errors, setErrors] = useState({});
 
   const [rates, setRates] = useState({});
   const [cartItems, setCartItems] = useState([]); // { product, key, qty }
   const [cartQuantities, setCartQuantities] = useState({});
-   const [guests, setGuests] = useState(1); // default 1
   const [showCart, setShowCart] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -169,7 +166,7 @@ console.log(selectedRoom, setSelectedRoom, step, setStep, rateFilter, setRateFil
     country: "",
     paymentType: "",
   });
-console.log(rates, setRates, cartItems, setCartItems, cartQuantities, setCartQuantities, guests, setGuests, showCart, setShowCart, formData, setFormData);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -177,7 +174,7 @@ console.log(rates, setRates, cartItems, setCartItems, cartQuantities, setCartQua
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
   };
-
+console.log(rates, setRates, cartItems, setCartItems, cartQuantities, setCartQuantities, showCart, setShowCart, formData, setFormData, errors, setErrors);
   const validateForm = () => {
     const newErrors = {};
     if (!formData.firstName.trim()) newErrors.firstName = "First Name is required";
@@ -355,8 +352,8 @@ const removeFromCart = (key) => {
         const resBookings = await axios.get('/api/room_calendar/getreservationprotel', {
           params: {
             propertyID,
-            startDate: '2026-04-01',
-            endDate: '2026-04-30'
+            startDate: '2026-03-01',
+            endDate: '2026-03-31'
           }
         });
         console.log("reservas22:", resBookings);
@@ -567,9 +564,8 @@ const removeFromCart = (key) => {
       );
       const tipologyName = selectedTipology ? selectedTipology.tipologyName : '';
       const tipologyID = selectedTipology ? selectedTipology.katnr : '';
-      const tipologyCode = selectedTipology ? selectedTipology.tipologyCode : '';
       setSelectedTipology(tipologyName);
-      console.log("tipologia selecionada:", tipologyName, tipologyID, tipologyCode);
+      console.log("tipologia selecionada:", tipologyName, tipologyID);
       // Extrair o segundo número (valor) do objeto groupReservation
       const groupNumber = Object.values(groupReservation)[0] || '';
 
@@ -582,16 +578,16 @@ const removeFromCart = (key) => {
         setEndDate2(date.format('YYYY-MM-DD'), () => {
           // O estado endDate2 foi atualizado, agora você pode acessá-lo com segurança
           setSelectedDates((prevDates) => [...prevDates,
-          { start: startDate, end: formattedDate, tipologyName, tipologyID, tipologyCode, groupNumber, numberNights, guests: 1 },
-          { start: startDate2, end: formattedDate, tipologyName, tipologyID, tipologyCode, groupNumber, numberNights, guests: 1 },
+          { start: startDate, end: formattedDate, tipologyName, tipologyID, groupNumber, numberNights },
+          { start: startDate2, end: formattedDate, tipologyName, tipologyID, groupNumber, numberNights },
           ]);
         });
       } else {
         // Se a tecla Ctrl não está pressionada, defina startDate e endDate
         setEndDate(date.format('YYYY-MM-DD'));
         // Usar o estado anterior para garantir que endDate tenha o valor atualizado
-        setSelectedDates((prevDates) => [...prevDates, { start: startDate, end: formattedDate, tipologyName, tipologyID, tipologyCode, groupNumber, numberNights, guests: 1  }]);
-        triggerSearchFromSelection(startDate, formattedDate, tipologyCode);
+        setSelectedDates((prevDates) => [...prevDates, { start: startDate, end: formattedDate, tipologyName, tipologyID, groupNumber, numberNights }]);
+        triggerSearchFromSelection(startDate, formattedDate, tipologyName);
       }
 
       // Limpar seleção após o uso
@@ -807,55 +803,29 @@ const removeFromCart = (key) => {
     setSelectedDates([]);
   };
 
-  const triggerSearchFromSelection = async (start, end, tipology, guests) => {
+  const triggerSearchFromSelection = async (start, end, tipology) => {
     const nights = calculateNights(start, end);
 
     const newForm = {
       checkin: start,
       checkout: end,
       nights,
-      adults: guests,
+      adults: 1, // ou outro valor default
     };
 
     await handleSearch(newForm, tipology);
   };
 
- const handleSearch = async (customForm, tipologyParam) => {
-  const activeForm = customForm;
-
+  const handleSearch = async (customForm, tipologyParam) => {
+  // aqui usamos apenas o customForm
+  const activeForm = customForm; // já que não há form global
   setError(null);
   setLoading(true);
   setProducts([]);
+  setRoomTypeGroups([]);
+  setSelectedRoomType(null);
 
   try {
-    // 1️⃣ BD MAP
-    const resDbRooms = await axios.get(
-      `/api/properties/roomCloudProtelType`,
-      { params: { propertyID } }
-    );
-
-    const dbRooms = resDbRooms.data.rooms || [];
-
-    // 🔥 NORMALIZE
-    const normalize = (str) =>
-      str
-        ?.toString()
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
-
-    const selectedTipology = normalize(tipologyParam);
-
-    console.log("🎯 TIP SELECTED:", selectedTipology);
-
-    // 🔥 PEGA ROOMCLOUD IDS DA TIPOLOGIA
-    const allowedRoomIds = dbRooms
-      .filter((r) => normalize(r.roomName) === selectedTipology)
-      .map((r) => String(r.roomcloudId));
-
-    console.log("🟢 ALLOWED ROOM IDS:", allowedRoomIds);
-
-    // 2️⃣ DAYS
     const days = [];
     const start = new Date(activeForm.checkin);
 
@@ -870,15 +840,13 @@ const removeFromCart = (key) => {
       days.push(formatDate(d));
     }
 
-    // 3️⃣ REQUESTS
-    const requests = [];
+    setAllDays(days);
+
     const maxAdults = Number(activeForm.adults) || 1;
+    const requests = [];
 
     for (const day of days) {
-      const nextDay = formatDate(
-        new Date(new Date(day).getTime() + 24 * 60 * 60 * 1000)
-      );
-
+      const nextDay = formatDate(new Date(new Date(day).getTime() + 24 * 60 * 60 * 1000));
       for (let persons = 1; persons <= maxAdults; persons++) {
         requests.push(
           axios
@@ -895,7 +863,7 @@ const removeFromCart = (key) => {
 
     const results = await Promise.all(requests);
 
-    // 4️⃣ BUILD FINAL PRODUCTS
+    // Processar produtos como antes
     const productsArray = [];
 
     results.forEach(({ day, persons, res }) => {
@@ -905,35 +873,86 @@ const removeFromCart = (key) => {
 
       const roomIdToCount = {};
       rooms.forEach((r) => {
-        const roomId = String(r.roomId?.value ?? r.roomId);
-        roomIdToCount[roomId] = r.count?.value ?? r.count ?? 0;
+        const roomId = r.roomId?.value ?? r.roomId;
+        const count = r.count?.value ?? r.count ?? 0;
+        roomIdToCount[roomId] = count;
       });
 
       dayProducts.forEach((p) => {
-        const roomId = String(p.roomId?.value ?? p.roomId);
+        const roomId = p.roomId?.value ?? p.roomId;
+        const rateId = p.rateId?.value ?? p.rateId;
+        const roomName = p.roomName ?? "Unknown";
+        const roomType = p.roomType ?? "Unknown";
+        const currency = p.currency?.value ?? "EUR";
+        let dailyAmount = Number(p.baseRate?.amountAfterTax ?? p.baseRate ?? 0);
 
-        // 🔥 AQUI É O FILTRO REAL (CRÍTICO)
-        if (!allowedRoomIds.includes(roomId)) return;
+        if (p.baseDailyAmounts?.baseDailyAmount) {
+          const arr = Array.isArray(p.baseDailyAmounts.baseDailyAmount)
+            ? p.baseDailyAmounts.baseDailyAmount
+            : [p.baseDailyAmounts.baseDailyAmount];
+
+          const found = arr.find((d) => (d.day?.value ?? d.day) === day);
+          if (found) dailyAmount = Number(found.amountAfterTax ?? dailyAmount);
+        }
 
         productsArray.push({
           roomId,
-          rateId: p.rateId?.value ?? p.rateId,
-          roomName: p.roomName,
-          roomType: p.roomType,
+          rateId,
+          roomName,
+          roomType,
           rateDescription: p.rateDescription,
-          currency: p.currency?.value ?? "EUR",
-          baseRate: Number(p.baseRate?.amountAfterTax ?? p.baseRate ?? 0),
+          currency,
+          baseRate: dailyAmount,
           persons,
           available: roomIdToCount[roomId] ?? 0,
+          raw: p,
           day,
         });
       });
     });
 
-    console.log("✅ FINAL PRODUCTS:", productsArray);
+    const normalize = (str) =>
+      str
+        ?.toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
 
-    setProducts(productsArray);
+    const filteredProducts = productsArray.filter((p) => {
+      if (!tipologyParam) return true;
 
+      const roomName = normalize(p.roomName);
+      const roomType = normalize(p.roomType);
+      const tipology = normalize(tipologyParam);
+      console.log("Comparando:", { roomName, roomType, tipology });
+
+      return roomName.includes(tipology) || roomType.includes(tipology);
+    });
+
+    setProducts(filteredProducts);
+
+    // Populate rates for calendar display
+    const newRates = {};
+    productsArray.forEach((p) => {
+      const roomType = p.roomType;
+      const found = roomTypeState.find(
+        (rt) => rt.tipologyName === roomType || rt.tipologyCode === roomType
+      );
+      if (found) {
+        const katnr = found.katnr;
+        const day = p.day;
+        const rate = p.baseRate;
+        // Determine filter key based on roomName
+        const filterKey = p.roomName.toLowerCase().includes("website")
+          ? "website"
+          : p.roomName.toLowerCase().includes("booking")
+          ? "booking"
+          : "all";
+        if (!newRates[katnr]) newRates[katnr] = {};
+        if (!newRates[katnr][day]) newRates[katnr][day] = {};
+        newRates[katnr][day][filterKey] = rate;
+      }
+    });
+    setRates(newRates);
   } catch (err) {
     console.error(err);
     setError("Erro ao procurar disponibilidade");
@@ -1042,7 +1061,7 @@ const handleSearchCalendar = async (customForm) => {
     });
 
     // 🔥 SET FINAL
-    setAllProducts(productsArray);
+    setProducts(productsArray);
 
     console.log("✅ PRODUCTS FINAL:", productsArray);
 
@@ -1130,108 +1149,58 @@ useEffect(() => {
                   </div>
                 </div>
 
-                               {selectedDates.map((dateRange, index) => (
-                  console.log("Date Range atualizado:", dateRange),
-<div className="flex flex-col gap-3 py-2">
+                {selectedDates.map((dateRange, index) => (
+                  <div
+                    key={index}
+                    className='bg-white border border-gray-300 text-sm px-4 py-2 rounded-lg mt-4'
+                  >
+                    <div className='flex justify-between items-center py-2'>
+                      <div className='flex items-center gap-4'>
+                        <FaBed size={25} color='gray' />
+                        <p>{dateRange.tipologyName}</p>
+                      </div>
 
-  {/* Linha 1 - Nome do quarto + Lixo */}
-  <div className="flex items-center justify-between">
-    <div className="flex items-center gap-2">
-      <FaBed size={20} color="gray" />
-      <p className="text-sm">{dateRange.tipologyName}</p>
-    </div>
+                      <FaRegTrashAlt
+                        className="cursor-pointer"
+                        size={15}
+                        color='gray'
+                        onClick={() => removeEvent(index)}
+                      />
+                    </div>
 
-    <FaRegTrashAlt
-      className="cursor-pointer"
-      size={16}
-      color="gray"
-      onClick={() => removeEvent(index)}
-    />
-  </div>
+                    <div className='flex justify-around py-1'>
+                      <div className="flex flex-col gap-1">
+                        <label>In:</label>
+                        <input
+                          type="date"
+                          value={dateRange.start}
+                          onChange={(e) =>
+                            updateDateRange(index, 'start', e.target.value)
+                          }
+                        />
+                      </div>
 
-  {/* Linha 2 - Restante conteúdo */}
-  <div className="flex items-end justify-between gap-6 flex-wrap">
+                      <div className="flex flex-col gap-1">
+                        <label>Out:</label>
+                        <input
+                          type="date"
+                          value={dateRange.end}
+                          onChange={(e) =>
+                            updateDateRange(index, 'end', e.target.value)
+                          }
+                        />
+                      </div>
 
-    {/* Check-in / Check-out */}
-    <div className="flex gap-4">
-      <div className="flex flex-col">
-        <label className="text-xs">Check-in</label>
-        <input
-          type="date"
-          value={dateRange.start}
-          onChange={(e) => updateDateRange(index, 'start', e.target.value)}
-          className="border px-2 py-1 rounded text-sm"
-        />
-      </div>
+                      <div className='flex items-center'>
+                        <p>N: {calculateNights(dateRange.start, dateRange.end)}</p>
+                      </div>
 
-      <div className="flex flex-col">
-        <label className="text-xs">Check-out</label>
-        <input
-          type="date"
-          value={dateRange.end}
-          onChange={(e) => updateDateRange(index, 'end', e.target.value)}
-          className="border px-2 py-1 rounded text-sm"
-        />
-      </div>
-    </div>
-
-    {/* Nights */}
-    <div className="flex flex-col">
-      <label className="text-xs">Nights</label>
-      <p className="h-[30px] flex items-center">
-        {calculateNights(dateRange.start, dateRange.end)}
-      </p>
-    </div>
-
-    {/* Guests */}
-    <div className="flex flex-col">
-      <label className="text-xs">Guests</label>
-      <div className="flex items-center gap-2 h-[30px]">
-        <button
-          onClick={() =>
-            updateDateRange(index, 'guests', Math.max(1, (dateRange.guests || 1) - 1))
-          }
-          className="px-2 py-1 border rounded bg-white"
-        >
-          -
-        </button>
-
-        <div className="flex items-center gap-1">
-          <FaUser size={14} />
-          <span>{dateRange.guests || 1}</span>
-        </div>
-
-        <button
-          onClick={() =>
-            updateDateRange(index, 'guests', (dateRange.guests || 1) + 1)
-          }
-          className="px-2 py-1 border rounded bg-white"
-        >
-          +
-        </button>
-      </div>
-    </div>
-
-    {/* Botão Search */}
-    <div className="flex items-end">
-      <button
-        onClick={() =>
-          triggerSearchFromSelection(
-            dateRange.start,
-            dateRange.end,
-            dateRange.tipologyCode,
-            dateRange.guests || 1
-          )
-        }
-        className="bg-primary text-white px-4 py-2 rounded"
-      >
-        <IoSearch size={18} />
-      </button>
-    </div>
-
-  </div>
-
-</div>
+                      <div className='flex flex-row items-center gap-2'>
+                        <FaUser size={15} />
+                        <p>1</p>
+                      </div>
+                    </div>
+                  </div>
                 ))}
 
                 {/* AVAILABLE ROOMS */}
@@ -1245,7 +1214,6 @@ useEffect(() => {
                 )}
 
                 {!loading && products.length > 0 && (
-                  console.log("CRLH PRODUCTS PARA EXIBIÇÃO:", products),
                   <div className="w-full my-4">
                     <div className="overflow-x-auto">
 
@@ -1262,165 +1230,95 @@ useEffect(() => {
                         </select>
                       </div>
 
-                     <table className="min-w-full border text-sm">
-  <tbody>
-    {(() => {
-      console.log("🔵 PRODUCTS TOTAL:", products);
+                      <table className="min-w-full border text-sm">
+                        <thead>
+                          <tr className="bg-primary text-white sticky top-0 z-10">
+                            <th className="border px-2 py-2">Room Name</th>
+                            <th className="border px-2 py-2">Available</th>
+                            {allDays.map((day) => (
+                              <th key={day} className="border px-2 py-2">{day}</th>
+                            ))}
+                            <th className="border px-2 py-2">Total</th>
+                          </tr>
+                        </thead>
 
-      const filteredProducts = products.filter(product => {
-        if (rateFilter === "all") return true;
+                        <tbody>
+                          {(() => {
+                            const filteredProducts = products.filter((product) => {
+                              if (rateFilter === "all") return true;
+                              const name = product.roomName.toLowerCase();
+                              if (rateFilter === "website") return name.includes("website");
+                              if (rateFilter === "booking") return name.includes("booking");
+                              return true;
+                            });
 
-        const name = product.roomName?.toLowerCase() || "";
+                            const grouped = filteredProducts.reduce((acc, product) => {
+                              const key = product.roomName;
+                              if (!acc[key]) acc[key] = [];
+                              acc[key].push(product);
+                              return acc;
+                            }, {});
 
-        return rateFilter === "website"
-          ? name.includes("website")
-          : name.includes("booking");
-      });
+                            return Object.entries(grouped).map(([roomName, group], index) => {
+                              const dailyMap = {};
+                              let available = 0;
 
-      const groupedByRoomId = filteredProducts.reduce((acc, product) => {
-        const key = product.roomId;
+                              group.forEach((p) => {
+                                dailyMap[p.day] = Number(p.baseRate);
+                                available = Math.max(available, Number(p.available));
+                              });
 
-        if (!acc[key]) {
-          acc[key] = {
-            roomName: product.roomName,
-            roomType: product.roomType,
-            items: [],
-          };
-        }
+                              const currency = group[0].currency || "EUR";
 
-        acc[key].items.push(product);
-        return acc;
-      }, {});
+                              const formatAmount = (amt) => {
+                                if (!Number.isFinite(amt)) return "-";
+                                return amt.toLocaleString(undefined, {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }) + ` ${currency}`;
+                              };
 
-      const entries = Object.entries(groupedByRoomId);
+                              const total = Object.values(dailyMap).reduce((s, v) => s + (v || 0), 0);
 
-      if (entries.length === 0) return null;
+                              const isSelectedCart = cartItems.some((item) => item.product.roomName === roomName && item.product.rateId === group[0]?.rateId);
+                              return (
+                                <tr
+                                  key={roomName + index}
+                                  className={`hover:bg-gray-50 cursor-pointer ${isSelectedCart ? 'bg-blue-100' : ''}`}
+                                  onClick={() => {
+                                    const selected = {
+                                      roomId: group[0]?.roomId,
+                                      rateId: group[0]?.rateId,
+                                      roomName,
+                                      roomType: group[0]?.roomType,
+                                      rateDescription: group[0]?.rateDescription,
+                                      baseRate: group[0]?.baseRate,
+                                      currency: group[0]?.currency,
+                                      total,
+                                      available,
+                                    };
+                                    setSelectedRoom(selected);
+                                    addToCart(selected);
+                                  }}
+                                >
+                                <td className="border px-2 py-2">{roomName}</td>
+                                <td className="border px-2 py-2 text-center">{available}</td>
 
-      return entries.map(([roomId, data], idx) => {
-        const group = data.items;
-        const roomName = data.roomName;
+                                {allDays.map((day) => (
+                                  <td key={`${roomName}-${day}`} className="border px-2 py-2 text-center">
+                                    {dailyMap[day] !== undefined ? formatAmount(dailyMap[day]) : "-"}
+                                  </td>
+                                ))}
 
-        const dailyMap = {};
-        const availableMap = {};
-
-        group.forEach(p => {
-          dailyMap[p.day] = Number(p.baseRate);
-
-          availableMap[p.day] = Math.max(
-            availableMap[p.day] || 0,
-            Number(p.available || 0)
-          );
-        });
-
-        const roomDays = [...new Set(group.map(p => p.day))].sort();
-
-        const total = Object.values(dailyMap).reduce(
-          (s, v) => s + (v || 0),
-          0
-        );
-
-        const currency = group[0]?.currency || "EUR";
-
-        const formatAmount = (amt) =>
-          !Number.isFinite(amt)
-            ? "-"
-            : `${amt.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })} ${currency}`;
-
-        return (
-          <React.Fragment key={roomId + idx}>
-            {/* HEADER */}
-            <tr className="bg-primary text-white">
-              <td colSpan={roomDays.length + 2} className="px-4 py-2 border">
-                {roomName}
-              </td>
-            </tr>
-
-            {/* DATAS */}
-            <tr className="bg-lightBlueCol text-xs">
-              <td className="border px-2 py-1"></td>
-
-              {roomDays.map(day => {
-                const d = new Date(day);
-
-                return (
-                  <td key={day} className="border px-2 py-1 text-center">
-                    <div className="flex flex-col items-center">
-                      <span className="font-bold">{d.getDate()}</span>
-                      <span className="text-gray-400 text-xs">
-                        {d.toLocaleString("default", { month: "short" })}
-                      </span>
-                    </div>
-                  </td>
-                );
-              })}
-
-              <td className="border px-2 py-1 text-center">Total</td>
-            </tr>
-
-            {/* DISPONIBILIDADE */}
-            <tr className="text-xs">
-              <td className="border px-2 py-1 font-medium">
-                Disponibilidade
-              </td>
-
-              {roomDays.map(day => (
-                <td key={day} className="border px-2 py-1 text-center">
-                  {availableMap[day] ?? 0}
-                </td>
-              ))}
-
-              <td className="border px-2 py-1"></td>
-            </tr>
-
-            {/* PREÇOS */}
-          <tr
-  className="hover:bg-gray-50 cursor-pointer"
-  onClick={() => {
-    const selected = {
-      roomId,
-      roomName,
-      roomType: data.roomType,
-      items: group,
-    };
-
-    console.log("CLICK ROOM:", selected);
-
-    // se quiseres ligar ao cart:
-    addToCart(selected);
-  }}
->
-  {/* 👤 PERSONS COLUMN */}
-  <td className="border px-2 py-2 flex items-center gap-1">
-    <FaUser size={14} color="gray" />
-    <span className="text-gray-600">
-      x{Math.max(...group.map(x => x.persons || 1))}
-    </span>
-  </td>
-
-  {/* 💰 DAILY PRICES */}
-  {roomDays.map(day => (
-    <td
-      key={`${roomId}-${day}`}
-      className="border px-2 py-2 text-center"
-    >
-      {formatAmount(dailyMap[day])}
-    </td>
-  ))}
-
-  {/* TOTAL */}
-  <td className="border px-2 py-2 text-center font-semibold">
-    {formatAmount(total)}
-  </td>
-</tr>
-          </React.Fragment>
-        );
-      });
-    })()}
-  </tbody>
-</table>
+                                <td className="border px-2 py-2 text-center font-semibold">
+                                  {formatAmount(total)}
+                                </td>
+                              </tr>
+                              );
+                            });
+                          })()}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 )}
@@ -1635,10 +1533,10 @@ useEffect(() => {
             {step === 1 && (
               <button
                 className={`text-sm px-4 py-2 rounded ${selectedDates.length === 0 || !selectedRoom
-                  ? "bg-gray-300 text-white cursor-not-allowed"
-                  : "bg-primary text-white"
+                    ? "bg-gray-300 text-white cursor-not-allowed"
+                    : "bg-primary text-white"
                   }`}
-                disabled={selectedDates.length === 0 && cartItems.length === 0}
+                disabled={selectedDates.length === 0 || !selectedRoom}
                 onClick={() => setStep(2)}
               >
                 Reserve
@@ -1646,7 +1544,7 @@ useEffect(() => {
             )}
 
             {/* STEP 2 */}
-             {step === 2 && (
+            {step === 2 && (
               <>
                 <button
                   className="text-sm bg-primary text-white px-4 py-2 rounded"
@@ -1786,7 +1684,7 @@ ${weeks[currentWeekIndex][weeks[currentWeekIndex].length - 1].date.format("DDMMM
   );
 
   // Produtos para esta célula — **sempre calculados, independente da seleção**
-  const cellProducts = allProducts.filter((p) => {
+  const cellProducts = products.filter((p) => {
     const matchesDay = p.day === formattedDate;
 
     const matchesTipologyInName =

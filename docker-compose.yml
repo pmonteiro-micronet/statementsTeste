@@ -1,11 +1,11 @@
 version: "3.9"
 
 services:
-  app:
-    build: .
-    container_name: hotelextv
-    ports:
-      - "3003:3000"
+  extensions:
+    build: ./extensions
+    container_name: extensions
+    expose:
+      - "3000"
     environment:
       DATABASE_URL: "mysql://micro:Nextjs.2024@192.168.145.20:3306/extensions"
       NEXTAUTH_SECRET: "dikr3FJ9I2HG408GF24G...hroigsfa8s7af09auijhf3208fhi2o"

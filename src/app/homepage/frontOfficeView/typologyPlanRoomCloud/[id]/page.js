@@ -11,7 +11,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 
 //imports de componentes
 // import ReservationsForm from '@/components/modals/frontOffice/reservations/multiReservations/page';
-// // import InputFieldControlled from '@/components/functionsForm/inputs/typeText/page';
+// import InputFieldControlled from '@/components/functionsForm/inputs/typeText/page';
 // import IndividualForm from "@/components/modals/frontOffice/clientForm/individuals/page";
 // import CompanyForm from "@/components/modals/frontOffice/clientForm/companies/page";
 // import TravelGroupForm from "@/components/modals/frontOffice/clientForm/travelAgency/page";
@@ -23,7 +23,6 @@ import { FaCalendarAlt, FaRegTrashAlt, FaBed, FaShoppingCart } from 'react-icons
 // import { FaPlus } from "react-icons/fa6";
 // import Modal from '@/components/modals/tipologyPlan/confirmationBoxs/page';
 import { IoChevronBack } from "react-icons/io5";
-import { IoSearch } from "react-icons/io5";
 
 import en from "../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
@@ -33,6 +32,7 @@ const translations = { en, pt, es };
 
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { FaUser } from "react-icons/fa";
+import { IoSearch } from "react-icons/io5";
 
 import { Popover, PopoverTrigger, PopoverContent, Button } from "@nextui-org/react";
 // import { getMonth } from 'date-fns';
@@ -131,7 +131,7 @@ export default function CalendarPage({ params }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isGuestNameValid, setIsGuestNameValid] = useState(false);
   const [selectedGuestId, setSelectedGuestId] = useState('');
-console.log(selectedGuestId, setSelectedGuestId, isGuestNameValid, setIsGuestNameValid, searchTerm, setSearchTerm, query, setQuery, guestName, setGuestName, selectedRoomType, setSelectedRoomType, selectedColumn, setSelectedColumn, overbookings, setOverbookings, years, setYears);
+console.log(selectedGuestId, setSelectedGuestId, isGuestNameValid, setIsGuestNameValid, searchTerm, setSearchTerm, query, setQuery, guestName, setGuestName, selectedRoomType, setSelectedRoomType);
   const [isSelecting, setIsSelecting] = useState(false);
   const [groupReservation, setRoomRevervation] = useState({}); // Estado para armazenar o número de quartos associados a cada tipo de quarto
 
@@ -150,14 +150,14 @@ console.log(selectedGuestId, setSelectedGuestId, isGuestNameValid, setIsGuestNam
   const [rateFilter, setRateFilter] = useState("website");
   const [step, setStep] = useState(1);
   const [selectedRoom, setSelectedRoom] = useState(null);
-console.log(selectedRoom, setSelectedRoom, step, setStep, rateFilter, setRateFilter, allDays, setAllDays, roomTypeGroups, setRoomTypeGroups, allProducts, setAllProducts, products, setProducts, error, loading);
+
   const [errors, setErrors] = useState({});
 
   const [rates, setRates] = useState({});
   const [cartItems, setCartItems] = useState([]); // { product, key, qty }
   const [cartQuantities, setCartQuantities] = useState({});
-   const [guests, setGuests] = useState(1); // default 1
   const [showCart, setShowCart] = useState(false);
+  const [guests, setGuests] = useState(1); // default 1
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -169,7 +169,7 @@ console.log(selectedRoom, setSelectedRoom, step, setStep, rateFilter, setRateFil
     country: "",
     paymentType: "",
   });
-console.log(rates, setRates, cartItems, setCartItems, cartQuantities, setCartQuantities, guests, setGuests, showCart, setShowCart, formData, setFormData);
+  const [tipologyCounts, setTipologyCounts] = useState({});
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -177,7 +177,7 @@ console.log(rates, setRates, cartItems, setCartItems, cartQuantities, setCartQua
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
   };
-
+console.log(tipologyCounts, setTipologyCounts, cartQuantities, setCartQuantities, guests, setGuests, rates, setRates, step, setStep, rateFilter, setRateFilter, allDays, setAllDays, roomTypeGroups, setRoomTypeGroups, allProducts, setAllProducts, products, setProducts, error, loading);
   const validateForm = () => {
     const newErrors = {};
     if (!formData.firstName.trim()) newErrors.firstName = "First Name is required";
@@ -213,8 +213,8 @@ console.log(rates, setRates, cartItems, setCartItems, cartQuantities, setCartQua
     const normalizedItems = cartItems.length
       ? cartItems
       : selectedRoom
-      ? [{ product: selectedRoom, qty: 1 }]
-      : [];
+        ? [{ product: selectedRoom, qty: 1 }]
+        : [];
 
     const items = normalizedItems.map((it) => ({
       roomId: it.product.roomId,
@@ -267,22 +267,22 @@ console.log(rates, setRates, cartItems, setCartItems, cartQuantities, setCartQua
   };
 
   const addToCart = (product) => {
-  const key = product.roomName + "-" + product.rateDescription; // ou qualquer ID único
-  setCartItems((prev) => {
-    const exists = prev.find((it) => it.key === key);
-    if (exists) {
-      return prev.map((it) =>
-        it.key === key ? { ...it, qty: it.qty + 1 } : it
-      );
-    } else {
-      return [...prev, { product, key, qty: 1 }];
-    }
-  });
-};
+    const key = product.roomName + "-" + product.rateDescription; // ou qualquer ID único
+    setCartItems((prev) => {
+      const exists = prev.find((it) => it.key === key);
+      if (exists) {
+        return prev.map((it) =>
+          it.key === key ? { ...it, qty: it.qty + 1 } : it
+        );
+      } else {
+        return [...prev, { product, key, qty: 1 }];
+      }
+    });
+  };
 
-const removeFromCart = (key) => {
-  setCartItems((prev) => prev.filter((it) => it.key !== key));
-};
+  const removeFromCart = (key) => {
+    setCartItems((prev) => prev.filter((it) => it.key !== key));
+  };
 
   console.log(roomTypeGroups, error, searchTerm, setShowButton, showButton, selectedTipology);
   useEffect(() => {
@@ -304,71 +304,124 @@ const removeFromCart = (key) => {
     setShowModal(!showModal);
   };
 
+  // useEffect(() => {
+  //   const getData = async () => {
+  //     try {
+
+  //       // buscar tipologias
+  //       const resTipologies = await axios.get(`/api/room_calendar/roomType`, {
+  //         params: { propertyID }
+  //       });
+
+  //       const tipologies = resTipologies.data;
+
+  //       // buscar quartos
+  //       const resRooms = await axios.get(`/api/room_calendar/rooms`, {
+  //         params: { propertyID }
+  //       });
+
+  //       const rooms = resRooms.data;
+
+  //       // agrupar quartos por tipologia
+  //       const roomCounts = {};
+  //       const tipologyMap = {};
+
+  //       rooms.forEach((room) => {
+  //         const tipology = tipologies.find(
+  //           (t) => Number(t.katnr) === Number(room.katnr)
+  //         );
+
+  //         if (!tipology) return;
+
+  //         // contar quartos
+  //         roomCounts[room.katnr] = (roomCounts[room.katnr] || 0) + 1;
+
+  //         // guardar tipologia única
+  //         if (!tipologyMap[room.katnr]) {
+  //           tipologyMap[room.katnr] = {
+  //             katnr: room.katnr,
+  //             tipologyCode: tipology.kat,
+  //             tipologyName: tipology.bez
+  //           };
+  //         }
+  //       });
+
+  //       const uniqueTipologies = Object.values(tipologyMap);
+
+  //       setRoomTypeState(uniqueTipologies);
+  //       setRoomCounts(roomCounts);
+
+  //       // reservas
+  //       const resBookings = await axios.get('/api/room_calendar/getreservationprotel', {
+  //         params: {
+  //           propertyID,
+  //           startDate: '2026-03-01',
+  //           endDate: '2026-03-31'
+  //         }
+  //       });
+  //       console.log("reservas22:", resBookings);
+  //       setReservation(resBookings.data);
+
+  //     } catch (error) {
+  //       console.error("Erro ao carregar dados:", error);
+  //     }
+  //   };
+
+  //   getData();
+  // }, []);
   useEffect(() => {
     const getData = async () => {
       try {
+        // 1️⃣ Buscar OTA rooms
+        const resOtaRooms = await axios.post(`/api/reservations/ota/rooms`, { propertyID });
+        const otaData = resOtaRooms.data?.Response;
+        const masterRooms = Array.isArray(otaData.masterRoom)
+          ? otaData.masterRoom
+          : [otaData.masterRoom];
+        console.log("masterRooms:", masterRooms);
+        // 2️⃣ Mapear tipologias
+        const roomTypes = masterRooms.map((room) => ({
+          katnr: room.$.id,
+          tipologyName: room.$.description,
+          roomId: room.childRoom?.$.id
+        }));
 
-        // buscar tipologias
-        const resTipologies = await axios.get(`/api/room_calendar/roomType`, {
+        setRoomTypeState(roomTypes);
+
+        // 3️⃣ Buscar os counts da base de dados
+        const resDbRooms = await axios.get(`/api/properties/roomCloudProtelType`, {
           params: { propertyID }
         });
+        console.log("resDbRooms:", resDbRooms);
+        const dbRooms = resDbRooms.data.rooms; // array com roomcount
 
-        const tipologies = resTipologies.data;
-
-        // buscar quartos
-        const resRooms = await axios.get(`/api/room_calendar/rooms`, {
-          params: { propertyID }
-        });
-
-        const rooms = resRooms.data;
-
-        // agrupar quartos por tipologia
+        // 4️⃣ Montar roomCounts usando o campo roomcount da base
         const roomCounts = {};
-        const tipologyMap = {};
-
-        rooms.forEach((room) => {
-          const tipology = tipologies.find(
-            (t) => Number(t.katnr) === Number(room.katnr)
+        roomTypes.forEach(rt => {
+          // Pega todos os DB rooms que pertencem a esta tipologia
+          const matchedDbRooms = dbRooms.filter(
+            r => String(r.roomcloudId) === String(rt.roomId)
           );
 
-          if (!tipology) return;
+          // Soma todos os roomcount caso haja mais de um
+          const totalCount = matchedDbRooms.reduce((sum, r) => sum + (r.roomcount ?? 0), 0);
 
-          // contar quartos
-          roomCounts[room.katnr] = (roomCounts[room.katnr] || 0) + 1;
-
-          // guardar tipologia única
-          if (!tipologyMap[room.katnr]) {
-            tipologyMap[room.katnr] = {
-              katnr: room.katnr,
-              tipologyCode: tipology.kat,
-              tipologyName: tipology.bez
-            };
-          }
+          roomCounts[rt.katnr] = totalCount;
         });
 
-        const uniqueTipologies = Object.values(tipologyMap);
-
-        setRoomTypeState(uniqueTipologies);
+        console.log("roomCounts:", roomCounts);
         setRoomCounts(roomCounts);
 
-        // reservas
-        const resBookings = await axios.get('/api/room_calendar/getreservationprotel', {
-          params: {
-            propertyID,
-            startDate: '2026-04-01',
-            endDate: '2026-04-30'
-          }
-        });
-        console.log("reservas22:", resBookings);
-        setReservation(resBookings.data);
+        // 5️⃣ Limpar reservas
+        setReservation([]);
 
       } catch (error) {
-        console.error("Erro ao carregar dados:", error);
+        console.error("Erro ao carregar OTA:", error);
       }
     };
 
     getData();
-  }, []);
+  }, [propertyID]);
 
   useEffect(() => {
     // Atualizar o updatedAvailability sempre que o availability for atualizado
@@ -440,6 +493,39 @@ const removeFromCart = (key) => {
     updateAvailability(); // Recalculate whenever dependencies change
   }, [roomTypeState, roomCounts, reservation, currentWeekIndex]);
 
+  const updateAvailabilityFromProducts = (productsArray) => {
+    let updatedAvailability = {};
+    let dailyOverbookings = {};
+
+    // Agrupar por roomId e day
+    const grouped = {};
+    productsArray.forEach((p) => {
+      const roomId = p.roomId;
+      const day = p.day;
+      if (!grouped[roomId]) grouped[roomId] = {};
+      if (!grouped[roomId][day]) grouped[roomId][day] = 0;
+      grouped[roomId][day] += Number(p.available) || 0;
+    });
+
+    // Para cada roomId, definir disponibilidade
+    Object.keys(grouped).forEach((roomId) => {
+      if (!updatedAvailability[roomId]) updatedAvailability[roomId] = {};
+      Object.keys(grouped[roomId]).forEach((day) => {
+        const available = grouped[roomId][day];
+        updatedAvailability[roomId][day] = available;
+
+        if (!dailyOverbookings[day]) dailyOverbookings[day] = 0;
+        if (available < 0) {
+          dailyOverbookings[day] += Math.abs(available);
+        }
+      });
+    });
+
+    setAvailability(updatedAvailability);
+    setTotalOverbookings(dailyOverbookings);
+    setOverbookings(dailyOverbookings);
+  };
+console.log(updateAvailabilityFromProducts);
   // Funções para navegar entre as semanas
   const goToPreviousWeek = () => {
     let newToday = today;
@@ -517,9 +603,9 @@ const removeFromCart = (key) => {
     return dayjs(date).format("YYYY-MM-DD");
   };
 
-  const handleMouseDown = (date, roomTypeID, rowIndex, columnIndex) => {
+  const handleMouseDown = (date, roomTypeID, roomid, rowIndex, columnIndex) => {
     const formattedDate = date.format('YYYY-MM-DD');
-    setSelectionInfo({ roomTypeID, dates: [formattedDate] });
+    setSelectionInfo({ roomTypeID, roomid, dates: [formattedDate] });
     setIsDragging(true);
     setIsSelecting(true);
     setStartDate(formattedDate);
@@ -531,6 +617,7 @@ const removeFromCart = (key) => {
     if (ctrlPressed) {
       setSelectionInfo(prev => ({
         roomTypeID: prev.roomTypeID,
+        roomid: prev.roomid,
         dates: [...prev.dates, formattedDate]
       }));
       setStartDate2(formattedDate);
@@ -562,14 +649,19 @@ const removeFromCart = (key) => {
       console.log("selecionado:", [...selectedCells]);
 
       const formattedDate = date.format('YYYY-MM-DD');
-      const selectedTipology = roomTypeState.find(
-        t => t.katnr === selectionInfo.roomTypeID
-      );
+      // const selectedTipology = roomTypeState.find(
+      //   t => t.katnr === selectionInfo.roomTypeID
+      // );
+      const selectedTipology = roomTypeState.find((t) => {
+
+        return t.katnr === selectionInfo.roomTypeID;
+      });
       const tipologyName = selectedTipology ? selectedTipology.tipologyName : '';
       const tipologyID = selectedTipology ? selectedTipology.katnr : '';
-      const tipologyCode = selectedTipology ? selectedTipology.tipologyCode : '';
+      const roomID = selectionInfo.roomid;
       setSelectedTipology(tipologyName);
-      console.log("tipologia selecionada:", tipologyName, tipologyID, tipologyCode);
+
+      console.log("tipologia selecionada:", tipologyName, tipologyID, roomID);
       // Extrair o segundo número (valor) do objeto groupReservation
       const groupNumber = Object.values(groupReservation)[0] || '';
 
@@ -582,16 +674,16 @@ const removeFromCart = (key) => {
         setEndDate2(date.format('YYYY-MM-DD'), () => {
           // O estado endDate2 foi atualizado, agora você pode acessá-lo com segurança
           setSelectedDates((prevDates) => [...prevDates,
-          { start: startDate, end: formattedDate, tipologyName, tipologyID, tipologyCode, groupNumber, numberNights, guests: 1 },
-          { start: startDate2, end: formattedDate, tipologyName, tipologyID, tipologyCode, groupNumber, numberNights, guests: 1 },
+          { start: startDate, end: formattedDate, tipologyName, tipologyID, roomID, groupNumber, numberNights, guests: 1 },
+          { start: startDate2, end: formattedDate, tipologyName, tipologyID, roomID, groupNumber, numberNights, guests: 1 },
           ]);
         });
       } else {
         // Se a tecla Ctrl não está pressionada, defina startDate e endDate
         setEndDate(date.format('YYYY-MM-DD'));
         // Usar o estado anterior para garantir que endDate tenha o valor atualizado
-        setSelectedDates((prevDates) => [...prevDates, { start: startDate, end: formattedDate, tipologyName, tipologyID, tipologyCode, groupNumber, numberNights, guests: 1  }]);
-        triggerSearchFromSelection(startDate, formattedDate, tipologyCode);
+        setSelectedDates((prevDates) => [...prevDates, { start: startDate, end: formattedDate, tipologyName, tipologyID, roomID, groupNumber, numberNights, guests: 1 }]);
+        triggerSearchFromSelection(startDate, formattedDate, roomID);
       }
 
       // Limpar seleção após o uso
@@ -662,9 +754,11 @@ const removeFromCart = (key) => {
   };
 
   const updateDateRange = (index, field, value) => {
-    const updatedDates = [...selectedDates];
-    updatedDates[index][field] = value;
-    setSelectedDates(updatedDates);
+    setSelectedDates((prevDates) =>
+      prevDates.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    );
   };
 
   // const handleInputChange = (event) => {
@@ -820,261 +914,333 @@ const removeFromCart = (key) => {
     await handleSearch(newForm, tipology);
   };
 
- const handleSearch = async (customForm, tipologyParam) => {
-  const activeForm = customForm;
+  const handleSearch = async (customForm, tipologyParam) => {
+    // aqui usamos apenas o customForm
+    const activeForm = customForm; // já que não há form global
+    setError(null);
+    setLoading(true);
+    setProducts([]);
+    setRoomTypeGroups([]);
+    setSelectedRoomType(null);
 
-  setError(null);
-  setLoading(true);
-  setProducts([]);
+    try {
+      const days = [];
+      const start = new Date(activeForm.checkin);
 
-  try {
-    // 1️⃣ BD MAP
-    const resDbRooms = await axios.get(
-      `/api/properties/roomCloudProtelType`,
-      { params: { propertyID } }
-    );
+      const nights =
+        Number(activeForm.nights) ||
+        calculateNights(activeForm.checkin, activeForm.checkout) ||
+        1;
 
-    const dbRooms = resDbRooms.data.rooms || [];
+      for (let i = 0; i < nights; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        days.push(formatDate(d));
+      }
 
-    // 🔥 NORMALIZE
-    const normalize = (str) =>
-      str
-        ?.toString()
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
+      setAllDays(days);
 
-    const selectedTipology = normalize(tipologyParam);
+      const maxAdults = Number(activeForm.adults) || 1;
+      const requests = [];
 
-    console.log("🎯 TIP SELECTED:", selectedTipology);
+      for (const day of days) {
+        const nextDay = formatDate(new Date(new Date(day).getTime() + 24 * 60 * 60 * 1000));
+        for (let persons = 1; persons <= maxAdults; persons++) {
+          requests.push(
+            axios
+              .post("/api/reservations/ota/available_products", {
+                propertyID,
+                checkin: day,
+                checkout: nextDay,
+                adults: persons,
+              })
+              .then((r) => ({ day, persons, res: r }))
+          );
+        }
+      }
 
-    // 🔥 PEGA ROOMCLOUD IDS DA TIPOLOGIA
-    const allowedRoomIds = dbRooms
-      .filter((r) => normalize(r.roomName) === selectedTipology)
-      .map((r) => String(r.roomcloudId));
+      const results = await Promise.all(requests);
+      console.log("✅ RESULTS:", results);
+      // Processar produtos como antes
+      const productsArray = [];
 
-    console.log("🟢 ALLOWED ROOM IDS:", allowedRoomIds);
+      results.forEach(({ day, persons, res }) => {
+        const data = res.data.products ? res.data : res.data.data || {};
+        const dayProducts = data.products || [];
+        const rooms = data.rooms || [];
 
-    // 2️⃣ DAYS
-    const days = [];
-    const start = new Date(activeForm.checkin);
+        const roomIdToCount = {};
+        rooms.forEach((r) => {
+          const roomId = r.roomId?.value ?? r.roomId;
+          const count = r.count?.value ?? r.count ?? 0;
+          roomIdToCount[roomId] = count;
+        });
 
-    const nights =
-      Number(activeForm.nights) ||
-      calculateNights(activeForm.checkin, activeForm.checkout) ||
-      1;
+        dayProducts.forEach((p) => {
+          const roomId = p.roomId?.value ?? p.roomId;
+          const rateId = p.rateId?.value ?? p.rateId;
+          const roomName = p.roomName ?? "Unknown";
+          const roomType = p.roomType ?? "Unknown";
+          const currency = p.currency?.value ?? "EUR";
+          let dailyAmount = Number(p.baseRate?.amountAfterTax ?? p.baseRate ?? 0);
 
-    for (let i = 0; i < nights; i++) {
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
-      days.push(formatDate(d));
+          if (p.baseDailyAmounts?.baseDailyAmount) {
+            const arr = Array.isArray(p.baseDailyAmounts.baseDailyAmount)
+              ? p.baseDailyAmounts.baseDailyAmount
+              : [p.baseDailyAmounts.baseDailyAmount];
+
+            const found = arr.find((d) => (d.day?.value ?? d.day) === day);
+            if (found) dailyAmount = Number(found.amountAfterTax ?? dailyAmount);
+          }
+
+          productsArray.push({
+            roomId,
+            rateId,
+            roomName,
+            roomType,
+            rateDescription: p.rateDescription,
+            currency,
+            baseRate: dailyAmount,
+            persons,
+            available: roomIdToCount[roomId] ?? 0,
+            raw: p,
+            day,
+          });
+        });
+      });
+
+      const normalize = (str) =>
+        str
+          ?.toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+
+      const filteredProducts = productsArray.filter((p) => {
+        if (!tipologyParam) return true;
+
+        const roomName = normalize(p.roomName);
+        const roomType = normalize(p.roomType);
+        const roomID = normalize(p.roomId);
+        const tipology = normalize(tipologyParam);
+        console.log("Comparando:", { roomName, roomType, tipology });
+        console.log("ROOM IDS:", productsArray.map(p => ({
+          roomId: p.roomId,
+          roomName: p.roomName
+        })));
+        return tipology.includes(roomID);
+      });
+
+      setProducts(filteredProducts);
+      console.log("✅ PRODUCTS FINAL:", filteredProducts);
+
+      // Populate rates for calendar display
+      const newRates = {};
+      productsArray.forEach((p) => {
+        const roomType = p.roomType;
+        const found = roomTypeState.find(
+          (rt) => rt.tipologyName === roomType || rt.tipologyCode === roomType
+        );
+        if (found) {
+          const katnr = found.katnr;
+          const day = p.day;
+          const rate = p.baseRate;
+          // Determine filter key based on roomName
+          const filterKey = p.roomName.toLowerCase().includes("website")
+            ? "website"
+            : p.roomName.toLowerCase().includes("booking")
+              ? "booking"
+              : "all";
+          if (!newRates[katnr]) newRates[katnr] = {};
+          if (!newRates[katnr][day]) newRates[katnr][day] = {};
+          newRates[katnr][day][filterKey] = rate;
+        }
+      });
+      setRates(newRates);
+    } catch (err) {
+      console.error(err);
+      setError("Erro ao procurar disponibilidade");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    // 3️⃣ REQUESTS
-    const requests = [];
-    const maxAdults = Number(activeForm.adults) || 1;
+  const handleSearchCalendar = async (customForm) => {
+    const activeForm = customForm;
 
-    for (const day of days) {
-      const nextDay = formatDate(
-        new Date(new Date(day).getTime() + 24 * 60 * 60 * 1000)
-      );
+    setError(null);
+    setLoading(true);
+    setAllProducts([]);
+    setAvailability({});
+    setTipologyCounts([]);
 
-      for (let persons = 1; persons <= maxAdults; persons++) {
+    try {
+      // 🔹 Gerar dias
+      const days = [];
+      const start = new Date(activeForm.checkin);
+      const nights = Number(activeForm.nights) || 1;
+
+      for (let i = 0; i < nights; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        days.push(formatDate(d));
+      }
+
+      setAllDays(days);
+
+      const requests = [];
+
+      for (const day of days) {
+        const nextDay = formatDate(
+          new Date(new Date(day).getTime() + 24 * 60 * 60 * 1000)
+        );
+
         requests.push(
           axios
             .post("/api/reservations/ota/available_products", {
               propertyID,
               checkin: day,
               checkout: nextDay,
-              adults: persons,
+              adults: guests,
             })
-            .then((r) => ({ day, persons, res: r }))
+            .then((r) => ({ day, res: r }))
         );
       }
-    }
 
-    const results = await Promise.all(requests);
+      const results = await Promise.all(requests);
 
-    // 4️⃣ BUILD FINAL PRODUCTS
-    const productsArray = [];
+      const productsArray = [];
 
-    results.forEach(({ day, persons, res }) => {
-      const data = res.data.products ? res.data : res.data.data || {};
-      const dayProducts = data.products || [];
-      const rooms = data.rooms || [];
+      results.forEach(({ day, res }) => {
+        const data = res.data.products ? res.data : res.data.data || {};
+        const dayProducts = data.products || [];
+        const rooms = data.rooms || [];
 
-      const roomIdToCount = {};
-      rooms.forEach((r) => {
-        const roomId = String(r.roomId?.value ?? r.roomId);
-        roomIdToCount[roomId] = r.count?.value ?? r.count ?? 0;
-      });
-
-      dayProducts.forEach((p) => {
-        const roomId = String(p.roomId?.value ?? p.roomId);
-
-        // 🔥 AQUI É O FILTRO REAL (CRÍTICO)
-        if (!allowedRoomIds.includes(roomId)) return;
-
-        productsArray.push({
-          roomId,
-          rateId: p.rateId?.value ?? p.rateId,
-          roomName: p.roomName,
-          roomType: p.roomType,
-          rateDescription: p.rateDescription,
-          currency: p.currency?.value ?? "EUR",
-          baseRate: Number(p.baseRate?.amountAfterTax ?? p.baseRate ?? 0),
-          persons,
-          available: roomIdToCount[roomId] ?? 0,
-          day,
+        const roomIdToCount = {};
+        rooms.forEach((r) => {
+          const roomId = r.roomId?.value ?? r.roomId;
+          const count = r.count?.value ?? r.count ?? 0;
+          roomIdToCount[roomId] = count;
         });
-      });
-    });
 
-    console.log("✅ FINAL PRODUCTS:", productsArray);
+        dayProducts.forEach((p) => {
+          const roomId = p.roomId?.value ?? p.roomId;
+          let dailyAmount = Number(p.baseRate?.amountAfterTax ?? p.baseRate ?? 0);
 
-    setProducts(productsArray);
+          if (p.baseDailyAmounts?.baseDailyAmount) {
+            const arr = Array.isArray(p.baseDailyAmounts.baseDailyAmount)
+              ? p.baseDailyAmounts.baseDailyAmount
+              : [p.baseDailyAmounts.baseDailyAmount];
 
-  } catch (err) {
-    console.error(err);
-    setError("Erro ao procurar disponibilidade");
-  } finally {
-    setLoading(false);
-  }
-};
-
-const handleSearchCalendar = async (customForm) => {
-  const activeForm = customForm;
-
-  setError(null);
-  setLoading(true);
-  setProducts([]);
-
-  try {
-    // 🔹 Gerar dias
-    const days = [];
-    const start = new Date(activeForm.checkin);
-    const nights = Number(activeForm.nights) || 1;
-
-    for (let i = 0; i < nights; i++) {
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
-      days.push(formatDate(d));
-    }
-
-    setAllDays(days);
-
-    const requests = [];
-
-    // 🔹 Requests por dia
-    for (const day of days) {
-      const nextDay = formatDate(
-        new Date(new Date(day).getTime() + 24 * 60 * 60 * 1000)
-      );
-
-      requests.push(
-        axios
-          .post("/api/reservations/ota/available_products", {
-            propertyID,
-            checkin: day,
-            checkout: nextDay,
-            adults: 1,
-          })
-          .then((r) => ({ day, res: r }))
-      );
-    }
-
-    const results = await Promise.all(requests);
-
-    // 🔥 ARRAY FINAL DE PRODUCTS (SEM FILTROS)
-    const productsArray = [];
-
-    results.forEach(({ day, res }) => {
-      const data = res.data.products ? res.data : res.data.data || {};
-      const dayProducts = data.products || [];
-      const rooms = data.rooms || [];
-
-      // 🔹 disponibilidade por roomId
-      const roomIdToCount = {};
-      rooms.forEach((r) => {
-        const roomId = r.roomId?.value ?? r.roomId;
-        const count = r.count?.value ?? r.count ?? 0;
-        roomIdToCount[roomId] = count;
-      });
-
-      dayProducts.forEach((p) => {
-        const roomId = p.roomId?.value ?? p.roomId;
-
-        let dailyAmount = Number(
-          p.baseRate?.amountAfterTax ?? p.baseRate ?? 0
-        );
-
-        // 🔹 preço por dia específico
-        if (p.baseDailyAmounts?.baseDailyAmount) {
-          const arr = Array.isArray(p.baseDailyAmounts.baseDailyAmount)
-            ? p.baseDailyAmounts.baseDailyAmount
-            : [p.baseDailyAmounts.baseDailyAmount];
-
-          const found = arr.find(
-            (d) => (d.day?.value ?? d.day) === day
-          );
-
-          if (found) {
-            dailyAmount = Number(
-              found.amountAfterTax ?? dailyAmount
-            );
+            const found = arr.find((d) => (d.day?.value ?? d.day) === day);
+            if (found) dailyAmount = Number(found.amountAfterTax ?? dailyAmount);
           }
-        }
 
-        // 🔥 GUARDA TUDO — SEM FILTROS
-        productsArray.push({
-          roomId,
-          rateId: p.rateId?.value ?? p.rateId,
-          roomName: p.roomName ?? "",
-          roomType: p.roomType ?? "",
-          rateDescription: p.rateDescription,
-          currency: p.currency?.value ?? "EUR",
-          baseRate: dailyAmount,
-          available: roomIdToCount[roomId] ?? 0,
-          day,
-          raw: p,
+          productsArray.push({
+            roomId,
+            roomName: p.roomName ?? "",
+            roomType: p.roomType ?? "",
+            available: Number(roomIdToCount[roomId] ?? 0),
+            day,
+            baseRate: dailyAmount,
+          });
         });
       });
-    });
 
-    // 🔥 SET FINAL
-    setAllProducts(productsArray);
+      setAllProducts(productsArray);
+      console.log("PRODUCTS CALENDAR:", productsArray);
 
-    console.log("✅ PRODUCTS FINAL:", productsArray);
+      // =========================================
+      // 🔥 DISPONIBILIDADE POR TIPOLOGIA
+      // =========================================
+      const availabilityByTipology = {};
 
-  } catch (err) {
-    console.error(err);
-    setError("Erro ao procurar disponibilidade");
-  } finally {
-    setLoading(false);
-  }
-};
+      productsArray.forEach((p) => {
+        const { roomId, roomType, day, available } = p;
+        if (!roomType || !day) return;
 
-// useEffect permanece igual
-useEffect(() => {
-  if (!roomTypeState.length) return;
+        const found = roomTypeState.find(
+          (rt) =>
+            rt.tipologyCode === roomType ||
+            rt.tipologyName === roomType
+        );
+        if (!found) return;
 
-  const calendarDays = weeks[currentWeekIndex].map(day => day.date.toDate());
-  if (calendarDays.length === 0) return;
+        const katnr = found.katnr;
+        if (!availabilityByTipology[katnr]) availabilityByTipology[katnr] = {};
+        if (!availabilityByTipology[katnr][day]) availabilityByTipology[katnr][day] = {};
 
-  const newForm = {
-    checkin: calendarDays[0],
-    checkout: calendarDays[calendarDays.length - 1],
-    nights: calendarDays.length,
-    adults: 1,
+        availabilityByTipology[katnr][day][roomId] = Math.max(
+          availabilityByTipology[katnr][day][roomId] || 0,
+          available
+        );
+      });
+
+      const finalAvailability = {};
+      Object.entries(availabilityByTipology).forEach(([roomType, days]) => {
+        finalAvailability[roomType] = {};
+        Object.entries(days).forEach(([day, rooms]) => {
+          finalAvailability[roomType][day] = Object.values(rooms).reduce((sum, val) => sum + val, 0);
+        });
+      });
+
+      setAvailability(finalAvailability);
+
+    } catch (err) {
+      console.error(err);
+      setError("Erro ao pesquisar disponibilidade");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  handleSearchCalendar(newForm);
-}, [currentWeekIndex, roomTypeState]);
+  useEffect(() => {
+    if (!allProducts.length || !roomTypeState.length) return;
+
+    const tipologyCount = {};
+
+    allProducts.forEach((p) => {
+      const { roomId } = p;
+
+      // Encontrar a tipologia correspondente pelo roomId
+      const foundTipology = roomTypeState.find(
+        (rt) => String(rt.roomId) === String(roomId)
+      );
+
+      if (!foundTipology) return;
+
+      const roomTypeKey = foundTipology.tipologyName || foundTipology.tipologyCode;
+      tipologyCount[roomTypeKey] = (tipologyCount[roomTypeKey] || 0) + 1;
+    });
+
+    const tipologyResult = Object.entries(tipologyCount).map(([roomType, nrm]) => ({
+      roomType,
+      nrm,
+    }));
+
+    setTipologyCounts(tipologyResult);
+  }, [allProducts, roomTypeState]);
+
+  // useEffect permanece igual
+  useEffect(() => {
+    if (!roomTypeState.length) return;
+
+    const calendarDays = weeks[currentWeekIndex].map(day => day.date.toDate());
+    if (calendarDays.length === 0) return;
+
+    const newForm = {
+      checkin: calendarDays[0],
+      checkout: calendarDays[calendarDays.length - 1],
+      nights: calendarDays.length,
+      adults: 1,
+    };
+
+    handleSearchCalendar(newForm);
+  }, [currentWeekIndex, roomTypeState]);
 
   return (
     <div className='w-full'>
       {showModal && (
-        <div className='fixed top-0 right-0 bg-lightBlue h-screen w-[30%] z-10 flex flex-col'>
+        <div className='fixed top-0 right-0 bg-lightWhite h-screen w-[30%] z-10 flex flex-col'>
 
           {/* 🔥 SCROLL PRINCIPAL */}
           <div className="flex-1 overflow-y-auto mt-4 px-2 min-h-0 pb-28">
@@ -1130,7 +1296,7 @@ useEffect(() => {
                   </div>
                 </div>
 
-                               {selectedDates.map((dateRange, index) => (
+                {selectedDates.map((dateRange, index) => (
                   console.log("Date Range atualizado:", dateRange),
 <div className="flex flex-col gap-3 py-2">
 
@@ -1219,7 +1385,7 @@ useEffect(() => {
           triggerSearchFromSelection(
             dateRange.start,
             dateRange.end,
-            dateRange.tipologyCode,
+            dateRange.roomID,
             dateRange.guests || 1
           )
         }
@@ -1235,17 +1401,18 @@ useEffect(() => {
                 ))}
 
                 {/* AVAILABLE ROOMS */}
-                <div className="sticky top-0 bg-lightBlue z-10 mt-6 py-2">
+                <div className="sticky top-0 bg-lightWhite z-10 mt-6 py-2">
                   <p className="text-xs text-gray-500">Available Rooms</p>
                 </div>
 
                 {loading && <p className="text-sm text-gray-400">Loading...</p>}
                 {!loading && products.length === 0 && (
+                  console.log("Products para exibição:", products),
                   <p className="text-sm text-gray-400">No rooms available</p>
                 )}
 
                 {!loading && products.length > 0 && (
-                  console.log("CRLH PRODUCTS PARA EXIBIÇÃO:", products),
+                  console.log("Products para exibição:", products),
                   <div className="w-full my-4">
                     <div className="overflow-x-auto">
 
@@ -1261,166 +1428,148 @@ useEffect(() => {
                           <option value="all">Todas</option>
                         </select>
                       </div>
+                      <table className="min-w-full border text-sm">
+                        <thead>
+                          {/* Agrupa por tipo de quarto */}
+                          {[...new Set(products.map(p => p.roomName))].map((roomName, idx) => {
+                            const group = products.filter(p => p.roomName === roomName);
 
-                     <table className="min-w-full border text-sm">
-  <tbody>
-    {(() => {
-      console.log("🔵 PRODUCTS TOTAL:", products);
+                            // Mapas para preços e disponibilidade
+                            const dailyMap = {};
+                            const availableMap = {};
+                            group.forEach(p => {
+                              dailyMap[p.day] = Number(p.baseRate);
+                              availableMap[p.day] = Math.max(availableMap[p.day] || 0, Number(p.available));
+                            });
 
-      const filteredProducts = products.filter(product => {
-        if (rateFilter === "all") return true;
+                            return (
+                              <React.Fragment key={roomName + idx}>
+                                {/* Room Type no topo */}
+                                <tr className="bg-primary text-white">
+                                  <th colSpan={allDays.length + 2} className="text-left px-4 py-2 border">
+                                    {roomName}
+                                  </th>
+                                </tr>
 
-        const name = product.roomName?.toLowerCase() || "";
+                                {/* Linha de datas */}
+                                <tr className="bg-lightBlueCol text-xs">
+                                  <th className="border px-2 py-1 text-left"> </th>
+                                  {allDays.map(day => {
+                                    const d = new Date(day);
+                                    return (
+                                      <th key={day} className="border px-2 py-1 text-center">
+                                        <div className="flex flex-col items-center">
+                                          <span className="text-black font-bold">
+                                            {d.getDate()}
+                                          </span>
+                                          <span className="text-gray-400 text-xs">
+                                            {d
+                                              .toLocaleString("default", { month: "short" })
+                                              .replace(".", "")
+                                              .toUpperCase()}
+                                          </span>
+                                        </div>
+                                      </th>
+                                    );
+                                  })}
+                                  <th className="border px-2 py-1 text-center">Total</th>
+                                </tr>
 
-        return rateFilter === "website"
-          ? name.includes("website")
-          : name.includes("booking");
-      });
+                                {/* Linha de disponibilidade */}
+                                <tr className="text-xs">
+                                  <td className="border px-2 py-1 font-medium">Disponibilidade</td>
+                                  {allDays.map(day => (
+                                    <td key={day} className="border px-2 py-1 text-center">
+                                      {availableMap[day] ?? 0}
+                                    </td>
+                                  ))}
+                                  <td className="border px-2 py-1"> </td>
+                                </tr>
+                              </React.Fragment>
+                            );
+                          })}
+                        </thead>
 
-      const groupedByRoomId = filteredProducts.reduce((acc, product) => {
-        const key = product.roomId;
+                        <tbody>
+                          {(() => {
+                            // Filtra produtos por tarifa
+                            const filteredProducts = products.filter(product => {
+                              console.log("produtossss123:", products);
+                              if (rateFilter === "all") return true;
+                              const name = product.roomName.toLowerCase();
+                              if (rateFilter === "website") return name.includes("website");
+                              if (rateFilter === "booking") return name.includes("booking");
+                              return true;
+                            });
 
-        if (!acc[key]) {
-          acc[key] = {
-            roomName: product.roomName,
-            roomType: product.roomType,
-            items: [],
-          };
-        }
+                            // Agrupa por roomId
+                            const grouped = filteredProducts.reduce((acc, product) => {
+                              const key = product.roomId;
+                              if (!acc[key]) acc[key] = [];
+                              acc[key].push(product);
+                              return acc;
+                            }, {});
 
-        acc[key].items.push(product);
-        return acc;
-      }, {});
+                            return Object.entries(grouped).map(([roomId, group]) => {
+                              const p = group[0]; // pega o primeiro item
+                              const dailyMap = {};
+                              group.forEach(item => (dailyMap[item.day] = Number(item.baseRate)));
 
-      const entries = Object.entries(groupedByRoomId);
+                              const total = Object.values(dailyMap).reduce((s, v) => s + (v || 0), 0);
+                              const currency = p.currency || "EUR";
 
-      if (entries.length === 0) return null;
+                              const formatAmount = amt =>
+                                !Number.isFinite(amt)
+                                  ? "-"
+                                  : amt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ` ${currency}`;
 
-      return entries.map(([roomId, data], idx) => {
-        const group = data.items;
-        const roomName = data.roomName;
+                              const persons = Math.max(...group.map(x => x.persons || 1));
+                              const available = Math.max(...group.map(x => x.available));
 
-        const dailyMap = {};
-        const availableMap = {};
+                              const isSelectedCart = cartItems.some(item => item.product.roomId === p.roomId);
 
-        group.forEach(p => {
-          dailyMap[p.day] = Number(p.baseRate);
+                              return (
+                                <tr
+                                  key={roomId} // chave única
+                                  className={`hover:bg-gray-50 cursor-pointer ${isSelectedCart ? "bg-blue-100" : ""}`}
+                                  onClick={() => {
+                                    const selected = {
+                                      roomId: p.roomId,
+                                      rateId: p.rateId,
+                                      roomName: p.roomName,
+                                      roomType: p.roomType,
+                                      rateDescription: p.rateDescription,
+                                      baseRate: p.baseRate,
+                                      currency: p.currency,
+                                      persons,
+                                      total,
+                                      available,
+                                    };
+                                    setSelectedRoom(selected);
+                                    addToCart(selected);
+                                  }}
+                                >
+                                  {/* Coluna de hóspedes com ícone */}
+                                  <td className="border px-2 py-2 flex items-center gap-1">
+                                    <FaUser size={14} color='gray' />
+                                    <span className='text-gray'>x{persons}</span>
+                                  </td>
 
-          availableMap[p.day] = Math.max(
-            availableMap[p.day] || 0,
-            Number(p.available || 0)
-          );
-        });
+                                  {/* Preço diário */}
+                                  {allDays.map(day => (
+                                    <td key={`${roomId}-${day}`} className="border px-2 py-2 text-center">
+                                      {dailyMap[day] !== undefined ? formatAmount(dailyMap[day]) : "-"}
+                                    </td>
+                                  ))}
 
-        const roomDays = [...new Set(group.map(p => p.day))].sort();
-
-        const total = Object.values(dailyMap).reduce(
-          (s, v) => s + (v || 0),
-          0
-        );
-
-        const currency = group[0]?.currency || "EUR";
-
-        const formatAmount = (amt) =>
-          !Number.isFinite(amt)
-            ? "-"
-            : `${amt.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })} ${currency}`;
-
-        return (
-          <React.Fragment key={roomId + idx}>
-            {/* HEADER */}
-            <tr className="bg-primary text-white">
-              <td colSpan={roomDays.length + 2} className="px-4 py-2 border">
-                {roomName}
-              </td>
-            </tr>
-
-            {/* DATAS */}
-            <tr className="bg-lightBlueCol text-xs">
-              <td className="border px-2 py-1"></td>
-
-              {roomDays.map(day => {
-                const d = new Date(day);
-
-                return (
-                  <td key={day} className="border px-2 py-1 text-center">
-                    <div className="flex flex-col items-center">
-                      <span className="font-bold">{d.getDate()}</span>
-                      <span className="text-gray-400 text-xs">
-                        {d.toLocaleString("default", { month: "short" })}
-                      </span>
-                    </div>
-                  </td>
-                );
-              })}
-
-              <td className="border px-2 py-1 text-center">Total</td>
-            </tr>
-
-            {/* DISPONIBILIDADE */}
-            <tr className="text-xs">
-              <td className="border px-2 py-1 font-medium">
-                Disponibilidade
-              </td>
-
-              {roomDays.map(day => (
-                <td key={day} className="border px-2 py-1 text-center">
-                  {availableMap[day] ?? 0}
-                </td>
-              ))}
-
-              <td className="border px-2 py-1"></td>
-            </tr>
-
-            {/* PREÇOS */}
-          <tr
-  className="hover:bg-gray-50 cursor-pointer"
-  onClick={() => {
-    const selected = {
-      roomId,
-      roomName,
-      roomType: data.roomType,
-      items: group,
-    };
-
-    console.log("CLICK ROOM:", selected);
-
-    // se quiseres ligar ao cart:
-    addToCart(selected);
-  }}
->
-  {/* 👤 PERSONS COLUMN */}
-  <td className="border px-2 py-2 flex items-center gap-1">
-    <FaUser size={14} color="gray" />
-    <span className="text-gray-600">
-      x{Math.max(...group.map(x => x.persons || 1))}
-    </span>
-  </td>
-
-  {/* 💰 DAILY PRICES */}
-  {roomDays.map(day => (
-    <td
-      key={`${roomId}-${day}`}
-      className="border px-2 py-2 text-center"
-    >
-      {formatAmount(dailyMap[day])}
-    </td>
-  ))}
-
-  {/* TOTAL */}
-  <td className="border px-2 py-2 text-center font-semibold">
-    {formatAmount(total)}
-  </td>
-</tr>
-          </React.Fragment>
-        );
-      });
-    })()}
-  </tbody>
-</table>
+                                  {/* Total */}
+                                  <td className="border px-2 py-2 text-center font-semibold">{formatAmount(total)}</td>
+                                </tr>
+                              );
+                            });
+                          })()}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 )}
@@ -1617,8 +1766,8 @@ useEffect(() => {
                       {cartItems.length > 0
                         ? `${cartItems.reduce((sum, it) => sum + (it.product.baseRate || 0) * it.qty, 0).toFixed(2)} ${cartItems[0]?.product.currency || 'EUR'}`
                         : selectedRoom
-                        ? `${(selectedRoom.total || 0).toFixed(2)} ${selectedRoom.currency}`
-                        : '0'}
+                          ? `${(selectedRoom.total || 0).toFixed(2)} ${selectedRoom.currency}`
+                          : '0'}
                     </span>
                   </div>
                 </div>
@@ -1630,7 +1779,7 @@ useEffect(() => {
           </div>
 
           {/* 🔥 FOOTER */}
-          <div className='absolute bottom-0 w-full flex justify-center gap-10 p-4 bg-lightBlue border-t'>
+          <div className='absolute bottom-0 w-full flex justify-center gap-10 p-4 bg-lightWhite border-t'>
 
             {step === 1 && (
               <button
@@ -1638,7 +1787,7 @@ useEffect(() => {
                   ? "bg-gray-300 text-white cursor-not-allowed"
                   : "bg-primary text-white"
                   }`}
-                disabled={selectedDates.length === 0 && cartItems.length === 0}
+                disabled={selectedDates.length === 0 || !selectedRoom}
                 onClick={() => setStep(2)}
               >
                 Reserve
@@ -1646,7 +1795,7 @@ useEffect(() => {
             )}
 
             {/* STEP 2 */}
-             {step === 2 && (
+            {step === 2 && (
               <>
                 <button
                   className="text-sm bg-primary text-white px-4 py-2 rounded"
@@ -1723,6 +1872,42 @@ useEffect(() => {
                 </Popover>
               )}
 
+              <div className="flex items-center gap-2">
+                <FaUser color="white" size={15} /> {/* ícone de pessoa */}
+                <button
+                  onClick={() => setGuests(prev => Math.max(prev - 1, 1))}
+                  className="px-2 bg-white text-black rounded"
+                >
+                  -
+                </button>
+                <span className="text-white px-2">{guests}</span>
+                <button
+                  onClick={() => setGuests(prev => prev + 1)}
+                  className="px-2 bg-white text-black rounded"
+                >
+                  +
+                </button>
+                <Button
+                  className='bg-white'
+                  onClick={() => {
+                    // 🔹 Pega todas as datas da semana atual
+                    const calendarDays = weeks[currentWeekIndex].map(day => day.date.toDate());
+                    if (calendarDays.length === 0) return;
+
+                    const form = {
+                      checkin: calendarDays[0],
+                      checkout: calendarDays[calendarDays.length - 1],
+                      nights: calendarDays.length,
+                      adults: guests, // 🔹 usa o seletor de pessoas
+                    };
+
+                    handleSearchCalendar(form); // 🔹 chamada única
+                  }}
+                >
+                  Pesquisar
+                </Button>
+              </div>
+
               <GrFormPrevious className='w-5 h-5 cursor-pointer text-white' onClick={goToPreviousWeek} />
               <p className='cursor-pointer text-white' onClick={goToCurrentWeek}>Today</p>
               <GrFormNext className='w-5 h-5 cursor-pointer text-white' onClick={goToNextWeek} />
@@ -1755,101 +1940,117 @@ ${weeks[currentWeekIndex][weeks[currentWeekIndex].length - 1].date.format("DDMMM
             <tbody>
               {/*EXIBE AS TIPOLOGIAS E O NRM DE QUARTOS ASSOCIADOS A CADA UMA */}
               {roomTypeState.map((roomType, rowIndex) => (
+                console.log("dados1235674:", roomTypeState),
+                console.log("🔹 Renderizando linha para tipologia:", roomType.tipologyName, "com katnr:", roomType.katnr),
                 <tr key={roomType.katnr} onClick={() => handleRowSelection(rowIndex)}>
-                 <td className='text-xs w-full h-10 flex items-center justify-between px-4 border-b-2 bg-white'>
-  <span>{roomType.tipologyCode}</span>
-  <div className='flex flex-row items-center gap-2'>
-    <span>{roomCounts[roomType.katnr] || 0}</span>
-    {/* <span><BiSolidPencil size={15} color='gray' onClick={() => {
+                  <td className='text-xs w-full h-10 flex items-center justify-between px-4 border-b-2 bg-white'>
+                    <span>{roomType.tipologyName}</span>
+                    <div className='flex flex-row items-center gap-2'>
+                      <span>{roomCounts[roomType.katnr] || 0}</span>
+                      {/* <span><BiSolidPencil size={15} color='gray' onClick={() => {
       const newCount = prompt("Enter the number of rooms:");
       if (newCount !== null && !isNaN(newCount)) {
         handleRoomCountUpdate(roomType.katnr, parseInt(newCount));
       }
     }} /></span> */}
-  </div>
-</td>
-{weeks[currentWeekIndex].map((day, index) => {
-  const formattedDate = day.date.format('YYYY-MM-DD');
+                    </div>
+                  </td>
+                  {weeks[currentWeekIndex].map((day, index) => {
+                    const formattedDate = day.date.format('YYYY-MM-DD');
 
-  const availableRooms = availability[roomType.katnr]?.[formattedDate] ?? 0;
+                    // const normalize = (str) =>
+                    //   str?.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-  const normalize = (str) =>
-    str?.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    // Cores de seleção
+                    const isSelected =
+                      selectionInfo.roomTypeID === roomType.katnr &&
+                      selectionInfo.dates.includes(formattedDate);
 
-  // Cores de seleção
-  const isSelected =
-    selectionInfo.roomTypeID === roomType.katnr &&
-    selectionInfo.dates.includes(formattedDate);
+                    const isCellSelected = finalSelectedCells.some(
+                      (cell) => cell.row === rowIndex && cell.column === index
+                    );
 
-  const isCellSelected = finalSelectedCells.some(
-    (cell) => cell.row === rowIndex && cell.column === index
-  );
+                    // Produtos para esta célula — sempre calculados
+                    const cellProducts = allProducts.filter((p) => {
+                      const matchesDay = p.day === formattedDate;
 
-  // Produtos para esta célula — **sempre calculados, independente da seleção**
-  const cellProducts = allProducts.filter((p) => {
-    const matchesDay = p.day === formattedDate;
+                      const matchesRoom =
+                        Number(p.roomId) === Number(roomType.roomId);
 
-    const matchesTipologyInName =
-      normalize(p.roomName).includes(normalize(roomType.tipologyName)) ||
-      normalize(p.roomName).includes(normalize(roomType.tipologyCode));
+                      const rateType = p.roomName?.toLowerCase().includes("website")
+                        ? "website"
+                        : p.roomName?.toLowerCase().includes("booking")
+                          ? "booking"
+                          : "all";
 
-    const rateType = p.roomName?.toLowerCase().includes("website")
-      ? "website"
-      : p.roomName?.toLowerCase().includes("booking")
-      ? "booking"
-      : "all";
+                      const matchesRateFilter =
+                        rateFilter === "all" || rateFilter === rateType;
 
-    const matchesRateFilter =
-      rateFilter === "all" || rateFilter === rateType;
+                      return matchesDay && matchesRoom && matchesRateFilter;
+                    });
 
-    return matchesDay && matchesTipologyInName && matchesRateFilter;
-  });
+                    // Preço mínimo da célula — sempre visível
+                    const rate =
+                      cellProducts.length > 0
+                        ? Math.min(...cellProducts.map((p) => p.baseRate))
+                        : null;
 
-  // Preço mínimo da célula — sempre visível
-  const rate =
-    cellProducts.length > 0
-      ? Math.min(...cellProducts.map((p) => p.baseRate))
-      : null;
+                    // 🔹 Disponibilidade total da tipologia para o dia
+                    const totalAvailable = cellProducts.reduce(
+                      (sum, p) => sum + (p.available ?? 0),
+                      0
+                    );
 
-  return (
-    <td
-      key={index}
-      style={{ backgroundColor: isCellSelected ? "#f5bb88" : "" }}
-      className={`
+                    // 🔹 Debug detalhado do que você quer
+                    cellProducts.forEach((p) => {
+                      console.log("🛏 Quarto:", p.roomName,
+                        "Tipologia:", roomType.tipologyName,
+                        "Disponibilidade:", p.available,
+                        "roomid:", p.roomId,
+                        "roomid2:", roomType.katnr,
+                        "Dia:", formattedDate);
+                    });
+                    console.log("📊 Total disponibilidade da tipologia:", totalAvailable);
+                    const roomId = cellProducts[0]?.roomId;
+                    return (
+                      <td
+                        key={index}
+                        style={{ backgroundColor: isCellSelected ? "#f5bb88" : "" }}
+                        className={`
         text-center text-sm border-l-3 border-r-3 border-b-2 rounded-lg
         ${(day.date.day() === 0 || day.date.day() === 6)
-          ? "bg-lightBlueCol"
-          : day.date.isSame(today, "day")
-          ? "bg-primary bg-opacity-30"
-          : "bg-white"}
+                            ? "bg-lightBlueCol"
+                            : day.date.isSame(today, "day")
+                              ? "bg-primary bg-opacity-30"
+                              : "bg-white"}
         ${isSelected ? "border-3 border-blue-600 rounded-lg" : ""}
         select-none
       `}
-      onMouseDown={() => {
-        setIsSelecting(true);
-        handleMouseDown(day.date, roomType.katnr, rowIndex, index);
-        setCellsSelection([...cellsSelection, { row: rowIndex, column: index, date: day.date }]);
-      }}
-      onMouseOver={() => {
-        if (isSelecting) {
-          handleMouseOver(day.date, rowIndex, index);
-          setCellsSelection([...cellsSelection, { row: rowIndex, column: index, date: day.date }]);
-        }
-      }}
-      onMouseUp={() => {
-        setIsSelecting(false);
-        handleMouseUp(day.date);
-      }}
-    >
-      <div className="flex flex-col items-center justify-center">
-        <span className='text-xs'>{availableRooms}</span>
-        <span className="text-[10px] text-gray-500">
-          {rate != null ? `${Number(rate).toFixed(2)}€` : "-"}
-        </span>
-      </div>
-    </td>
-  );
-})}
+                        onMouseDown={() => {
+                          setIsSelecting(true);
+                          handleMouseDown(day.date, roomType.katnr, roomId, rowIndex, index);
+                          setCellsSelection([...cellsSelection, { row: rowIndex, column: index, date: day.date }]);
+                        }}
+                        onMouseOver={() => {
+                          if (isSelecting) {
+                            handleMouseOver(day.date, rowIndex, index);
+                            setCellsSelection([...cellsSelection, { row: rowIndex, column: index, date: day.date }]);
+                          }
+                        }}
+                        onMouseUp={() => {
+                          setIsSelecting(false);
+                          handleMouseUp(day.date);
+                        }}
+                      >
+                        <div className="flex flex-col items-center justify-center">
+                          <span className='text-xs'>{totalAvailable}</span> {/* disponibilidade da tipologia */}
+                          <span className="text-[10px] text-gray-500">
+                            {rate != null ? `${Number(rate).toFixed(2)}€` : "-"}
+                          </span>
+                        </div>
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
               <tr>
@@ -1885,15 +2086,48 @@ ${weeks[currentWeekIndex][weeks[currentWeekIndex].length - 1].date.format("DDMMM
                 <td className='text-xs w-full h-8 flex justify-between items-center px-4 border-b-2 bg-white'>
                   <span>{"Total Available"}</span>
                 </td>
+
                 {weeks[currentWeekIndex].map((day, index) => {
+                  const formattedDate = day.date.format('YYYY-MM-DD');
+
                   const totalAvailable = roomTypeState.reduce((acc, roomType) => {
-                    return acc + (availability[roomType.katnr]?.[day.date.format('YYYY-MM-DD')] || 0);
+
+                    const cellProducts = allProducts.filter((p) => {
+                      const matchesDay = p.day === formattedDate;
+
+                      const matchesRoom =
+                        Number(p.roomId) === Number(roomType.roomId);
+
+                      const rateType = p.roomName?.toLowerCase().includes("website")
+                        ? "website"
+                        : p.roomName?.toLowerCase().includes("booking")
+                          ? "booking"
+                          : "all";
+
+                      const matchesRateFilter =
+                        rateFilter === "all" || rateFilter === rateType;
+
+                      return matchesDay && matchesRoom && matchesRateFilter;
+                    });
+
+                    const roomTotal = cellProducts.reduce(
+                      (sum, p) => sum + (p.available ?? 0),
+                      0
+                    );
+
+                    return acc + roomTotal;
+
                   }, 0);
+
                   return (
                     <td
                       key={index}
                       className={`text-center text-sm border-l-3 border-r-3 border-b-2 rounded-lg 
-                  ${(day.date.day() === 0 || day.date.day() === 6) ? "bg-lightBlueCol" : (day.date.isSame(today, 'day') ? "bg-primary bg-opacity-30" : "bg-white")
+        ${(day.date.day() === 0 || day.date.day() === 6)
+                          ? "bg-lightBlueCol"
+                          : day.date.isSame(today, 'day')
+                            ? "bg-primary bg-opacity-30"
+                            : "bg-white"
                         }`}
                     >
                       {totalAvailable}
@@ -2041,19 +2275,52 @@ ${weeks[currentWeekIndex][weeks[currentWeekIndex].length - 1].date.format("DDMMM
                 })}
               </tr>
               <tr>
-                {/*CALCULA O NRM DE QUARTOS FISICOS DISPONIVEIS*/}
+                {/* CALCULA O NRM DE QUARTOS FISICOS DISPONIVEIS */}
                 <td className='text-xs w-full h-8 flex justify-between items-center px-4 border-b-2 bg-white'>
                   <span>{"Physically Available"}</span>
                 </td>
+
                 {weeks[currentWeekIndex].map((day, index) => {
+                  const formattedDate = day.date.format('YYYY-MM-DD');
+
                   const totalAvailable = roomTypeState.reduce((acc, roomType) => {
-                    return acc + (availability[roomType.katnr]?.[day.date.format('YYYY-MM-DD')] || 0);
+
+                    const cellProducts = allProducts.filter((p) => {
+                      const matchesDay = p.day === formattedDate;
+
+                      const matchesRoom =
+                        Number(p.roomId) === Number(roomType.roomId);
+
+                      const rateType = p.roomName?.toLowerCase().includes("website")
+                        ? "website"
+                        : p.roomName?.toLowerCase().includes("booking")
+                          ? "booking"
+                          : "all";
+
+                      const matchesRateFilter =
+                        rateFilter === "all" || rateFilter === rateType;
+
+                      return matchesDay && matchesRoom && matchesRateFilter;
+                    });
+
+                    const roomTotal = cellProducts.reduce(
+                      (sum, p) => sum + (p.available ?? 0),
+                      0
+                    );
+
+                    return acc + roomTotal;
+
                   }, 0);
+
                   return (
                     <td
                       key={index}
                       className={`text-center text-sm border-l-3 border-r-3 border-b-2 rounded-lg 
-                  ${(day.date.day() === 0 || day.date.day() === 6) ? "bg-lightBlueCol" : (day.date.isSame(today, 'day') ? "bg-primary bg-opacity-30" : "bg-white")
+        ${(day.date.day() === 0 || day.date.day() === 6)
+                          ? "bg-lightBlueCol"
+                          : day.date.isSame(today, 'day')
+                            ? "bg-primary bg-opacity-30"
+                            : "bg-white"
                         }`}
                     >
                       {totalAvailable}
@@ -2061,45 +2328,71 @@ ${weeks[currentWeekIndex][weeks[currentWeekIndex].length - 1].date.format("DDMMM
                   );
                 })}
               </tr>
-              <tr>
-                {/*
-            CALCULA A % DE QUARTOS JÁ OCUPADOS
-            O% - TODOS OS QUARTOS LIVRES | 100% - TODOS OS QUARTOS OCUPADOS
-            */}
-                <td className='text-xs w-full h-8 flex justify-between items-center px-4 border-b-2 bg-white'>
-                  <span>{"Occupancy"}</span>
-                </td>
-                {weeks[currentWeekIndex].map((day, index) => {
-                  // const totalAvailableRooms = roomTypeState.reduce((acc, roomType) => {
-                  //   return acc + (availability[roomType.katnr]?.[day.date.format('YYYY-MM-DD')] || 0);
-                  // }, 0);
-                  const totalOccupiedRooms = roomTypeState.reduce((acc, roomType) => {
-                    const availableRooms = availability[roomType.katnr]?.[day.date.format('YYYY-MM-DD')] || 0;
-                    const occupiedRooms = (roomCounts[roomType.katnr] || 0) - availableRooms;
-                    return acc + occupiedRooms;
-                  }, 0);
-                  const totalRooms = roomTypeState.reduce((acc, roomType) => acc + (roomCounts[roomType.katnr] || 0), 0);
-                  const dailyOccupancyPercentage = totalRooms > 0 ? Math.round((totalOccupiedRooms / totalRooms) * 100) : 0;
+             <tr>
+  {/* OCCUPANCY */}
+  <td className='text-xs w-full h-8 flex justify-between items-center px-4 border-b-2 bg-white'>
+    <span>{"Occupancy"}</span>
+  </td>
 
-                  return (
-                    /*
-                    PINTA A CELULA DE ACORDO COM A %
-                    VERDE 0 A 49
-                    AMARELO 50 A 69
-                    VERMELHO 70 A 100
-                    */
-                    <td
-                      key={index}
-                      className={`text-center text-sm border-l-3 border-r-3 border-b-2 rounded-lg 
-                  ${dailyOccupancyPercentage <= 49 ? "bg-green bg-opacity-30" : ""} 
-                  ${dailyOccupancyPercentage >= 50 && dailyOccupancyPercentage <= 69 ? "bg-yellow-100" : ""} 
-                  ${dailyOccupancyPercentage >= 70 ? "bg-red-200" : ""} 
-                  border-tableCol select-none`}>
-                      {dailyOccupancyPercentage}%
-                    </td>
-                  );
-                })}
-              </tr>
+  {weeks[currentWeekIndex].map((day, index) => {
+    const formattedDate = day.date.format('YYYY-MM-DD');
+
+    let totalRooms = 0;
+    let totalAvailable = 0;
+
+    roomTypeState.forEach((roomType) => {
+      const cellProducts = allProducts.filter((p) => {
+        const matchesDay = p.day === formattedDate;
+
+        const matchesRoom =
+          Number(p.roomId) === Number(roomType.roomId);
+
+        const rateType = p.roomName?.toLowerCase().includes("website")
+          ? "website"
+          : p.roomName?.toLowerCase().includes("booking")
+            ? "booking"
+            : "all";
+
+        const matchesRateFilter =
+          rateFilter === "all" || rateFilter === rateType;
+
+        return matchesDay && matchesRoom && matchesRateFilter;
+      });
+
+      // 🔹 disponíveis (não ocupados)
+      const available = cellProducts.reduce(
+        (sum, p) => sum + (p.available ?? 0),
+        0
+      );
+
+      const rooms = roomCounts[roomType.katnr] || 0;
+
+      totalRooms += rooms;
+      totalAvailable += available;
+    });
+
+    // 🔹 ocupação = total - disponíveis
+    const totalOccupied = totalRooms - totalAvailable;
+
+    const occupancy =
+      totalRooms > 0
+        ? Math.round((totalOccupied / totalRooms) * 100)
+        : 0;
+
+    return (
+      <td
+        key={index}
+        className={`text-center text-sm border-l-3 border-r-3 border-b-2 rounded-lg 
+          ${occupancy <= 49 ? "bg-green bg-opacity-30" : ""} 
+          ${occupancy >= 50 && occupancy <= 69 ? "bg-yellow-100" : ""} 
+          ${occupancy >= 70 ? "bg-red-200" : ""} 
+          border-tableCol select-none`}
+      >
+        {occupancy}%
+      </td>
+    );
+  })}
+</tr>
             </tbody>
           </table>
         </div>

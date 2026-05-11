@@ -41,6 +41,7 @@ model properties {
   hasRoomCloud     Boolean           @default(false)
   sendStayByEmail  Boolean?          @default(false)
   hasLockSys       Boolean           @default(false)
+  roomcloudRules   String?           @db.VarChar(3)
   usersProperties  usersProperties[]
 }
 
@@ -77,7 +78,7 @@ model users {
 model usersProperties {
   userID      Int
   propertyID  Int
-  propertyTag String     @db.VarChar(10)
+  propertyTag String     @db.VarChar(50)
   properties  properties @relation(fields: [propertyID], references: [propertyID], onDelete: Cascade)
   users       users      @relation(fields: [userID], references: [userID], onDelete: Cascade)
 
@@ -252,4 +253,15 @@ model lockSysTemplates {
   emailSubject String? @default("") @db.VarChar(500)
   emailBody    String? @default("") @db.VarChar(8000)
   language     String? @default("") @db.VarChar(3)
+}
+
+model property_rooms {
+  id          Int       @id @default(autoincrement())
+  propertyId  Int
+  roomName    String    @db.VarChar(255)
+  roomcloudId String    @db.VarChar(50)
+  createdAt   DateTime? @default(now()) @db.Timestamp(0)
+  roomcount   Int?      @default(0)
+
+  @@unique([propertyId, roomcloudId], map: "unique_property_roomcloud")
 }

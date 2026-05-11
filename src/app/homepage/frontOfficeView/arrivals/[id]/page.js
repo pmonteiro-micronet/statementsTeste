@@ -20,7 +20,7 @@ import en from "../../../../../../public/locales/english/common.json";
 import pt from "../../../../../../public/locales/portuguesPortugal/common.json";
 import es from "../../../../../../public/locales/espanol/common.json";
 // teste
-import ArrivalInfoForm from "@/components/modals/arrivals/info/page";
+// import ArrivalInfoForm from "@/components/modals/arrivals/info/page";
 import "../../table.css";
 import LoadingBackdrop from "@/components/Loader/page";
 
@@ -50,7 +50,7 @@ export default function Arrivals({ params }) {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+console.log(isModalOpen);
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState('');
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Controle do modal de erro
@@ -130,6 +130,7 @@ export default function Arrivals({ params }) {
   }, [propertyID]);
 
   const [selectedReserva, setSelectedReserva] = useState(null);
+  const [redirectUrl, setRedirectUrl] = useState(null);
 
   const handleOpenModal = (reserva) => {
     setSelectedReserva(reserva);
@@ -137,11 +138,15 @@ export default function Arrivals({ params }) {
   };
 
   const handleCloseModal = () => {
+    if (redirectUrl) {
+      router.push(redirectUrl);
+      setRedirectUrl(null);
+    }
     setSelectedReserva(null);
     setIsModalOpen(false);
   };
 
-
+console.log(selectedReserva, setSelectedReserva, handleOpenModal, handleCloseModal);
   // Função para pegar as reservas
   useEffect(() => {
     const fetchReservas = async () => {
@@ -493,7 +498,25 @@ export default function Arrivals({ params }) {
                               closeOnSelect={true}
                               className="relative z-10 text-textPrimaryColor"
                             >
-                              <DropdownItem key="edit" onClick={() => handleOpenModal(reserva)}>
+                              <DropdownItem
+                                key="edit"
+                                onClick={() => {
+                                  const queryParams = new URLSearchParams({
+                                    room: reserva?.Room || '',
+                                    dateCI: reserva?.DateCI || '',
+                                    booker: reserva?.Booker || '',
+                                    salutation: reserva?.Salutation || '',
+                                    lastName: reserva?.LastName || '',
+                                    firstName: reserva?.FirstName || '',
+                                    roomType: reserva?.RoomType || '',
+                                    resStatus: reserva?.RoomStatus || '',
+                                    totalPax: reserva?.TotalPax || '',
+                                    balance: reserva?.Total || '',
+                                    country: reserva?.Country || ''
+                                  }).toString();
+                                  router.push(`/homepage/frontOfficeView/info?${queryParams}`);
+                                }}
+                              >
                                 <div className="flex flex-row gap-2">
                                   <IoMdInformationCircle size={15} /> {t.frontOffice.arrivals.info}
                                 </div>
@@ -544,12 +567,12 @@ export default function Arrivals({ params }) {
                             </DropdownMenu>
                           </Dropdown>
 
-                          <ArrivalInfoForm
+                          {/* <ArrivalInfoForm
                             buttonName={"Info"}
                             buttonColor={"transparent"}
                             modalHeader={t.frontOffice.infoModal.arrival.reservation.title}
                             formTypeModal={11}
-                            roomNumber={selectedReserva?.Room}  // Passando o roomNumber
+                            roomNumber={selectedReserva?.Room}
                             dateCI={selectedReserva?.DateCI}
                             booker={selectedReserva?.Booker}
                             salutation={selectedReserva?.Salutation}
@@ -563,7 +586,7 @@ export default function Arrivals({ params }) {
                             isBackdropVisible={true}
                             isOpen={isModalOpen}
                             onClose={handleCloseModal}
-                          />
+                          /> */}
                         </td>
                         <td className="pr-2 border-r border-[#e6e6e6] text-right">{reserva.Room}</td>
                         <td className="border-r border-[#e6e6e6] text-center h-full">

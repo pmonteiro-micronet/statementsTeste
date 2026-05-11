@@ -36,20 +36,45 @@ export default function SidebarWrapper({ children }) {
   const [hotels, setHotels] = useState([]);
   const [showSelectionButtons, setShowSelectionButtons] = useState(false);
   const [isHotelConfirmed, setIsHotelConfirmed] = useState(false);
+const [roomcloudRules, setRoomcloudRules] = useState(null);
+  const [locale, setLocale] = useState("pt");
 
-    const [locale, setLocale] = useState("pt");
+  useEffect(() => {
+  const fetchRoomcloudRules = async () => {
+    if (!selectedHotelID) return;
 
-      useEffect(() => {
-        // Carregar o idioma do localStorage
-        const storedLanguage = localStorage.getItem("language");
-        if (storedLanguage) {
-          setLocale(storedLanguage);
-        }
-      }, []);
-    
-      // Carregar as traduções com base no idioma atual
-      const t = translations[locale] || translations["pt"]; // fallback para "pt"
-  
+    try {
+      const res = await axios.get(
+        `/api/properties/${selectedHotelID}`
+      );
+
+      const data = res.data?.response?.[0];
+
+      if (data?.roomcloudRules) {
+        setRoomcloudRules(data.roomcloudRules);
+      } else {
+        setRoomcloudRules(null);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar roomcloudRules:", error);
+      setRoomcloudRules(null);
+    }
+  };
+
+  fetchRoomcloudRules();
+}, [selectedHotelID]);
+
+  useEffect(() => {
+    // Carregar o idioma do localStorage
+    const storedLanguage = localStorage.getItem("language");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    }
+  }, []);
+
+  // Carregar as traduções com base no idioma atual
+  const t = translations[locale] || translations["pt"]; // fallback para "pt"
+
 
   console.log(showSelectionButtons);
   useEffect(() => {
@@ -105,9 +130,9 @@ export default function SidebarWrapper({ children }) {
     if (selectedHotelID) {
       setIsLoading(true);
       try {
-          // Redirect after all API calls have been made
-          router.push(`/homepage/frontOfficeView/${type}/${selectedHotelID}`);
-       
+        // Redirect after all API calls have been made
+        router.push(`/homepage/frontOfficeView/${type}/${selectedHotelID}`);
+
       } catch (error) {
         console.error("Erro durante as requisições", error);
       } finally {
@@ -115,11 +140,11 @@ export default function SidebarWrapper({ children }) {
       }
     }
   };
-  
+
   // const sendDataToAPI = async (type, mpehotel) => {
   //   try {
   //     const propertyID = selectedHotelID;
-  
+
   //     if (mpehotel && propertyID) {
   //       if (type === "arrivals") {
   //         await axios.get("/api/reservations/checkins/reservations_4_tat", {
@@ -139,153 +164,168 @@ export default function SidebarWrapper({ children }) {
   //     console.error(`Erro ao enviar os dados para ${type}:`, error);
   //   }
   // };
-  
-useEffect(() => {
-  if (selectedHotelID && session?.user) {
-    const isAdmin = session?.user?.role?.includes(1) ?? false;
-    const isHousekeeping = session?.user?.role?.includes(2) ?? false;
-    const isUser = session?.user?.role?.includes(3) ?? false;
 
-    const menu = {};
+  useEffect(() => {
+    if (selectedHotelID && session?.user && roomcloudRules !== null) {
+      const isAdmin = session?.user?.role?.includes(1) ?? false;
+      const isHousekeeping = session?.user?.role?.includes(2) ?? false;
+      const isUser = session?.user?.role?.includes(3) ?? false;
 
-    // Admin vê tudo
-    if (isAdmin) {
-      menu[t.navbar.text.statements] = {
-        icon: <IoDocumentOutline size={20} />,
-        items: [
-          { ref: "/homepage/statements", label: `${t.navbar.text.dashboard}`, icon: <TbLayoutDashboardFilled /> },
-          { ref: "/homepage/statements/pending", label: `${t.navbar.text.pendings}`, icon: <MdOutlinePendingActions />, count: pendingCount },
-          { ref: "/homepage/statements/viewed", label: `${t.navbar.text.viewed}`, icon: <AiOutlineFileDone /> },
-        ],
-      };
+      const menu = {};
 
-      menu.Front_Office = {
-        icon: <FaRegCalendarAlt size={18} />,
-        items: [
-          {
-            ref: `/homepage/frontOfficeView/${selectedHotelID}`,
-            label: `${t.navbar.text.dashboard}`,
-            onClick: () => router.push(`/homepage/frontOfficeView/${selectedHotelID}`),
-            icon: <TbLayoutDashboardFilled />,
-          },
-          {
-            ref: `/homepage/frontOfficeView/reservations/${selectedHotelID}`,
-            label: `Reservations`,
-            onClick: () => handleRedirect("reservations"),
-            icon: <GiArchiveRegister />,
-          },
-          {
-            ref: `/homepage/frontOfficeView/checkinRequest`,
-            label: `Registration Form`,
-            icon: <FaRegAddressCard />,
-          },
-          {
-            ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
-            label: `${t.navbar.text.arrivals}`,
-            onClick: () => handleRedirect("arrivals"),
-            icon: <RxEnter />,
-          },
-          {
-            ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
-            label: `${t.navbar.text.inHouses}`,
-            onClick: () => handleRedirect("inhouses"),
-            icon: <LuMapPinHouse />,
-          },
-          {
-            ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
-            label: `${t.navbar.text.departures}`,
-            onClick: () => handleRedirect("departures"),
-            icon: <RxExit />,
-          },
-          {
-            ref: `/homepage/frontOfficeView/tipologyPlan/${selectedHotelID}`,
-            label: `Tipology Plan`,
-            onClick: () => handleRedirect("tipologyPlan"),
-            icon: <FaBed />,
-          },
-        ],
-      };
+      // Admin vê tudo
+      if (isAdmin) {
+        menu[t.navbar.text.statements] = {
+          icon: <IoDocumentOutline size={20} />,
+          items: [
+            { ref: "/homepage/statements", label: `${t.navbar.text.dashboard}`, icon: <TbLayoutDashboardFilled /> },
+            { ref: "/homepage/statements/pending", label: `${t.navbar.text.pendings}`, icon: <MdOutlinePendingActions />, count: pendingCount },
+            { ref: "/homepage/statements/viewed", label: `${t.navbar.text.viewed}`, icon: <AiOutlineFileDone /> },
+          ],
+        };
 
-      menu.Housekeeping = {
-        icon: <PiBroom size={20} />,
-        items: [
-          {
-            ref: `/homepage/housekeeping/${selectedHotelID}`,
-            label: `${t.navbar.text.management}`,
-            onClick: () => handleRedirect("housekeeping"),
-            icon: <PiBroom size={18} />,
-          },
-        ],
-      };
+        menu.Front_Office = {
+          icon: <FaRegCalendarAlt size={18} />,
+          items: [
+            {
+              ref: `/homepage/frontOfficeView/${selectedHotelID}`,
+              label: `${t.navbar.text.dashboard}`,
+              onClick: () => router.push(`/homepage/frontOfficeView/${selectedHotelID}`),
+              icon: <TbLayoutDashboardFilled />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/reservations/${selectedHotelID}`,
+              label: `Reservations`,
+              onClick: () => handleRedirect("reservations"),
+              icon: <GiArchiveRegister />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/checkinRequest`,
+              label: `Registration Form`,
+              icon: <FaRegAddressCard />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
+              label: `${t.navbar.text.arrivals}`,
+              onClick: () => handleRedirect("arrivals"),
+              icon: <RxEnter />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
+              label: `${t.navbar.text.inHouses}`,
+              onClick: () => handleRedirect("inhouses"),
+              icon: <LuMapPinHouse />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
+              label: `${t.navbar.text.departures}`,
+              onClick: () => handleRedirect("departures"),
+              icon: <RxExit />,
+            },
+            {
+              ref:
+                roomcloudRules === "RC"
+                  ? `/homepage/frontOfficeView/typologyPlanRoomCloud/${selectedHotelID}`
+                  : roomcloudRules === "P"
+                    ? `/homepage/frontOfficeView/type/${selectedHotelID}`
+                    : `/homepage/frontOfficeView/tipologyPlan/${selectedHotelID}`,
+
+              label: `Typology Plan`,
+
+             onClick: () => { 
+              if (roomcloudRules === "RC") { 
+                handleRedirect("typologyPlanRoomCloud"); 
+              } else if (roomcloudRules === "P") { 
+                handleRedirect("type"); 
+              } else { 
+                handleRedirect("tipologyPlan"); 
+              } },
+
+              icon: <FaBed />,
+            }
+          ],
+        };
+
+        menu.Housekeeping = {
+          icon: <PiBroom size={20} />,
+          items: [
+            {
+              ref: `/homepage/housekeeping/${selectedHotelID}`,
+              label: `${t.navbar.text.management}`,
+              onClick: () => handleRedirect("housekeeping"),
+              icon: <PiBroom size={18} />,
+            },
+          ],
+        };
+      }
+
+      // Usuário comum vê statements e front office (sem reservations e housekeeping)
+      else if (isUser) {
+        menu[t.navbar.text.statements] = {
+          icon: <IoDocumentOutline size={20} />,
+          items: [
+            { ref: "/homepage/statements", label: `${t.navbar.text.dashboard}`, icon: <TbLayoutDashboardFilled /> },
+            { ref: "/homepage/statements/pending", label: `${t.navbar.text.pendings}`, icon: <MdOutlinePendingActions />, count: pendingCount },
+            { ref: "/homepage/statements/viewed", label: `${t.navbar.text.viewed}`, icon: <AiOutlineFileDone /> },
+          ],
+        };
+
+        menu.Front_Office = {
+          icon: <FaRegCalendarAlt size={18} />,
+          items: [
+            {
+              ref: `/homepage/frontOfficeView/${selectedHotelID}`,
+              label: `${t.navbar.text.dashboard}`,
+              onClick: () => router.push(`/homepage/frontOfficeView/${selectedHotelID}`),
+              icon: <TbLayoutDashboardFilled />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/checkinRequest`,
+              label: `Registration Form`,
+              icon: <FaRegAddressCard />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
+              label: `${t.navbar.text.arrivals}`,
+              onClick: () => handleRedirect("arrivals"),
+              icon: <RxEnter />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
+              label: `${t.navbar.text.inHouses}`,
+              onClick: () => handleRedirect("inhouses"),
+              icon: <LuMapPinHouse />,
+            },
+            {
+              ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
+              label: `${t.navbar.text.departures}`,
+              onClick: () => handleRedirect("departures"),
+              icon: <RxExit />,
+            },
+          ],
+        };
+      }
+
+      // Housekeeping vê apenas Housekeeping
+      else if (isHousekeeping) {
+        menu.Housekeeping = {
+          icon: <PiBroom size={20} />,
+          items: [
+            {
+              ref: `/homepage/housekeeping/${selectedHotelID}`,
+              label: `${t.navbar.text.management}`,
+              onClick: () => handleRedirect("housekeeping"),
+              icon: <PiBroom size={18} />,
+            },
+          ],
+        };
+      }
+
+      setListItems(menu);
+    } else {
+      setListItems({});
     }
-
-    // Usuário comum vê statements e front office (sem reservations e housekeeping)
-    else if (isUser) {
-      menu[t.navbar.text.statements] = {
-        icon: <IoDocumentOutline size={20} />,
-        items: [
-          { ref: "/homepage/statements", label: `${t.navbar.text.dashboard}`, icon: <TbLayoutDashboardFilled /> },
-          { ref: "/homepage/statements/pending", label: `${t.navbar.text.pendings}`, icon: <MdOutlinePendingActions />, count: pendingCount },
-          { ref: "/homepage/statements/viewed", label: `${t.navbar.text.viewed}`, icon: <AiOutlineFileDone /> },
-        ],
-      };
-
-      menu.Front_Office = {
-        icon: <FaRegCalendarAlt size={18} />,
-        items: [
-          {
-            ref: `/homepage/frontOfficeView/${selectedHotelID}`,
-            label: `${t.navbar.text.dashboard}`,
-            onClick: () => router.push(`/homepage/frontOfficeView/${selectedHotelID}`),
-            icon: <TbLayoutDashboardFilled />,
-          },
-          {
-            ref: `/homepage/frontOfficeView/checkinRequest`,
-            label: `Registration Form`,
-            icon: <FaRegAddressCard />,
-          },
-          {
-            ref: `/homepage/frontOfficeView/arrivals/${selectedHotelID}`,
-            label: `${t.navbar.text.arrivals}`,
-            onClick: () => handleRedirect("arrivals"),
-            icon: <RxEnter />,
-          },
-          {
-            ref: `/homepage/frontOfficeView/inhouses/${selectedHotelID}`,
-            label: `${t.navbar.text.inHouses}`,
-            onClick: () => handleRedirect("inhouses"),
-            icon: <LuMapPinHouse />,
-          },
-          {
-            ref: `/homepage/frontOfficeView/departures/${selectedHotelID}`,
-            label: `${t.navbar.text.departures}`,
-            onClick: () => handleRedirect("departures"),
-            icon: <RxExit />,
-          },
-        ],
-      };
-    }
-
-    // Housekeeping vê apenas Housekeeping
-    else if (isHousekeeping) {
-      menu.Housekeeping = {
-        icon: <PiBroom size={20} />,
-        items: [
-          {
-            ref: `/homepage/housekeeping/${selectedHotelID}`,
-            label: `${t.navbar.text.management}`,
-            onClick: () => handleRedirect("housekeeping"),
-            icon: <PiBroom size={18} />,
-          },
-        ],
-      };
-    }
-
-    setListItems(menu);
-  } else {
-    setListItems({});
-  }
-}, [selectedHotelID, pendingCount, session, router.pathname]);
+  }, [selectedHotelID, pendingCount, session, router.pathname]);
 
 
 
